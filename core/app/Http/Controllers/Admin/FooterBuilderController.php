@@ -15,6 +15,7 @@ class FooterBuilderController extends Controller
     /** Valid URL slugs for each footer section (one link = one feature). Payment Methods & Legal are under payment-shipping and Policy. */
     public const FOOTER_SECTIONS = [
         'company-info'        => ['title' => 'Company Info',             'icon' => 'las la-building'],
+        'company-contacts'    => ['title' => 'Company Contacts',         'icon' => 'las la-address-book'],
         'quick-links'         => ['title' => 'Quick Links',             'icon' => 'las la-link'],
         'support-center'      => ['title' => 'Support Center',          'icon' => 'las la-headset'],
         'security-badges'     => ['title' => 'Security Badges',         'icon' => 'las la-shield-alt'],
@@ -112,6 +113,8 @@ class FooterBuilderController extends Controller
             $values['mission_text'] = $request->input('mission_text', '');
             $values['registration_info'] = $request->input('registration_info', '');
             $values['business_license'] = $request->input('business_license', '');
+            $values['contact_phone'] = trim((string) $request->input('contact_phone', ''));
+            $values['contact_email'] = trim((string) $request->input('contact_email', ''));
         } elseif ($section === 'support_center') {
             $values['enabled'] = (int) $request->input('enabled', 1);
             $values['help_center_url'] = $request->input('help_center_url', '');

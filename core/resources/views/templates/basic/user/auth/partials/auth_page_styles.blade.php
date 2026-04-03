@@ -12,13 +12,15 @@
     padding: clamp(0.5rem, 2vw, 1.25rem);
     box-sizing: border-box;
     background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 .auth-card {
     width: 100%;
     max-width: 420px;
     background: #ffffff !important;
     border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.12);
     padding: 30px;
     box-sizing: border-box;
     word-break: break-word;

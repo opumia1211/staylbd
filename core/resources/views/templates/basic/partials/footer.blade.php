@@ -125,7 +125,30 @@
                     @endif
                     @if($contactContent && !empty($contactContent->data_values->address))
                         <div class="footer-app-info footer-address-block mt-2 pt-2 border-top border-white border-opacity-25">
-                            <p class="mb-0">@include($activeTemplate . 'partials.icon', ['name' => 'map-marker-alt', 'class' => 'me-1']){{ __($contactContent->data_values->address) }}</p>
+                            <p class="mb-0 footer-address-line">
+                                <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'map-marker-alt', 'class' => 'me-1'])</span>
+                                <span class="footer-address-line__text">{{ __($contactContent->data_values->address) }}</span>
+                            </p>
+                        </div>
+                    @endif
+                    @php
+                        $aboutPhone = trim((string)($companyInfo->data_values->contact_phone ?? ''));
+                        $aboutEmail = trim((string)($companyInfo->data_values->contact_email ?? ''));
+                    @endphp
+                    @if($aboutPhone !== '' || $aboutEmail !== '')
+                        <div class="footer-app-info footer-address-block mt-1 pt-1 border-top border-white border-opacity-25">
+                            @if($aboutPhone !== '')
+                                <p class="mb-1 footer-address-line">
+                                    <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'mobile-alt', 'class' => 'me-1'])</span>
+                                    <span class="footer-address-line__text"><a href="tel:{{ preg_replace('/[^0-9+]/', '', $aboutPhone) }}">{{ __($aboutPhone) }}</a></span>
+                                </p>
+                            @endif
+                            @if($aboutEmail !== '')
+                                <p class="mb-0 footer-address-line">
+                                    <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'envelope', 'class' => 'me-1'])</span>
+                                    <span class="footer-address-line__text"><a href="mailto:{{ $aboutEmail }}">{{ __($aboutEmail) }}</a></span>
+                                </p>
+                            @endif
                         </div>
                     @endif
                 </div>

@@ -51,6 +51,20 @@
                                 <label class="form-label">@lang('Business / Trade License')</label>
                                 <input type="text" name="business_license" class="form-control" value="{{ optional($companyInfo)->data_values->business_license ?? '' }}">
                             </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">@lang('Footer Phone Number')</label>
+                                        <input type="text" name="contact_phone" class="form-control" value="{{ optional($companyInfo)->data_values->contact_phone ?? '+1 202-555-0178' }}" placeholder="@lang('e.g. +1 202-555-0178')">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">@lang('Footer Gmail / Email')</label>
+                                        <input type="email" name="contact_email" class="form-control" value="{{ optional($companyInfo)->data_values->contact_email ?? 'support@staylbd.com' }}" placeholder="@lang('e.g. support@staylbd.com')">
+                                    </div>
+                                </div>
+                            </div>
                             <button type="submit" class="btn btn--primary">@lang('Save Company Info')</button>
                         </form>
                     </div>

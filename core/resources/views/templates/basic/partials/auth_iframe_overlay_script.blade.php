@@ -69,14 +69,18 @@
             overlay.style.justifyContent = 'center';
             overlay.style.zIndex = '100120';
             overlay.style.padding = '10px';
+            overlay.style.background = 'rgba(0, 0, 0, 0.15)';
+            overlay.style.backdropFilter = 'none';
+            overlay.style.webkitBackdropFilter = 'none';
             frame = document.createElement('iframe');
             frame.id = 'pageAuthFrame';
             frame.style.border = '0';
             frame.style.width = '100%';
             frame.style.maxWidth = '420px';
             frame.style.height = '95vh';
-            frame.style.borderRadius = '10px';
+            frame.style.borderRadius = '12px';
             frame.style.background = 'transparent';
+            frame.style.boxShadow = 'none';
             frame.setAttribute('allowtransparency', 'true');
             overlay.appendChild(frame);
             overlay.addEventListener('click', function(e) {
