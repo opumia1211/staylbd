@@ -1,0 +1,5 @@
+/**
+ * Tailwind utilities only (no base/components) — loaded after legacy main/custom CSS.
+ * Keeps HTTP small vs full storefront bundle while fixing missing utility classes on public pages.
+ */
+@tailwind utilities;

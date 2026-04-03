@@ -1,0 +1,372 @@
+/**
+ * Product list rows – screenshot style
+ * Image | Product (name, SKU, Category, Brand, In Stock) | Price | Rating | View, Buy Now, Cart, Remove
+ */
+
+.product-list-table { min-width: 720px; }
+.product-list-thead th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1f2937;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 0.5rem !important;
+    white-space: nowrap;
+}
+
+.product-list-row__img-link,
+.product-list-row__img-link img {
+    width: 80px !important;
+    height: 80px !important;
+    min-width: 80px !important;
+    min-height: 80px !important;
+    border-radius: 10px;
+    background: #f3f4f6;
+    object-fit: contain;
+    display: block;
+    overflow: hidden;
+}
+.product-list-row__name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1a1d21;
+    line-height: 1.35;
+    display: block;
+    word-break: break-word;
+}
+.product-list-row__name:hover { color: var(--base, #0d6efd); }
+.product-list-row__meta {
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-top: 0.25rem;
+}
+.product-list-row__meta span { margin-right: 0.5rem; }
+.product-list-row__meta span + span::before { content: ''; }
+.product-list-row__stock {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.product-list-row__price-val,
+.product-list-row__price .price {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #059669;
+}
+.product-list-row__review-count { font-size: 0.75rem; color: #9ca3af; margin-left: 2px; }
+.ratings i { color: #f0ad4e; }
+
+/* Buttons – সব ডিভাইসে স্পষ্ট: View (blue), Buy Now (green), Cart (blue), Remove (red outline) */
+.product-list-row__action-btns {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+/* Action column – বাটনগুলো যেন কাটা না যায়, সব বাটন স্পষ্ট */
+.product-list-th-action,
+.product-list-td-action { min-width: 300px; }
+.product-list-row__action-btns--all-visible .product-list-row__btn span.btn-label { display: inline !important; }
+/* wishlist action buttons: layout in user-list-pages-common.css */
+.wishlist-page .product-list-row__btn { flex-shrink: 0; white-space: nowrap; }
+/* Wishlist বাটন স্পষ্ট – টেক্সট ও ব্যাকগ্রাউন্ড কনট্রাস্ট */
+.wishlist-page .product-list-row__btn--view { background: #0d6efd !important; color: #fff !important; }
+.wishlist-page .product-list-row__btn--buy { background: #198754 !important; color: #fff !important; }
+.wishlist-page .product-list-row__btn--cart { background: #0d6efd !important; color: #fff !important; }
+.wishlist-page .product-list-row__btn--remove { background: #ffebee !important; color: #b71c1c !important; border: 2px solid #c62828 !important; }
+.wishlist-page .product-list-row__btn--remove:hover { background: #ffcdd2 !important; color: #8e0000 !important; }
+.wishlist-mobile-card__actions .product-list-row__btn--view { background: #0d6efd !important; color: #fff !important; }
+.wishlist-mobile-card__actions .product-list-row__btn--buy { background: #198754 !important; color: #fff !important; }
+.wishlist-mobile-card__actions .product-list-row__btn--cart { background: #0d6efd !important; color: #fff !important; }
+.wishlist-mobile-card__actions .product-list-row__btn--remove { background: #ffebee !important; color: #b71c1c !important; border: 2px solid #c62828 !important; }
+.product-list-row__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0 12px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.product-list-row__btn i { font-size: 1rem; margin-right: 0.15rem; }
+
+/* বাটন স্পষ্ট – সাদা কালার এড়িয়ে কনট্রাস্ট নিশ্চিত */
+.product-list-row__btn--view {
+    background: #0d6efd !important;
+    color: #fff !important;
+    border: 1px solid #0a58ca !important;
+    box-shadow: 0 1px 3px rgba(13, 110, 253, 0.35);
+}
+.product-list-row__btn--view:hover {
+    background: #0a58ca !important;
+    color: #fff !important;
+    border-color: #084298 !important;
+}
+
+.product-list-row__btn--buy {
+    background: #198754 !important;
+    color: #fff !important;
+    border: 1px solid #157347 !important;
+    box-shadow: 0 1px 3px rgba(25, 135, 84, 0.35);
+}
+.product-list-row__btn--buy:hover {
+    background: #157347 !important;
+    color: #fff !important;
+    border-color: #146c43 !important;
+}
+
+.product-list-row__btn--cart {
+    background: #0d6efd !important;
+    color: #fff !important;
+    border: 1px solid #0a58ca !important;
+    box-shadow: 0 1px 3px rgba(13, 110, 253, 0.35);
+}
+.product-list-row__btn--cart:hover {
+    background: #0a58ca !important;
+    color: #fff !important;
+    border-color: #084298 !important;
+}
+
+.product-list-row__btn--wishlist {
+    background: #fff5f5 !important;
+    color: #c92a2a !important;
+    border: 2px solid #dc3545 !important;
+    box-shadow: 0 1px 3px rgba(220, 53, 69, 0.2);
+}
+.product-list-row__btn--wishlist:hover {
+    background: #ffebee !important;
+    color: #b02a37 !important;
+    border-color: #b02a37 !important;
+}
+.product-list-row__btn--remove {
+    background: #fff0f0 !important;
+    color: #c92a2a !important;
+    border: 2px solid #dc3545 !important;
+    box-shadow: 0 1px 3px rgba(220, 53, 69, 0.25);
+}
+.product-list-row__btn--remove:hover {
+    background: #ffebee !important;
+    color: #a71d2a !important;
+    border-color: #b02a37 !important;
+}
+
+/* Cart quantity control */
+.cart-qty-control {
+    display: inline-flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 999px;
+    overflow: hidden;
+}
+.cart-qty-control .qty-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border: 0;
+    background: #f1f3f5;
+    color: #495057;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+}
+.cart-qty-control .cart-quantity-input {
+    width: 2.5rem;
+    border: 0;
+    background: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.2rem;
+    -moz-appearance: textfield;
+}
+.cart-qty-control .cart-quantity-input::-webkit-outer-spin-button,
+.cart-qty-control .cart-quantity-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* চিকন ডটেড লাইন – wishlist ও cart একই স্টাইল */
+.product-list-row { border-bottom: 1px dotted #c4c8cc; }
+.product-list-row:last-child { border-bottom: none; }
+.product-list-row:hover { background: #fafbfc; }
+.product-list-thead th { border-bottom: 1px dotted #b8bcc0; }
+.product-list-table { border-collapse: collapse; }
+.product-list-table td,
+.product-list-table th { border-right: 1px dotted #c4c8cc; vertical-align: middle !important; }
+.product-list-table td:last-child,
+.product-list-table th:last-child { border-right: none; }
+/* Product cell – overflow fix, প্রোডাক্ট বাইরে না যাওয়া (wishlist ও cart উভয়) */
+.product-list-table td .product-list-row__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; display: block; }
+.product-list-table td .product-list-row__meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.cart-page__td--product { max-width: 220px; min-width: 0; overflow: hidden; }
+
+/* Wishlist মোবাইল কার্ড – সব বাটন ও তথ্য স্পষ্ট */
+.wishlist-mobile-cards { padding: 0 0 1rem; }
+.wishlist-mobile-card__img img { display: block; }
+.wishlist-mobile-card__name { font-size: 0.95rem; line-height: 1.35; }
+.wishlist-mobile-card__meta span { margin-right: 0.35rem; }
+.wishlist-mobile-card__price { font-size: 1rem; }
+.wishlist-mobile-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+}
+.wishlist-mobile-card__actions .product-list-row__btn {
+    flex: 1 1 auto;
+    min-width: calc(50% - 0.4rem);
+    min-height: 44px;
+    padding: 0.5rem 0.5rem;
+    font-size: 0.8rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.wishlist-mobile-card__actions .product-list-row__btn:active { opacity: 0.9; }
+.wishlist-mobile-card__actions .product-list-row__btn i { font-size: 1rem; margin-right: 0.25rem; }
+.wishlist-mobile-card__actions .product-list-row__btn span { display: inline !important; }
+@media (max-width: 380px) {
+    .wishlist-mobile-card__actions .product-list-row__btn { min-width: 100%; }
+}
+
+@media (max-width: 767.98px) {
+    .product-list-row__img-link,
+    .product-list-row__img-link img { width: 64px !important; height: 64px !important; min-width: 64px !important; min-height: 64px !important; }
+    /* Cart/other tables: মোবাইলে আইকনই দেখালেই হয়; wishlist এর জন্য আলাদা মোবাইল কার্ড আছে */
+    .product-list-row__btn span:not(.btn-label) { display: none; }
+    .product-list-row__action-btns--all-visible .product-list-row__btn span { display: inline; }
+    .product-list-th-action,
+    .product-list-td-action { min-width: 240px; }
+    .product-list-row__btn { min-height: 40px; padding: 0 8px; font-size: 0.75rem; }
+}
+
+/* ========== Wishlist বাটন স্পষ্ট ও স্বচ্ছ – সকল ডিভাইসে, সর্বোচ্চ স্পেসিফিসিটি ========== */
+/* View – নীল ব্যাকগ্রাউন্ড, সাদা টেক্সট/আইকন (ঝাপসা দূর) */
+body .wishlist-page .product-list-row__btn--view,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--view,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--view,
+body .dashboard-wrapper .wishlist-page .product-list-row__btn--view {
+    background: #0d6efd !important;
+    color: #ffffff !important;
+    border: 1px solid #0a58ca !important;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.4);
+    font-weight: 700 !important;
+    -webkit-font-smoothing: antialiased;
+}
+body .wishlist-page .product-list-row__btn--view i,
+body .wishlist-page .product-list-row__btn--view span,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--view i,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--view span,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--view i,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--view span {
+    color: #ffffff !important;
+}
+/* Buy Now – সবুজ ব্যাকগ্রাউন্ড, সাদা টেক্সট/আইকন */
+body .wishlist-page .product-list-row__btn--buy,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--buy,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--buy,
+body .dashboard-wrapper .wishlist-page .product-list-row__btn--buy {
+    background: #198754 !important;
+    color: #ffffff !important;
+    border: 1px solid #157347 !important;
+    box-shadow: 0 2px 4px rgba(25, 135, 84, 0.4);
+    font-weight: 700 !important;
+    -webkit-font-smoothing: antialiased;
+}
+body .wishlist-page .product-list-row__btn--buy i,
+body .wishlist-page .product-list-row__btn--buy span,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--buy i,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--buy span,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--buy i,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--buy span {
+    color: #ffffff !important;
+}
+/* Cart – নীল ব্যাকগ্রাউন্ড, সাদা টেক্সট/আইকন */
+body .wishlist-page .product-list-row__btn--cart,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--cart,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--cart,
+body .dashboard-wrapper .wishlist-page .product-list-row__btn--cart {
+    background: #0d6efd !important;
+    color: #ffffff !important;
+    border: 1px solid #0a58ca !important;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.4);
+    font-weight: 700 !important;
+    -webkit-font-smoothing: antialiased;
+}
+body .wishlist-page .product-list-row__btn--cart i,
+body .wishlist-page .product-list-row__btn--cart span,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--cart i,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--cart span,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--cart i,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--cart span {
+    color: #ffffff !important;
+}
+/* Remove – হালকা লাল ব্যাক, গাঢ় লাল টেক্সট/আইকন (সাদা না) */
+body .wishlist-page .product-list-row__btn--remove,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--remove,
+body #dashboard-ajax-content .wishlist-page .product-list-row__btn--remove,
+body .dashboard-wrapper .wishlist-page .product-list-row__btn--remove,
+body .wishlist-page .wishlist-delete-btn,
+body #user-dashboard-root .wishlist-page .wishlist-delete-btn,
+body #dashboard-ajax-content .wishlist-page .wishlist-delete-btn {
+    background: #ffebee !important;
+    color: #b71c1c !important;
+    border: 2px solid #c62828 !important;
+    box-shadow: 0 2px 4px rgba(198, 40, 40, 0.25);
+    font-weight: 700 !important;
+    -webkit-font-smoothing: antialiased;
+}
+body .wishlist-page .product-list-row__btn--remove i,
+body .wishlist-page .product-list-row__btn--remove span,
+body .wishlist-page .wishlist-delete-btn i,
+body .wishlist-page .wishlist-delete-btn span,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--remove i,
+body #user-dashboard-root .wishlist-page .product-list-row__btn--remove span {
+    color: #b71c1c !important;
+}
+body .wishlist-page .product-list-row__btn--remove:hover,
+body .wishlist-page .wishlist-delete-btn:hover {
+    background: #ffcdd2 !important;
+    color: #8e0000 !important;
+    border-color: #b71c1c !important;
+}
+body .wishlist-page .product-list-row__btn--remove:hover i,
+body .wishlist-page .product-list-row__btn--remove:hover span,
+body .wishlist-page .wishlist-delete-btn:hover i,
+body .wishlist-page .wishlist-delete-btn:hover span {
+    color: #8e0000 !important;
+}
+/* মোবাইল কার্ড বাটন – একই রঙ নিশ্চিত */
+body .wishlist-mobile-card__actions .product-list-row__btn--view,
+body .wishlist-mobile-card__actions .product-list-row__btn--buy,
+body .wishlist-mobile-card__actions .product-list-row__btn--cart {
+    color: #ffffff !important;
+}
+body .wishlist-mobile-card__actions .product-list-row__btn--view { background: #0d6efd !important; }
+body .wishlist-mobile-card__actions .product-list-row__btn--view i,
+body .wishlist-mobile-card__actions .product-list-row__btn--view span { color: #ffffff !important; }
+body .wishlist-mobile-card__actions .product-list-row__btn--buy { background: #198754 !important; }
+body .wishlist-mobile-card__actions .product-list-row__btn--buy i,
+body .wishlist-mobile-card__actions .product-list-row__btn--buy span { color: #ffffff !important; }
+body .wishlist-mobile-card__actions .product-list-row__btn--cart { background: #0d6efd !important; }
+body .wishlist-mobile-card__actions .product-list-row__btn--cart i,
+body .wishlist-mobile-card__actions .product-list-row__btn--cart span { color: #ffffff !important; }
+body .wishlist-mobile-card__actions .product-list-row__btn--remove {
+    background: #ffebee !important;
+    color: #b71c1c !important;
+    border: 2px solid #c62828 !important;
+}
+body .wishlist-mobile-card__actions .product-list-row__btn--remove i,
+body .wishlist-mobile-card__actions .product-list-row__btn--remove span { color: #b71c1c !important; }

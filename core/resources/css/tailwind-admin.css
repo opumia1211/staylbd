@@ -1,0 +1,15 @@
+/* Admin: Inter + Tailwind utilities (no preflight). Loaded after app.css so body font applies. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body,
+    button,
+    input,
+    select,
+    textarea,
+    .form-control {
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+}

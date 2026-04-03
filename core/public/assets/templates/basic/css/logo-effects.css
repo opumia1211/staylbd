@@ -1,0 +1,384 @@
+/**
+ * Logo Effects & Animation - Professional E-Commerce
+ * StayLBD - Complete Logo Animation System
+ * Applied where main logo is displayed across the entire site
+ */
+
+/* Base Logo Styles */
+.site-logo-img,
+.footer-logo,
+.admin-sidebar-logo {
+    transition: all 0.3s ease;
+    will-change: transform, opacity, filter;
+}
+
+/* ===========================
+   HOVER EFFECTS
+   =========================== */
+
+/* Fade Effect */
+.logo-hover-fade .site-logo-img:hover,
+.logo-hover-fade:hover .site-logo-img,
+.logo-hover-fade a:hover .footer-logo,
+.logo-hover-fade a:hover .admin-sidebar-logo {
+    opacity: 0.75;
+}
+
+/* Scale (Zoom) Effect */
+.logo-hover-scale .site-logo-img:hover,
+.logo-hover-scale:hover .site-logo-img,
+.logo-hover-scale a:hover .footer-logo,
+.logo-hover-scale a:hover .admin-sidebar-logo {
+    transform: scale(1.08);
+}
+
+/* Rotate Effect */
+.logo-hover-rotate .site-logo-img:hover,
+.logo-hover-rotate:hover .site-logo-img,
+.logo-hover-rotate a:hover .footer-logo,
+.logo-hover-rotate a:hover .admin-sidebar-logo {
+    transform: rotate(2deg);
+}
+
+/* Bounce Effect */
+.logo-hover-bounce .site-logo-img:hover,
+.logo-hover-bounce:hover .site-logo-img,
+.logo-hover-bounce a:hover .footer-logo,
+.logo-hover-bounce a:hover .admin-sidebar-logo {
+    animation: logo-bounce-once 0.5s ease;
+}
+
+/* Shake Effect */
+.logo-hover-shake .site-logo-img:hover,
+.logo-hover-shake:hover .site-logo-img,
+.logo-hover-shake a:hover .footer-logo,
+.logo-hover-shake a:hover .admin-sidebar-logo {
+    animation: logo-shake 0.5s ease;
+}
+
+/* Glow Effect */
+.logo-hover-glow .site-logo-img:hover,
+.logo-hover-glow:hover .site-logo-img,
+.logo-hover-glow a:hover .footer-logo,
+.logo-hover-glow a:hover .admin-sidebar-logo {
+    filter: drop-shadow(0 0 12px rgba(78, 115, 223, 0.4));
+}
+
+/* Bright Effect */
+.logo-hover-bright .site-logo-img:hover,
+.logo-hover-bright:hover .site-logo-img,
+.logo-hover-bright a:hover .footer-logo,
+.logo-hover-bright a:hover .admin-sidebar-logo {
+    filter: brightness(1.15) contrast(1.05);
+}
+
+/* Shadow Effect */
+.logo-hover-shadow .site-logo-img:hover,
+.logo-hover-shadow:hover .site-logo-img,
+.logo-hover-shadow a:hover .footer-logo,
+.logo-hover-shadow a:hover .admin-sidebar-logo {
+    filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+/* Lift Up Effect */
+.logo-hover-lift .site-logo-img:hover,
+.logo-hover-lift:hover .site-logo-img,
+.logo-hover-lift a:hover .footer-logo,
+.logo-hover-lift a:hover .admin-sidebar-logo {
+    transform: translateY(-4px);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* ===========================
+   CONTINUOUS ANIMATIONS
+   =========================== */
+
+/* Pulse Animation */
+@keyframes logo-pulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.85; 
+        transform: scale(0.98);
+    }
+}
+
+/* Float Animation */
+@keyframes logo-float {
+    0%, 100% { 
+        transform: translateY(0); 
+    }
+    50% { 
+        transform: translateY(-5px); 
+    }
+}
+
+/* Glow Animation */
+@keyframes logo-glow {
+    0%, 100% { 
+        filter: drop-shadow(0 0 0 transparent); 
+    }
+    50% { 
+        filter: drop-shadow(0 0 10px rgba(78, 115, 223, 0.3)); 
+    }
+}
+
+/* Shimmer Animation */
+@keyframes logo-shimmer {
+    0% {
+        filter: brightness(1) contrast(1);
+    }
+    50% {
+        filter: brightness(1.1) contrast(1.02);
+    }
+    100% {
+        filter: brightness(1) contrast(1);
+    }
+}
+
+/* Heartbeat Animation */
+@keyframes logo-heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    14% {
+        transform: scale(1.05);
+    }
+    28% {
+        transform: scale(1);
+    }
+    42% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(1);
+    }
+}
+
+/* Swing Animation */
+@keyframes logo-swing {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(2deg);
+    }
+    75% {
+        transform: rotate(-2deg);
+    }
+}
+
+/* Bounce Once (for hover) */
+@keyframes logo-bounce-once {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    25% {
+        transform: translateY(-6px);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    75% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Shake (for hover) */
+@keyframes logo-shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    20% {
+        transform: translateX(-4px);
+    }
+    40% {
+        transform: translateX(4px);
+    }
+    60% {
+        transform: translateX(-3px);
+    }
+    80% {
+        transform: translateX(3px);
+    }
+}
+
+/* Apply Continuous Animations */
+.logo-animate-pulse .site-logo-img,
+.logo-animate-pulse .footer-logo,
+.logo-animate-pulse .admin-sidebar-logo {
+    animation: logo-pulse 2.5s ease-in-out infinite;
+}
+
+.logo-animate-float .site-logo-img,
+.logo-animate-float .footer-logo,
+.logo-animate-float .admin-sidebar-logo {
+    animation: logo-float 3s ease-in-out infinite;
+}
+
+.logo-animate-glow .site-logo-img,
+.logo-animate-glow .footer-logo,
+.logo-animate-glow .admin-sidebar-logo {
+    animation: logo-glow 2s ease-in-out infinite;
+}
+
+.logo-animate-shimmer .site-logo-img,
+.logo-animate-shimmer .footer-logo,
+.logo-animate-shimmer .admin-sidebar-logo {
+    animation: logo-shimmer 2s ease-in-out infinite;
+}
+
+.logo-animate-heartbeat .site-logo-img,
+.logo-animate-heartbeat .footer-logo,
+.logo-animate-heartbeat .admin-sidebar-logo {
+    animation: logo-heartbeat 1.5s ease-in-out infinite;
+}
+
+.logo-animate-swing .site-logo-img,
+.logo-animate-swing .footer-logo,
+.logo-animate-swing .admin-sidebar-logo {
+    animation: logo-swing 2s ease-in-out infinite;
+}
+
+/* ===========================
+   ANIMATION SPEED MODIFIERS
+   =========================== */
+.logo-speed-slow .site-logo-img,
+.logo-speed-slow .footer-logo,
+.logo-speed-slow .admin-sidebar-logo {
+    animation-duration: 3.5s !important;
+}
+
+.logo-speed-normal .site-logo-img,
+.logo-speed-normal .footer-logo,
+.logo-speed-normal .admin-sidebar-logo {
+    animation-duration: 2s !important;
+}
+
+.logo-speed-fast .site-logo-img,
+.logo-speed-fast .footer-logo,
+.logo-speed-fast .admin-sidebar-logo {
+    animation-duration: 1s !important;
+}
+
+/* ===========================
+   RESPONSIVE ADJUSTMENTS
+   =========================== */
+@media (prefers-reduced-motion: reduce) {
+    .site-logo-img,
+    .footer-logo,
+    .admin-sidebar-logo {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Reduce animation intensity on mobile */
+    .logo-hover-scale .site-logo-img:hover,
+    .logo-hover-scale:hover .site-logo-img {
+        transform: scale(1.03);
+    }
+    
+    .logo-hover-lift .site-logo-img:hover,
+    .logo-hover-lift:hover .site-logo-img {
+        transform: translateY(-2px);
+    }
+    
+    @keyframes logo-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+}
+
+/* ===========================
+   ADMIN PREVIEW SPECIFIC
+   =========================== */
+#effectPreview img {
+    transition: all 0.3s ease;
+    max-height: 80px;
+}
+
+#effectPreview .logo-hover-fade:hover,
+#effectPreview img.logo-hover-fade:hover {
+    opacity: 0.75;
+}
+
+#effectPreview .logo-hover-scale:hover,
+#effectPreview img.logo-hover-scale:hover {
+    transform: scale(1.08);
+}
+
+#effectPreview .logo-hover-rotate:hover,
+#effectPreview img.logo-hover-rotate:hover {
+    transform: rotate(2deg);
+}
+
+#effectPreview .logo-hover-glow:hover,
+#effectPreview img.logo-hover-glow:hover {
+    filter: drop-shadow(0 0 12px rgba(78, 115, 223, 0.4));
+}
+
+#effectPreview .logo-hover-bright:hover,
+#effectPreview img.logo-hover-bright:hover {
+    filter: brightness(1.15) contrast(1.05);
+}
+
+#effectPreview .logo-hover-shadow:hover,
+#effectPreview img.logo-hover-shadow:hover {
+    filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+#effectPreview .logo-hover-lift:hover,
+#effectPreview img.logo-hover-lift:hover {
+    transform: translateY(-4px);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+#effectPreview .logo-hover-bounce:hover,
+#effectPreview img.logo-hover-bounce:hover {
+    animation: logo-bounce-once 0.5s ease;
+}
+
+#effectPreview .logo-hover-shake:hover,
+#effectPreview img.logo-hover-shake:hover {
+    animation: logo-shake 0.5s ease;
+}
+
+#effectPreview img.logo-animate-pulse {
+    animation: logo-pulse 2.5s ease-in-out infinite;
+}
+
+#effectPreview img.logo-animate-float {
+    animation: logo-float 3s ease-in-out infinite;
+}
+
+#effectPreview img.logo-animate-glow {
+    animation: logo-glow 2s ease-in-out infinite;
+}
+
+#effectPreview img.logo-animate-shimmer {
+    animation: logo-shimmer 2s ease-in-out infinite;
+}
+
+#effectPreview img.logo-animate-heartbeat {
+    animation: logo-heartbeat 1.5s ease-in-out infinite;
+}
+
+#effectPreview img.logo-animate-swing {
+    animation: logo-swing 2s ease-in-out infinite;
+}
+
+#effectPreview img.logo-speed-slow {
+    animation-duration: 3.5s !important;
+}
+
+#effectPreview img.logo-speed-normal {
+    animation-duration: 2s !important;
+}
+
+#effectPreview img.logo-speed-fast {
+    animation-duration: 1s !important;
+}

@@ -1,0 +1,15 @@
+; StayLBD Queue Worker – Supervisor configuration
+; Copy to /etc/supervisor/conf.d/staylbd-worker.conf (Linux) and run: supervisorctl reread && supervisorctl update
+
+[program:staylbd-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path/to/staylbd/core/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/path/to/staylbd/core/storage/logs/worker.log
+stopwaitsecs=3600

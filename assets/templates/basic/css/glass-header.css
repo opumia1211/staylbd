@@ -1,0 +1,2778 @@
+/* ============================================
+   WORLD'S BEST E-COMMERCE HEADER
+   Ultra-Thin Glass Morphism Design
+   Robust structure: layout stays in place even if some CSS fails
+   All buttons in one serial line - position guaranteed by fallbacks
+   ============================================ */
+
+/* Base: box-sizing so padding/border don't break width */
+.glass-header,
+.glass-header *,
+.glass-header *::before,
+.glass-header *::after {
+    box-sizing: border-box !important;
+}
+
+/* Critical layout fallbacks – flexible units (rem) so zoom/resize does not break */
+.glass-header-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    gap: 1rem !important;
+}
+.glass-header-left {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+.glass-header-center {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    display: flex !important;
+}
+.glass-header-nav {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+.glass-header-right {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    flex-shrink: 0 !important;
+}
+.glass-header-right .glass-icon-btn,
+.glass-header-right .glass-dropdown-wrapper {
+    flex-shrink: 0 !important;
+}
+.glass-header-nav .glass-nav-btn {
+    flex-shrink: 0 !important;
+}
+
+/* মোবাইল সার্চ মোড - ফোকাস করলে অটোমেটিক, বাটনগুলোর উপরে ভাসমান */
+@media (max-width: 991px) {
+    /* CSS :focus - JS ছাড়াই ক্লিক করলে কাজ করবে */
+    .glass-header:has(.glass-search-input:focus),
+    .glass-header.glass-mobile-search-mode,
+    .glass-header:has(.glass-search-results.active) {
+        z-index: 2147483640 !important; /* সব বাটন ও এলিমেন্টের উপরে */
+        isolation: isolate;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-header-nav,
+    .glass-header:has(.glass-search-input:focus) .glass-header-right,
+    .glass-header.glass-mobile-search-mode .glass-header-nav,
+    .glass-header.glass-mobile-search-mode .glass-header-right,
+    .glass-header:has(.glass-search-results.active) .glass-header-nav,
+    .glass-header:has(.glass-search-results.active) .glass-header-right {
+        display: none !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-header-wrapper,
+    .glass-header.glass-mobile-search-mode .glass-header-wrapper,
+    .glass-header:has(.glass-search-results.active) .glass-header-wrapper {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        z-index: 2147483640 !important; /* বাটনগুলোর উপরে ভাসমান */
+        isolation: isolate;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        padding: 8px 12px 8px max(12px, env(safe-area-inset-left)) !important;
+        overflow: visible !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-header-left,
+    .glass-header.glass-mobile-search-mode .glass-header-left,
+    .glass-header:has(.glass-search-results.active) .glass-header-left {
+        display: flex !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-header-center,
+    .glass-header.glass-mobile-search-mode .glass-header-center,
+    .glass-header:has(.glass-search-results.active) .glass-header-center {
+        flex: 1 1 100% !important;
+        min-width: calc(100vw - 140px) !important;
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 0 0 12px !important;
+        overflow: visible !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-search-form,
+    .glass-header.glass-mobile-search-mode .glass-search-form,
+    .glass-header:has(.glass-search-results.active) .glass-search-form {
+        width: 100% !important;
+        min-width: 100% !important;
+        overflow: visible !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-search-wrapper,
+    .glass-header.glass-mobile-search-mode .glass-search-wrapper,
+    .glass-header:has(.glass-search-results.active) .glass-search-wrapper {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 250px !important;
+        min-height: 40px !important;
+        max-height: 44px !important;
+        padding: 8px 12px 8px 16px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        position: relative !important;
+        z-index: 2 !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-search-input,
+    .glass-header.glass-mobile-search-mode .glass-search-input,
+    .glass-header:has(.glass-search-results.active) .glass-search-input {
+        font-size: 16px !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+        padding: 10px 12px 10px 0 !important;
+    }
+    /* ভাসমান সার্চ রেজাল্ট বক্স – orders/contact/track বাটনগুলোর উপরে */
+    .glass-header:has(.glass-search-input:focus) .glass-search-results,
+    .glass-header.glass-mobile-search-mode .glass-search-results,
+    .glass-header:has(.glass-search-results.active) .glass-search-results {
+        z-index: 2147483641 !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-top: 8px !important;
+    }
+}
+
+/* Glass Header Container — vertical centering: flex column + equal top/bottom */
+.glass-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    min-height: 54px;
+    height: 56px;
+    max-height: 56px;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: all 0.1s ease-out;
+    will-change: transform, background-color;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+}
+
+.glass-header .glass-header__shell {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+}
+
+.glass-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+}
+
+/* Container inside header - full width, never collapse */
+.glass-header .container-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+    min-height: 1px;
+}
+
+/* Header Wrapper - one line; symmetric vertical alignment (no extra top/bottom padding) */
+.glass-header-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    padding: 0 clamp(12px, 2vw, 20px) 0 clamp(24px, 3vw, 40px) !important;
+    gap: 16px;
+    max-width: 100% !important;
+    width: 100% !important; /* Full width */
+    position: relative;
+    flex-wrap: nowrap !important; /* Always keep in one line */
+    overflow: visible !important; /* ভাষা/ড্রপডাউন ক্লিপ না হয় – ব্যানার নিচে যাবে না */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar */
+    -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+}
+
+.glass-header-wrapper::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+/* Ensure buttons are properly aligned and visible - ভাসমান বাটন সকল ডিভাইসে */
+.glass-header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    position: relative !important;
+    z-index: 100 !important;
+    isolation: isolate;
+}
+
+.glass-header-right .glass-icon-btn {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06); /* Enhanced floating shadow */
+    margin: 0 !important; /* Remove default margin, use gap instead */
+}
+
+.glass-header-right .glass-icon-btn:hover {
+    box-shadow: 0 8px 20px rgba(79, 196, 247, 0.3), 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhanced floating shadow */
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* Left Section: Logo + Hamburger - never collapse, same line */
+.glass-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    flex-shrink: 0 !important;
+    min-width: 80px;
+    min-height: 1px;
+}
+.glass-header-left .glass-menu-toggle,
+.glass-header-left .glass-logo {
+    flex-shrink: 0 !important;
+}
+
+.glass-menu-toggle {
+    display: flex !important; /* Always visible on all devices */
+    flex-direction: column;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.glass-menu-toggle span {
+    width: 22px;
+    height: 2px;
+    background: #333;
+    border-radius: 2px;
+    transition: all 0.1s ease-out;
+}
+
+.glass-menu-toggle:hover span {
+    background: var(--main, #4FC4F7);
+}
+
+.glass-logo {
+    display: flex;
+    align-items: center;
+}
+
+.glass-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+}
+
+.glass-logo a:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+
+.glass-logo img {
+    height: 35px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.1s ease-out;
+}
+
+.glass-logo img:hover {
+    transform: scale(1.05);
+}
+
+.glass-logo .logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0b254a;
+    font-family: inherit;
+}
+
+/* Center Section: Search Bar - professional, wider, crisp text - structure stable */
+.glass-header-center {
+    flex: 1 1 0%;
+    max-width: 800px;
+    margin: 0 auto;
+    min-width: 0;
+    min-height: 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    align-self: center !important;
+    flex-shrink: 1;
+}
+
+.glass-search-zone {
+    position: relative;
+    z-index: 5;
+}
+
+.glass-search-form {
+    width: 100%;
+    position: relative;
+}
+
+/* Legacy row wrapper (optional); search controls now live in one .glass-search-wrapper flex row */
+.glass-search-row {
+    display: flex;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Navigation Buttons Section - Products, Contact, Track Order - ভাসমান, one line never collapse */
+.glass-header-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    flex-shrink: 0 !important;
+    margin-left: 20px;
+    min-width: 0;
+    min-height: 1px;
+    visibility: visible !important;
+    opacity: 1 !important;
+    white-space: nowrap !important;
+    position: relative;
+    z-index: 100;
+    isolation: isolate;
+    flex-wrap: nowrap !important;
+}
+
+.glass-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50% !important; /* Perfect circle */
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.1s ease-out;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    min-height: 40px;
+    height: 40px;
+    min-width: 40px;
+    width: 40px;
+    max-width: 40px;
+    max-height: 40px;
+    flex-shrink: 0;
+    box-sizing: border-box !important;
+}
+
+.glass-nav-btn i {
+    font-size: 18px; /* Compact icon */
+    line-height: 1;
+    font-weight: 600;
+    margin: 0;
+}
+
+.glass-nav-btn .ui-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    stroke-width: 1.8px;
+    flex-shrink: 0;
+}
+
+.glass-nav-btn:hover {
+    background: rgba(79, 196, 247, 0.15);
+    border-color: var(--main, #4FC4F7);
+    color: var(--main, #4FC4F7);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 196, 247, 0.25);
+}
+
+.glass-nav-btn.active {
+    background: linear-gradient(135deg, var(--main, #4FC4F7) 0%, #3aa8d8 100%);
+    border-color: var(--main, #4FC4F7);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(79, 196, 247, 0.4);
+}
+
+.glass-nav-btn.active:hover {
+    background: linear-gradient(135deg, #3aa8d8 0%, var(--main, #4FC4F7) 100%);
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* Search bar body card - Ultra Professional, clean and transparent */
+.glass-search-wrapper {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 999px; /* pill shape */
+    padding: 6px 12px 6px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    transition: all 0.1s ease-out;
+    z-index: 10;
+    overflow: visible !important;
+    min-width: 0;
+    min-height: 48px;
+    flex-shrink: 1;
+    max-width: 100% !important;
+    width: 100% !important;
+    isolation: isolate;
+}
+
+.glass-search-wrapper--card {
+    flex: 1 1 auto;
+    flex-wrap: nowrap !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    border-radius: 999px !important;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(12px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+    padding: 4px 8px 4px 20px !important;
+    min-height: 48px;
+    max-height: 48px;
+    align-items: center;
+}
+
+.glass-search-wrapper .glass-search-icon,
+.glass-search-wrapper .glass-search-btn,
+.glass-search-wrapper .glass-search-submit {
+    flex-shrink: 0;
+}
+
+.glass-search-wrapper:focus-within {
+    border-color: rgba(79, 196, 247, 0.5) !important;
+    box-shadow: 0 4px 24px rgba(79, 196, 247, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.8) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Input - Ultra crisp, transparent, professional eCommerce size */
+.glass-search-input {
+    flex: 1 1 0;
+    min-width: 0;
+    border: none;
+    background: transparent !important;
+    padding: 8px 10px 8px 0 !important;
+    font-size: 16px !important; /* Professional standard size */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
+    caret-color: var(--main, #4FC4F7) !important;
+    outline: none;
+    border-radius: 0;
+    font-weight: 500 !important;
+    height: 100% !important;
+    min-height: 40px !important;
+    line-height: normal;
+    letter-spacing: 0.01em;
+    box-sizing: border-box !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    opacity: 1 !important;
+}
+
+.glass-search-input::placeholder {
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+}
+
+/* Ensure typed text visible - override autofill/quirks while keeping transparency */
+.glass-search-input:-webkit-autofill,
+.glass-search-input:-webkit-autofill:hover,
+.glass-search-input:-webkit-autofill:focus,
+.glass-search-input:-webkit-autofill:active {
+    -webkit-text-fill-color: #0f172a !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Voice & submit icons */
+.glass-search-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+    border-radius: 50%;
+    margin: 0 2px;
+    font-size: 16px;
+    flex-shrink: 0;
+    box-sizing: border-box !important;
+}
+
+.glass-search-voice.glass-search-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+}
+
+.glass-search-voice .ui-icon {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2px;
+}
+
+.glass-search-submit {
+    background: var(--main, #4FC4F7) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(79, 196, 247, 0.3) !important;
+}
+
+.glass-search-submit .ui-icon,
+.glass-search-submit__icon {
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    stroke: #fff;
+    stroke-width: 2px;
+}
+
+.glass-search-submit img.ui-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: block;
+    filter: brightness(0) invert(1);
+}
+
+.glass-search-icon:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--main, #4FC4F7);
+    transform: scale(1.05);
+}
+
+.glass-search-submit:hover {
+    background: #3aa8d8 !important;
+    box-shadow: 0 6px 14px rgba(79, 196, 247, 0.4) !important;
+    color: #fff;
+}
+
+.glass-search-voice {
+    color: #64748b;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.glass-search-voice.listening {
+    background: rgba(34, 197, 94, 0.15) !important;
+    color: #22c55e !important;
+    animation: listen-pulse 1.5s infinite;
+}
+
+@keyframes listen-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.glass-search-image {
+    color: #4ecdc4;
+}
+
+.glass-search-image:hover {
+    background: rgba(78, 205, 196, 0.15);
+    color: #4ecdc4;
+}
+
+.glass-search-image.uploading {
+    background: rgba(78, 205, 196, 0.3);
+    color: #4ecdc4;
+    animation: upload-pulse 1s infinite;
+}
+
+.glass-search-image.uploading i {
+    animation: loading-spin 1s linear infinite;
+}
+
+/* Camera beside search bar */
+.glass-header-camera-btn.glass-icon-btn {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    max-width: 48px;
+    max-height: 48px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.glass-header-camera-btn .ui-icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+    stroke-width: 1.8px;
+}
+
+@media (max-width: 991.98px) {
+    .glass-header-camera-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        max-width: 44px !important;
+        max-height: 44px !important;
+    }
+    .glass-header-camera-btn .ui-icon {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .glass-header-camera-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        max-width: 44px !important;
+        max-height: 44px !important;
+    }
+    .glass-header-camera-btn .ui-icon {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+.glass-header-camera-btn.uploading {
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+.glass-header-camera-btn.uploading .ui-icon {
+    animation: loading-spin 1s linear infinite;
+}
+
+@keyframes loading-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes upload-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Legacy search btn keep just in case */
+.glass-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    background: transparent !important;
+    border: none !important;
+    color: #64748b !important;
+    cursor: pointer;
+    border-radius: 50%;
+    margin: 0;
+    transition: all 0.1s ease-out;
+    flex-shrink: 0;
+    box-sizing: border-box !important;
+}
+
+.glass-search-btn:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #0f172a !important;
+}
+
+/* Search Results Dropdown - Professional Real-time Popup */
+.glass-search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.15), 0 4px 10px -4px rgba(15, 23, 42, 0.05);
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 10000;
+    padding: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.1s ease-out;
+    pointer-events: none;
+}
+
+.glass-search-results.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.glass-search-result-item {
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: transparent;
+    text-decoration: none !important;
+}
+
+.glass-search-result-item:hover,
+.glass-search-result-item.glass-search-result-focused {
+    background: rgba(79, 196, 247, 0.08);
+    outline: none;
+}
+
+.glass-search-result-item {
+    color: inherit;
+}
+
+.glass-search-result-item img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+.glass-search-result-item-content {
+    flex: 1;
+    min-width: 0; /* truncate fix */
+}
+
+.glass-search-result-item-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #0f172a;
+    margin-bottom: 4px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.glass-search-result-item-meta {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.glass-search-result-item-type {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: rgba(79, 196, 247, 0.12);
+    color: rgb(14, 137, 203);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    -webkit-font-smoothing: antialiased;
+}
+
+.glass-search-no-results {
+    padding: 24px 20px;
+    text-align: center;
+    color: #334155;
+    font-size: 15px;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Right Section: All Features in One Line - Floating Buttons - structure stable, serial order */
+.glass-header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important; /* Proper spacing between buttons */
+    flex-shrink: 0 !important; /* Keep all buttons in line; allow parent to scroll on small screens */
+    flex-wrap: nowrap !important;
+    overflow: visible !important; /* Allow badges to overflow */
+    min-width: 0;
+    min-height: 1px;
+    width: auto;
+    max-width: 100%; /* Prevent overflow */
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10 !important; /* Ensure buttons appear above */
+}
+.glass-header-right > * {
+    flex-shrink: 0 !important; /* Every button/feature stays same size in one line */
+}
+
+/* Icon Buttons - All Features - Compact & Uniform size - Floating */
+.glass-icon-btn,
+button.glass-icon-btn {
+    position: relative;
+    display: flex;
+    border: none;
+    outline: none;
+    font: inherit;
+    cursor: pointer;
+}
+.glass-icon-btn {
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    padding: 0 !important;
+    margin: 0 2px; /* Small margin for floating effect */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50% !important; /* Perfect circle - same as all buttons */
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06); /* Enhanced shadow for floating */
+    /* Browser compatibility - fallback for older browsers */
+    -moz-backdrop-filter: blur(15px);
+    -ms-backdrop-filter: blur(15px);
+    /* Ensure visibility */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    box-sizing: border-box !important; /* Ensure proper sizing */
+    /* Floating effect - not constrained */
+    overflow: visible !important; /* Allow badges to overflow */
+    z-index: 10; /* Ensure buttons appear above */
+}
+
+.glass-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--main, #4FC4F7);
+    color: var(--main, #4FC4F7);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(79, 196, 247, 0.3), 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhanced floating shadow */
+}
+
+.glass-icon-btn i {
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 600;
+}
+
+.glass-icon-btn .ui-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    stroke-width: 1.8px;
+    flex-shrink: 0;
+}
+
+.glass-badge-text {
+    font-size: 14px;
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Language Button - Icon Only, Professional */
+/* ভাষা ড্রপডাউন wrapper – ক্লিপ না হয়, সঠিক পজিশন */
+.glass-dropdown-wrapper {
+    position: relative !important;
+    overflow: visible !important;
+    display: inline-flex !important;
+}
+
+.glass-lang-btn .glass-badge-text {
+    display: none !important; /* Hide text, show only icon */
+}
+
+.glass-lang-btn {
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+}
+
+.glass-lang-btn i {
+    font-size: 18px !important; /* Uniform icon size */
+    color: #333;
+}
+
+/* Login Button - স্বচ্ছ কাঁচের মতো, no blue */
+.glass-login-btn {
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px);
+    color: #333 !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex-shrink: 0 !important; /* Never shrink */
+    align-items: center !important; /* Center vertically */
+    box-sizing: border-box !important; /* Ensure proper sizing */
+    border-radius: 50% !important; /* Perfect circle - same as others */
+    overflow: visible !important; /* Allow content to overflow if needed */
+    z-index: 10 !important; /* Ensure button appears above */
+}
+
+.glass-login-btn:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #333 !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.glass-login-btn i {
+    font-size: 18px !important;
+    color: #333 !important;
+}
+
+.glass-login-text {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.3px !important;
+    color: #333 !important;
+    display: none !important; /* Icon only - same size as others */
+    margin-left: 4px;
+}
+
+/* Badge for Counts - Bigger & More Visible */
+.glass-badge {
+    position: absolute;
+    top: -8px; /* More space above for visibility */
+    right: -8px; /* More space on right for visibility */
+    min-width: 20px;
+    height: 20px;
+    z-index: 20; /* Ensure badge appears above everything */
+    overflow: visible !important; /* Allow badge to be fully visible */
+    padding: 0 6px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(255, 107, 107, 0.5);
+    border: 2.5px solid rgba(255, 255, 255, 0.95);
+    line-height: 1;
+}
+
+/* Profile Avatar - স্বচ্ছ কাঁচের মতো, no blue */
+.glass-avatar {
+    width: 100%;
+    height: 100%;
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 50% !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
+    color: #333 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.glass-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.glass-avatar i {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* লগইন অবস্থায় নামের অক্ষর – রঙিন ব্যাকগ্রাউন্ড, same size */
+.glass-avatar--logged .glass-avatar-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-width: 28px;
+    min-height: 28px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 50%;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    line-height: 1;
+}
+
+.glass-profile-name {
+    display: none !important; /* Icon only - same size as other buttons */
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+/* Profile button - same 40x40 circle as other icon buttons, no oval */
+.glass-profile-btn {
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+}
+
+/* Dropdown Menu – ভাষা ও অন্যান্য ড্রপডাউন ব্যানার/কন্টেন্টের উপরে দেখাবে */
+.glass-dropdown,
+.dropdown-menu.glass-dropdown,
+.glass-header .dropdown-menu {
+    z-index: 100002 !important;
+    position: absolute !important;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    padding: 8px;
+    margin-top: 8px;
+    min-width: 180px;
+}
+
+.glass-dropdown .dropdown-item {
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.1s ease-out;
+    color: #333;
+    font-size: 14px;
+}
+
+.glass-dropdown .dropdown-item:hover {
+    background: rgba(79, 196, 247, 0.1);
+    color: var(--main, #4FC4F7);
+}
+
+.glass-dropdown .dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+/* ড্রপডাউন খোলা থাকলে সবসময় উপরে */
+.glass-dropdown.show,
+.dropdown-menu.glass-dropdown.show {
+    z-index: 100002 !important;
+}
+
+/* ভাষা ড্রপডাউন খোলা থাকলে হেডার সবসময় উপরে (ব্যানার/কন্টেন্টের উপরে) – সব ডিভাইস */
+.glass-header.glass-header-lang-open,
+.glass-header:has(.glass-lang-dropdown-wrap.show) {
+    z-index: 2147483647 !important;
+    isolation: isolate;
+    overflow: visible !important;
+    transform: translateZ(0); /* মোবাইলে লেয়ার আলাদা করে ড্রপডাউন উপরে দেখায় */
+}
+.glass-header.glass-header-lang-open .glass-header-wrapper,
+.glass-header.glass-header-lang-open .glass-header-right,
+.glass-header.glass-header-lang-open .glass-lang-dropdown-wrap,
+.glass-header:has(.glass-lang-dropdown-wrap.show) .glass-header-wrapper,
+.glass-header:has(.glass-lang-dropdown-wrap.show) .glass-header-right,
+.glass-header:has(.glass-lang-dropdown-wrap.show) .glass-lang-dropdown-wrap {
+    overflow: visible !important;
+}
+
+/* মোবাইল ও ট্যাবে: ব্যানার নিচে রাখা + ভাষা ড্রপডাউন ব্যানারের উপরে */
+@media (max-width: 991px) {
+    /* main ও ব্যানার নিচে স্ট্যাক – হেডার ও ড্রপডাউন উপরে থাকবে */
+    main {
+        z-index: 0 !important;
+        position: relative;
+    }
+    .banner-section,
+    .banner-section--fullscreen,
+    main .banner-section,
+    .banner-fullscreen-inner,
+    .banner-slider {
+        z-index: 1 !important;
+        position: relative;
+        isolation: auto;
+    }
+    /* ভাষা ড্রপডাউন মেনু – সর্বোচ্চ z-index, ব্যানারের উপরে */
+    .glass-lang-dropdown-menu,
+    .glass-lang-dropdown-wrap .dropdown-menu.glass-dropdown,
+    .glass-header .glass-lang-dropdown-wrap .dropdown-menu,
+    .glass-header .glass-lang-dropdown-wrap .dropdown-menu.show,
+    .dropdown-menu.glass-lang-dropdown-menu,
+    .dropdown-menu.glass-lang-dropdown-menu.show {
+        z-index: 2147483647 !important;
+        min-width: 200px;
+        max-height: min(70vh, 320px);
+        overflow-y: auto;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        position: absolute !important;
+    }
+    .glass-lang-dropdown-wrap.show .dropdown-menu.glass-dropdown {
+        z-index: 2147483647 !important;
+    }
+    /* ভাষা ড্রপডাউন খোলা থাকলে হেডার ব্যানারের উপরে – JS ক্লাস অথবা :has() */
+    .glass-header.glass-header-lang-open,
+    .glass-header:has(.glass-lang-dropdown-wrap.show) {
+        z-index: 2147483647 !important;
+        isolation: isolate;
+        overflow: visible !important;
+    }
+    .glass-header.glass-header-lang-open .glass-header-wrapper,
+    .glass-header.glass-header-lang-open .glass-header-right,
+    .glass-header.glass-header-lang-open .glass-lang-dropdown-wrap,
+    .glass-header:has(.glass-lang-dropdown-wrap.show) .glass-header-wrapper,
+    .glass-header:has(.glass-lang-dropdown-wrap.show) .glass-header-right,
+    .glass-header:has(.glass-lang-dropdown-wrap.show) .glass-lang-dropdown-wrap {
+        overflow: visible !important;
+    }
+}
+
+/* ============================================
+   Mobile Sidebar Menu - Professional & Responsive
+   Above header when open | All devices
+   ============================================ */
+.glass-mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: none;
+    pointer-events: none;
+}
+
+.glass-mobile-menu.active {
+    display: block;
+    pointer-events: auto;
+    z-index: 100001; /* Above header (99999) - full menu visible */
+}
+
+.glass-mobile-menu-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    will-change: opacity;
+}
+
+.glass-mobile-menu.active .glass-mobile-menu-overlay {
+    opacity: 1;
+}
+
+.glass-mobile-menu-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(320px, 88vw);
+    max-width: 360px;
+    height: 100%;
+    min-height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 4px 0 40px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transform: translateX(-100%);
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+    -webkit-overflow-scrolling: touch;
+    contain: content;
+    /* Safe area for notched devices (iPhone X, etc.) */
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.glass-mobile-menu.active .glass-mobile-menu-content {
+    transform: translateX(0);
+}
+
+/* Sidebar Header - Close + Title - Always visible at top */
+.glass-mobile-menu-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(12px + env(safe-area-inset-top, 0)) 16px 12px;
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+.glass-mobile-menu-close {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 22px;
+    color: #333;
+    transition: all 0.1s ease-out;
+}
+
+.glass-mobile-menu-close:hover {
+    background: rgba(255, 107, 107, 0.12);
+    color: #ff6b6b;
+    transform: scale(1.02);
+}
+
+.glass-mobile-menu-close:active {
+    transform: scale(0.97);
+}
+
+.glass-mobile-menu-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+}
+
+/* Search in Sidebar */
+.glass-mobile-search {
+    padding: 16px;
+    flex-shrink: 0;
+}
+
+/* Inline pill search (input + submit inside .glass-mobile-search-inner) */
+.glass-mobile-search form.glass-mobile-search-form {
+    display: block;
+    width: 100%;
+    margin: 0;
+}
+
+.glass-mobile-search form:not(.glass-mobile-search-form) {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.glass-mobile-search input:not(.glass-mobile-search-input) {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    outline: none;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+.glass-mobile-search input:not(.glass-mobile-search-input):focus {
+    border-color: var(--main, #4FC4F7);
+    box-shadow: 0 0 0 3px rgba(79, 196, 247, 0.15);
+}
+
+.glass-mobile-search button:not(.glass-mobile-search-submit) {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border: none;
+    background: linear-gradient(135deg, var(--main, #4FC4F7) 0%, #3aa8d8 100%);
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: transform 0.2s;
+}
+
+.glass-mobile-search button:not(.glass-mobile-search-submit):hover {
+    transform: scale(1.05);
+}
+
+/* Nav Links */
+.glass-mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 16px 16px;
+}
+
+.glass-mobile-nav a {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.03);
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.1s ease-out;
+}
+
+.glass-mobile-nav a:hover,
+.glass-mobile-nav a.active {
+    background: rgba(79, 196, 247, 0.12);
+    color: var(--main, #4FC4F7);
+}
+
+.glass-mobile-nav a i {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Logged-in user menu section in mobile sidebar (Dashboard, Orders, Profile, Logout) */
+.glass-mobile-user-section {
+    padding: 0 0 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.glass-mobile-user-menu-title {
+    padding: 12px 16px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+}
+
+.glass-mobile-user-nav {
+    padding-top: 0;
+}
+
+.glass-mobile-logout-form {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.glass-mobile-logout-btn {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.03);
+    color: #333;
+    border: 0;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+    font-family: inherit;
+}
+
+.glass-mobile-logout-btn:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.glass-mobile-logout-btn i {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Categories section in sidebar */
+.glass-mobile-categories-section {
+    padding: 0 0 16px;
+}
+
+.glass-mobile-categories-title {
+    padding: 12px 16px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+}
+
+/* Sidebar categories - submenu flows BELOW inside sidebar (not to the right) */
+.glass-mobile-menu .sidebar-category-list {
+    list-style: none;
+    padding: 0 16px 20px;
+    margin: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: 16px;
+}
+
+.glass-mobile-menu .sidebar-category-list > li {
+    margin-bottom: 4px;
+}
+
+.glass-mobile-menu .sidebar-cat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border-radius: 10px;
+}
+
+.glass-mobile-menu .sidebar-cat-row:hover {
+    background: rgba(79, 196, 247, 0.06);
+}
+
+.glass-mobile-menu .sidebar-cat-link {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.glass-mobile-menu .sidebar-cat-link:hover {
+    background: rgba(79, 196, 247, 0.1);
+    color: var(--main, #4FC4F7);
+}
+
+.glass-mobile-menu .sidebar-cat-expand {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(79, 196, 247, 0.1);
+    border-radius: 10px;
+    color: var(--main, #4FC4F7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.glass-mobile-menu .sidebar-cat-expand:hover {
+    background: rgba(79, 196, 247, 0.2);
+}
+
+.glass-mobile-menu .sidebar-cat-expand i {
+    transition: transform 0.25s;
+}
+
+.glass-mobile-menu .sidebar-category-list > li.expanded .sidebar-cat-expand i {
+    transform: rotate(180deg);
+}
+
+/* Subcategories - BELOW parent, inside sidebar (no main.css left:100%) */
+.glass-mobile-menu .sidebar-sublink {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 12px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    border-left: 2px solid rgba(79, 196, 247, 0.3);
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+
+.glass-mobile-menu .sidebar-category-list > li.expanded .sidebar-sublink {
+    max-height: 500px;
+    opacity: 1;
+    padding: 8px 0 8px 12px;
+}
+
+.glass-mobile-menu .sidebar-sublink li {
+    margin: 4px 0;
+}
+
+.glass-mobile-menu .sidebar-sublink li a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.glass-mobile-menu .sidebar-sublink li a:hover {
+    background: rgba(79, 196, 247, 0.12);
+    color: var(--main, #4FC4F7);
+}
+
+.glass-mobile-menu .sidebar-cat-all {
+    display: block;
+    padding: 12px 14px;
+}
+
+/* Sidebar - Responsive widths for all devices */
+@media (max-width: 575px) {
+    .glass-mobile-menu-content {
+        width: min(280px, 85vw);
+    }
+}
+@media (min-width: 576px) {
+    .glass-mobile-menu-content {
+        width: min(320px, 88vw);
+    }
+}
+@media (min-width: 768px) {
+    .glass-mobile-menu-content {
+        width: 340px;
+        max-width: 340px;
+    }
+}
+@media (min-width: 992px) {
+    .glass-mobile-menu-content {
+        width: 360px;
+        max-width: 360px;
+    }
+}
+
+/* Enhanced Responsive Design - All Devices Professional */
+@media (max-width: 1399px) {
+    .glass-header-wrapper {
+        padding: 0 18px 0 40px !important;
+        gap: 12px;
+        width: 100% !important;
+    }
+    
+    .glass-header-center {
+        max-width: 720px;
+    }
+    
+    .glass-search-input {
+        font-size: 16px;
+        padding: 12px 14px 12px 0;
+        background: #ffffff !important;
+        color: #202124 !important;
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+    
+    .glass-search-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+    
+    .glass-search-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .glass-icon-btn {
+        min-width: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        padding: 0 !important;
+        font-size: 14px;
+    }
+    
+    .glass-icon-btn i {
+        font-size: 19px;
+    }
+    
+    .glass-nav-btn {
+        padding: 0;
+        border-radius: 50%;
+        min-height: 40px;
+        height: 40px;
+        min-width: 40px;
+        width: 40px;
+        max-width: 40px;
+        max-height: 40px;
+    }
+}
+
+@media (max-width: 1199px) {
+    .glass-header-center {
+        max-width: 660px;
+    }
+    
+    .glass-search-input {
+        font-size: 16px;
+        padding: 12px 14px 12px 0;
+        font-weight: 400 !important;
+        background: #ffffff !important;
+        color: #202124 !important;
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+    
+    .glass-search-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .glass-search-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 991px) {
+    .glass-header-center {
+        max-width: 520px;
+    }
+    
+    .glass-search-wrapper {
+        overflow: hidden !important;
+        padding: 4px 4px 4px 12px !important;
+        background: #fff !important;
+        max-height: 44px !important;
+    }
+    
+    .glass-search-input {
+        padding: 8px 6px 8px 0 !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+        font-size: 14px;
+        font-weight: 400 !important;
+        background: #ffffff !important;
+        color: #202124 !important;
+        -webkit-text-fill-color: #202124 !important;
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+    
+    .glass-search-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        margin: 0 1px !important;
+        padding: 0 !important;
+        flex-shrink: 0 !important;
+        font-size: 14px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .glass-search-btn {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex-shrink: 0 !important;
+        font-size: 14px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .glass-search-btn i {
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 1199px) {
+    .glass-header-right {
+        gap: 4px !important;
+        margin-right: 6px !important;
+        flex-shrink: 0 !important;
+        overflow: visible !important;
+    }
+    
+    .glass-icon-btn {
+        min-width: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        padding: 0 !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+    
+    .glass-icon-btn i {
+        font-size: 18px;
+    }
+    
+    .glass-badge-text {
+        display: none !important;
+    }
+    
+    /* Login button - same 40px circle as other toolbar actions */
+    .glass-login-btn {
+        min-width: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        padding: 0 !important;
+        margin: 0 2px !important;
+        overflow: visible !important;
+        box-shadow: 0 4px 14px rgba(79, 196, 247, 0.4), 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .glass-login-text {
+        display: none !important; /* Hide text on tablet - icon only */
+        font-size: 0 !important;
+    }
+    
+    .glass-login-btn i {
+        font-size: 18px !important;
+    }
+    
+    .glass-header-nav {
+        gap: 6px;
+        margin-left: 12px;
+    }
+    
+    .glass-nav-btn {
+        padding: 0;
+        border-radius: 50%;
+        min-height: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        width: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+    }
+    
+    .glass-nav-btn i {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 991px) {
+    .glass-header-wrapper {
+        gap: 6px;
+        padding: 6px 10px 6px 35px !important; /* Vertical padding for floating buttons */
+        flex-wrap: nowrap !important;
+        width: 100% !important; /* Full width */
+        align-items: center !important; /* Center buttons vertically */
+        overflow-y: visible !important; /* Allow badges to overflow vertically */
+    }
+    
+    .glass-header-center {
+        max-width: none;
+        flex: 1;
+        min-width: 150px; /* Minimum width for tablet */
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .glass-search-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        padding: 4px 4px 4px 12px !important;
+        background: #ffffff !important;
+        box-sizing: border-box !important;
+        max-height: 44px !important;
+    }
+    
+    .glass-search-input {
+        font-size: 14px;
+        padding: 8px 6px 8px 0 !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+        max-width: none !important;
+        box-sizing: border-box !important;
+        background: #ffffff !important;
+        color: #202124 !important;
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+    
+    .glass-search-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        font-size: 14px !important;
+        flex-shrink: 0 !important;
+        margin: 0 1px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+    }
+    
+    .glass-search-btn {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+        font-size: 14px !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+    }
+    
+    .glass-search-btn i {
+        font-size: 14px !important;
+    }
+    
+    /* Navigation buttons - icon only, compact but visible on tablets */
+    .glass-header-nav {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        gap: 5px;
+        margin-left: 6px;
+        flex-shrink: 0;
+    }
+    
+    .glass-nav-btn {
+        padding: 0;
+        border-radius: 50%;
+        min-height: 40px;
+        height: 40px;
+        min-width: 40px;
+        width: 40px;
+        max-width: 40px;
+        max-height: 40px;
+        flex-shrink: 0;
+    }
+    
+    .glass-nav-btn i {
+        font-size: 18px;
+        margin: 0;
+    }
+    
+    .glass-header-left {
+        flex-shrink: 0;
+        min-width: auto;
+    }
+    
+    .glass-logo img {
+        max-width: 100px;
+    }
+    
+    .glass-header-right {
+        gap: 4px;
+        flex-shrink: 0;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .glass-login-btn {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        min-width: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        padding: 0 !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .glass-header {
+        height: 60px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        box-sizing: border-box !important;
+    }
+    /* ভাষা ড্রপডাউন খোলা থাকলে হেডার/র‍্যাপার ক্লিপ করবে না – মোবাইলে উপরে দেখাবে */
+    .glass-header.glass-header-lang-open .glass-header-wrapper,
+    .glass-header:has(.glass-lang-dropdown-wrap.show) .glass-header-wrapper {
+        overflow: visible !important;
+    }
+    /* Hamburger + Logo + Search + Nav + Buttons - horizontal scroll */
+    .glass-header-wrapper {
+        height: 58px;
+        padding: 6px 4px 6px max(6px, env(safe-area-inset-left)) !important;
+        gap: 3px !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+        position: relative !important;
+    }
+    
+    .glass-header-left {
+        min-width: auto !important;
+        gap: 4px !important;
+        flex: 0 0 auto !important;
+        flex-shrink: 0;
+        padding-right: 2px;
+    }
+    
+    .glass-menu-toggle {
+        padding: 4px !important;
+    }
+    
+    .glass-menu-toggle span {
+        width: 16px;
+    }
+    
+    .glass-logo img {
+        max-width: 80px;
+        height: 26px;
+    }
+    
+    /* সার্চ + পাশের ক্যামেরা — পর্যাপ্ত প্রস্থ */
+    .glass-header-center {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        margin: 0;
+        margin-left: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        flex-shrink: 1 !important;
+        gap: 6px !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-header-center,
+    .glass-header.glass-mobile-search-mode .glass-header-center,
+    .glass-header:has(.glass-search-results.active) .glass-header-center {
+        overflow: visible !important;
+    }
+    
+    .glass-search-form {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        display: flex !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        transition: all 0.1s ease-out;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-search-form,
+    .glass-header.glass-mobile-search-mode .glass-search-form,
+    .glass-header:has(.glass-search-results.active) .glass-search-form {
+        overflow: visible !important;
+    }
+    
+    /* সার্চ মোড স্টাইল 991px ব্লকে আছে */
+    
+    .glass-search-wrapper {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        display: flex !important;
+        overflow: hidden !important;
+        padding: 3px 3px 3px 8px !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(12px);
+        box-sizing: border-box !important;
+        max-height: 38px !important;
+        border-radius: 24px !important;
+        transition: all 0.1s ease-out;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+    
+    .glass-header.glass-mobile-search-mode .glass-search-wrapper {
+        border-radius: 24px !important;
+        max-width: none !important;
+        min-width: 250px !important;
+        min-height: 40px !important;
+        max-height: 44px !important;
+        padding: 8px 12px 8px 16px !important;
+    }
+    
+    .glass-search-input {
+        font-size: 16px !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        padding: 6px 3px 6px 0 !important;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        box-sizing: border-box !important;
+        font-weight: 600 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+        caret-color: #202124 !important;
+        text-shadow: 0 0 0 #000000;
+        -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Voice + search — larger touch targets (mic emphasis) */
+    .glass-search-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        font-size: 12px !important;
+        margin: 0 1px !important;
+        padding: 0 !important;
+        flex-shrink: 0 !important;
+        border-radius: 50% !important;
+    }
+
+    .glass-search-voice.glass-search-icon {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+    }
+
+    .glass-search-voice .ui-icon {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    
+    .glass-search-submit.glass-search-icon {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+    }
+    .glass-search-submit .ui-icon,
+    .glass-search-submit__icon {
+        width: 17px !important;
+        height: 17px !important;
+    }
+    
+    .glass-logo {
+        flex: 0 0 auto;
+    }
+    
+    .glass-logo a {
+        width: auto;
+        justify-content: flex-start;
+    }
+    
+    .glass-logo img {
+        height: 28px;
+        max-width: 80px;
+        object-fit: contain;
+    }
+    
+    .glass-logo .logo-text {
+        font-size: 14px;
+    }
+    
+    .glass-header-right {
+        gap: 4px !important;
+        flex-shrink: 0 !important; /* সব বাটন দেখা যাবে - scroll দিয়ে */
+        margin-left: 0 !important;
+        margin-right: 8px !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        align-items: center !important;
+        min-width: auto !important;
+        padding-right: 0 !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        position: relative !important;
+        z-index: 10 !important;
+    }
+    
+    /* মোবাইলে সব বাটন একই সাইজ - ছোট কিন্তু visible */
+    .glass-icon-btn {
+        min-width: 32px !important;
+        width: 32px !important;
+        height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+        padding: 0 !important;
+        flex-shrink: 0;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        align-items: center !important; /* Center vertically */
+        justify-content: center !important; /* Center horizontally */
+        box-sizing: border-box !important; /* Ensure proper sizing */
+    }
+    
+    .glass-icon-btn i {
+        font-size: 14px !important;
+    }
+    
+    /* Language Button - Same size on Mobile */
+    .glass-lang-btn {
+        min-width: 32px !important;
+        width: 32px !important;
+        height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+        padding: 0 !important;
+    }
+    
+    .glass-lang-btn .glass-badge-text {
+        display: none !important;
+    }
+    
+    .glass-lang-btn i {
+        font-size: 16px !important;
+    }
+    
+    /* Login button - Same 32px as other buttons on Mobile */
+    .glass-login-btn {
+        min-width: 32px !important;
+        max-width: 32px !important;
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important; /* No padding - icon only */
+        margin: 0 1px !important; /* Small margin for floating effect */
+        flex-shrink: 0 !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        box-sizing: border-box !important;
+        justify-content: center !important; /* Center icon */
+        align-items: center !important; /* Center vertically */
+        overflow: visible !important; /* Allow content to overflow if needed */
+        box-shadow: 0 3px 10px rgba(79, 196, 247, 0.4), 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Floating shadow */
+    }
+    
+    .glass-login-btn i {
+        font-size: 14px !important; /* Smaller icon */
+        flex-shrink: 0;
+        margin: 0 !important; /* No margin */
+    }
+    
+    .glass-login-text {
+        display: none !important; /* Hide text on mobile - icon only */
+    }
+    
+    .glass-badge {
+        min-width: 14px;
+        height: 14px;
+        font-size: 9px;
+        top: -5px; /* More space above for visibility */
+        right: -5px; /* More space on right for visibility */
+        z-index: 20 !important; /* Ensure badge appears above */
+        overflow: visible !important; /* Allow badge to be fully visible */
+    }
+    
+    .glass-badge-text {
+        display: none !important;
+    }
+    
+    .glass-profile-name {
+        display: none !important;
+    }
+    
+    .glass-avatar {
+        width: 100%;
+        height: 100%;
+        min-width: 24px;
+        min-height: 24px;
+        border-radius: 50% !important;
+    }
+    
+    .glass-avatar i {
+        font-size: 14px;
+    }
+    
+    .glass-avatar-letter {
+        font-size: 14px !important;
+    }
+    
+    /* Navigation buttons - same 32px as other buttons on mobile */
+    .glass-header-nav {
+        display: flex !important;
+        gap: 4px;
+        margin-left: 4px;
+        flex-shrink: 0;
+    }
+    
+    .glass-nav-btn {
+        padding: 0;
+        border-radius: 50%;
+        min-height: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        width: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+        flex-shrink: 0;
+    }
+    
+    .glass-nav-btn i {
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    .glass-profile-btn {
+        min-width: 32px !important;
+        width: 32px !important;
+        height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+    }
+    
+    .glass-menu-toggle {
+        padding: 5px;
+        flex-shrink: 0;
+    }
+    
+    .glass-menu-toggle span {
+        width: 18px;
+        height: 2px;
+    }
+}
+
+@media (max-width: 575px) {
+    .glass-header {
+        height: 60px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        box-sizing: border-box !important;
+    }
+    /* ভাষা ড্রপডাউন খোলা থাকলে ক্লিপ করবে না – ছোট মোবাইলে উপরে দেখাবে */
+    .glass-header.glass-header-lang-open .glass-header-wrapper,
+    .glass-header:has(.glass-lang-dropdown-wrap.show) .glass-header-wrapper {
+        overflow: visible !important;
+    }
+    /* সব বাটন ও সার্চ দেখা যাবে - horizontal scroll */
+    .glass-header-wrapper {
+        padding: 0 2px 0 max(4px, env(safe-area-inset-left)) !important;
+        gap: 2px !important;
+        height: 56px;
+        flex-wrap: nowrap !important;
+        box-sizing: border-box !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+    }
+    
+    .glass-header-left {
+        gap: 3px !important;
+        min-width: auto !important;
+        flex-shrink: 0;
+        padding-right: 2px;
+    }
+    
+    .glass-menu-toggle {
+        padding: 4px !important;
+    }
+    
+    .glass-menu-toggle span {
+        width: 16px;
+        height: 2px;
+    }
+    
+    .glass-logo img {
+        height: 22px;
+        max-width: 60px;
+    }
+    
+    .glass-logo .logo-text {
+        font-size: 11px;
+    }
+    
+    /* সার্চ বক্স – 575px এও দেখা যাবে */
+    .glass-header-center {
+        min-width: 110px !important;
+        max-width: 100% !important;
+        flex: 1 1 0 !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        margin-left: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-header-center,
+    .glass-header.glass-mobile-search-mode .glass-header-center,
+    .glass-header:has(.glass-search-results.active) .glass-header-center {
+        overflow: visible !important;
+    }
+    
+    .glass-search-form {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+    .glass-header:has(.glass-search-input:focus) .glass-search-form,
+    .glass-header.glass-mobile-search-mode .glass-search-form,
+    .glass-header:has(.glass-search-results.active) .glass-search-form {
+        overflow: visible !important;
+    }
+    
+    .glass-search-wrapper {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        padding: 3px 3px 3px 6px !important; /* আরো সংকীর্ণ */
+        gap: 0 !important;
+        box-sizing: border-box !important;
+        max-height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    
+    /* টাইপ করা লেখা স্পষ্ট দেখা যাবে – কালো কালার, system-ui ফন্ট */
+    .glass-search-input {
+        font-size: 16px !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        padding: 6px 2px 6px 0 !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+        max-width: none !important;
+        box-sizing: border-box !important;
+        font-weight: 600 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+        caret-color: #202124 !important;
+        text-shadow: 0 0 0 #000000;
+        -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Voice + search — readable sizes on small phones */
+    .glass-search-icon {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        font-size: 10px !important;
+        flex-shrink: 0 !important;
+        margin: 0 1px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .glass-search-voice.glass-search-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+    }
+
+    .glass-search-voice .ui-icon {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    
+    .glass-search-submit.glass-search-icon {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
+    }
+    .glass-search-submit .ui-icon,
+    .glass-search-submit__icon {
+        width: 15px !important;
+        height: 15px !important;
+    }
+    
+    .glass-icon-btn {
+        min-width: 28px !important;
+        height: 28px !important;
+        width: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
+        padding: 0 !important;
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        align-items: center !important; /* Center vertically */
+        justify-content: center !important; /* Center horizontally */
+        box-sizing: border-box !important; /* Ensure proper sizing */
+    }
+    
+    .glass-icon-btn i {
+        font-size: 11px !important;
+    }
+    
+    /* Language Button - Icon Only on Small Mobile */
+    .glass-lang-btn {
+        min-width: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
+        padding: 0 !important;
+    }
+    
+    .glass-lang-btn .glass-badge-text {
+        display: none !important;
+    }
+    
+    .glass-lang-btn i {
+        font-size: 15px !important;
+    }
+    
+    /* Login button - Even Smaller on Small Mobile */
+    .glass-login-btn {
+        min-width: 28px !important;
+        max-width: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+        padding: 0 !important; /* No padding - icon only */
+        margin: 0 1px !important; /* Small margin for floating effect */
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        flex-shrink: 0 !important;
+        box-sizing: border-box !important;
+        justify-content: center !important; /* Center icon */
+        align-items: center !important; /* Center vertically */
+        overflow: visible !important; /* Allow content to overflow if needed */
+        box-shadow: 0 2px 8px rgba(79, 196, 247, 0.4), 0 1px 2px rgba(0, 0, 0, 0.1) !important; /* Floating shadow */
+    }
+    
+    .glass-login-btn i {
+        font-size: 12px !important; /* Smaller icon */
+        flex-shrink: 0;
+        margin: 0 !important; /* No margin */
+    }
+    
+    .glass-login-text {
+        display: none !important; /* Hide text on small mobile - icon only */
+    }
+    
+    .glass-badge {
+        min-width: 12px;
+        height: 12px;
+        font-size: 8px;
+        padding: 0 2px;
+        top: -4px !important; /* More space above for visibility */
+        right: -4px !important; /* More space on right for visibility */
+        z-index: 20 !important; /* Ensure badge appears above */
+        overflow: visible !important; /* Allow badge to be fully visible */
+    }
+    
+    .glass-avatar {
+        width: 100%;
+        height: 100%;
+        min-width: 22px;
+        min-height: 22px;
+        border-radius: 50% !important;
+    }
+    
+    .glass-avatar i {
+        font-size: 13px;
+    }
+    
+    .glass-avatar-letter {
+        font-size: 13px !important;
+    }
+    
+    .glass-profile-btn {
+        min-width: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+    }
+    
+    .glass-header-nav {
+        gap: 3px;
+        margin-left: 3px;
+    }
+    
+    .glass-nav-btn {
+        padding: 0;
+        border-radius: 50%;
+        min-height: 28px;
+        height: 28px;
+        min-width: 28px;
+        width: 28px;
+        max-width: 28px;
+        max-height: 28px;
+    }
+    
+    .glass-nav-btn i {
+        font-size: 12px;
+        margin: 0;
+    }
+    
+    .glass-menu-toggle {
+        padding: 4px;
+    }
+    
+    .glass-menu-toggle span {
+        width: 16px;
+        height: 2px;
+    }
+}
+
+/* Toolbar glyphs: identical box + centering (jQuery UI .ui-icon sprite rules reset) */
+.glass-header .glass-nav-btn .ui-icon,
+.glass-header .glass-icon-btn .ui-icon,
+.glass-header .glass-lang-btn .ui-icon,
+.glass-header .glass-login-btn .ui-icon,
+.glass-header .glass-notification-btn .ui-icon,
+.glass-header .glass-header-left .glass-nav-btn .ui-icon,
+.glass-header .glass-header-left .glass-custom-btn .ui-icon,
+.glass-header .glass-header-right .glass-custom-btn .ui-icon {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+    margin: 0 !important;
+    text-indent: 0 !important;
+    overflow: visible !important;
+    position: relative !important;
+    object-fit: contain !important;
+    box-sizing: content-box !important;
+}
+
+@media (max-width: 767px) {
+    .glass-header .glass-nav-btn .ui-icon,
+    .glass-header .glass-icon-btn .ui-icon,
+    .glass-header .glass-lang-btn .ui-icon,
+    .glass-header .glass-login-btn .ui-icon,
+    .glass-header .glass-notification-btn .ui-icon,
+    .glass-header .glass-header-left .glass-nav-btn .ui-icon,
+    .glass-header .glass-header-left .glass-custom-btn .ui-icon,
+    .glass-header .glass-header-right .glass-custom-btn .ui-icon {
+        width: 18px !important;
+        height: 18px !important;
+        min-width: 18px !important;
+        min-height: 18px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .glass-header .glass-nav-btn .ui-icon,
+    .glass-header .glass-icon-btn .ui-icon,
+    .glass-header .glass-lang-btn .ui-icon,
+    .glass-header .glass-login-btn .ui-icon,
+    .glass-header .glass-notification-btn .ui-icon,
+    .glass-header .glass-header-left .glass-nav-btn .ui-icon,
+    .glass-header .glass-header-left .glass-custom-btn .ui-icon,
+    .glass-header .glass-header-right .glass-custom-btn .ui-icon {
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        min-height: 16px !important;
+    }
+}
+
+/* Scroll Effect - Header becomes more opaque on scroll */
+.glass-header.scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Animation for smooth appearance */
+@keyframes glassHeaderSlide {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.glass-header {
+    animation: glassHeaderSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Micro-interactions for better UX */
+.glass-icon-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.glass-search-btn:active {
+    transform: scale(0.95);
+}
+
+/* Smooth badge animations */
+.glass-badge {
+    animation: badgePulse 0.3s ease-out;
+}
+
+@keyframes badgePulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Hide old header styles completely */
+.header-top,
+.header-bottom,
+.header-menu,
+.header__top__wrapper {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Fixed glass-header উচ্চতার সাথে মিল রাখুন — অতিরিক্ত px = হেডার-নিচে ফাঁক */
+body {
+    padding-top: 56px;
+}
+
+@media (max-width: 991.98px) {
+    body {
+        padding-top: 60px;
+    }
+}
+
+/* Ensure old header doesn't take space */
+.header-top + .header-bottom {
+    margin-top: 0 !important;
+}
+
+/* Additional hiding for any remaining old header elements */
+.bg--base.header-top,
+.bg--section.header-bottom,
+.header-menu {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Ensure content doesn't overlap with fixed header */
+main {
+    padding-top: 0;
+}
+
+/* Smooth transitions */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}

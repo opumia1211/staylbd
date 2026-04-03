@@ -1,0 +1,308 @@
+/* ===== Professional Product Sections – Clean, transparent, high-end e-commerce ===== */
+
+/* Section wrapper – subtle background, generous spacing */
+.pro-section {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+    background: transparent;
+}
+.pro-section:nth-child(even) {
+    background: rgba(248, 250, 252, 0.6);
+}
+@media (min-width: 768px) {
+    .pro-section {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+}
+
+/* Compact variant – লাল মার্ক করা সাদা গ্যাপ মিনিমাম (প্রোডাক্ট বক্স অপরিবর্তিত) */
+.pro-section--tight {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+/* Hot Deals ↔ Featured Products ইত্যাদি পরপর সেকশনের মাঝে ফাঁকা শূন্য */
+.pro-section--tight + .pro-section--tight {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+/* লাল মার্ক সাদা গ্যাপ শূন্য – কন্টেইনার ও রোতে ভার্টিক্যাল স্পেস নেই */
+.pro-section--tight .container-fluid {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+.pro-section--tight .row.products-home-grid {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+.pro-section--tight .pro-section__head + .row {
+    margin-top: 0 !important;
+}
+.pro-section--tight .pro-section__head {
+    line-height: 1.2;
+}
+.pro-section--tight .pro-section__title {
+    line-height: 1.25;
+}
+@media (min-width: 768px) {
+    .pro-section--tight {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    .pro-section--tight + .pro-section--tight {
+        padding-top: 0 !important;
+    }
+}
+
+/* Section header – clean, minimal, no heavy green tab */
+.pro-section__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Tighter header inside compact sections – হেডার নিচে/উপরে মিনিমাম গ্যাপ */
+.pro-section--tight .pro-section__head {
+    margin-top: 0;
+    margin-bottom: 1px !important;
+    padding-bottom: 1px !important;
+}
+
+.pro-section__title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+.pro-section__title i {
+    color: var(--base, #6366f1);
+    font-size: 1.1em;
+}
+.pro-section__link {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--base, #6366f1);
+    text-decoration: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    transition:  0.1s ease-out;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+.pro-section__link:hover {
+    background: var(--base, #6366f1);
+    color: #fff !important;
+}
+
+/* Empty state – friendly, centered */
+.pro-section__empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    text-align: center;
+}
+.pro-section__empty-inner {
+    padding: 2rem;
+    color: #64748b;
+}
+.pro-section__empty-inner i {
+    font-size: 2.5rem;
+    color: rgba(0, 0, 0, 0.12);
+    display: block;
+    margin-bottom: 0.75rem;
+}
+.pro-section__empty-inner p {
+    font-size: 0.95rem;
+}
+
+/* Product card image: fixed 1:1 aspect ratio, object-fit cover, no stretch */
+.products-grid .product-card__img-wrap,
+.products-home-grid .product-card__img-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 0 !important;
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+}
+.products-grid .product-card__img-wrap .product-card__img,
+.products-home-grid .product-card__img-wrap .product-card__img {
+    object-fit: cover;
+    object-position: center;
+}
+.products-grid .product-card,
+.products-home-grid .product-card {
+    border-radius: 10px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition:  0.1s ease-out;
+}
+@media (hover: hover) {
+    .products-grid .product-card:hover,
+    .products-home-grid .product-card:hover {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+        transform: translateY(-1px);
+    }
+}
+
+/* Home grid: do not override grid-template-columns; products-listing.css uses auto-fill minmax */
+.products-home-grid.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+}
+.products-home-grid .product-card-col {
+    min-width: 0;
+    max-width: 100%;
+}
+.products-home-grid .pro-section__empty {
+    grid-column: 1 / -1;
+}
+
+/* Top Categories / Top Brands – ব্যানার নিচে, কুইক ক্যাটাগরি কার্ডের মতো একই সাইজ ও ডিজাইন */
+.top-categories-brands-section .pro-section__head {
+    margin-bottom: 1rem;
+}
+.top-categories-brands-section--below-banner .pro-section__head {
+    margin-bottom: 0.75rem;
+}
+.pro-cat-brand-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+@media (min-width: 576px) {
+    .pro-cat-brand-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+}
+@media (min-width: 768px) {
+    .pro-cat-brand-grid {
+        gap: 18px;
+    }
+}
+.pro-cat-brand-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 100px;
+    padding: 16px 12px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    text-decoration: none;
+    color: #1f2937;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.pro-cat-brand-card:hover {
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    color: var(--base, #6366f1);
+}
+.pro-cat-brand-card__img {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.pro-cat-brand-card:hover .pro-cat-brand-card__img {
+    background: rgba(99, 102, 241, 0.08);
+}
+.pro-cat-brand-card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.pro-cat-brand-card__img i {
+    font-size: 1.6rem;
+    color: #374151;
+}
+.pro-cat-brand-card:hover .pro-cat-brand-card__img i {
+    color: var(--base, #6366f1);
+}
+.pro-cat-brand-card__name {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pro-cat-brand-card__arrow {
+    font-size: 1rem;
+    color: #94a3b8;
+    flex-shrink: 0;
+    transition:  0.1s ease-out;
+}
+.pro-cat-brand-card:hover .pro-cat-brand-card__arrow {
+    transform: translateX(4px);
+    color: var(--base, #6366f1);
+}
+
+/* Legacy section headers – override heavy green style when .pro-section is used */
+.pro-section .section__header.products-section__header--glass,
+.hot-deal-section .section__header,
+.latest-products-section .section__header,
+.best-selling-section .section__header {
+    border: none;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+}
+.pro-section .section__header .title {
+    background: transparent !important;
+    color: #1a1a2e !important;
+    clip-path: none;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+/* ক্যাটাগরি হেডার (Recommended For You) উপরে/নিচে সাদা গ্যাপ শূন্য – লাল মার্ক জায়গা চিকন */
+.pro-section--tight .pro-section__head.pro-section__head-gap,
+.pro-section__head.pro-section__head-gap {
+    margin-top: 0 !important;
+    margin-bottom: 1px !important;
+    padding-bottom: 1px !important;
+}
+
+/* Social proof & recommendations use same pro-section if needed */
+.social-proof-section,
+.recommendations-section {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.social-proof-section .section__header,
+.recommendations-section .section__header {
+    margin-bottom: 1px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}

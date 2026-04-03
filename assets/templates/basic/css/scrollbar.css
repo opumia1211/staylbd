@@ -1,0 +1,343 @@
+/**
+ * Scroll Bar / Headline Ticker - TV-style, professional.
+ * Static asset: safe to cache (CSS). Served from assets/ with long cache headers.
+ */
+/* ~2mm gap above and below bar on all positions */
+.scrollbar-section {
+    margin: 0;
+    padding: 6px 0;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+}
+
+.scrollbar-section--banner_below {
+    margin-top: 0;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.scrollbar-section--footer_above,
+.scrollbar-section--header_above,
+.scrollbar-section--content_top,
+.scrollbar-section--content_bottom,
+.scrollbar-section--footer_below,
+.scrollbar-section--product_listing_above,
+.scrollbar-section--product_listing_below,
+.scrollbar-section--category_above,
+.scrollbar-section--category_below,
+.scrollbar-section--product_detail_above,
+.scrollbar-section--product_detail_below,
+.scrollbar-section--custom { padding: 6px 0; }
+
+.scrollbar-section--header_below {
+    padding: 0 0 6px;
+}
+
+main > .scrollbar-section--content_top:first-of-type {
+    padding-top: 0;
+}
+
+/* Outer: full width, no side padding so bar is truly full width and centered */
+.scrollbar-bar-outer {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.scrollbar-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 8px 16px;
+    line-height: 1.4;
+    min-height: 52px; /* overridden by inline style from bar_height (16–120px) */
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Bar size: minimal padding so bar stays thin when bar_height is 16–24px */
+.scrollbar--size-extra-small {
+    padding: 2px 8px !important;
+}
+.scrollbar--size-extra-small .scrollbar-track { font-size: 0.8rem; }
+.scrollbar--size-small {
+    padding: 4px 10px !important;
+}
+.scrollbar--size-small .scrollbar-track { font-size: 0.9rem; }
+.scrollbar--size-large {
+    padding: 12px 16px !important;
+}
+.scrollbar--size-large .scrollbar-track { font-size: 1.1rem; }
+.scrollbar--size-extra-large {
+    padding: 14px 20px !important;
+}
+.scrollbar--size-extra-large .scrollbar-track { font-size: 1.2rem; }
+
+/* Bar thickness: extra_thin = very thin bar */
+.scrollbar--thickness-ultra-thin {
+    padding: 0 4px !important;
+    border-width: 0;
+    border-radius: 3px;
+}
+.scrollbar--thickness-extra-thin {
+    padding: 0 6px !important;
+    border-width: 0;
+    border-radius: 4px;
+}
+.scrollbar--thickness-thin {
+    padding: 2px 8px !important;
+    border-width: 1px;
+}
+.scrollbar--thickness-thick {
+    padding: 16px 20px !important;
+    border-width: 3px;
+}
+.scrollbar--thickness-extra-thick {
+    padding: 20px 24px !important;
+    border-width: 4px;
+}
+.scrollbar--thickness-ultra-thick {
+    padding: 24px 28px !important;
+    border-width: 5px;
+}
+
+/* Default text size (bar-level): extra_small / small / normal / large / extra_large */
+.scrollbar--text-size-extra-small .scrollbar-segment--text,
+.scrollbar--text-size-extra-small .scrollbar-rich-chunk { font-size: 0.8rem; }
+.scrollbar--text-size-small .scrollbar-segment--text,
+.scrollbar--text-size-small .scrollbar-rich-chunk { font-size: 0.95rem; }
+.scrollbar--text-size-large .scrollbar-segment--text,
+.scrollbar--text-size-large .scrollbar-rich-chunk { font-size: 1.35rem; }
+.scrollbar--text-size-extra-large .scrollbar-segment--text,
+.scrollbar--text-size-extra-large .scrollbar-rich-chunk { font-size: 1.55rem; }
+
+/* Default text weight (bar-level): light .. extrabold */
+.scrollbar--text-weight-light .scrollbar-segment--text,
+.scrollbar--text-weight-light .scrollbar-rich-chunk { font-weight: 300; }
+.scrollbar--text-weight-normal .scrollbar-segment--text,
+.scrollbar--text-weight-normal .scrollbar-rich-chunk { font-weight: 400; }
+.scrollbar--text-weight-medium .scrollbar-segment--text,
+.scrollbar--text-weight-medium .scrollbar-rich-chunk { font-weight: 500; }
+.scrollbar--text-weight-semibold .scrollbar-segment--text,
+.scrollbar--text-weight-semibold .scrollbar-rich-chunk { font-weight: 600; }
+.scrollbar--text-weight-bold .scrollbar-segment--text,
+.scrollbar--text-weight-bold .scrollbar-rich-chunk { font-weight: 700; }
+.scrollbar--text-weight-extrabold .scrollbar-segment--text,
+.scrollbar--text-weight-extrabold .scrollbar-rich-chunk { font-weight: 800; }
+
+.scrollbar-wrapper + .scrollbar-wrapper {
+    margin-top: 12px;
+}
+
+.scrollbar-track {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    font-size: 1rem;
+    contain: layout style;
+}
+
+.scrollbar-content {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scrollbar-scroll 45s linear infinite;
+    will-change: transform;
+}
+.scrollbar--ease .scrollbar-content { animation-timing-function: ease-in-out; }
+.scrollbar--fade .scrollbar-content { animation-name: scrollbar-scroll-fade; animation-timing-function: linear; }
+@keyframes scrollbar-scroll-fade {
+    0% { transform: translateX(0); opacity: 0.92; }
+    100% { transform: translateX(-50%); opacity: 1; }
+}
+.scrollbar--slide .scrollbar-content { animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1); }
+.scrollbar--bounce .scrollbar-content { animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+
+/* Pause on hover only when enabled */
+.scrollbar-pause-on-hover:hover .scrollbar-content,
+.scrollbar-pause-on-hover .scrollbar-content:hover {
+    animation-play-state: paused;
+}
+.scrollbar-wrapper {
+    cursor: default;
+}
+/* Hover effects */
+.scrollbar-hover-dim:hover .scrollbar-content { opacity: 0.7; }
+.scrollbar-hover-slow .scrollbar-content { animation-duration: calc(var(--scrollbar-duration, 45s) * 1.5); }
+.scrollbar-hover-slow:hover .scrollbar-content { animation-duration: var(--scrollbar-duration, 45s); }
+/* Item animation (optional) */
+.scrollbar-item--fade .scrollbar-segment { animation: scrollbar-item-fade 0.4s ease; }
+.scrollbar-item--slide .scrollbar-segment { animation: scrollbar-item-slide 0.3s ease; }
+.scrollbar-item--zoom .scrollbar-segment { animation: scrollbar-item-zoom 0.35s ease; }
+@keyframes scrollbar-item-fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+@keyframes scrollbar-item-slide {
+    0% { transform: translateX(8px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes scrollbar-item-zoom {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+/* Loop once */
+.scrollbar-wrapper[data-loop="once"] .scrollbar-content {
+    animation-iteration-count: 1;
+}
+
+@keyframes scrollbar-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.scrollbar-segment {
+    display: inline;
+    white-space: nowrap;
+    margin: 0 var(--scrollbar-gap, 0.5em);
+    vertical-align: middle;
+}
+
+.scrollbar-segment:not(:last-child)::after {
+    content: "\2022";
+    margin-left: 0.6em;
+    opacity: 0.5;
+    font-size: 0.75em;
+}
+
+.scrollbar-segment--emoji + .scrollbar-segment::after,
+.scrollbar-segment--image + .scrollbar-segment::after {
+    margin-left: 0.4em;
+}
+
+.scrollbar-segment--emoji {
+    font-size: 1.15em;
+    vertical-align: middle;
+}
+
+.scrollbar-inline-img {
+    height: 1.5em;
+    width: auto;
+    max-height: 32px;
+    vertical-align: middle;
+    margin: 0 8px;
+    object-fit: contain;
+}
+
+.scrollbar-segment--text {
+    font-size: 1.05rem;
+}
+
+/* Glass template - full width, centered */
+.scrollbar--glass {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 8px;
+    margin: 0;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.scrollbar--glass .scrollbar-track {
+    color: #1a1a1a;
+}
+
+/* Solid template */
+.scrollbar--solid {
+    background: #f5f5f5;
+    border-radius: 8px;
+    margin: 0;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.scrollbar--solid .scrollbar-track {
+    color: #333;
+}
+
+/* Minimal - border only */
+.scrollbar--minimal {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+    border-radius: 0;
+}
+
+.scrollbar--minimal .scrollbar-track {
+    color: #444;
+}
+
+/* Dark template */
+.scrollbar--dark {
+    background: rgba(30, 30, 45, 0.96);
+    border-radius: 8px;
+    margin: 0;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+}
+
+.scrollbar--dark .scrollbar-track {
+    color: #eee;
+}
+
+.scrollbar--dark .scrollbar-segment--text {
+    color: inherit;
+}
+
+.scrollbar--dark .scrollbar-segment:not(:last-child)::after {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Breaking News template */
+.scrollbar--breaking_news {
+    background: linear-gradient(90deg, #b91c1c 0%, #dc2626 100%);
+    border-radius: 0;
+    margin: 0;
+    padding: 8px 16px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(185, 28, 28, 0.3);
+}
+.scrollbar--breaking_news .scrollbar-track { color: #fff; }
+.scrollbar--breaking_news .scrollbar-segment:not(:last-child)::after { color: rgba(255,255,255,0.7); }
+
+/* Offer / Discount template */
+.scrollbar--offer {
+    background: linear-gradient(90deg, #047857 0%, #059669 100%);
+    border-radius: 8px;
+    margin: 0;
+    box-shadow: 0 2px 12px rgba(4, 120, 87, 0.25);
+}
+.scrollbar--offer .scrollbar-track { color: #fff; }
+.scrollbar--offer .scrollbar-segment:not(:last-child)::after { color: rgba(255,255,255,0.8); }
+
+/* Alert / Warning template */
+.scrollbar--alert {
+    background: linear-gradient(90deg, #b45309 0%, #d97706 100%);
+    border-radius: 8px;
+    margin: 0;
+    border: 1px solid rgba(217, 119, 6, 0.4);
+    box-shadow: 0 2px 10px rgba(180, 83, 9, 0.2);
+}
+.scrollbar--alert .scrollbar-track { color: #fff; }
+.scrollbar--alert .scrollbar-segment:not(:last-child)::after { color: rgba(255,255,255,0.8); }
+
+/* Info / Announcement template */
+.scrollbar--info {
+    background: linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%);
+    border-radius: 8px;
+    margin: 0;
+    box-shadow: 0 2px 12px rgba(29, 78, 216, 0.25);
+}
+.scrollbar--info .scrollbar-track { color: #fff; }
+.scrollbar--info .scrollbar-segment:not(:last-child)::after { color: rgba(255,255,255,0.8); }
+
+/* Responsive: hide on mobile / desktop */
+@media (max-width: 767px) {
+    .scrollbar-hide-mobile { display: none !important; }
+}
+@media (min-width: 768px) {
+    .scrollbar-hide-desktop { display: none !important; }
+}

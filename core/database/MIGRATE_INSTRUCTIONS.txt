@@ -1,0 +1,31 @@
+============================================
+  Fix "Table already exists" - Run in order
+============================================
+
+Your database already has tables (users, categories, etc.), but Laravel's
+migrations table was empty, so "migrate" tried to create everything again.
+
+Do these TWO steps in order:
+
+--- STEP 1: Sync migrations table (mark old migrations as done) ---
+
+1. Open phpMyAdmin (http://localhost/phpmyadmin)
+2. Select your database (e.g. staylbd or whatever you use)
+3. Click "SQL" tab
+4. Open this file in a text editor:  database/sync_migrations_table.sql
+5. Copy all the INSERT lines and paste into the SQL box
+6. If your MySQL version does not support INSERT IGNORE, remove "IGNORE" so it says just INSERT INTO ...
+7. Click "Go"
+
+--- STEP 2: Run only the new category migration ---
+
+In XAMPP shell (or cmd), run:
+
+  cd c:\xampp\htdocs\staylbd\core
+
+  c:\xampp\php\php.exe artisan migrate --force
+
+This will run ONLY the migration that adds publish_status and scheduled_at
+to the categories table (the rest are already marked as run in Step 1).
+
+Done. Your category Public/Pending/Schedule feature will work.

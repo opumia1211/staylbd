@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat Test</title>
+    <link rel="stylesheet" href="../../../assets/templates/basic/css/contact-chat.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+        }
+
+        .test-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <div style="padding: 15px; background: #7c4dff; color: white;">
+            <h3 style="margin: 0;">Live Chat Test</h3>
+        </div>
+
+        <!-- Chat Panel -->
+        <div id="contactPanelChatThread" class="contact-panel-message-box contact-panel-unified-chat"
+            style="display:flex;">
+            <!-- Message history and typing area combined -->
+            <div class="contact-panel-chat-scroll-area" id="contactPanelChatScrollArea">
+                <div class="contact-panel-chat-messages" id="contactPanelChatMessages">
+                    <!-- Test messages -->
+                    <div class="contact-chat-date-divider"><span>Today</span></div>
+                    <div class="contact-chat-msg contact-chat-msg-user">
+                        <div class="contact-chat-msg-name">User</div>
+                        <div class="contact-chat-msg-text">Hello! This is a test message.</div>
+                        <div class="contact-chat-msg-time">10:30 AM</div>
+                    </div>
+                    <div class="contact-chat-msg contact-chat-msg-admin">
+                        <div class="contact-chat-msg-name">Admin</div>
+                        <div class="contact-chat-msg-text">Hi! How can I help you?</div>
+                        <div class="contact-chat-msg-meta">
+                            <span class="contact-chat-msg-time">10:31 AM</span>
+                            <span class="contact-chat-msg-read"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l4 4 5-5"></path><path d="M10 13l4 4 7-7"></path></svg></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Typing spacer -->
+                <div class="contact-panel-typing-spacer"></div>
+            </div>
+
+            <!-- Floating input bar -->
+            <div class="contact-panel-floating-input">
+                <div class="contact-panel-input-wrap contact-panel-input-wrap--floating">
+                    <button type="button" class="contact-panel-plus-btn contact-panel-btn-floating"
+                        title="Add photo/file">
+                        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                    </button>
+
+                    <button type="button" class="contact-panel-emoji-btn contact-panel-btn-floating" title="Emoji">
+                        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5a5 5 0 0 0 7 0"></path><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle></svg>
+                    </button>
+
+                    <textarea id="contactPanelMessage"
+                        class="form-control form-control-sm contact-panel-msg contact-panel-msg-floating"
+                        maxlength="500" rows="1" placeholder="Type a message" required></textarea>
+
+                    <button type="button" class="contact-panel-mic-btn contact-panel-btn-floating"
+                        title="Voice message">
+                        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="10" rx="3"></rect><path d="M6 10a6 6 0 0 0 12 0"></path><path d="M12 16v5"></path></svg>
+                    </button>
+
+                    <button type="button" class="contact-panel-send-btn contact-panel-btn-floating" title="Send">
+                        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path></svg>
+                    </button>
+
+                    <span class="contact-char-counter contact-char-counter--floating">
+                        <span class="contact-panel-char-count">0</span>/500
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Character counter
+        const textarea = document.getElementById('contactPanelMessage');
+        const charCount = document.querySelector('.contact-panel-char-count');
+
+        textarea.addEventListener('input', function () {
+            charCount.textContent = this.value.length;
+        });
+
+        // Auto-resize textarea
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+    </script>
+</body>
+
+</html>

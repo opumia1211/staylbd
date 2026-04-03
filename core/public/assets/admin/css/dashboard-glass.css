@@ -1,0 +1,411 @@
+/* Dashboard: Glass / Transparent / Clean – no unnecessary colors, clear readable text */
+
+.dashboard-glass {
+    --glass-bg: rgba(255, 255, 255, 0.88);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-muted: #6c757d;
+    background: #f5f6f8;
+    padding-bottom: 1.5rem;
+    margin: 0 -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.dashboard-glass .card,
+.dashboard-glass .widget-two,
+.dashboard-glass .bg--primary,
+.dashboard-glass .bg--success,
+.dashboard-glass .bg--danger,
+.dashboard-glass .bg--warning,
+.dashboard-glass .bg--info,
+.dashboard-glass .bg--red,
+.dashboard-glass .bg--white,
+.dashboard-glass [class^="bg--"] {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+.dashboard-glass .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    color: var(--text-primary) !important;
+}
+
+.dashboard-glass .card-header h5,
+.dashboard-glass .card-header h6 {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+.dashboard-glass .widget-two__content h3,
+.dashboard-glass .widget-two .widget-two__content p,
+.dashboard-glass .card-body .text--white,
+.dashboard-glass .text--white,
+.dashboard-glass h2.text--white,
+.dashboard-glass .text--primary,
+.dashboard-glass .text--success,
+.dashboard-glass .text--danger,
+.dashboard-glass .text--info {
+    color: var(--text-primary) !important;
+}
+
+.dashboard-glass .widget-two__content p {
+    color: var(--text-muted) !important;
+}
+
+.dashboard-glass .widget-two__icon,
+.dashboard-glass .widget-two .overlay-icon,
+.dashboard-glass .card-body .la.f-size--56 {
+    color: var(--text-secondary) !important;
+    border-color: var(--glass-border) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+}
+
+.dashboard-glass .widget-two__btn,
+.dashboard-glass .btn-outline-primary {
+    color: var(--text-primary) !important;
+    border-color: var(--glass-border) !important;
+    background: transparent !important;
+}
+
+.dashboard-glass .widget-two__btn:hover,
+.dashboard-glass .btn-outline-primary:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: var(--text-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dashboard-glass .table th {
+    color: var(--text-secondary) !important;
+    font-weight: 600;
+    border-color: var(--glass-border) !important;
+}
+
+.dashboard-glass .table td {
+    color: var(--text-primary) !important;
+    border-color: var(--glass-border) !important;
+}
+
+.dashboard-glass .table-light {
+    background: rgba(0, 0, 0, 0.02) !important;
+}
+
+.dashboard-glass .list-group-item {
+    color: var(--text-primary) !important;
+    border-color: var(--glass-border) !important;
+}
+
+.dashboard-glass .list-group-item:hover {
+    background: rgba(0, 0, 0, 0.02) !important;
+}
+
+.dashboard-glass .text-muted {
+    color: var(--text-muted) !important;
+}
+
+.dashboard-glass .alert-warning {
+    background: rgba(255, 193, 7, 0.12) !important;
+    border: 1px solid rgba(255, 193, 7, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+.dashboard-glass .alert-primary {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-primary) !important;
+}
+
+.dashboard-glass .badge {
+    font-weight: 500;
+}
+
+/* Catalog & content: minimal accent – very light section cue */
+.dashboard-glass .catalog-section-title {
+    padding-left: 0.6rem;
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
+.dashboard-glass .catalog-section .card {
+    transition: background 0.15s ease;
+}
+.dashboard-glass .catalog-section .card:hover {
+    background: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* ---------- Dashboard Grid – সমস্ত ফ্রেম এক সাইজ (220px), প্রতিটি সেকশনে একই ঘর ---------- */
+.dashboard-glass {
+    --dash-card-w: 200px;
+    --dash-card-h: 100px;
+}
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--dash-card-w), 1fr));
+    gap: 14px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    align-items: stretch;
+}
+
+.dashboard-grid > * {
+    min-width: 0;
+}
+
+@media (max-width: 576px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+}
+
+.dashboard-section {
+    margin-bottom: 1rem;
+}
+
+.dashboard-section__title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #6c757d);
+    margin-bottom: 8px;
+    padding-left: 8px;
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Stat card – সমস্ত ফ্রেম এক সাইজ */
+.dashboard-stat-card,
+a.dashboard-stat-card {
+    background: var(--glass-bg, rgba(255, 255, 255, 0.88));
+    border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.08));
+    border-radius: 10px;
+    padding: 14px;
+    min-height: var(--dash-card-h, 100px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease;
+    min-width: 0;
+}
+
+.dashboard-stat-card:hover,
+a.dashboard-stat-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-stat-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    color: var(--text-secondary, #4a4a4a);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.dashboard-stat-card__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.dashboard-stat-card__value {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a1a);
+    line-height: 1.3;
+}
+
+.dashboard-stat-card__title {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted, #6c757d);
+    margin-top: 2px;
+    line-height: 1.3;
+}
+
+.dashboard-stat-card__link {
+    margin-top: 6px;
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a4a);
+    text-decoration: none;
+}
+
+.dashboard-stat-card__link:hover {
+    color: var(--text-primary, #1a1a1a);
+}
+
+/* Revenue/KPI – স্ট্যাট গ্রিডে, একই সাইজ */
+.dashboard-grid--stats > .card.border-0 {
+    min-height: var(--dash-card-h, 100px);
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.08));
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    min-width: 0;
+    display: flex;
+    align-items: stretch;
+}
+
+.dashboard-grid--stats > .card.border-0 .card-body {
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.dashboard-grid--stats > .card.border-0 .rounded-3.bg-light {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 10px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-grid--stats > .card.border-0 .fw-bold.fs-5 {
+    font-size: 1.1rem !important;
+}
+
+.dashboard-grid--stats > .card.border-0 .small {
+    font-size: 0.75rem !important;
+}
+
+/* Quick actions & Critical Alerts – সব বাটন এক লাইনে (no wrap) */
+.dashboard-quick-actions,
+.dashboard-alerts-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    min-width: 0;
+}
+.dashboard-quick-actions .btn,
+.dashboard-alerts-bar .btn,
+.dashboard-alerts-bar a.btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+.dashboard-actions-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+}
+.dashboard-actions-row .dashboard-quick-actions {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
+}
+
+/* ---------- লাল মার্ক জায়গা: Welcome + বাটন দুই লাইনে, সমস্ত বাটন এক সাইজ ---------- */
+.dashboard-actions-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.dashboard-welcome-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+}
+.dashboard-welcome-row .dashboard-welcome-text {
+    font-weight: 600;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--text-primary, #1a1a1a);
+}
+.dashboard-welcome-row .dashboard-welcome-meta {
+    font-size: clamp(0.75rem, 1.5vw, 0.8rem);
+    color: var(--text-muted, #6c757d);
+}
+.dashboard-actions-two-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+.dashboard-actions-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+.dashboard-action-btn {
+    flex: 0 0 auto;
+    min-width: clamp(100px, 12vw, 140px);
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    font-size: clamp(0.7rem, 1.2vw, 0.8125rem);
+    font-weight: 500;
+    white-space: nowrap;
+    border-radius: 6px;
+    gap: 6px;
+}
+.dashboard-action-btn .badge {
+    font-size: 0.7em;
+}
+@media (max-width: 768px) {
+    .dashboard-actions-line {
+        gap: 6px;
+    }
+    .dashboard-action-btn {
+        min-width: clamp(90px, 14vw, 130px);
+        height: 36px;
+        font-size: 0.75rem;
+    }
+}
+@media (max-width: 576px) {
+    .dashboard-action-btn {
+        min-width: 100px;
+        height: 34px;
+        padding: 0 8px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid[style*="grid-template-columns: 2fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    .dashboard-grid[style*="grid-template-columns: repeat(3, 1fr)"] {
+        grid-template-columns: 1fr !important;
+    }
+}

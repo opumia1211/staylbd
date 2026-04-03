@@ -1,0 +1,1220 @@
+@import "../../public/assets/global/css/bootstrap.min.css";
+@import "../../public/assets/global/css/verification-code.css";
+@import "../../public/assets/templates/basic/css/main.css";
+@import "../../public/assets/templates/basic/css/custom.css";
+@import "../../public/assets/templates/basic/css/glass-header.css";
+@import "../../public/assets/templates/basic/css/jquery-ui.min.css";
+@import "../../public/assets/templates/basic/css/animate.css";
+@import "../../public/assets/templates/basic/css/lightbox.min.css";
+@import "../../public/assets/templates/basic/css/owl.min.css";
+@import "../../public/assets/templates/basic/css/slick.css";
+@import "../../public/assets/templates/basic/css/professional-filter.css";
+@import "../../public/assets/templates/basic/css/logo-effects.css";
+@import "../../public/assets/templates/basic/css/scrollbar.css";
+@import "../../public/assets/templates/basic/css/contact-chat.css";
+@import "../../public/assets/templates/basic/css/floating-actions.css";
+@import "../../public/assets/templates/basic/css/product-carousel.css";
+@import "../../public/assets/templates/basic/css/gdpr-cookie.css";
+@import "../../public/assets/templates/basic/css/cart-page.css";
+@import "../../public/assets/templates/basic/css/footer-glass.css";
+@import "../../public/assets/templates/basic/css/products-listing.css";
+@import "../../public/assets/templates/basic/css/products-section-pro.css";
+@import "../../public/assets/templates/basic/css/dashboard.css";
+@import "../../public/assets/templates/basic/css/track-order.css";
+@import "../../public/assets/templates/basic/css/product-list-screenshot.css";
+@import "../../public/assets/templates/basic/css/user-pages.css";
+@import "../../public/assets/templates/basic/css/dashboard-sidebar.css";
+@import "../../public/assets/templates/basic/css/wishlist-responsive.css";
+@import "../../public/assets/templates/basic/css/wishlist-buttons.css";
+@import "../../public/assets/templates/basic/css/user-list-pages-layout.css";
+@import "../../public/assets/templates/basic/css/user-list-pages-common.css";
+@import "../../public/assets/templates/basic/css/auth-modal.css";
+@import "../../public/assets/global/css/glass-product-card.css";
+@import "../../public/assets/global/css/product-card-buttons.css";
+@import "../../public/assets/templates/basic/css/product-details.css";
+@import "../../public/assets/templates/basic/css/all-category.css";
+@import "../../public/assets/templates/basic/css/compare.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        font-family: Inter, sans-serif;
+    }
+}
+
+@layer components {
+    .glass-header,
+    .glass-header *,
+    .glass-header *::before,
+    .glass-header *::after {
+        box-sizing: border-box !important;
+    }
+
+    .glass-header {
+        @apply fixed top-0 left-0 right-0 w-full overflow-visible flex flex-col justify-center items-stretch;
+        z-index: 99999;
+        height: 56px;
+        max-height: 56px;
+        min-height: 54px;
+        padding-top: 0;
+        padding-bottom: 0;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(25px) saturate(200%);
+        -webkit-backdrop-filter: blur(25px) saturate(200%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.05);
+        transition: background-color 0.14s cubic-bezier(0.4, 0, 0.2, 1),
+            box-shadow 0.14s cubic-bezier(0.4, 0, 0.2, 1),
+            border-color 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform, background-color;
+    }
+
+    .glass-header .glass-header__shell {
+        display: flex;
+        align-items: center;
+        flex: 1 1 auto;
+        min-height: 0;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .glass-header::before {
+        content: "";
+        @apply absolute inset-0 pointer-events-none;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    }
+
+    .glass-header-wrapper {
+        @apply flex items-center justify-between w-full max-w-full flex-nowrap overflow-visible;
+        height: 52px !important;
+        min-height: 52px !important;
+        max-height: 52px !important;
+        padding: 0 clamp(12px, 2vw, 20px) 0 clamp(24px, 3vw, 40px) !important;
+        gap: 16px;
+        position: relative;
+    }
+
+    .glass-header-left { @apply flex items-center shrink-0 min-w-[80px]; gap: 15px !important; }
+    .glass-header-center {
+        @apply flex flex-1 min-w-0 max-w-[800px] mx-auto items-center self-center;
+    }
+    .glass-header-nav { @apply flex items-center shrink-0 whitespace-nowrap ml-5; gap: 10px !important; }
+    .glass-header-right { @apply flex items-center shrink-0 flex-nowrap relative z-10; gap: 8px !important; }
+
+    .glass-search-wrapper {
+        @apply relative flex items-center w-full min-w-0 overflow-hidden rounded-[24px];
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        padding: 6px 6px 6px 18px;
+        box-shadow: 0 1px 6px rgba(32, 33, 36, 0.2);
+        min-height: 36px;
+        max-height: 48px;
+    }
+
+    .glass-search-input {
+        @apply flex-1 min-w-0 border-0 outline-none rounded-none bg-white text-black font-medium;
+        padding: 12px 14px 12px 0;
+        height: 36px;
+        font-size: 16px;
+        font-family: inherit;
+        -webkit-text-fill-color: #000000 !important;
+    }
+
+    .glass-search-input::placeholder { color: #5f6368 !important; -webkit-text-fill-color: #5f6368 !important; }
+
+    .glass-nav-btn,
+    .glass-icon-btn {
+        @apply inline-flex items-center justify-center rounded-full no-underline shrink-0;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1.5px solid rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.85);
+        color: #333;
+    }
+
+    .glass-nav-btn { width: 36px; height: 36px; min-width: 36px; min-height: 36px; }
+    .glass-icon-btn { width: 40px; height: 40px; min-width: 40px; min-height: 40px; }
+
+    .glass-badge {
+        @apply absolute inline-flex items-center justify-center text-white font-bold rounded-[10px];
+        top: -8px;
+        right: -8px;
+        min-width: 20px;
+        height: 20px;
+        font-size: 12px;
+        line-height: 1;
+        padding: 0 6px;
+        z-index: 20;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        border: 2.5px solid rgba(255, 255, 255, 0.95);
+    }
+
+    .glass-dropdown {
+        @apply rounded-xl p-2;
+        z-index: 100002 !important;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        margin-top: 8px;
+        min-width: 180px;
+    }
+
+    .glass-mobile-menu { @apply fixed inset-0 hidden pointer-events-none; z-index: 10000; }
+    .glass-mobile-menu.active { @apply block pointer-events-auto; z-index: 100001; }
+    .glass-mobile-menu-overlay { @apply absolute inset-0; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .glass-mobile-menu-content {
+        @apply absolute top-0 left-0 h-full overflow-y-auto overflow-x-hidden;
+        width: min(320px, 88vw);
+        max-width: 360px;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+        transform: translateX(-100%);
+        transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .glass-mobile-menu.active .glass-mobile-menu-content { transform: translateX(0); }
+
+    .glass-header.scrolled {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(30px) saturate(200%);
+        -webkit-backdrop-filter: blur(30px) saturate(200%);
+    }
+
+    .header-top,
+    .header-bottom,
+    .header-menu,
+    .header__top__wrapper {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1199px) {
+    .glass-header-nav { margin-left: 12px; gap: 6px !important; }
+    .glass-icon-btn { width: 38px !important; height: 38px !important; min-width: 38px !important; min-height: 38px !important; }
+    .glass-nav-btn { width: 38px !important; height: 38px !important; min-width: 38px !important; min-height: 38px !important; }
+}
+
+@media (max-width: 991px) {
+    .glass-header-wrapper { padding: 6px 10px 6px 35px !important; gap: 6px !important; }
+    .glass-search-wrapper { padding: 4px 4px 4px 12px !important; max-height: 44px !important; background: #fff !important; }
+    .glass-search-input { font-size: 14px !important; padding: 8px 6px 8px 0 !important; }
+    .glass-search-icon { width: 32px !important; height: 32px !important; min-width: 32px !important; min-height: 32px !important; }
+    .glass-search-btn { width: 34px !important; height: 34px !important; min-width: 34px !important; min-height: 34px !important; }
+}
+
+@media (max-width: 767px) {
+    .glass-header { height: 60px; }
+    .glass-header-wrapper { height: 58px; padding: 6px 4px 6px 6px !important; gap: 3px !important; overflow-x: auto !important; }
+    .glass-header-center { min-width: 0 !important; max-width: none !important; }
+    .glass-icon-btn, .glass-nav-btn, .glass-profile-btn, .glass-login-btn { width: 32px !important; height: 32px !important; min-width: 32px !important; min-height: 32px !important; max-width: 32px !important; max-height: 32px !important; padding: 0 !important; box-sizing: border-box !important; }
+}
+
+/* ================= FINAL HEADER BASELINE LOCK ================= */
+.glass-header,
+.glass-header * {
+    box-sizing: border-box !important;
+}
+
+.glass-header {
+    height: 56px !important;
+    min-height: 54px !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.08) !important;
+    backdrop-filter: blur(18px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+}
+
+.glass-header .glass-header-wrapper {
+    min-height: 52px !important;
+    height: 52px !important;
+    padding: 6px 14px 6px 12px !important;
+    gap: 10px !important;
+    flex-wrap: nowrap !important;
+    overflow: visible !important;
+}
+
+.glass-header .glass-header-left {
+    gap: 8px !important;
+    min-width: auto !important;
+}
+
+.glass-header .glass-menu-toggle {
+    padding: 6px !important;
+}
+
+.glass-header .glass-menu-toggle span {
+    width: 16px !important;
+    height: 2px !important;
+}
+
+.glass-header .glass-logo img {
+    height: 30px !important;
+    max-width: 120px !important;
+}
+
+.glass-header .glass-header-center {
+    flex: 1 1 auto !important;
+    min-width: 220px !important;
+    max-width: 760px !important;
+}
+
+.glass-header .glass-search-wrapper {
+    min-height: 42px !important;
+    max-height: 46px !important;
+    height: auto !important;
+    border-radius: 24px !important;
+    padding: 3px 6px 3px 14px !important;
+    border: 1px solid rgba(0, 0, 0, 0.09) !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08) !important;
+}
+
+.glass-header .glass-search-input {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 6px 8px 6px 0 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+.glass-header .glass-search-icon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    font-size: 12px !important;
+}
+
+.glass-header .glass-search-submit.glass-search-icon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.glass-header .glass-header-nav {
+    gap: 8px !important;
+    margin-left: 2px !important;
+}
+
+.glass-header .glass-nav-btn,
+.glass-header .glass-header-left .glass-nav-btn,
+.glass-header .glass-header-right .glass-icon-btn,
+.glass-header .glass-header-right .glass-lang-btn,
+.glass-header .glass-header-right .glass-profile-btn,
+.glass-header .glass-login-btn,
+.glass-header .glass-notification-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    padding: 0 !important;
+    border-radius: 9999px !important;
+    box-sizing: border-box !important;
+}
+
+.glass-header .glass-header-right {
+    gap: 8px !important;
+}
+
+.glass-header .glass-badge {
+    top: -7px !important;
+    right: -7px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    font-size: 10px !important;
+    border-width: 2px !important;
+}
+
+@media (max-width: 991px) {
+    .glass-header .glass-header-wrapper {
+        padding: 6px 8px 6px 8px !important;
+        gap: 6px !important;
+    }
+    .glass-header .glass-header-nav {
+        display: none !important;
+    }
+    .glass-header .glass-header-center {
+        min-width: 150px !important;
+        max-width: none !important;
+    }
+}
+
+/* ============================================================
+   Screenshot-accurate ecommerce header lock
+   Keeps desktop header visually identical and clean.
+   ============================================================ */
+.glass-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e8eaed !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.glass-header::before {
+    display: none !important;
+}
+
+.glass-header .glass-header-wrapper {
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 2px 14px !important;
+    gap: 12px !important;
+}
+
+.glass-header .glass-menu-toggle {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50% !important;
+    border: 1px solid #e5e7eb !important;
+    background: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.glass-header .glass-menu-toggle span {
+    width: 14px !important;
+    height: 1.8px !important;
+    background: #5f6368 !important;
+}
+
+.glass-header .glass-logo img {
+    height: 32px !important;
+    max-width: 170px !important;
+}
+
+.glass-header .glass-header-center {
+    max-width: 720px !important;
+    min-width: 220px !important;
+}
+
+.glass-header .glass-search-wrapper {
+    background: #f1f3f4 !important;
+    border: 1px solid #f1f3f4 !important;
+    box-shadow: none !important;
+    border-radius: 999px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 46px !important;
+    padding: 3px 4px 3px 12px !important;
+}
+
+.glass-header .glass-search-input {
+    background: transparent !important;
+    color: #202124 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 8px 4px 0 !important;
+}
+
+.glass-header .glass-search-input::placeholder {
+    color: #5f6368 !important;
+}
+
+.glass-header .glass-search-icon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    border-radius: 999px !important;
+    color: #5f6368 !important;
+}
+
+.glass-header .glass-search-submit.glass-search-icon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    border: none !important;
+    color: #5f6368 !important;
+}
+
+.glass-header .glass-nav-btn,
+.glass-header .glass-header-left .glass-nav-btn,
+.glass-header .glass-header-right .glass-icon-btn,
+.glass-header .glass-header-right .glass-lang-btn,
+.glass-header .glass-header-right .glass-profile-btn,
+.glass-header .glass-login-btn,
+.glass-header .glass-notification-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    color: #5f6368 !important;
+    box-sizing: border-box !important;
+}
+
+.glass-header .glass-header-right {
+    gap: 6px !important;
+}
+
+.glass-header .glass-badge {
+    top: -4px !important;
+    right: -4px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    font-size: 10px !important;
+    background: #ef4444 !important;
+    border: 2px solid #ffffff !important;
+}
+
+.glass-header .glass-login-text {
+    display: none !important;
+}
+
+@media (max-width: 991px) {
+    .glass-header .glass-header-wrapper {
+        padding: 8px !important;
+        gap: 8px !important;
+    }
+
+    .glass-header .glass-header-center {
+        min-width: 150px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .glass-header-wrapper { height: 56px; gap: 2px !important; padding: 0 2px 0 4px !important; }
+    .glass-icon-btn, .glass-nav-btn, .glass-profile-btn, .glass-login-btn { width: 28px !important; height: 28px !important; min-width: 28px !important; min-height: 28px !important; max-width: 28px !important; max-height: 28px !important; padding: 0 !important; box-sizing: border-box !important; }
+    .glass-search-icon { width: 18px !important; height: 18px !important; min-width: 18px !important; min-height: 18px !important; }
+    .glass-search-btn { width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; }
+}
+
+@layer components {
+    /* Screenshot parity: floating action buttons align on image right-center */
+    .product-card .product-card__actions {
+        right: clamp(4px, 1.2vw, 12px) !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        gap: clamp(4px, 0.6vw, 8px) !important;
+        z-index: 12 !important;
+    }
+    .product-card .product-card__action {
+        width: clamp(32px, 3vw, 40px) !important;
+        height: clamp(32px, 3vw, 40px) !important;
+        min-width: clamp(32px, 3vw, 40px) !important;
+        min-height: clamp(32px, 3vw, 40px) !important;
+        border-radius: 9999px !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14) !important;
+        background: rgba(255, 255, 255, 0.92) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+    }
+
+    /* Fluid typography/spacing for micro->4K */
+    .product-card .product-card__title a {
+        font-size: clamp(12px, 0.72vw, 15px) !important;
+    }
+    .product-card .product-card__price {
+        font-size: clamp(15px, 1.05vw, 20px) !important;
+    }
+    .footer-glass .footer__bottom__widget .title {
+        font-size: clamp(12px, 0.75vw, 14px) !important;
+    }
+    .footer-glass .footer__bottom__widget p,
+    .footer-glass .footer__bottom__widget ul li a {
+        font-size: clamp(11px, 0.7vw, 13px) !important;
+    }
+
+    /* 2G/3G first paint guard: above-fold header animation off */
+    .glass-header {
+        animation: none !important;
+    }
+
+    /* Final visual lock: match current storefront hex values exactly */
+    .product-card .product-card__badge--discount-banner {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+        color: #ffffff !important;
+    }
+
+    .product-card .product-card__cta.buy-now-cta {
+        background: linear-gradient(180deg, #2dd4bf 0%, #0d9488 62%, #0b7c73 100%) !important;
+        color: #ffffff !important;
+        border-color: rgba(13, 148, 136, 0.45) !important;
+    }
+
+    .product-card .product-card__cta.buy-now-cta:hover {
+        background: linear-gradient(180deg, #2dd4bf 0%, #0d9488 62%, #0b7c73 100%) !important;
+        color: #ffffff !important;
+    }
+
+    /* Toolbar: fixed glyph box (same visual size); mobile menu keeps em-based below */
+    .glass-header .glass-nav-btn .ui-icon,
+    .glass-header .glass-header-left .glass-nav-btn .ui-icon,
+    .glass-header .glass-header-right .glass-icon-btn .ui-icon,
+    .glass-header .glass-lang-btn .ui-icon,
+    .glass-header .glass-login-btn .ui-icon,
+    .glass-header .glass-notification-btn .ui-icon,
+    .glass-header .glass-header-left .glass-custom-btn .ui-icon,
+    .glass-header .glass-header-right .glass-custom-btn .ui-icon {
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        display: block !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+        text-indent: 0 !important;
+        overflow: visible !important;
+        object-fit: contain !important;
+        vertical-align: middle;
+        color: currentColor;
+    }
+
+    @media (max-width: 767px) {
+        .glass-header .glass-nav-btn .ui-icon,
+        .glass-header .glass-header-left .glass-nav-btn .ui-icon,
+        .glass-header .glass-header-right .glass-icon-btn .ui-icon,
+        .glass-header .glass-lang-btn .ui-icon,
+        .glass-header .glass-login-btn .ui-icon,
+        .glass-header .glass-notification-btn .ui-icon,
+        .glass-header .glass-header-left .glass-custom-btn .ui-icon,
+        .glass-header .glass-header-right .glass-custom-btn .ui-icon {
+            width: 18px !important;
+            height: 18px !important;
+            min-width: 18px !important;
+            min-height: 18px !important;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .glass-header .glass-nav-btn .ui-icon,
+        .glass-header .glass-header-left .glass-nav-btn .ui-icon,
+        .glass-header .glass-header-right .glass-icon-btn .ui-icon,
+        .glass-header .glass-lang-btn .ui-icon,
+        .glass-header .glass-login-btn .ui-icon,
+        .glass-header .glass-notification-btn .ui-icon,
+        .glass-header .glass-header-left .glass-custom-btn .ui-icon,
+        .glass-header .glass-header-right .glass-custom-btn .ui-icon {
+            width: 16px !important;
+            height: 16px !important;
+            min-width: 16px !important;
+            min-height: 16px !important;
+        }
+    }
+
+    /* Inline SVG icon parity for header + product card */
+    .glass-header .ui-icon {
+        width: 1em;
+        height: 1em;
+        display: inline-block;
+        vertical-align: middle;
+        color: currentColor;
+    }
+
+    .glass-header .glass-mobile-nav .ui-icon,
+    .glass-header .glass-mobile-logout-btn .ui-icon {
+        width: 1.1em;
+        height: 1.1em;
+        margin-right: 0.45rem;
+        flex-shrink: 0;
+    }
+
+    .product-card__action .ui-icon {
+        width: 1em;
+        height: 1em;
+        display: inline-block;
+        color: currentColor;
+    }
+}
+
+/* ============================================================
+   No-regression guard: Buy Now + Discount badge style lock
+   Applies across all breakpoints to prevent unintended overrides.
+   ============================================================ */
+@layer components {
+    .product-card .product-card__badge--discount-banner,
+    .products-grid .product-card__badge--discount-banner,
+    .products-home-grid .product-card__badge--discount-banner {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+
+    .product-card .product-card__cta.buy-now-cta,
+    .products-grid .product-card__cta.buy-now-cta,
+    .products-home-grid .product-card__cta.buy-now-cta {
+        background: linear-gradient(180deg, #2dd4bf 0%, #0d9488 62%, #0b7c73 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        border-color: rgba(13, 148, 136, 0.45) !important;
+    }
+
+    .product-card .product-card__cta.buy-now-cta:hover,
+    .products-grid .product-card__cta.buy-now-cta:hover,
+    .products-home-grid .product-card__cta.buy-now-cta:hover,
+    .product-card .product-card__cta.buy-now-cta:focus,
+    .products-grid .product-card__cta.buy-now-cta:focus,
+    .products-home-grid .product-card__cta.buy-now-cta:focus,
+    .product-card .product-card__cta.buy-now-cta:active,
+    .products-grid .product-card__cta.buy-now-cta:active,
+    .products-home-grid .product-card__cta.buy-now-cta:active {
+        background: linear-gradient(180deg, #2dd4bf 0%, #0d9488 62%, #0b7c73 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .product-card .product-card__action {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+    }
+    .product-card .product-card__badge--discount-banner,
+    .product-card .product-card__cta.buy-now-cta {
+        background-clip: padding-box !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .product-card .product-card__action {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .product-card .product-card__badge--discount-banner,
+    .product-card .product-card__cta.buy-now-cta {
+        background-clip: padding-box !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .product-card .product-card__badge--discount-banner,
+    .product-card .product-card__cta.buy-now-cta {
+        background-clip: padding-box !important;
+    }
+}
+
+.ui-icon--runtime {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    vertical-align: -0.125em;
+    color: currentColor;
+    fill: currentColor;
+}
+
+.ui-icon--spin {
+    animation: ui-icon-spin 0.8s linear infinite;
+}
+
+@keyframes ui-icon-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   HEADER RESTORATION LOCK
+   High-specificity guard to keep baseline parity.
+   ============================================================ */
+.glass-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 99999 !important;
+}
+
+.glass-header .glass-header-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    min-height: 56px !important;
+    width: 100% !important;
+    gap: 10px !important;
+    overflow: visible !important;
+}
+
+.glass-header .glass-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex: 0 0 auto !important;
+}
+
+.glass-header .glass-logo,
+.glass-header .glass-logo a {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.glass-header .glass-logo img {
+    height: 34px !important;
+    width: auto !important;
+    max-width: 160px !important;
+}
+
+.glass-header .glass-header-center {
+    flex: 1 1 auto !important;
+    min-width: 180px !important;
+    max-width: 780px !important;
+}
+
+.glass-header .glass-search-wrapper {
+    border-radius: 24px !important;
+    padding: 6px 6px 6px 18px !important;
+}
+
+.glass-header .glass-header-nav {
+    gap: 10px !important;
+}
+
+.glass-header .glass-header-right {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+}
+
+.glass-header .glass-header-right .glass-icon-btn,
+.glass-header .glass-header-right .glass-profile-btn,
+.glass-header .glass-header-right .glass-lang-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    border-radius: 9999px !important;
+}
+
+@media (max-width: 991px) {
+    .glass-header .glass-header-nav {
+        display: none !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .glass-header .glass-header-wrapper {
+        min-height: 56px !important;
+        padding-inline: 6px !important;
+        gap: 4px !important;
+    }
+    .glass-header .glass-logo img {
+        height: 28px !important;
+        max-width: 120px !important;
+    }
+    .glass-header .glass-header-center {
+        min-width: 130px !important;
+    }
+    .glass-header .glass-header-right {
+        gap: 6px !important;
+    }
+    .glass-header .glass-header-right .glass-icon-btn,
+    .glass-header .glass-header-right .glass-profile-btn,
+    .glass-header .glass-header-right .glass-lang-btn {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+    }
+}
+
+/* Search pill (thicker) + neutral stroke icons; camera = round toolbar */
+.glass-header .glass-search-wrapper.glass-search-wrapper--card {
+    min-height: 42px !important;
+    max-height: 46px !important;
+    height: auto !important;
+    align-items: center !important;
+}
+.glass-header .glass-search-voice.glass-search-icon {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+}
+.glass-header .glass-search-voice .ui-icon {
+    width: 20px !important;
+    height: 20px !important;
+}
+.glass-header .glass-search-submit.glass-search-icon {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #5f6368 !important;
+}
+.glass-header .glass-search-submit .ui-icon,
+.glass-header .glass-search-submit__icon {
+    width: 20px !important;
+    height: 20px !important;
+    color: #5f6368 !important;
+    stroke: #5f6368 !important;
+}
+.glass-header .glass-header-camera-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    border-radius: 50% !important;
+}
+.glass-header .glass-header-camera-btn .ui-icon {
+    width: 24px !important;
+    height: 24px !important;
+}
+@media (max-width: 991px) {
+    .glass-header .glass-search-voice.glass-search-icon {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
+    }
+    .glass-header .glass-search-voice .ui-icon {
+        width: 17px !important;
+        height: 17px !important;
+    }
+    .glass-header .glass-search-submit.glass-search-icon {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
+    }
+    .glass-header .glass-search-submit .ui-icon,
+    .glass-header .glass-search-submit__icon {
+        width: 17px !important;
+        height: 17px !important;
+    }
+    .glass-header .glass-header-camera-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        max-width: 44px !important;
+        max-height: 44px !important;
+    }
+    .glass-header .glass-header-camera-btn .ui-icon {
+        width: 24px !important;
+        height: 24px !important;
+    }
+}
+@media (max-width: 575px) {
+    .glass-header .glass-search-voice.glass-search-icon {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+    }
+    .glass-header .glass-search-voice .ui-icon {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    .glass-header .glass-search-submit.glass-search-icon {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+    }
+    .glass-header .glass-search-submit .ui-icon,
+    .glass-header .glass-search-submit__icon {
+        width: 15px !important;
+        height: 15px !important;
+    }
+    .glass-header .glass-header-camera-btn {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
+        max-width: 42px !important;
+        max-height: 42px !important;
+    }
+    .glass-header .glass-header-camera-btn .ui-icon {
+        width: 23px !important;
+        height: 23px !important;
+    }
+}
+
+/*
+ * Footer social (premium): unlayered, end of bundle — wins over imported footer-glass.css
+ * (older premium rules used width:100% + border-radius:999px on grid cells = pills).
+ * Tailwind utilities on .stayl-footer-social-grid also ship via @tailwind above when rebuilt.
+ */
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid.footer-social-grid,
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link,
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    min-width: 2.75rem !important;
+    min-height: 2.75rem !important;
+    max-width: 2.75rem !important;
+    max-height: 2.75rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+    color: #334155 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06) !important;
+    transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s, background 0.2s !important;
+}
+
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link:hover,
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a:hover {
+    background: #fff !important;
+    border-color: #2563eb !important;
+    color: #2563eb !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12) !important;
+}
+
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link .ui-icon,
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a .ui-icon {
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+    min-width: 1.35rem !important;
+    min-height: 1.35rem !important;
+    max-width: 1.35rem !important;
+    max-height: 1.35rem !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: inherit !important;
+    background: none !important;
+    background-image: none !important;
+    text-indent: 0 !important;
+    overflow: visible !important;
+}
+
+/* Older footer-glass.css uses overflow:hidden on .social-icons a — ensure SVG/icons stay visible */
+footer.site-footer.footer-glass.footer-glass--premium .footer-connect-widget .social-icons a.stayl-footer-social-link {
+    overflow: visible !important;
+}
+
+footer.site-footer.footer-glass.footer-glass--premium .stayl-footer-social-inline-wrap,
+footer.site-footer.footer-glass.footer-glass--premium .stayl-footer-social-inline-wrap svg {
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+    min-width: 1.35rem !important;
+    min-height: 1.35rem !important;
+    max-width: 1.35rem !important;
+    max-height: 1.35rem !important;
+    display: block !important;
+    box-sizing: border-box !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .stayl-footer-social-inline-wrap {
+    color: inherit !important;
+}
+
+/*
+ * main.css (.social-icons li a i) paints 40×40 colored circles (#4FC4F7, twitter blue, etc.).
+ * Premium footer already uses a white chip on <a>; reset inner <i> (FA / Line Awesome) to flat glyphs.
+ */
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid.social-icons > li > a.stayl-footer-social-link > i,
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid.social-icons > li > a > i,
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-inline-wrap i,
+footer.site-footer.footer-glass.footer-glass--premium .stayl-footer-social-inline-wrap.text-lg i {
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    line-height: 1 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    color: inherit !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    font-size: 1.15em !important;
+    box-shadow: none !important;
+}
+
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link img.stayl-footer-social-img,
+footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a img.stayl-footer-social-img {
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+    min-width: 1.35rem !important;
+    min-height: 1.35rem !important;
+    max-width: 1.35rem !important;
+    max-height: 1.35rem !important;
+    flex-shrink: 0 !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+@media (max-width: 319.98px) {
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid {
+        gap: 0.4rem !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link,
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a {
+        width: 2.4rem !important;
+        height: 2.4rem !important;
+        min-width: 2.4rem !important;
+        min-height: 2.4rem !important;
+        max-width: 2.4rem !important;
+        max-height: 2.4rem !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link .ui-icon,
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a .ui-icon {
+        width: 1.15rem !important;
+        height: 1.15rem !important;
+        min-width: 1.15rem !important;
+        min-height: 1.15rem !important;
+        max-width: 1.15rem !important;
+        max-height: 1.15rem !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link img.stayl-footer-social-img,
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a img.stayl-footer-social-img {
+        width: 1.15rem !important;
+        height: 1.15rem !important;
+        min-width: 1.15rem !important;
+        min-height: 1.15rem !important;
+        max-width: 1.15rem !important;
+        max-height: 1.15rem !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link,
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        min-width: 2.5rem !important;
+        min-height: 2.5rem !important;
+        max-width: 2.5rem !important;
+        max-height: 2.5rem !important;
+        border-radius: 50% !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link .ui-icon,
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a .ui-icon {
+        width: 1.2rem !important;
+        height: 1.2rem !important;
+        min-width: 1.2rem !important;
+        min-height: 1.2rem !important;
+        max-width: 1.2rem !important;
+        max-height: 1.2rem !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid a.stayl-footer-social-link img.stayl-footer-social-img,
+    footer.site-footer.footer-glass.footer-glass--premium ul.stayl-footer-social-grid > li > a img.stayl-footer-social-img {
+        width: 1.2rem !important;
+        height: 1.2rem !important;
+        min-width: 1.2rem !important;
+        min-height: 1.2rem !important;
+        max-width: 1.2rem !important;
+        max-height: 1.2rem !important;
+    }
+}
+
+/*
+ * Footer app-promotion cards (public page): compact sizing only.
+ * Keeps admin data structure and existing functionality unchanged.
+ */
+footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.16rem !important;
+    max-width: 100% !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card {
+    padding: 0.08rem 0.16rem !important;
+    border-radius: 0.3rem !important;
+    min-height: 0.85rem !important;
+    gap: 0.12rem !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__logo,
+footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__icon {
+    width: 0.5rem !important;
+    height: 0.5rem !important;
+    min-width: 0.5rem !important;
+    min-height: 0.5rem !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__btn,
+footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__label {
+    font-size: 7.5px !important;
+    line-height: 1.05 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+}
+@media (max-width: 767.98px) {
+    footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 0.12rem !important;
+        max-width: 100% !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card {
+        padding: 0.06rem 0.12rem !important;
+        border-radius: 0.26rem !important;
+        min-height: 0.8rem !important;
+        gap: 0.1rem !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__logo,
+    footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__icon {
+        width: 0.46rem !important;
+        height: 0.46rem !important;
+        min-width: 0.46rem !important;
+        min-height: 0.46rem !important;
+    }
+    footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__btn,
+    footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__label {
+        font-size: 7px !important;
+    }
+}
