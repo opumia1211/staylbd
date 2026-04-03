@@ -38521,22 +38521,37 @@ footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-
 footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card {
     padding: 0.08rem 0.16rem !important;
     border-radius: 0.3rem !important;
-    min-height: 0.85rem !important;
+    min-height: 2.05rem !important;
     gap: 0.12rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    text-align: center !important;
 }
 footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__logo,
 footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__icon {
-    width: 0.5rem !important;
-    height: 0.5rem !important;
-    min-width: 0.5rem !important;
-    min-height: 0.5rem !important;
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    min-width: 1.15rem !important;
+    min-height: 1.15rem !important;
+    max-width: 1.15rem !important;
+    max-height: 1.15rem !important;
+    -o-object-fit: contain !important;
+       object-fit: contain !important;
+    display: block !important;
 }
 footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__btn,
 footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__label {
-    font-size: 7.5px !important;
+    font-size: 8px !important;
     line-height: 1.05 !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    overflow: visible !important;
+    display: inline-block !important;
     padding: 0 !important;
     min-height: 0 !important;
+    width: 100% !important;
 }
 @media (max-width: 767.98px) {
     footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-grid {
@@ -38547,19 +38562,22 @@ footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-
     footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card {
         padding: 0.06rem 0.12rem !important;
         border-radius: 0.26rem !important;
-        min-height: 0.8rem !important;
+        min-height: 1.85rem !important;
         gap: 0.1rem !important;
     }
     footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__logo,
     footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__icon {
-        width: 0.46rem !important;
-        height: 0.46rem !important;
-        min-width: 0.46rem !important;
-        min-height: 0.46rem !important;
+        width: 1rem !important;
+        height: 1rem !important;
+        min-width: 1rem !important;
+        min-height: 1rem !important;
+        max-width: 1rem !important;
+        max-height: 1rem !important;
     }
     footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__btn,
     footer.site-footer.footer-glass.footer-glass--premium .footer-right-col .footer-app-card__label {
         font-size: 7px !important;
+        line-height: 1.02 !important;
     }
 }
 .focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}
