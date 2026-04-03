@@ -123,6 +123,11 @@
                     @if(!empty($companyInfo->data_values->business_license))
                         <p class="mb-0 small text-white-50">{{ __($companyInfo->data_values->business_license) }}</p>
                     @endif
+                    @if($contactContent && !empty($contactContent->data_values->address))
+                        <div class="footer-app-info footer-address-block mt-2 pt-2 border-top border-white border-opacity-25">
+                            <p class="mb-0">@include($activeTemplate . 'partials.icon', ['name' => 'map-marker-alt', 'class' => 'me-1']){{ __($contactContent->data_values->address) }}</p>
+                        </div>
+                    @endif
                 </div>
                 @endif
 
@@ -530,18 +535,9 @@
                                 @endif
                             </div>
                         @endif
-                        <div class="footer-app-info footer-address-block">
-                            @if($contactContent && !empty($contactContent->data_values->address))
-                                <p class="mb-0">@include($activeTemplate . 'partials.icon', ['name' => 'map-marker-alt', 'class' => 'me-1']){{ __($contactContent->data_values->address) }}</p>
-                            @endif
-                        </div>
                     </div>
                     @else
-                    <div class="footer-app-info footer-address-block mt-1 pt-1 border-top border-white border-opacity-25">
-                        @if($contactContent && !empty($contactContent->data_values->address))
-                            <p class="mb-0">@include($activeTemplate . 'partials.icon', ['name' => 'map-marker-alt', 'class' => 'me-1']){{ __($contactContent->data_values->address) }}</p>
-                        @endif
-                    </div>
+                    {{-- Address moved under About Us section as requested --}}
                     @endif
                 </div>
             </div>
