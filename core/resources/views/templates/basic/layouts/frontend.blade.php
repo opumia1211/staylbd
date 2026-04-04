@@ -260,7 +260,7 @@
                         return;
                     }
                     var html = '', lastDate = '';
-                    var doubleCheck = '<span class="contact-chat-msg-read" aria-label="{{ __("Read") }}">@include($activeTemplate . 'partials.icon', ['name' => 'check-double'])</span>';
+                    var doubleCheck = `<span class="contact-chat-msg-read" aria-label="{{ __("Read") }}">@include($activeTemplate . 'partials.icon', ['name' => 'check-double'])</span>`;
                     messages.forEach(function(m) {
                         var datePart = m.date_label || (m.created_at || '').split(',')[0].trim();
                         if (datePart && datePart !== lastDate) {
@@ -272,7 +272,7 @@
                         var msg = (m.message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
                         html += '<div class="contact-chat-msg ' + cls + '"><div class="contact-chat-msg-name">' + name + '</div><div class="contact-chat-msg-text">' + msg + '</div>';
                         if (m.attachments && m.attachments.length) {
-                            html += '<div class="contact-chat-msg-att"><a href="' + (m.attachments[0] || '#') + '" target="_blank">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) {{ __("Attachment") }}</a></div>';
+                            html += `<div class="contact-chat-msg-att"><a href="${m.attachments[0] || '#'}" target="_blank">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) {{ __("Attachment") }}</a></div>`;
                         }
                         var dateTimeStr = (m.date_label ? m.date_label + ' · ' : '') + (m.created_at || '');
                         if (m.is_admin) {
@@ -345,6 +345,7 @@
                         if (counterEl) counterEl.classList.toggle('at-limit', n >= 500);
                     });
                 }
+
 
                 function getMsg() { return (contactMsg && contactMsg.value) ? contactMsg.value.trim() : ''; }
                 var glass = document.getElementById('contactPanelGlass');

@@ -115,6 +115,44 @@ class ServeAssetController extends Controller
     }
 
     /**
+     * jQuery UI (bundled in tailwind-storefront.css) uses url("images/ui-icons_*.png").
+     * Resolved against /serve-css/tailwind-storefront → /serve-css/images/…
+     */
+    public function cssBundleImages(Request $request, string $name): Response|BinaryFileResponse
+    {
+        if (str_contains($name, '..') || str_contains($name, '/') || str_contains($name, '\\')) {
+            abort(404);
+        }
+        // Allow underscores or spaces/dashes in the icon filenames to be robust
+        if (!preg_match('/^ui-icons[-_ ]?[A-Za-z0-9._\s-]+(?:\.[a-z0-9]+)?\.(png|gif|svg)$/i', urldecode($name))) {
+            abort(404);
+        }
+        
+        // Ensure spaces in URL resolve to underscores on disk
+        $diskName = str_replace([' ', '%20'], '_', $name);
+        
+        // Try core/public first, then standard public_path
+        $path = base_path('public/css/images/' . $diskName);
+        if (!is_file($path)) {
+            $path = public_path('css/images/' . $diskName);
+        }
+
+        if (!is_file($path) || !is_readable($path)) {
+            abort(404);
+        }
+        $mime = match (strtolower(pathinfo($name, PATHINFO_EXTENSION))) {
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            default => 'application/octet-stream',
+        };
+        return response()->file($path, [
+            'Content-Type' => $mime,
+            'Cache-Control' => 'public, max-age=2592000',
+        ]);
+    }
+
+    /**
      * Serve Font Awesome webfonts. CSS from serve-css/global/all.min references ../webfonts/ → /serve-css/webfonts/
      * Place files in: public/assets/global/webfonts/ (fa-brands-400.woff2, fa-regular-400.woff2, fa-solid-900.woff2, etc.)
      */

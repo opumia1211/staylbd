@@ -25,14 +25,14 @@
     @if (isRegistrationFieldEnabled('firstname'))
     <div class="form-group">
         <label class="form--label sr-only">@lang('Name')</label>
-        <input type="text" class="form-control form--control" name="firstname" value="{{ old('firstname') }}" placeholder="@lang('Name')" required maxlength="100" autocomplete="off">
+        <input type="text" class="form-control form--control" name="firstname" value="{{ old('firstname') }}" placeholder="@lang('Name')" required maxlength="100" autocomplete="name">
     </div>
     @endif
     @if (isRegistrationFieldEnabled('username'))
     <div class="form-group">
         <label class="form--label sr-only">@lang('Username')</label>
         <div class="input-group username-input-wrap">
-            <input type="text" class="form-control form--control checkUser" id="modal_register_username" name="username" value="" {{ isRegistrationFieldEnabled('username') ? 'required' : '' }} minlength="6" maxlength="30" placeholder="@lang('Username')" autocomplete="off">
+            <input type="text" class="form-control form--control checkUser" id="modal_register_username" name="username" value="" {{ isRegistrationFieldEnabled('username') ? 'required' : '' }} minlength="6" maxlength="30" placeholder="@lang('Username')" autocomplete="username">
             <span class="username-available-tick d-none" aria-hidden="true" title="@lang('Available')">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="#047857" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
             </span>
@@ -46,7 +46,7 @@
     @if (isRegistrationFieldEnabled('email'))
     <div class="form-group">
         <label class="form--label sr-only">@lang('E-Mail Address')</label>
-        <input type="text" class="form-control form--control" name="email" value="" {{ isRegistrationFieldEnabled('email') ? 'required' : '' }} placeholder="@lang('Email or Mobile number')" autocomplete="off">
+        <input type="text" class="form-control form--control" name="email" value="" {{ isRegistrationFieldEnabled('email') ? 'required' : '' }} placeholder="@lang('Email or Mobile number')" autocomplete="email">
         @if($errors->has('email'))
             <div class="invalid-feedback d-block">{{ $errors->first('email') }}</div>
         @endif
@@ -95,7 +95,7 @@
             </datalist>
             <input type="hidden" name="country_code" value="{{ old('country_code') }}">
             <input type="hidden" name="mobile_code" value="{{ old('mobile_code') }}">
-            <input type="number" name="mobile" value="{{ old('mobile') }}" class="form-control form--control" placeholder="@lang('Phone number')" {{ isRegistrationFieldEnabled('mobile') ? 'required' : '' }} autocomplete="off">
+            <input type="number" name="mobile" value="{{ old('mobile') }}" class="form-control form--control" placeholder="@lang('Phone number')" {{ isRegistrationFieldEnabled('mobile') ? 'required' : '' }} autocomplete="tel">
         </div>
         @if($errors->has('mobile'))
             <div class="invalid-feedback d-block">{{ $errors->first('mobile') }}</div>

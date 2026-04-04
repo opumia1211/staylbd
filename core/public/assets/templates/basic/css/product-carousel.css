@@ -1,5 +1,57 @@
 /* Product sections: always ONE row per category; overflow = horizontal scroll or auto-scroll carousel */
 
+/*
+ * Horizontal product row (used by product_carousel_section.blade.php).
+ * Previously these widths lived only in home.blade.php — on product detail and other
+ * pages the row had no item widths, so each card stretched to 100% and stacked vertically.
+ */
+.product-line-flex-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1mm;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    scroll-snap-type: x proximity;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.product-line-flex-row::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+.product-line-flex-row > .product-card-col {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: calc((100% - 1mm) / 2);
+    min-width: 0;
+    max-width: none;
+}
+@media (min-width: 768px) {
+    .product-line-flex-row > .product-card-col {
+        width: calc((100% - 3mm) / 4);
+    }
+}
+@media (min-width: 1024px) {
+    .product-line-flex-row > .product-card-col {
+        width: calc((100% - 4mm) / 5);
+    }
+}
+@media (min-width: 1280px) {
+    .product-line-flex-row > .product-card-col {
+        width: calc((100% - 5mm) / 6);
+    }
+}
+
 /* Default home sections: no horizontal bleed on mobile */
 .product-carousel-section { min-width: 0; }
 .product-carousel-section > .w-full { min-width: 0; max-width: 100%; box-sizing: border-box; }

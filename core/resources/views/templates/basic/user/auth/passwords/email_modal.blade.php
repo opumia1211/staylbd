@@ -1,6 +1,7 @@
 @extends($activeTemplate . 'layouts.auth_modal')
 @section('content')
-<div class="auth-overlay">
+@include($activeTemplate . 'user.auth.partials.auth_page_styles')
+<div class="auth-overlay" id="authModalOverlay">
     <div class="auth-card" style="position:relative;">
         @php $authLogo = getLogo('logo'); $siteName = gs('site_name'); @endphp
         <button type="button" class="auth-close" onclick="window.location.href='{{ route('home') }}'" aria-label="@lang('Close')" title="@lang('Close')">&times;</button>
@@ -20,11 +21,11 @@
             @csrf
             <div class="form-group">
                 <label class="form--label sr-only" for="email_or_username">@lang('Email or Username')</label>
-                <input type="text" id="email_or_username" class="form-control form--control" name="email_or_username" value="{{ old('email_or_username') }}" required autocomplete="off" placeholder="@lang('Email or Username')">
+                <input type="text" id="email_or_username" class="form-control form--control" name="email_or_username" value="{{ old('email_or_username') }}" required autocomplete="username" placeholder="@lang('Email or Username')">
             </div>
             <div class="form-group">
                 <label class="form--label sr-only" for="phone">@lang('Phone number')</label>
-                <input type="text" id="phone" class="form-control form--control" name="phone" value="{{ old('phone') }}" required autocomplete="off" placeholder="@lang('Phone number (as registered)')">
+                <input type="text" id="phone" class="form-control form--control" name="phone" value="{{ old('phone') }}" required autocomplete="tel" placeholder="@lang('Phone number (as registered)')">
             </div>
             <x-captcha />
             <div class="form-group">

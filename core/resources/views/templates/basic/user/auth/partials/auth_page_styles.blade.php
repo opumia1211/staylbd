@@ -1,5 +1,19 @@
 {{-- Shared auth page layout: center alignment, responsive card, no fixed widths --}}
 <style>
+/* Keep iframe background fully clear: no global auth blur layer */
+html,
+body,
+body.floating-auth-page,
+.floating-auth-page {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+.floating-auth-page::before,
+.floating-auth-page::after {
+    display: none !important;
+    content: none !important;
+}
 /* STEP 2: Same flex-based centering for login & register */
 .auth-overlay {
     display: flex;
@@ -44,18 +58,43 @@
     font-weight: 600;
     color: #333;
 }
-.auth-close {
+/* Compact professional close — minimal motion for snappy feel */
+.floating-auth-page .auth-close {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 24px;
-    color: #999;
-    text-decoration: none !important;
+    top: 10px;
+    right: 10px;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
     line-height: 1;
-    transition: color 0.2s;
+    letter-spacing: -0.02em;
+    color: #64748b;
+    text-decoration: none !important;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    background: rgba(248, 250, 252, 0.96);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease,
+        box-shadow 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
 }
-.auth-close:hover {
-    color: #333;
+.floating-auth-page .auth-close:hover {
+    color: #0f172a;
+    background: #fff;
+    border-color: rgba(13, 148, 136, 0.28);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+.floating-auth-page .auth-close:active {
+    background: #f1f5f9;
 }
 .auth-panel {
     display: none;
@@ -109,6 +148,18 @@
     background: #fff;
     box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
     outline: none;
+}
+/* Register/Login: do not stretch checkbox/radio like text fields (auth-modal .auth-overlay input min-height/width) */
+.floating-auth-page .auth-overlay .form-check-input {
+    width: 1.125em;
+    height: 1.125em;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+    align-self: center;
+    box-sizing: border-box;
+    border-radius: 0.25em;
 }
 .auth-btn {
     background: #2dd4bf; 
@@ -200,4 +251,20 @@
 .floating-auth-page .floating-auth-site-name,
 .floating-auth-page .account-header--compact .title,
 .floating-auth-page .form--label { word-break: break-word; }
+/* Embedded in parent overlay iframe: single card; × is on .auth-card; parent only backdrop + dismiss on backdrop tap */
+html.st-auth-iframe,
+body.st-auth-iframe.floating-auth-page {
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+body.st-auth-iframe .auth-overlay {
+    min-height: 100%;
+    min-height: 0;
+    padding: clamp(0.35rem, 2vw, 0.75rem);
+}
+body.st-auth-iframe .auth-card {
+    max-height: 100%;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.14);
+}
 </style>

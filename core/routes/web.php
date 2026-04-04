@@ -9,6 +9,7 @@ use App\Http\Controllers\ServeAssetController;
 Route::get('serve-js/{name}', [ServeAssetController::class, 'js'])->name('serve.js')->where('name', 'fly-to-header|product-carousel|glass-header|auth');
 Route::get('serve-css/global/{name}', [ServeAssetController::class, 'cssGlobal'])->name('serve.css.global');
 Route::get('serve-css/img/{name}', [ServeAssetController::class, 'imageTemplate'])->name('serve.css.img');
+Route::get('serve-css/images/{name}', [ServeAssetController::class, 'cssBundleImages'])->name('serve.css.bundle-images');
 Route::get('serve-css/webfonts/{name}', [ServeAssetController::class, 'webfonts'])->name('serve.css.webfonts');
 Route::get('serve-css/fonts/{name}', [ServeAssetController::class, 'fonts'])->name('serve.css.fonts');
 Route::get('serve-css/tailwind-utilities', [ServeAssetController::class, 'tailwindUtilities'])->name('serve.css.tailwind.utilities');

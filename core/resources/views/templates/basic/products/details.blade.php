@@ -1,7 +1,9 @@
 @extends($activeTemplate . 'layouts.frontend')
 @php
-    $disableLegacyBootstrapBundle = true;
-    $disableLegacyJquery = true;
+    // PDP scripts rely on jQuery + Bootstrap Modal (tabs, AJAX actions, image lightbox).
+    // Keep these enabled on this page to avoid non-responsive buttons/features.
+    $disableLegacyBootstrapBundle = false;
+    $disableLegacyJquery = false;
 @endphp
 
 @php
@@ -66,6 +68,44 @@
             contain-intrinsic-size: auto 300px;
         }
         .pro-detail-more-sections .pro-section__title { font-size: 1.1rem; }
+        /* Bottom product list: force real responsive grid so one card never takes full row */
+        .pro-detail-bottom-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+            width: 100% !important;
+            align-items: stretch;
+        }
+        .pro-detail-bottom-grid > .product-card-col {
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            flex: 0 0 auto !important;
+        }
+        .pro-detail-bottom-grid .product-card {
+            height: 100%;
+        }
+        @media (min-width: 768px) {
+            .pro-detail-bottom-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 12px !important;
+            }
+        }
+        @media (min-width: 992px) {
+            .pro-detail-bottom-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            }
+        }
+        @media (min-width: 1200px) {
+            .pro-detail-bottom-grid {
+                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+            }
+        }
+        @media (min-width: 1400px) {
+            .pro-detail-bottom-grid {
+                grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+            }
+        }
         /* Critical: no horizontal overflow on any device */
         .pro-detail-page { overflow-x: hidden; width: 100%; }
         .pro-detail-page .container { max-width: 100%; box-sizing: border-box; }
@@ -750,6 +790,30 @@
                     @endif
                 </div>
             @endif
+
+            @if(($bottomProducts ?? collect())->count() > 0)
+                <div class="pro-detail-more-sections mt-4">
+                    <div class="pro-detail-related-section">
+                        <div class="pro-section pro-section--tight">
+                            <div class="pro-section__head d-flex align-items-center justify-content-between mb-3">
+                                <h4 class="pro-section__title mb-0">
+                                    @include($activeTemplate . 'partials.icon', ['name' => 'th-large', 'class' => 'me-1'])
+                                    {{ __('More Products For You') }}
+                                </h4>
+                                <a href="{{ route('products') }}" class="small text-decoration-none">{{ __('View all') }}</a>
+                            </div>
+                            <div class="products-grid pro-detail-bottom-grid" role="list">
+                                @foreach(($bottomProducts ?? collect()) as $bottomProduct)
+                                    <div class="product-card-col product-card-col--home" role="listitem">
+                                        @php $fp = $loop->iteration <= 8 ? 'high' : 'low'; @endphp
+                                        @include($activeTemplate . 'products.partials.card', ['product' => $bottomProduct, 'general' => $general, 'fetchpriority' => $fp])
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         {{-- Sticky Add to Cart bar (mobile only) --}}
@@ -878,22 +942,39 @@
                 var showReviews = 10;
                 var reviewSort = 'recent';
 
-                // Review tab: prevent default (stop scroll-to-top); scroll to Review section first, then show tab
-                $(document).on('click', 'a.review-tab-link, a[href="#tab-review"]', function(e) {
+                // All PDP tabs: prevent anchor jump-to-top; always show exact tab and keep viewport in tab section.
+                function showProductTab(linkEl) {
+                    if (!linkEl) return;
+                    var targetSel = linkEl.getAttribute('href') || '';
+                    if (!targetSel || targetSel.charAt(0) !== '#') return;
+                    var tabsWrap = document.getElementById('product-detail-tabs');
+                    var pane = document.querySelector(targetSel);
+                    var scrollTarget = tabsWrap || pane;
+                    if (scrollTarget) scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+                        bootstrap.Tab.getOrCreateInstance(linkEl).show();
+                        return;
+                    }
+
+                    // Safe fallback when Bootstrap Tab JS is unavailable.
+                    var nav = linkEl.closest('.nav-tabs, .van-tabs');
+                    if (nav) {
+                        var allLinks = nav.querySelectorAll('a[data-bs-toggle="tab"]');
+                        allLinks.forEach(function(a) { a.classList.remove('active'); });
+                    }
+                    linkEl.classList.add('active');
+                    var content = tabsWrap ? tabsWrap.querySelector('.tab-content') : null;
+                    if (content) {
+                        var panes = content.querySelectorAll('.tab-pane');
+                        panes.forEach(function(p) { p.classList.remove('show', 'active'); });
+                    }
+                    if (pane) pane.classList.add('show', 'active');
+                }
+                $(document).on('click', '#product-detail-tabs .nav-tabs a[data-bs-toggle="tab"], #product-detail-tabs .van-tabs a[data-bs-toggle="tab"]', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    var linkEl = this;
-                    var tabsWrap = document.getElementById('product-detail-tabs');
-                    var pane = document.getElementById('tab-review');
-                    if (!tabsWrap && !pane) return;
-                    var scrollTarget = tabsWrap || pane;
-                    scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
-                        var tab = bootstrap.Tab.getOrCreateInstance(linkEl);
-                        tab.show();
-                    } else {
-                        $(linkEl).tab('show');
-                    }
+                    showProductTab(this);
                 });
                 $(document).on('shown.bs.tab', 'a[href="#tab-review"]', function() {
                     var el = document.getElementById('product-detail-tabs') || document.getElementById('tab-review');
@@ -1107,7 +1188,8 @@
                     @endforeach
                 ];
                 var zoomPreviewRef = null;
-                var canHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+                // Use any-hover for hybrid devices (touch laptop + mouse) so hover zoom works when mouse exists.
+                var canHover = window.matchMedia ? window.matchMedia('(any-hover: hover)').matches : true;
                 function setMainImage(idx) {
                     if (thumbSrcs[idx] === undefined) return;
                     $('#proDetailThumbs .thumb-item').removeClass('active');
@@ -1229,6 +1311,13 @@
                                 } catch (e) {}
                             }
                             bootstrap.Modal.getOrCreateInstance(m).show();
+                        } else if (m) {
+                            // Fallback for rare cases where Bootstrap modal JS is unavailable.
+                            m.classList.add('show');
+                            m.style.display = 'block';
+                            m.removeAttribute('aria-hidden');
+                            document.body.classList.add('modal-open', 'pro-lightbox-open');
+                            document.documentElement.classList.add('pro-lightbox-open');
                         }
                     }
                 }

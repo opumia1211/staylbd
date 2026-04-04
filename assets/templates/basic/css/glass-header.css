@@ -563,9 +563,8 @@
 }
 
 .glass-search-voice .ui-icon {
-    width: 20px;
-    height: 20px;
-    stroke-width: 2px;
+    width: 22px;
+    height: 22px;
 }
 
 .glass-search-submit {
@@ -576,11 +575,9 @@
 
 .glass-search-submit .ui-icon,
 .glass-search-submit__icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     color: #fff;
-    stroke: #fff;
-    stroke-width: 2px;
 }
 
 .glass-search-submit img.ui-icon {
@@ -654,10 +651,8 @@
 }
 
 .glass-header-camera-btn .ui-icon {
-    width: 24px;
-    height: 24px;
-    display: block;
-    stroke-width: 1.8px;
+    width: 22px;
+    height: 22px;
 }
 
 @media (max-width: 991.98px) {
@@ -934,10 +929,9 @@ button.glass-icon-btn {
 }
 
 .glass-icon-btn .ui-icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     display: block;
-    stroke-width: 1.8px;
     flex-shrink: 0;
 }
 
@@ -1424,11 +1418,16 @@ button.glass-icon-btn {
     color: var(--main, #4FC4F7);
 }
 
-.glass-mobile-nav a i {
+.glass-mobile-nav a i,
+.glass-mobile-nav a .ui-icon {
     font-size: 20px;
     width: 24px;
+    height: 20px;
     text-align: center;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Logged-in user menu section in mobile sidebar (Dashboard, Orders, Profile, Logout) */
@@ -2161,10 +2160,6 @@ button.glass-icon-btn {
         object-fit: contain;
     }
     
-    .glass-logo .logo-text {
-        font-size: 14px;
-    }
-    
     .glass-header-right {
         gap: 4px !important;
         flex-shrink: 0 !important; /* সব বাটন দেখা যাবে - scroll দিয়ে */
@@ -2374,10 +2369,6 @@ button.glass-icon-btn {
     .glass-logo img {
         height: 22px;
         max-width: 60px;
-    }
-    
-    .glass-logo .logo-text {
-        font-size: 11px;
     }
     
     /* সার্চ বক্স – 575px এও দেখা যাবে */
@@ -2636,7 +2627,7 @@ button.glass-icon-btn {
     overflow: visible !important;
     position: relative !important;
     object-fit: contain !important;
-    box-sizing: content-box !important;
+    box-sizing: border-box !important;
 }
 
 @media (max-width: 767px) {
@@ -2655,20 +2646,34 @@ button.glass-icon-btn {
     }
 }
 
-@media (max-width: 575px) {
-    .glass-header .glass-nav-btn .ui-icon,
-    .glass-header .glass-icon-btn .ui-icon,
-    .glass-header .glass-lang-btn .ui-icon,
-    .glass-header .glass-login-btn .ui-icon,
-    .glass-header .glass-notification-btn .ui-icon,
-    .glass-header .glass-header-left .glass-nav-btn .ui-icon,
-    .glass-header .glass-header-left .glass-custom-btn .ui-icon,
-    .glass-header .glass-header-right .glass-custom-btn .ui-icon {
-        width: 16px !important;
-        height: 16px !important;
-        min-width: 16px !important;
-        min-height: 16px !important;
-    }
+/* Block FontAwesome pseudoelements to prevent double icons/ghosting with our new solid SVGs */
+.glass-icon-btn i,
+.glass-icon-btn::before,
+.glass-icon-btn::after,
+.glass-search-icon i,
+.glass-search-icon::before,
+.glass-search-icon::after,
+.glass-nav-btn i,
+.glass-nav-btn::before,
+.glass-nav-btn::after {
+    display: none !important;
+    content: none !important;
+}
+
+.glass-icon-btn, 
+.glass-search-icon, 
+.glass-nav-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+}
+
+.glass-icon-btn .ui-icon,
+.glass-search-icon .ui-icon,
+.glass-nav-btn .ui-icon {
+    margin: 0 !important;
+    display: block !important;
 }
 
 /* Scroll Effect - Header becomes more opaque on scroll */

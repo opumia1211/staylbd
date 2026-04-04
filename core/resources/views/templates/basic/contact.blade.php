@@ -114,11 +114,11 @@
                         <div class="contact-form-row contact-form-row--half">
                             <div class="contact-form-field">
                                 <label class="contact-form-label">@lang('Name')</label>
-                                <input name="name" type="text" class="contact-form-input" value="{{ old('name', optional($user)->fullname ?? '') }}" @if($user) readonly @endif required>
+                                <input name="name" type="text" class="contact-form-input" value="{{ old('name', optional($user)->fullname ?? '') }}" autocomplete="name" @if($user) readonly @endif required>
                             </div>
                             <div class="contact-form-field">
                                 <label class="contact-form-label">@lang('Email')</label>
-                                <input name="email" type="email" class="contact-form-input" value="{{ old('email', optional($user)->email ?? '') }}" @if($user) readonly @endif required>
+                                <input name="email" type="email" class="contact-form-input" value="{{ old('email', optional($user)->email ?? '') }}" autocomplete="email" @if($user) readonly @endif required>
                             </div>
                         </div>
                         <div class="contact-form-field">

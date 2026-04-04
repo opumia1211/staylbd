@@ -1,211 +1,247 @@
+@php
+    $authModalEnabled = true;
+    if (isset($disableAuthModal) && $disableAuthModal) {
+        $authModalEnabled = false;
+    }
+@endphp
+
 <script>
 (function() {
     'use strict';
-    if (window.self !== window.top) return;
+    // Prevent double execution if included twice
+    if (window.__stAuthOverlayInitialized) return;
+    window.__stAuthOverlayInitialized = true;
 
-    window.openSocialPopup = function(u) {
-        var w = 520, h = 650;
-        var y = ((window.top.outerHeight || 600) / 2) + (window.top.screenY || 0) - h / 2;
-        var x = ((window.top.outerWidth || 800) / 2) + (window.top.screenX || 0) - w / 2;
-        return window.open(u, 'social_login', 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=' + w + ',height=' + h + ',top=' + y + ',left=' + x) || null;
-    };
+    var authModalEnabled = @json($authModalEnabled);
+    if (window.location.search.indexOf('no_auth_modal=1') !== -1) {
+        authModalEnabled = false;
+    }
 
     var overlay = null;
+    var container = null;
     var frame = null;
-    /** True after we pushed a history entry for the auth iframe (close = history.back) */
+    var currentIframeUrl = '';
+    var lastOpenAuthUrl = '';
+    var lastOpenAuthAt = 0;
     var authModalHistoryActive = false;
+    var authOverlayIsOpen = false;
 
-    function hideOverlayVisualOnly() {
-        if (!overlay) return;
-        overlay.style.display = 'none';
-        document.body.classList.remove('auth-iframe-open');
-    }
+    function createOverlay() {
+        if (overlay) return;
+        overlay = document.createElement('div');
+        overlay.id = 'st-auth-overlay';
+        /* Keep public page fully visible: no dim/blur backdrop for auth modal */
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;z-index:100000;display:none;opacity:1;align-items:center;justify-content:center;padding:clamp(8px, 3vw, 20px);box-sizing:border-box;touch-action:none;';
 
-    function toSameOriginPath(fullUrl) {
-        try {
-            var u = new URL(fullUrl, window.location.origin);
-            if (u.origin !== window.location.origin) return null;
-            return u.pathname + u.search + u.hash;
-        } catch (err) {
-            return null;
-        }
-    }
+        container = document.createElement('div');
+        container.style.cssText = 'position:relative;width:100%;max-width:none;height:100%;min-height:0;background:transparent;border-radius:0;overflow:visible;box-shadow:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;';
 
-    function stripOpenAuthQuery(search) {
-        if (!search || search === '?') return '';
-        var q = search.replace(/^\?/, '');
-        var parts = q.split('&').filter(function (seg) {
-            return !/^open=(login|register)$/.test(decodeURIComponent(seg.split('=')[0] || ''));
+        /* Close control lives on .auth-card inside iframe (correct position on modal) */
+        frame = document.createElement('iframe');
+        /* Full width so the shell fills the viewport (no narrow “strip” beside blurred page) */
+        frame.style.cssText = 'width:100%;max-width:100%;height:92vh;max-height:92vh;border:0;background:transparent;display:block;';
+        frame.setAttribute('allow', 'payment');
+        frame.setAttribute('title', 'Account');
+
+        container.appendChild(frame);
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) userCloseAuthOverlay();
         });
-        var kept = parts.filter(Boolean);
-        return kept.length ? '?' + kept.join('&') : '';
+    }
+
+    function toSameOriginPath(url) {
+        try {
+            var origin = window.location.origin;
+            var u = new URL(url, origin);
+            if (u.origin !== origin) return null;
+            return u.pathname + u.search + u.hash;
+        } catch (e) { return null; }
+    }
+
+    function normalizePath(path) {
+        return (path || '').replace(/\/+$/, '') || '/';
+    }
+
+    /** URLs that load the same minimal auth_modal shell in the iframe */
+    function isAuthIframeShellPath(path) {
+        var p = normalizePath(path);
+        if (/\/user\/login$/.test(p) || /\/user\/register$/.test(p)) return true;
+        if (/\/user\/password\/reset$/.test(p)) return true;
+        if (/\/user\/password\/code-verify$/.test(p)) return true;
+        if (/\/user\/password\/reset\/.+/.test(p)) return true;
+        return false;
+    }
+
+    function openAuthModalWithHistory(cleanUrl) {
+        if (!authModalEnabled) return false;
+        
+        var now = Date.now();
+        // Strict anti-flicker: if already open and showing this URL, do nothing
+        if (overlay && overlay.style.display === 'flex' && currentIframeUrl === cleanUrl) return true;
+        // Debounce rapid double-clicks
+        if (cleanUrl === lastOpenAuthUrl && now - lastOpenAuthAt < 600) return true;
+        
+        lastOpenAuthUrl = cleanUrl;
+        lastOpenAuthAt = now;
+
+        createOverlay();
+        currentIframeUrl = cleanUrl;
+        frame.src = cleanUrl;
+        overlay.style.display = 'flex';
+        authOverlayIsOpen = true;
+        document.body.style.overflow = 'hidden';
+
+        // Close any potentially open guest/account modals to prevent layering issues
+        if (window.StaylModal && typeof window.StaylModal.hide === 'function') {
+            document.querySelectorAll('.modal.is-open, .modal.show').forEach(function(m) {
+                try { window.StaylModal.hide(m); } catch (e) {}
+            });
+        }
+
+        var path = toSameOriginPath(cleanUrl);
+        if (path && window.location.pathname + window.location.search !== path) {
+            try {
+                history.pushState({ stAuthModal: 1 }, '', path);
+                authModalHistoryActive = true;
+            } catch (e) {
+                console.error('Auth state push failed', e);
+            }
+        } else if (path) {
+            authModalHistoryActive = true;
+        }
+        return true;
     }
 
     function userCloseAuthOverlay() {
+        if (!overlay || !authOverlayIsOpen) return;
+        authOverlayIsOpen = false;
+        document.body.style.overflow = '';
+        overlay.style.display = 'none';
+        try {
+            if (frame) frame.src = 'about:blank';
+        } catch (e) {}
+        currentIframeUrl = '';
         if (authModalHistoryActive) {
             authModalHistoryActive = false;
-            try {
-                history.back();
-            } catch (e) {
-                hideOverlayVisualOnly();
+            if (window.history.state && window.history.state.stAuthModal) {
+                window.history.back();
             }
-            return;
         }
-        hideOverlayVisualOnly();
     }
 
-    function createOverlay(url) {
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'pageAuthOverlay';
-            overlay.style.position = 'fixed';
-            overlay.style.top = '0';
-            overlay.style.left = '0';
-            overlay.style.width = '100%';
-            overlay.style.height = '100%';
-            overlay.style.background = 'transparent';
-            overlay.style.display = 'flex';
-            overlay.style.alignItems = 'center';
-            overlay.style.justifyContent = 'center';
-            overlay.style.zIndex = '100120';
-            overlay.style.padding = '10px';
-            overlay.style.background = 'rgba(0, 0, 0, 0.15)';
-            overlay.style.backdropFilter = 'none';
-            overlay.style.webkitBackdropFilter = 'none';
-            frame = document.createElement('iframe');
-            frame.id = 'pageAuthFrame';
-            frame.style.border = '0';
-            frame.style.width = '100%';
-            frame.style.maxWidth = '420px';
-            frame.style.height = '95vh';
-            frame.style.borderRadius = '12px';
-            frame.style.background = 'transparent';
-            frame.style.boxShadow = 'none';
-            frame.setAttribute('allowtransparency', 'true');
-            overlay.appendChild(frame);
-            overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) userCloseAuthOverlay();
-            });
-            document.body.appendChild(overlay);
-        }
-        if (frame) frame.src = url;
-        overlay.style.display = 'flex';
-        document.body.classList.add('auth-iframe-open');
-    }
-
-    function openAuthModalWithHistory(fullUrl) {
-        var path = toSameOriginPath(fullUrl);
-        if (!path) {
-            createOverlay(String(fullUrl).split('#')[0]);
-            return;
-        }
-        var scrollY = window.scrollY || window.pageYOffset || 0;
-        try {
-            sessionStorage.setItem('__stAuthScroll', String(scrollY));
-        } catch (e0) {}
-        try {
-            history.pushState({ stAuthModal: 1 }, '', path);
-            authModalHistoryActive = true;
-        } catch (e1) {
+    window.addEventListener('popstate', function(e) {
+        if (!overlay || !authOverlayIsOpen) return;
+        if (!e.state || !e.state.stAuthModal) {
             authModalHistoryActive = false;
+            userCloseAuthOverlay();
+            return;
         }
-        createOverlay(String(fullUrl).split('#')[0]);
-    }
-
-    window.openAuthModalInIframe = function(url) {
-        if (!url) return;
-        openAuthModalWithHistory(String(url).split('#')[0]);
-    };
+        var path = window.location.pathname + window.location.search;
+        var next = window.location.origin + path;
+        if (frame && isAuthIframeShellPath(window.location.pathname) && currentIframeUrl !== next) {
+            currentIframeUrl = next;
+            frame.src = next;
+        }
+    });
 
     window.addEventListener('message', function(ev) {
-        if (!ev || !ev.data) return;
-        if (ev.data === 'close-auth-overlay') {
-            userCloseAuthOverlay();
+        if (!ev.data) return;
+        if (ev.data === 'close-auth-overlay') { userCloseAuthOverlay(); return; }
+        if (typeof ev.data !== 'object') return;
+
+        if (ev.data.type === 'st-auth-nav' && typeof ev.data.url === 'string') {
+            var rel = ev.data.url;
+            var pathOnly = rel.split('#')[0];
+            var full = window.location.origin + pathOnly;
+            if (!authModalEnabled) return;
+            createOverlay();
+            currentIframeUrl = full;
+            frame.src = full;
+            overlay.style.display = 'flex';
+            authOverlayIsOpen = true;
+            document.body.style.overflow = 'hidden';
+            lastOpenAuthUrl = full;
+            lastOpenAuthAt = Date.now();
+            try {
+                history.pushState({ stAuthModal: 1 }, '', pathOnly);
+                authModalHistoryActive = true;
+            } catch (e) {}
             return;
         }
+
         if (ev.data.type === 'st-auth-url' && typeof ev.data.url === 'string') {
-            var p = toSameOriginPath(ev.data.url.indexOf('http') === 0 ? ev.data.url : (window.location.origin + ev.data.url));
-            if (!p) return;
-            var st = history.state && typeof history.state === 'object' ? Object.assign({}, history.state) : {};
-            st.stAuthModal = 1;
+            var p = ev.data.url;
+            var st = { stAuthModal: 1 };
             try {
                 history.replaceState(st, '', p);
-            } catch (e2) {}
-        }
-    });
-
-    window.addEventListener('popstate', function() {
-        if (!overlay || overlay.style.display !== 'flex') return;
-        authModalHistoryActive = false;
-        hideOverlayVisualOnly();
-        var sy = null;
-        try {
-            var raw = sessionStorage.getItem('__stAuthScroll');
-            if (raw !== null) sy = parseInt(raw, 10);
-            sessionStorage.removeItem('__stAuthScroll');
-        } catch (e4) {}
-        if (sy !== null && !isNaN(sy)) {
-            window.requestAnimationFrame(function() {
-                window.scrollTo(0, sy);
-            });
-        }
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && overlay && overlay.style.display === 'flex') {
-            userCloseAuthOverlay();
+                currentIframeUrl = window.location.origin + p;
+            } catch (e) {}
         }
     });
 
     document.addEventListener('click', function(e) {
-        var link = e.target.closest('a[href]');
+        if (e.defaultPrevented) return;
+        
+        var link = e.target.closest('a[href], [data-guest-auth]');
         if (!link) return;
-        if (link.classList.contains('js-auth-navigate')) return;
-        var hrefAttr = link.getAttribute('href') || '';
-        if (hrefAttr === '#' || hrefAttr.indexOf('javascript:') === 0) return;
-        if (link.getAttribute('target') === '_blank') return;
 
+        var isAuthPath = false;
         var path = '';
-        try {
-            path = (link.pathname || new URL(link.href, window.location.origin).pathname || '').replace(/\/+$/, '') || '/';
-        } catch (err) {
-            path = '';
+        var href = link.getAttribute('href') || link.getAttribute('data-href');
+        
+        // If it's a data-guest-auth button, determine the URL
+        if (link.hasAttribute('data-guest-auth')) {
+            var mode = link.getAttribute('data-guest-auth');
+            href = mode === 'register' ? '{{ route("user.register") }}' : '{{ route("user.login") }}';
         }
-        var isAuthPath = /\/user\/login$/.test(path) || /\/user\/register$/.test(path);
+
+        if (!href || href.indexOf('#') === 0 || href.indexOf('javascript:') === 0) return;
+
+        try {
+            var urlObj = new URL(href, window.location.origin);
+            path = urlObj.pathname;
+            isAuthPath = isAuthIframeShellPath(path);
+        } catch (err) {
+            path = href.split('?')[0].split('#')[0];
+            isAuthPath = isAuthIframeShellPath(path);
+        }
+
         var isTrigger = link.classList.contains('glass-login-btn')
             || link.classList.contains('js-footer-floating-login')
             || link.classList.contains('js-footer-floating-register')
-            || link.classList.contains('js-open-floating-login')
-            || link.classList.contains('js-open-floating-register')
-            || link.classList.contains('js-floating-login-link')
-            || link.classList.contains('js-floating-register-link');
+            || link.hasAttribute('data-guest-auth');
+
         if (!isAuthPath && !isTrigger) return;
 
-        var u = link.href || hrefAttr;
-        if (!u) return;
+        // Take complete ownership of the event to prevent secondary handler conflicts
         e.preventDefault();
         e.stopPropagation();
-        openAuthModalWithHistory(String(u).split('#')[0]);
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+        var iframeUrl = String(new URL(href, window.location.origin).href).split('#')[0];
+        openAuthModalWithHistory(iframeUrl);
     }, true);
 
     function tryOpenAuthFromQuery() {
-        try {
-            var p = (window.location.pathname || '').replace(/\/+$/, '') || '/';
-            if (/\/user\/login$/.test(p) || /\/user\/register$/.test(p)) return;
-        } catch (e2) {}
-        var m = window.location.search.match(/[?&]open=(login|register)/);
+        if (!authModalEnabled || authModalHistoryActive) return;
+        var search = window.location.search;
+        if (search.indexOf('open=login') === -1 && search.indexOf('open=register') === -1) return;
+
+        var m = search.match(/[?&]open=(login|register)/);
         if (!m) return;
-        var loginRoute = @json(route('user.login'));
-        var regRoute = @json(route('user.register'));
-        var qs = window.location.search.replace(/^\?/, '');
-        var base = m[1] === 'register' ? regRoute : loginRoute;
-        var join = base.indexOf('?') >= 0 ? '&' : '?';
-        var iframeSrc = qs ? base + join + qs : base;
-        var newSearch = stripOpenAuthQuery(window.location.search);
-        var cleanUrl = window.location.pathname + newSearch;
-        try {
-            history.replaceState(history.state && typeof history.state === 'object' ? history.state : {}, '', cleanUrl);
-        } catch (e3) {}
+
+        var iframeSrc = (m[1] === 'register' ? '{{ route("user.register") }}' : '{{ route("user.login") }}');
+        
+        // Preserve other query params for redirects, but strip open= to avoid loops
+        var newSearch = search.replace(/[?&]open=(login|register)/g, '').replace(/^[&]/, '?');
+        if (newSearch && newSearch !== '?') {
+            iframeSrc += (iframeSrc.indexOf('?') === -1 ? '?' : '&') + newSearch.substring(newSearch.indexOf('?') === 0 ? 1 : 0);
+        }
+        
+        lastOpenAuthAt = 0; // Forced open
         openAuthModalWithHistory(iframeSrc);
     }
 
@@ -214,5 +250,7 @@
     } else {
         tryOpenAuthFromQuery();
     }
+
+    window.openAuthModalInIframe = openAuthModalWithHistory;
 })();
 </script>

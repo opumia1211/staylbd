@@ -74,13 +74,13 @@
                                data-search-url="{{ url('/search/universal') }}"
                                data-placeholder-listening="@lang('Listening… speak now')">
                         <button type="button" class="glass-search-icon glass-search-voice shrink-0" id="voiceSearchBtn" title="@lang('Voice Search')" aria-label="@lang('Voice Search')">
-                            @include($activeTemplate . 'partials.icon', ['name' => 'microphone'])
+                            @include('templates.basic.partials.icon', ['name' => 'microphone', 'class' => 'icon-bold'])
                         </button>
                         <button type="submit" class="glass-search-icon glass-search-submit shrink-0" title="@lang('Search')" aria-label="@lang('Search')">
                             @if($headerIconImage('search_icon'))
                                 <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('search_icon')) }}" alt="" class="ui-icon" width="20" height="20" decoding="async" loading="eager">
                             @else
-                                @include($activeTemplate . 'partials.icon', ['name' => 'search', 'class' => 'glass-search-submit__icon'])
+                                @include('templates.basic.partials.icon', ['name' => 'search', 'class' => 'icon-bold'])
                             @endif
                         </button>
                     </div>

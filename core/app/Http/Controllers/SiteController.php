@@ -549,11 +549,70 @@ class SiteController extends Controller
         }
 
         $emptyMessage = __('No reviews yet. Be the first to review!');
-        $response = response()->view($this->activeTemplate . 'products.details', compact('product', 'pageTitle', 'relatedProduct', 'sameBrandProducts', 'youMayAlsoLike', 'reviews', 'reviewsTotal', 'ratingBreakdown', 'canReview', 'hasPurchased', 'userReview', 'seoContents', 'wishListProductIds', 'productUrl', 'productImages', 'breadcrumbList', 'detailPrice', 'emptyMessage', 'reviewBlockedReason', 'productViews24h'));
+        $bottomProducts = $this->buildProductDetailBottomProducts($product->id);
+        $response = response()->view($this->activeTemplate . 'products.details', compact('product', 'pageTitle', 'relatedProduct', 'sameBrandProducts', 'youMayAlsoLike', 'reviews', 'reviewsTotal', 'ratingBreakdown', 'canReview', 'hasPurchased', 'userReview', 'seoContents', 'wishListProductIds', 'productUrl', 'productImages', 'breadcrumbList', 'detailPrice', 'emptyMessage', 'reviewBlockedReason', 'productViews24h', 'bottomProducts'));
         if (!auth()->check()) {
             $response->header('Cache-Control', 'public, max-age=30, stale-while-revalidate=60');
         }
         return $response;
+    }
+
+    /**
+     * Product details bottom list:
+     * - prioritize recently viewed product IDs from cookie (excluding current product)
+     * - fill remaining slots with latest active products
+     */
+    protected function buildProductDetailBottomProducts(int $currentProductId, int $limit = 24)
+    {
+        $limit = max(8, min(48, $limit));
+
+        $productSelect = [
+            'id', 'name', 'slug', 'image', 'price', 'discount', 'discount_type', 'today_deals',
+            'category_id', 'brand_id', 'sale_count', 'avg_rate', 'quantity', 'created_at', 'gallery'
+        ];
+
+        $recentCookie = (string) request()->cookie('recently_viewed_ids', '');
+        $recentIds = [];
+        if ($recentCookie !== '') {
+            $decoded = json_decode(urldecode($recentCookie), true);
+            if (is_array($decoded)) {
+                $recentIds = collect($decoded)
+                    ->map(fn ($v) => (int) $v)
+                    ->filter(fn ($v) => $v > 0 && $v !== $currentProductId)
+                    ->unique()
+                    ->take($limit)
+                    ->values()
+                    ->all();
+            }
+        }
+
+        $recentProducts = collect();
+        if (!empty($recentIds)) {
+            $recentProducts = Product::active()
+                ->select($productSelect)
+                ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                ->with(['category:id,name', 'brand:id,name'])
+                ->whereIn('id', $recentIds)
+                ->get()
+                ->sortBy(fn ($p) => array_search((int) $p->id, $recentIds, true))
+                ->values();
+        }
+
+        $remaining = max(0, $limit - $recentProducts->count());
+        $fillerProducts = collect();
+        if ($remaining > 0) {
+            $excludeIds = $recentProducts->pluck('id')->push($currentProductId)->unique()->values()->all();
+            $fillerProducts = Product::active()
+                ->select($productSelect)
+                ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                ->with(['category:id,name', 'brand:id,name'])
+                ->whereNotIn('id', $excludeIds)
+                ->latest()
+                ->take($remaining)
+                ->get();
+        }
+
+        return $recentProducts->concat($fillerProducts)->take($limit)->values();
     }
 
     /** Precompute product image list for JSON-LD and view (avoids getImage in loop). */

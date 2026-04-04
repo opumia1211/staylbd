@@ -1,6 +1,7 @@
 @extends($activeTemplate . 'layouts.auth_modal')
 @section('content')
-<div class="auth-overlay">
+@include($activeTemplate . 'user.auth.partials.auth_page_styles')
+<div class="auth-overlay" id="authModalOverlay">
     <div class="auth-card" style="position:relative;">
         @php $authLogo = getLogo('logo'); $siteName = gs('site_name'); @endphp
         <button type="button" class="auth-close" onclick="window.location.href='{{ route('home') }}'" aria-label="@lang('Close')" title="@lang('Close')">&times;</button>
@@ -21,7 +22,7 @@
             <input type="hidden" name="email" value="{{ $email }}">
             <div class="form-group">
                 <label class="form--label" for="reset_code">@lang('Verification Code')</label>
-                <input type="text" id="reset_code" name="code" class="form-control form--control" required autocomplete="off" placeholder="@lang('Enter 6 digit code')">
+                <input type="text" id="reset_code" name="code" class="form-control form--control" required autocomplete="one-time-code" placeholder="@lang('Enter 6 digit code')">
             </div>
             <div class="form-group">
                 <button type="submit" class="auth-btn">@lang('Submit')</button>

@@ -124,10 +124,14 @@
                         <p class="mb-0 small text-white-50">{{ __($companyInfo->data_values->business_license) }}</p>
                     @endif
                     @if($contactContent && !empty($contactContent->data_values->address))
+                        @php
+                            $aboutAddress = trim((string)($contactContent->data_values->address ?? ''));
+                            $aboutAddress = preg_replace('/\s*,\s*/', ', ', $aboutAddress);
+                        @endphp
                         <div class="footer-app-info footer-address-block mt-2 pt-2 border-top border-white border-opacity-25">
                             <p class="mb-0 footer-address-line">
                                 <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'map-marker-alt', 'class' => 'me-1'])</span>
-                                <span class="footer-address-line__text">{{ __($contactContent->data_values->address) }}</span>
+                                <span class="footer-address-line__text">{{ __($aboutAddress) }}</span>
                             </p>
                         </div>
                     @endif
@@ -136,7 +140,7 @@
                         $aboutEmail = trim((string)($companyInfo->data_values->contact_email ?? ''));
                     @endphp
                     @if($aboutPhone !== '' || $aboutEmail !== '')
-                        <div class="footer-app-info footer-address-block mt-1 pt-1 border-top border-white border-opacity-25">
+                        <div class="footer-app-info footer-address-block mt-2 pt-2 border-top border-white border-opacity-25">
                             @if($aboutPhone !== '')
                                 <p class="mb-1 footer-address-line">
                                     <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'mobile-alt', 'class' => 'me-1'])</span>
@@ -230,8 +234,8 @@
                         <form class="js-footer-return-form" action="{{ route('footer.return.submit') }}" method="post">
                             @csrf
                             <div class="row g-0">
-                                <div class="col-12"><input type="text" name="name" class="form-control form-control-sm" placeholder="{{ __('Name') }}" required></div>
-                                <div class="col-12"><input type="email" name="email" class="form-control form-control-sm" placeholder="{{ __('Email') }}" required></div>
+                                <div class="col-12"><input type="text" name="name" class="form-control form-control-sm" placeholder="{{ __('Name') }}" autocomplete="name" required></div>
+                                <div class="col-12"><input type="email" name="email" class="form-control form-control-sm" placeholder="{{ __('Email') }}" autocomplete="email" required></div>
                                 <div class="col-12"><input type="text" name="order_number" class="form-control form-control-sm" placeholder="{{ __('Order number (optional)') }}"></div>
                                 <div class="col-12"><input type="text" name="reason" class="form-control form-control-sm" placeholder="{{ __('Reason for return (optional)') }}"></div>
                                 <div class="col-12"><textarea name="message" class="form-control form-control-sm" rows="1" placeholder="{{ __('Message') }}" required></textarea></div>
@@ -518,7 +522,7 @@
                                     $platformKey = strtolower($platform);
                                     $platformIcon = match(true) {
                                         str_contains($platformKey, 'android') => 'android',
-                                        in_array($platformKey, ['ios', 'apple', 'mac']) => 'apple',
+                                        in_array($platformKey, ['ios', 'apple', 'mac', 'iphone']) => 'apple',
                                         str_contains($platformKey, 'windows') => 'windows',
                                         str_contains($platformKey, 'mac') => 'apple',
                                         str_contains($platformKey, 'desktop') => 'desktop',
@@ -526,23 +530,23 @@
                                     };
                                     $platformLogoUrl = getPlatformLogoUrl($platform);
                                     $downloadUrl = $appFile ? asset('assets/files/frontend/apps/' . $appFile) : null;
+                                    $finalLink = $downloadUrl ?: $link ?: '#';
                                 @endphp
-                                <div class="footer-app-card">
-                                    @if($img)
-                                        <img src="{{ getImage('assets/images/frontend/footer/' . $img) }}" alt="{{ $name ?: $platform }}" loading="lazy" width="28" height="28" class="footer-app-card__logo rounded">
-                                    @elseif($platformLogoUrl)
-                                        <img src="{{ $platformLogoUrl }}" alt="{{ $label }}" loading="lazy" width="28" height="28" class="footer-app-card__logo rounded">
-                                    @else
-                                        <span class="footer-app-card__icon">@include($activeTemplate . 'partials.icon', ['name' => $platformIcon])</span>
-                                    @endif
-                                    @if($downloadUrl)
-                                        <a href="{{ $downloadUrl }}" download class="footer-app-card__btn">{{ __($label) }} @include($activeTemplate . 'partials.icon', ['name' => 'download', 'class' => 'ms-1'])</a>
-                                    @elseif($link)
-                                        <a href="{{ $link }}" target="_blank" rel="noopener noreferrer" class="footer-app-card__btn">{{ __($label) }}</a>
-                                    @else
-                                        <span class="footer-app-card__label">{{ __($label) }}</span>
-                                    @endif
-                                </div>
+                                <a href="{{ $finalLink }}" class="footer-app-card" @if(!$downloadUrl && $link) target="_blank" rel="noopener noreferrer" @endif title="{{ __($label) }}">
+                                    <div class="footer-app-card__icon-wrap">
+                                        @if($img)
+                                            <img src="{{ getImage('assets/images/frontend/footer/' . $img) }}" alt="{{ $label }}" loading="lazy" class="footer-app-card__logo">
+                                        @elseif($platformLogoUrl)
+                                            <img src="{{ $platformLogoUrl }}" alt="{{ $label }}" loading="lazy" class="footer-app-card__logo">
+                                        @else
+                                            @include($activeTemplate . 'partials.icon', ['name' => $platformIcon])
+                                        @endif
+                                    </div>
+                                    <div class="footer-app-card__text">
+                                        <span class="platform-label">{{ __('Get it on') }}</span>
+                                        <span class="platform-name">{{ __($label) }}</span>
+                                    </div>
+                                </a>
                             @endforeach
                             </div>
                         @else
@@ -614,21 +618,7 @@
 </footer>
 @push('script')
 <script>
-(function() {
-  document.addEventListener('click', function(e) {
-    var loginLnk = e.target.closest('footer.site-footer .js-footer-floating-login');
-    var regLnk = e.target.closest('footer.site-footer .js-footer-floating-register');
-    if (!loginLnk && !regLnk) return;
-    e.preventDefault();
-    var href = (loginLnk || regLnk).getAttribute('href') || '';
-    if (typeof window.openAuthModalInIframe === 'function') {
-      window.openAuthModalInIframe((loginLnk || regLnk).href || href);
-    } else {
-      window.location.href = href;
-    }
-  });
-})();
-
+// Footer login/register links: use global capture in auth_iframe_overlay_script only (duplicate handler caused double load).
 (function() {
   var footer = document.querySelector('footer.site-footer.footer-glass');
   if (!footer) return;

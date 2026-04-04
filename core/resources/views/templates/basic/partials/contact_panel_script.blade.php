@@ -191,7 +191,7 @@
 
                 var html = '';
                 var lastDate = '';
-                var doubleCheck = '<span class="contact-chat-msg-read" aria-label="@lang("Read")">@include($activeTemplate . 'partials.icon', ['name' => 'check-double'])</span>';
+                var doubleCheck = `<span class="contact-chat-msg-read" aria-label="@lang("Read")">@include($activeTemplate . 'partials.icon', ['name' => 'check-double'])</span>`;
                 messages.forEach(function (m) {
                     var datePart = m.date_label || (m.created_at || '').split(',')[0].trim();
                     if (datePart && datePart !== lastDate) {
@@ -215,9 +215,9 @@
                             attLabel = att.name || att.type || attLabel;
                         }
                         if (attUrl) {
-                            html += '<div class="contact-chat-msg-att"><a href="' + attUrl + '" target="_blank">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) ' + attLabel + '</a></div>';
+                            html += `<div class="contact-chat-msg-att"><a href="${attUrl}" target="_blank">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) ${attLabel}</a></div>`;
                         } else {
-                            html += '<div class="contact-chat-msg-att">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) ' + attLabel + '</div>';
+                            html += `<div class="contact-chat-msg-att">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) ${attLabel}</div>`;
                         }
                     }
                     var dateTimeStr = (m.date_label ? m.date_label + ' · ' : '') + (m.created_at || '');

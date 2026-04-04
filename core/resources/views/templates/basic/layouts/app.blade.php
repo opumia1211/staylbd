@@ -1,13 +1,14 @@
 @php
     $assetVersion = app()->environment('local') ? time() : ($assetVersion ?? (config('app.asset_version') ?? '1'));
-    $disableLegacyJquery = true;
-    $disableLegacyBootstrapBundle = true;
-    $disableLegacyJqueryUi = true;
-    $disableLegacyVisualLibs = true;
-    $disableLegacyLightbox = true;
-    $disableLegacyWow = true;
-    $disableLegacyCarouselJs = false;
-    $disableLegacyOwl = true;
+    // Respect page-level overrides (e.g. PDP needs jQuery + Bootstrap for interactions).
+    $disableLegacyJquery = $disableLegacyJquery ?? true;
+    $disableLegacyBootstrapBundle = $disableLegacyBootstrapBundle ?? true;
+    $disableLegacyJqueryUi = $disableLegacyJqueryUi ?? true;
+    $disableLegacyVisualLibs = $disableLegacyVisualLibs ?? true;
+    $disableLegacyLightbox = $disableLegacyLightbox ?? true;
+    $disableLegacyWow = $disableLegacyWow ?? true;
+    $disableLegacyCarouselJs = $disableLegacyCarouselJs ?? false;
+    $disableLegacyOwl = $disableLegacyOwl ?? true;
 @endphp
 <!doctype html>
 <html lang="{{ config('app.locale') }}" itemscope itemtype="http://schema.org/WebPage">
@@ -24,10 +25,16 @@
     <link rel="preconnect" href="https://rsms.me/" crossorigin>
     <link rel="preload" href="https://rsms.me/inter/inter.css" as="style" crossorigin>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" crossorigin>
-    {{-- Footer social: FA + Line Awesome for admin-picked classes; Inter + Tailwind = serve-css/tailwind-storefront only. --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="preload" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}" as="style">
+    {{-- Icon fonts: non-blocking (first paint uses Inter + tailwind-storefront only; icons apply right after load) --}}
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://maxst.icons8.com">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" media="print" onload="this.media='all'" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+    <link rel="preload" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" media="print" onload="this.media='all'" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <noscript><link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+    <link rel="stylesheet" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}" crossorigin="anonymous">
     @stack('head-meta')
     <title>{{ $general->siteName(__($pageTitle ?? 'Home')) }}</title>
     @include('partials.seo')
@@ -141,10 +148,7 @@
     </style>
 
     {{-- Single compiled storefront stylesheet (Bootstrap + legacy + Tailwind @tailwind) — fewer round trips, long cache --}}
-    <link rel="stylesheet" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}">
-    <noscript>
-        <link rel="stylesheet" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}">
-    </noscript>
+    <link rel="stylesheet" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}" crossorigin="anonymous">
 
     @stack('style-lib')
 
@@ -752,17 +756,8 @@
                     modalApi.hide(guestAccountModal);
                 }
             });
-            document.addEventListener('click', function(e) {
-                var authBtn = e.target.closest('[data-guest-auth]');
-                if (!authBtn) return;
-                e.preventDefault();
-                var mode = authBtn.getAttribute('data-guest-auth');
-                var authUrl = mode === 'register' ? '{{ route("user.register") }}' : '{{ route("user.login") }}';
-                var guestAccountModal = document.getElementById('guestAccountModal');
-                if (guestAccountModal) modalApi.hide(guestAccountModal);
-                if (typeof window.openAuthModalInIframe === 'function') window.openAuthModalInIframe(authUrl);
-                else window.location.href = authUrl;
-            });
+            // Handled globally by auth_iframe_overlay_script.blade.php
+            // document.addEventListener('click', function(e) { ... });
         })();
     </script>
     @endguest

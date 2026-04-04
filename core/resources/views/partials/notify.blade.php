@@ -4,7 +4,7 @@
     @foreach(session('notify') as $msg)
         <script>
             "use strict";
-            iziToast.{{ $msg[0] }}({message:"{{ __($msg[1]) }}", position: "topRight", timeout: 1200, transitionIn: 'fadeInDown', transitionOut: 'fadeOutUp', displayMode: 'replace'});
+            iziToast.{{ $msg[0] }}({message: @json(__($msg[1])), position: "topRight", timeout: 1200, transitionIn: 'fadeInDown', transitionOut: 'fadeOutUp', displayMode: 'replace'});
         </script>
     @endforeach
 @endif
@@ -19,7 +19,7 @@
         "use strict";
         @foreach ($errors as $error)
         iziToast.error({
-            message: '{{ __($error) }}',
+            message: @json(__($error)),
             position: "topRight",
             timeout: 2500
         });

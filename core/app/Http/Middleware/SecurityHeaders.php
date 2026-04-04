@@ -28,10 +28,14 @@ class SecurityHeaders
         // Content-Security-Policy: allow Google Fonts, tawk.to chat, inline scripts
         $cspReportOnly = config('security_headers.csp_report_only', true);
         $strictCsp = config('security_headers.csp_strict', false);
+        /*
+         * Public storefront loads Inter (rsms.me), Font Awesome (jsdelivr), Line Awesome (icons8)
+         * in addition to fonts.googleapis.com. Without these hosts, CSP-Report-Only logs fat-font violations.
+         */
         if ($strictCsp) {
-            $csp = "default-src 'self'; script-src 'self' https://embed.tawk.to; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https: https://embed.tawk.to; frame-ancestors 'self'; base-uri 'self'; form-action 'self'";
+            $csp = "default-src 'self'; script-src 'self' https://embed.tawk.to; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://rsms.me https://cdn.jsdelivr.net https://maxst.icons8.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://rsms.me https://cdn.jsdelivr.net https://maxst.icons8.com data:; img-src 'self' data: https:; connect-src 'self' https: https://embed.tawk.to; frame-ancestors 'self'; base-uri 'self'; form-action 'self'";
         } else {
-            $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: https:; connect-src 'self' https: https://embed.tawk.to; frame-ancestors 'self'; base-uri 'self'; form-action 'self'";
+            $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://rsms.me https://cdn.jsdelivr.net https://maxst.icons8.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://rsms.me https://cdn.jsdelivr.net https://maxst.icons8.com data:; img-src 'self' data: https:; connect-src 'self' https: https://embed.tawk.to; frame-ancestors 'self'; base-uri 'self'; form-action 'self'";
         }
         $response->headers->set($cspReportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy', $csp);
 

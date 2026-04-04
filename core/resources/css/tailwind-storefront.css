@@ -1468,12 +1468,12 @@ footer.site-footer.footer-glass.footer-glass--premium .footer-return-form-wrap .
 
 /* Auth iframe overlay: keep background clear, avoid blur */
 body.auth-iframe-open #pageAuthOverlay {
-    background: rgba(2, 6, 23, 0.16) !important;
+    background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
 body.auth-iframe-open #pageAuthFrame {
-    background: #ffffff !important;
+    background: transparent !important;
 }
 
 /* =======================================================================
@@ -1547,6 +1547,38 @@ footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .foot
     overflow-wrap: anywhere !important;
     word-break: break-word !important;
     line-height: 1.35 !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block:first-of-type .footer-address-line__text {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block {
+    margin-top: 0.45rem !important;
+    padding-top: 0.35rem !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block .footer-address-line {
+    margin-bottom: 0.18rem !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block .footer-address-line:last-child {
+    margin-bottom: 0 !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block .footer-address-line__icon,
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block .footer-address-line__text a {
+    color: #dc2626 !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block .footer-address-line__icon {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block .footer-address-line__text a {
+    font-size: 15px !important;
+    line-height: 1.45 !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+footer.site-footer.footer-glass.footer-glass--premium .footer-about-widget .footer-address-block + .footer-address-block .footer-address-line__text a:hover {
+    color: #b91c1c !important;
+    text-decoration: underline !important;
 }
 
 footer.site-footer.footer-glass.footer-glass--premium .footer__bottom__widget .footer-col-title {

@@ -56,15 +56,23 @@
   margin-bottom: 6px;
 }
 .auth-overlay .form-check-input {
-  width: auto;
+  width: 1.125em;
+  height: 1.125em;
+  min-height: 0;
   margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  align-self: center;
+  box-sizing: border-box;
+  border-radius: 0.25em;
 }
 .auth-overlay .form-check-label {
   margin: 0;
   font-size: 0.85rem;
 }
 
-.auth-overlay input,
+/* Exclude checkbox/radio: shared min-height/width breaks native controls */
+.auth-overlay input:not([type="checkbox"]):not([type="radio"]),
 .auth-overlay textarea,
 .auth-overlay select {
   width: 100%;
@@ -192,13 +200,40 @@
 }
 .auth-overlay .auth-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  color: #666;
-  text-decoration: none;
-  font-size: 1.4rem;
+  top: 10px;
+  right: 10px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
   line-height: 1;
-  z-index: 1;
+  letter-spacing: -0.02em;
+  color: #64748b;
+  text-decoration: none;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background: rgba(248, 250, 252, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease,
+    box-shadow 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.auth-overlay .auth-close:hover {
+  color: #0f172a;
+  background: #fff;
+  border-color: rgba(14, 159, 144, 0.28);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+.auth-overlay .auth-close:active {
+  background: #f1f5f9;
 }
 .auth-overlay .invalid-feedback,
 .auth-overlay .invalid-feedback.d-block {
