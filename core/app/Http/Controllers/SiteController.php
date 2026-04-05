@@ -399,7 +399,7 @@ class SiteController extends Controller
 
             $categoryId = $product->category_id;
             $brandId = $product->brand_id;
-            $productSelect = ['id', 'name', 'slug', 'image', 'price', 'discount', 'discount_type', 'today_deals', 'category_id', 'brand_id', 'sale_count', 'avg_rate', 'quantity', 'created_at', 'gallery'];
+            $productSelect = ['id', 'name', 'slug', 'image', 'price', 'discount', 'discount_type', 'today_deals', 'category_id', 'brand_id', 'sale_count', 'avg_rate', 'quantity', 'created_at', 'gallery', 'product_sku'];
 
             // 1) Related: same category, up to 12 (for carousel + sidebar)
             $relatedProduct = Product::active()
@@ -1664,7 +1664,32 @@ class SiteController extends Controller
         });
 
         $emptyMessage = __('No categories found.');
-        return view($this->activeTemplate . 'all_category', compact('pageTitle', 'categories', 'emptyMessage', 'sort', 'search', 'perPage', 'featuredOnly'));
+
+        $categoriesNav = Cache::remember('category_all_nav.' . $cacheVersion, 600, function () {
+            return Category::query()
+                ->active()
+                ->publicPublished()
+                ->orderBy('name')
+                ->with(['subcategories' => function ($q) {
+                    $q->active()->orderBy('name');
+                }])
+                ->get();
+        });
+
+        return view($this->activeTemplate . 'all_category', compact('pageTitle', 'categories', 'categoriesNav', 'emptyMessage', 'sort', 'search', 'perPage', 'featuredOnly'));
+    }
+
+    /**
+     * Guest account menu (same options as the old bottom-nav modal), opens in a new tab from mobile nav.
+     */
+    public function guestAccountMenu()
+    {
+        if (auth()->check()) {
+            return redirect()->route('user.home');
+        }
+        $pageTitle = __('My Account');
+
+        return view($this->activeTemplate . 'guest_account_page', compact('pageTitle'));
     }
 
     public function allBrand()

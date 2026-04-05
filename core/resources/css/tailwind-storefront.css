@@ -473,6 +473,75 @@
     box-sizing: border-box !important;
 }
 
+/*
+ * Premium hover (match “Search by image” / glass-header.css intent): screenshot-lock above uses !important
+ * on resting state, which suppressed generic .glass-icon-btn:hover — camera sits outside that list so it still animated.
+ * These :hover / :focus-visible rules use !important + equal/higher specificity so all toolbar glyphs behave the same.
+ */
+.glass-header .glass-nav-btn,
+.glass-header .glass-header-left .glass-nav-btn,
+.glass-header .glass-header-right .glass-icon-btn,
+.glass-header .glass-lang-btn,
+.glass-header .glass-notification-btn,
+.glass-header .glass-login-btn,
+.glass-header .glass-header-camera-btn,
+.glass-header .glass-search-icon {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.glass-header .glass-header-right .glass-profile-btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.glass-header .glass-nav-btn:hover,
+.glass-header .glass-nav-btn:focus-visible,
+.glass-header .glass-header-left .glass-nav-btn:hover,
+.glass-header .glass-header-left .glass-nav-btn:focus-visible,
+.glass-header .glass-header-right .glass-icon-btn:hover,
+.glass-header .glass-header-right .glass-icon-btn:focus-visible,
+.glass-header .glass-lang-btn:hover,
+.glass-header .glass-lang-btn:focus-visible,
+.glass-header .glass-notification-btn:hover,
+.glass-header .glass-notification-btn:focus-visible,
+.glass-header .glass-login-btn:hover,
+.glass-header .glass-login-btn:focus-visible,
+.glass-header .glass-header-camera-btn:hover,
+.glass-header .glass-header-camera-btn:focus-visible,
+.glass-header .glass-search-icon:hover,
+.glass-header .glass-search-icon:focus-visible {
+    background: rgba(37, 99, 235, 0.1) !important;
+    border-color: #2563eb !important;
+    color: #2563eb !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.22) !important;
+    transform: translateY(-1px) scale(1.04) !important;
+}
+
+.glass-header .glass-search-submit.glass-search-icon:hover,
+.glass-header .glass-search-submit.glass-search-icon:focus-visible {
+    background: rgba(37, 99, 235, 0.08) !important;
+}
+
+.glass-header .glass-search-icon:hover .ui-icon,
+.glass-header .glass-search-icon:focus-visible .ui-icon {
+    color: #2563eb !important;
+    stroke: #2563eb !important;
+}
+
+.glass-header .glass-nav-btn.active:hover,
+.glass-header .glass-nav-btn.active:focus-visible {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+    border-color: #1d4ed8 !important;
+    color: #fff !important;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35) !important;
+    transform: translateY(-1px) scale(1.04) !important;
+}
+
+.glass-header .glass-header-right .glass-profile-btn:hover,
+.glass-header .glass-header-right .glass-profile-btn:focus-visible {
+    transform: scale(1.045) !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.22) !important;
+}
+
 .glass-header .glass-header-right {
     gap: 6px !important;
 }
@@ -489,6 +558,35 @@
 
 .glass-header .glass-login-text {
     display: none !important;
+}
+
+/* Mobile drawer menu links — same hover language as header / camera button */
+#glassSidebar.glass-mobile-menu .glass-mobile-nav a {
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+    border-radius: 8px !important;
+}
+
+#glassSidebar.glass-mobile-menu .glass-mobile-nav a:hover,
+#glassSidebar.glass-mobile-menu .glass-mobile-nav a:focus-visible {
+    background: rgba(37, 99, 235, 0.09) !important;
+    color: #2563eb !important;
+}
+
+#glassSidebar.glass-mobile-menu .glass-mobile-nav a:hover .ui-icon,
+#glassSidebar.glass-mobile-menu .glass-mobile-nav a:focus-visible .ui-icon {
+    transform: scale(1.07);
+}
+
+/* Back-to-top: blue glow + scale when visible (.active) */
+button.scrollToTop {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
+}
+
+button.scrollToTop.active:hover,
+button.scrollToTop.active:focus-visible {
+    transform: translateY(0) scale(1.07) !important;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.38) !important;
+    filter: brightness(1.06);
 }
 
 @media (max-width: 991px) {
@@ -528,6 +626,14 @@
         background: rgba(255, 255, 255, 0.92) !important;
         backdrop-filter: blur(8px) !important;
         -webkit-backdrop-filter: blur(8px) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease !important;
+    }
+
+    .product-card .product-card__action:hover,
+    .product-card .product-card__action:focus-visible {
+        transform: translateY(-2px) scale(1.05) !important;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2) !important;
+        color: #2563eb !important;
     }
 
     /* Fluid typography/spacing for micro->4K */
@@ -1676,4 +1782,15 @@ footer.site-footer.footer-glass.footer-glass--premium .footer-glass__policy-link
     footer.site-footer.footer-glass.footer-glass--premium .footer__bottom__widget a {
         font-size: 12px !important;
     }
+}
+
+/*
+ * jQuery UI defines `.ui-icon` with a PNG sprite (background-image). Our Lucide/header glyphs reuse
+ * the class name on real <svg> / <img> nodes — the sprite paints a stray caret/triangle (^) on top.
+ * Spans with `.ui-icon` + `.ui-icon-*` (real jQuery widgets) keep the sprite; svg/img do not.
+ */
+svg.ui-icon,
+img.ui-icon {
+    background: none !important;
+    background-image: none !important;
 }

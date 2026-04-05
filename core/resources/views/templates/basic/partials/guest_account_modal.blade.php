@@ -9,73 +9,7 @@
                 @include($activeTemplate . 'partials.icon', ['name' => 'times'])
             </button>
             <div class="modal-body p-3 p-sm-4">
-                <div class="mx-auto w-full max-w-storefront">
-                    <h6 id="guestAccountModalLabel" class="mb-3 fw-semibold text-slate-800">@lang('My Account')</h6>
-
-                    <div class="guest-account-auth-row d-grid gap-2 mb-3">
-                        <button type="button" class="btn btn--base btn-sm w-100" data-guest-auth="login">@lang('Login')</button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm w-100" data-guest-auth="register">@lang('Registration')</button>
-                    </div>
-
-                    <div class="guest-account-links mb-3">
-                        <div class="small text-muted mb-2">@lang('Quick Links')</div>
-                        <div class="guest-account-grid guest-account-grid--links">
-                            <a href="{{ route('products') }}" class="guest-account-card" data-no-ajax>
-                                <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'box'])</span>
-                                <span class="guest-account-card__text">@lang('Products')</span>
-                            </a>
-                            <a href="{{ route('contact') }}" class="guest-account-card" data-no-ajax>
-                                <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'phone'])</span>
-                                <span class="guest-account-card__text">@lang('Contact')</span>
-                            </a>
-                            <a href="{{ route('track.order') }}" class="guest-account-card" data-no-ajax>
-                                <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'shipping-fast'])</span>
-                                <span class="guest-account-card__text">@lang('Track Order')</span>
-                            </a>
-                            <button type="button" class="guest-account-card guest-account-card--btn" data-guest-auth="login">
-                                <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'sign-in-alt'])</span>
-                                <span class="guest-account-card__text">@lang('Login')</span>
-                            </button>
-                            <button type="button" class="guest-account-card guest-account-card--btn" data-guest-auth="register">
-                                <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'user-plus'])</span>
-                                <span class="guest-account-card__text">@lang('Register')</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="guest-account-grid">
-                        <a href="{{ route('user.wishlist') }}" class="guest-account-card" data-no-ajax>
-                            <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'heart'])</span>
-                            <span class="guest-account-card__text">@lang('Wishlist')</span>
-                            <span class="guest-account-card__count show-wishlist-count">0</span>
-                        </a>
-                        <a href="{{ route('user.compare') }}" class="guest-account-card" data-no-ajax>
-                            <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'exchange-alt'])</span>
-                            <span class="guest-account-card__text">@lang('Compare')</span>
-                            <span class="guest-account-card__count show-compare-count">0</span>
-                        </a>
-                        <a href="{{ route('user.cart') }}" class="guest-account-card" data-no-ajax>
-                            <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'shopping-cart'])</span>
-                            <span class="guest-account-card__text">@lang('Cart')</span>
-                            <span class="guest-account-card__count show-cart-count">0</span>
-                        </a>
-                        <a href="{{ route('track.order') }}" class="guest-account-card" data-no-ajax>
-                            <span class="guest-account-card__icon">@include($activeTemplate . 'partials.icon', ['name' => 'shipping-fast'])</span>
-                            <span class="guest-account-card__text">@lang('Order Tracking')</span>
-                        </a>
-                    </div>
-
-                    @if($general->multi_language && $guestLangs->isNotEmpty())
-                        <div class="guest-account-lang mt-3">
-                            <div class="small text-muted mb-2">@lang('Language')</div>
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach($guestLangs as $lng)
-                                    <a href="{{ route('lang', $lng->code) }}" class="btn btn-sm btn-light border" data-no-ajax>{{ __($lng->name) }}</a>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-                </div>
+                @include($activeTemplate . 'partials.guest_account_panel', ['guestAccountHeadingId' => 'guestAccountModalLabel'])
             </div>
         </div>
     </div>
@@ -142,28 +76,6 @@
 @media (max-width: 639.98px) {
     #guestAccountModal .guest-account-modal-dialog { max-width: min(560px, calc(100vw - 16px)); margin: 0.5rem auto; }
     #guestAccountModal .guest-account-modal-content { border-radius: 16px; box-shadow: 0 24px 60px rgba(2, 6, 23, 0.22); }
-    #guestAccountModal .guest-account-auth-row { grid-template-columns: 1fr 1fr; }
-    #guestAccountModal .guest-account-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
-    #guestAccountModal .guest-account-card {
-        display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px;
-        text-decoration: none; color: #0f172a; border: 1px solid rgba(148,163,184,.35);
-        border-radius: 10px; background: #fff;
-    }
-    #guestAccountModal .guest-account-card--btn {
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-    }
-    #guestAccountModal .guest-account-grid--links {
-        grid-template-columns: repeat(2, minmax(0,1fr));
-    }
-    #guestAccountModal .guest-account-card__icon .ui-icon { width: 18px; height: 18px; }
-    #guestAccountModal .guest-account-card__text { font-size: 12px; font-weight: 600; }
-    #guestAccountModal .guest-account-card__count {
-        margin-left: auto; min-width: 18px; height: 18px; border-radius: 999px;
-        background: #0f766e; color: #fff; font-size: 10px; line-height: 18px; text-align: center;
-        padding: 0 5px; font-weight: 700;
-    }
 }
 </style>
 @endpush

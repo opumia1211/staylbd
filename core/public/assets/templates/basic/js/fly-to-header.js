@@ -100,7 +100,7 @@
      */
     function bounceHeaderIcon(headerIcon) {
         if (!headerIcon) return;
-        var icon = headerIcon.querySelector('i');
+        var icon = headerIcon.querySelector('svg.ui-icon') || headerIcon.querySelector('img.ui-icon') || headerIcon.querySelector('i');
         var badge = headerIcon.querySelector('.glass-badge');
         if (icon) {
             icon.classList.remove('header-icon-bounce');

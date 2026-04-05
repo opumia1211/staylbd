@@ -7,7 +7,7 @@
                     <h3 class="text-center text-danger">@lang('You are banned')</h3>
                     <p class="fw-bold mb-1">@lang('Reason'):</p>
                     <p>{{ $user->ban_reason }}</p>
-                    <a href="{{ route('user.logout') }}" class="btn btn--danger btn-sm">@include($activeTemplate . 'partials.icon', ['name' => 'sign-out-alt'])@lang('Logout')</a>
+                    <a href="{{ route('user.logout') }}" class="btn btn--danger btn-sm">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'logout_icon', 'fallback' => 'sign-out-alt', 'width' => 18, 'height' => 18, 'alt' => ''])@lang('Logout')</a>
                 </div>
             </div>
         </div>

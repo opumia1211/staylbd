@@ -46,32 +46,32 @@
                 <li class="side__menu-title">@lang('Overview')</li>
                 <li>
                     <a class="{{ menuActive('user.home') }}" href="{{ route('user.home') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'home']) <span class="cont">@lang('Dashboard')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'home_icon', 'fallback' => 'home', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Dashboard')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('user.track.order') }}" href="{{ route('user.track.order') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'shipping-fast']) <span class="cont">@lang('Track Order')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Track Order')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('user.notifications') }}" href="{{ route('user.notifications') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'bell']) <span class="cont">@lang('Notifications')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Notifications')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('user.order.index') }}" href="{{ route('user.order.index') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'shopping-bag']) <span class="cont">@lang('My Orders')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'shopping-bag', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('My Orders')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('user.transactions') }}" href="{{ route('user.transactions') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'money-bill-wave']) <span class="cont">@lang('Transactions History')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'transactions_icon', 'fallback' => 'money-bill-wave', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Transactions History')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('message*') }}" href="{{ route('message.index') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'comments']) <span class="cont">@lang('My Messages')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'messages_icon', 'fallback' => 'comments', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('My Messages')</span>
                     </a>
                 </li>
                 @endauth
@@ -80,24 +80,24 @@
                 <li class="side__menu-title mt-2">@lang('Shopping')</li>
                 <li>
                     <a class="{{ menuActive('user.cart') }}" href="{{ route('user.cart') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'shopping-cart']) <span class="cont">@lang('Cart')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Cart')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('user.wishlist') }}" href="{{ route('user.wishlist') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'heart']) <span class="cont">@lang('Wishlist')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Wishlist')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('user.compare') }}" href="{{ route('user.compare') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'exchange-alt']) <span class="cont">@lang('Compare')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Compare')</span>
                     </a>
                 </li>
 
                 @auth
                 <li>
                     <a class="{{ menuActive('user.review*') }}" href="{{ route('user.review.index') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'haykal']) <span class="cont">@lang('Review Products')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'review_icon', 'fallback' => 'haykal', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Review Products')</span>
                     </a>
                 </li>
 
@@ -105,18 +105,18 @@
                 <li class="side__menu-title mt-2">@lang('Account')</li>
                 <li>
                     <a class="{{ menuActive('user.profile.setting') }}" href="{{ route('user.profile.setting') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'user-tie']) <span class="cont">@lang('Profile')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'profile_icon', 'fallback' => 'user-tie', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Profile')</span>
                     </a>
                 </li>
                 <li>
                     <a class="{{ menuActive('user.change.password') }}" href="{{ route('user.change.password') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'key']) <span class="cont">@lang('Change Password')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'change_password_icon', 'fallback' => 'key', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Change Password')</span>
                     </a>
                 </li>
                 <li>
                     <form method="POST" action="{{ route('user.logout') }}" class="d-inline w-100">
                         @csrf
-                        <button type="submit" class="side__menu__logout-btn border-0 bg-transparent w-100 text-start d-flex align-items-center" style="cursor:pointer;">@include($activeTemplate . 'partials.icon', ['name' => 'sign-out-alt'])<span class="cont">@lang('Logout')</span></button>
+                        <button type="submit" class="side__menu__logout-btn border-0 bg-transparent w-100 text-start d-flex align-items-center" style="cursor:pointer;">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'logout_icon', 'fallback' => 'sign-out-alt', 'width' => 18, 'height' => 18, 'alt' => ''])<span class="cont">@lang('Logout')</span></button>
                     </form>
                 </li>
                 @else
@@ -124,7 +124,7 @@
                 <li class="side__menu-title mt-2">@lang('Account')</li>
                 <li>
                     <a href="{{ route('user.login') }}?redirect={{ urlencode(request()->url()) }}" class="text--base" role="button">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'sign-in-alt']) <span class="cont">@lang('Login')</span>
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'login_icon', 'fallback' => 'sign-in-alt', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Login')</span>
                     </a>
                 </li>
                 @endauth

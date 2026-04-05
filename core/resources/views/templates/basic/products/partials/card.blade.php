@@ -51,17 +51,6 @@
         $promoText = 'পলো অফার';
     }
 
-    // Admin-controlled icon for Add To Cart CTA (header_icons.content)
-    static $buyNowIconConfig = null;
-    if ($buyNowIconConfig === null) {
-        $headerIconsContent = getContent('header_icons.content', true);
-        $iconValues = (array) ($headerIconsContent->data_values ?? []);
-        $buyNowIconConfig = [
-            'name' => trim((string) ($iconValues['buy_now_icon'] ?? 'cart-grid')) ?: 'cart-grid',
-            'image' => trim((string) ($iconValues['buy_now_icon_image'] ?? '')),
-        ];
-    }
-
 @endphp
 
 {{-- Click behavior: image/upper area → Product Details; CTA button → Add to Cart --}}
@@ -107,10 +96,10 @@
         </div>
         {{-- Hover actions: Cart, Compare, Wishlist, View – always anchored inside image area --}}
         <div class="product-card__actions flex flex-col gap-2">
-            <button type="button" class="product-card__action product-card__action--cart add-to-cart btn-cart" data-product_id="{{ $product->id }}" data-qty="{{ $qty }}" aria-label="@lang('Add to cart')">@include($activeTemplate . 'partials.icon', ['name' => 'cart-grid'])</button>
-            <button type="button" class="product-card__action product-card__action--compare add-to-compare btn-compare" data-product_id="{{ $product->id }}" aria-label="@lang('Compare')">@include($activeTemplate . 'partials.icon', ['name' => 'exchange-alt'])</button>
-            <button type="button" class="product-card__action add-wishlist btn-wishlist" data-product_id="{{ $product->id }}" aria-label="@lang('Add to wishlist')">@include($activeTemplate . 'partials.icon', ['name' => 'heart'])</button>
-            <button type="button" class="product-card__action quickView" data-product_id="{{ $product->id }}" aria-label="@lang('Quick view')">@include($activeTemplate . 'partials.icon', ['name' => 'eye'])</button>
+            <button type="button" class="product-card__action product-card__action--cart add-to-cart btn-cart" data-product_id="{{ $product->id }}" data-qty="{{ $qty }}" aria-label="@lang('Add to cart')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'cart-grid', 'width' => 18, 'height' => 18, 'alt' => ''])</button>
+            <button type="button" class="product-card__action product-card__action--compare add-to-compare btn-compare" data-product_id="{{ $product->id }}" aria-label="@lang('Compare')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'width' => 18, 'height' => 18, 'alt' => ''])</button>
+            <button type="button" class="product-card__action add-wishlist btn-wishlist" data-product_id="{{ $product->id }}" aria-label="@lang('Add to wishlist')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'width' => 18, 'height' => 18, 'alt' => ''])</button>
+            <button type="button" class="product-card__action quickView" data-product_id="{{ $product->id }}" aria-label="@lang('Quick view')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'quick_view_icon', 'fallback' => 'eye', 'width' => 18, 'height' => 18, 'alt' => ''])</button>
         </div>
     </div>
     {{-- Bottom: compact info (name, price, stock, rating) + Add to Cart CTA --}}
@@ -150,11 +139,17 @@
             title="@lang('Add to cart')"
             data-product_id="{{ $product->id }}"
             data-qty="{{ $qty }}">
+            @php
+                $buyNowUploaded = header_icon_uploaded('buy_now_icon');
+                $buyNowInline = header_icon_inline_svg_html('buy_now_icon', 'buy-now-cta__icon-img', 20, 20, '');
+            @endphp
             <span class="buy-now-cta__icon" aria-hidden="true">
-                @if(!empty($buyNowIconConfig['image']))
-                    <img src="{{ asset('assets/images/frontend/header_icons/' . $buyNowIconConfig['image']) }}" alt="" loading="lazy" decoding="async" width="20" height="20" class="buy-now-cta__icon-img">
+                @if($buyNowInline)
+                    {!! $buyNowInline !!}
+                @elseif($buyNowUploaded)
+                    <img src="{{ header_icon_uploaded_asset_url($buyNowUploaded) }}" alt="" loading="lazy" decoding="async" width="20" height="20" class="buy-now-cta__icon-img">
                 @else
-                    @include($activeTemplate . 'partials.icon', ['name' => $buyNowIconConfig['name'], 'class' => 'buy-now-cta__icon-svg'])
+                    @include($activeTemplate . 'partials.icon', ['name' => header_icon_svg('buy_now_icon', 'cart-grid'), 'class' => 'buy-now-cta__icon-svg'])
                 @endif
             </span>
             <span class="product-card__cta-label">@lang('Add to Cart')</span>

@@ -49,7 +49,10 @@ class ModuleServiceProvider extends ServiceProvider
             }
 
             $this->loadMigrationsFrom("{$base}/Database/Migrations");
-            $this->loadViewsFrom("{$base}/Resources/views", "modules.{$name}");
+            $viewsPath = "{$base}/Resources/views";
+            if (is_dir($viewsPath)) {
+                $this->loadViewsFrom($viewsPath, "modules.{$name}");
+            }
 
             $routesFile = "{$base}/Routes/web.php";
             if (file_exists($routesFile)) {

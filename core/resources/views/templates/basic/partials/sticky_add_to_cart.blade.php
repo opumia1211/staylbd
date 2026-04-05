@@ -33,6 +33,11 @@
 .sticky-add-to-cart-bar[aria-hidden="false"] { transform: translateY(0); }
 .sticky-add-to-cart-bar__img { object-fit: cover; }
 .cart-plus-minus--sticky input { width: 50px; text-align: center; }
+.sticky-add-to-cart-btn.in-cart {
+    background: rgba(220, 53, 69, 0.92) !important;
+    border-color: rgba(176, 42, 55, 0.85) !important;
+    color: #fff !important;
+}
 </style>
 @endpush
 

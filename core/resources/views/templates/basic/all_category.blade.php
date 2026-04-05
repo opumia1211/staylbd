@@ -5,11 +5,92 @@
     $disableLegacyJqueryUi = true;
 @endphp
 
+{{-- পেজ-স্কোপড: টেইলউইন্ড বান্ডল ক্যাশে পুরনো হলেও ডেস্কটপে মোবাইল হাব লুকাবে, রেল সারি নয় --}}
+@push('style')
+<style>
+@media (min-width: 992px) {
+    #catMobileHub { display: none !important; }
+    .all-categories-section .all-categories-desktop-only { display: block !important; }
+}
+@media (max-width: 991.98px) {
+    .all-categories-section .all-categories-desktop-only { display: none !important; }
+}
+#catMobileHub .cat-mobile-hub__rail {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+}
+#catMobileHub .cat-mobile-hub__cat {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+</style>
+@endpush
+
 @section('content')
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'category_above'])
 
+    @php
+        $categoriesNav = $categoriesNav ?? collect();
+    @endphp
+
     <section class="all-categories-section products-section products-section--compact pb-120" aria-label="@lang('All Categories')">
-        <div class="container-fluid px-3 px-lg-4">
+        {{-- Phone / tablet: left rail = categories, right = subcategories (app-style) --}}
+        <div class="cat-mobile-hub px-2 pt-1" id="catMobileHub">
+            @if($categoriesNav->isEmpty())
+                <div class="cat-mobile-hub__empty rounded-3 border bg-white p-4">
+                    <p class="mb-2">{{ $emptyMessage }}</p>
+                    <a href="{{ route('home') }}" class="cat-mobile-hub__cta">@lang('Home')</a>
+                </div>
+            @else
+                <div class="cat-mobile-hub__body">
+                    <nav class="cat-mobile-hub__rail" aria-label="@lang('Categories')">
+                        @foreach ($categoriesNav as $cat)
+                            <button type="button"
+                                    class="cat-mobile-hub__cat @if($loop->first) is-active @endif"
+                                    data-cat-hub-select="{{ $cat->id }}"
+                                    aria-pressed="{{ $loop->first ? 'true' : 'false' }}">
+                                <span class="all-category-card__ring cat-mobile-hub__cat-ring" aria-hidden="true">
+                                    <img src="{{ $cat->imageShow() }}" alt="" class="all-category-card__photo" width="96" height="96" loading="lazy" decoding="async">
+                                </span>
+                                <span class="cat-mobile-hub__cat-name">{{ __($cat->name) }}</span>
+                            </button>
+                        @endforeach
+                    </nav>
+                    <div class="cat-mobile-hub__content">
+                        @foreach ($categoriesNav as $cat)
+                            <div class="cat-mobile-hub__panel @if($loop->first) is-active @endif"
+                                 data-cat-hub-panel="{{ $cat->id }}"
+                                 @if(!$loop->first) hidden @endif>
+                                <div class="cat-mobile-hub__section-title">{{ __($cat->name) }}</div>
+                                @if($cat->subcategories->isEmpty())
+                                    <p class="small text-muted mb-2">@lang('No subcategories yet.')</p>
+                                    <a href="{{ route('category.products', [slug($cat->name), $cat->id]) }}" class="cat-mobile-hub__cta">@lang('View products')</a>
+                                @else
+                                    <div class="cat-mobile-hub__subgrid">
+                                        @foreach ($cat->subcategories as $sub)
+                                            <a href="{{ route('subcategory.products', [slug($sub->name), $sub->id]) }}" class="cat-mobile-hub__sub">
+                                                <span class="all-category-card__ring cat-mobile-hub__sub-ring" aria-hidden="true">
+                                                    <img src="{{ $cat->imageShow() }}" alt="" class="all-category-card__photo" width="96" height="96" loading="lazy" decoding="async">
+                                                </span>
+                                                <span class="cat-mobile-hub__sub-label">{{ __($sub->name) }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                    <a href="{{ route('category.products', [slug($cat->name), $cat->id]) }}" class="cat-mobile-hub__cta d-inline-flex mt-3">@lang('View all in category')</a>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <div class="container-fluid px-3 px-lg-4 all-categories-desktop-only">
             <div class="row all-categories-page-row g-0">
                 {{-- SIDEBAR: Search & Filter (aligned with products page filter) --}}
                 <div class="col-12 col-lg-3 order-2 order-lg-1 all-categories-sidebar-col">
@@ -17,6 +98,21 @@
                         <div class="close--sidebar d-lg-none" id="allCategoriesSidebarClose" aria-label="@lang('Close')">
                             @include($activeTemplate . 'partials.icon', ['name' => 'times'])
                         </div>
+                        @if($categoriesNav->isNotEmpty())
+                            <div class="all-categories-sidebar-cats d-lg-none">
+                                <div class="all-categories-sidebar-cats__title">@lang('Browse categories')</div>
+                                <div class="all-categories-sidebar-cats__scroll" role="list">
+                                    @foreach ($categoriesNav as $sc)
+                                        <a href="{{ route('category.products', [slug($sc->name), $sc->id]) }}" class="all-categories-sidebar-cats__item" role="listitem">
+                                            <span class="all-category-card__ring all-categories-sidebar-cats__ring" aria-hidden="true">
+                                                <img src="{{ $sc->imageShow() }}" alt="" class="all-category-card__photo" width="96" height="96" loading="lazy" decoding="async">
+                                            </span>
+                                            <span class="all-categories-sidebar-cats__label">{{ __($sc->name) }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                         <div class="filter--sidebar-inner cat-filter-panel">
                             <form method="get" action="{{ route('category.all') }}" id="allCategoryToolbar" class="cat-filter-form">
                                 <div class="cat-filter-header">
@@ -177,34 +273,18 @@
                             <div class="row g-3 all-categories-grid" id="allCategoriesGrid" data-view="grid">
                                 @foreach ($categories as $category)
                                     <div class="col-sm-12 col-md-6 col-lg-4 all-category-card-col">
-                                        <article class="all-category-card product-card card h-100 overflow-hidden" aria-label="{{ __($category->name) }}">
-                                            <a class="text-decoration-none text-body d-block h-100 all-category-card__link" href="{{ route('category.products', [slug($category->name), $category->id]) }}">
-                                                <div class="all-category-card__img product-card__img-wrap position-relative">
-                                                    <img src="{{ $category->imageShow() }}" alt="{{ __($category->name) }}" loading="lazy" decoding="async"
-                                                         class="product-card__img img-fluid" width="320" height="320">
+                                        <article class="all-category-card product-card" aria-label="{{ __($category->name) }}">
+                                            <a class="text-decoration-none text-body all-category-card__link" href="{{ route('category.products', [slug($category->name), $category->id]) }}">
+                                                <span class="all-category-card__ring-wrap position-relative d-inline-flex">
+                                                    <span class="all-category-card__ring" aria-hidden="true">
+                                                        <img src="{{ $category->imageShow() }}" alt="{{ __($category->name) }}" loading="lazy" decoding="async"
+                                                             class="all-category-card__photo" width="256" height="256" sizes="(max-width: 576px) 40vw, 180px">
+                                                    </span>
                                                     @if($category->featured ?? 0)
                                                         <span class="badge all-category-card__badge all-category-card__badge--featured">@lang('Featured')</span>
                                                     @endif
-                                                </div>
-                                                <div class="all-category-card__body product-card__info">
-                                                    <h2 class="all-category-card__title">{{ __($category->name) }}</h2>
-                                                    <p class="all-category-card__meta">
-                                                        {{ $category->product_count ?? 0 }} @lang('products')
-                                                    </p>
-                                                    @if(isset($category->subcategories) && $category->subcategories->isNotEmpty())
-                                                        <div class="all-category-subcats d-flex flex-wrap gap-1">
-                                                            @foreach($category->subcategories->take(4) as $sub)
-                                                                <span class="badge all-category-subcat-badge">{{ __($sub->name) }}</span>
-                                                            @endforeach
-                                                            @if($category->subcategories->count() > 4)
-                                                                <span class="badge all-category-subcat-more">+{{ $category->subcategories->count() - 4 }}</span>
-                                                            @endif
-                                                        </div>
-                                                    @endif
-                                                    <span class="all-category-card__cta">
-                                                        @lang('View products') @include($activeTemplate . 'partials.icon', ['name' => 'angle-right', 'class' => 'ms-1'])
-                                                    </span>
-                                                </div>
+                                                </span>
+                                                <span class="all-category-card__label">{{ __($category->name) }}</span>
                                             </a>
                                         </article>
                                     </div>
@@ -246,6 +326,24 @@
             }
 
             function init() {
+                var hub = document.getElementById('catMobileHub');
+                if (hub) {
+                    hub.addEventListener('click', function(e) {
+                        var btn = e.target.closest('[data-cat-hub-select]');
+                        if (!btn || !hub.contains(btn)) return;
+                        var id = btn.getAttribute('data-cat-hub-select');
+                        hub.querySelectorAll('[data-cat-hub-panel]').forEach(function(p) {
+                            var on = p.getAttribute('data-cat-hub-panel') === id;
+                            p.hidden = !on;
+                            p.classList.toggle('is-active', on);
+                        });
+                        hub.querySelectorAll('[data-cat-hub-select]').forEach(function(b) {
+                            var on = b.getAttribute('data-cat-hub-select') === id;
+                            b.classList.toggle('is-active', on);
+                            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                        });
+                    });
+                }
                 try {
                     var saved = localStorage.getItem(STORAGE_KEY);
                     if (saved === 'list' || saved === 'grid') setView(saved);

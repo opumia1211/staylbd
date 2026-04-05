@@ -94,6 +94,7 @@ Route::controller('SiteController')->group(function () {
     Route::get('product/new-arrival', 'newArrival')->name('products.new');
     Route::get('product/discount', 'discount')->name('products.discount');
     Route::get('category/all', 'categoryAll')->name('category.all');
+    Route::get('account/guest-menu', 'guestAccountMenu')->name('guest.account.menu');
 
     Route::get('product/filter', 'filterProduct')->name('all.products.filter')->middleware('throttle:product_filter');
 

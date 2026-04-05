@@ -68,8 +68,8 @@ class FrontendController extends Controller
         $labels = (object) [
             'label_en' => $data->label_en ?? 'District',
             'label_bn' => $data->label_bn ?? 'জেলা',
-            'help_en'  => $data->help_en ?? 'All Bangladesh districts — select for delivery charge',
-            'help_bn'  => $data->help_bn ?? 'বাংলাদেশের সব জেলা — ডেলিভারি চার্জের জন্য নির্বাচন করুন',
+            'help_en' => $data->help_en ?? 'All Bangladesh districts — select for delivery charge',
+            'help_bn' => $data->help_bn ?? 'বাংলাদেশের সব জেলা — ডেলিভারি চার্জের জন্য নির্বাচন করুন',
         ];
         $useDb = Schema::hasTable('divisions') && Schema::hasTable('districts');
         $divisions = $useDb ? Division::orderBy('sort_order')->orderBy('name_en')->get() : collect();
@@ -95,20 +95,22 @@ class FrontendController extends Controller
         $request->validate([
             'label_en' => 'nullable|string|max:100',
             'label_bn' => 'nullable|string|max:100',
-            'help_en'  => 'nullable|string|max:300',
-            'help_bn'  => 'nullable|string|max:300',
+            'help_en' => 'nullable|string|max:300',
+            'help_bn' => 'nullable|string|max:300',
         ]);
         if ($request->has('label_en') || $request->has('label_bn')) {
             $row = Frontend::where('data_keys', 'district.settings')->first();
             $data = $row && isset($row->data_values) ? (array) $row->data_values : [];
             Frontend::updateOrCreate(
                 ['data_keys' => 'district.settings'],
-                ['data_values' => array_merge($data, [
-                    'label_en' => $request->input('label_en', $data['label_en'] ?? 'District'),
-                    'label_bn' => $request->input('label_bn', $data['label_bn'] ?? 'জেলা'),
-                    'help_en'  => $request->input('help_en', ''),
-                    'help_bn'  => $request->input('help_bn', ''),
-                ])]
+                [
+                    'data_values' => array_merge($data, [
+                        'label_en' => $request->input('label_en', $data['label_en'] ?? 'District'),
+                        'label_bn' => $request->input('label_bn', $data['label_bn'] ?? 'জেলা'),
+                        'help_en' => $request->input('help_en', ''),
+                        'help_bn' => $request->input('help_bn', ''),
+                    ])
+                ]
             );
         }
         $districtId = (int) $request->input('district_id');
@@ -128,9 +130,9 @@ class FrontendController extends Controller
                 foreach ($list as $t) {
                     Thana::create([
                         'district_id' => $districtId,
-                        'name_en'     => $t['name_en'],
-                        'name_bn'     => $t['name_bn'],
-                        'sort_order'  => ++$sort,
+                        'name_en' => $t['name_en'],
+                        'name_bn' => $t['name_bn'],
+                        'sort_order' => ++$sort,
                     ]);
                 }
             }
@@ -242,7 +244,7 @@ class FrontendController extends Controller
         $general->active_template = $request->name;
         $general->save();
 
-        $notify[] = ['success', strtoupper($request->name).' template activated successfully'];
+        $notify[] = ['success', strtoupper($request->name) . ' template activated successfully'];
         return back()->withNotify($notify);
     }
 
@@ -250,7 +252,7 @@ class FrontendController extends Controller
     {
         $pageTitle = 'SEO Configuration';
         $seo = Frontend::where('data_keys', 'seo.data')->first();
-        if(!$seo){
+        if (!$seo) {
             $data_values = '{"keywords":[],"description":"","social_title":"","social_description":"","image":null}';
             $data_values = json_decode($data_values, true);
             $frontend = new Frontend();
@@ -277,10 +279,10 @@ class FrontendController extends Controller
                 }
             }
         }
-        
+
         // Map clean route names to internal keys
         $key = $this->mapRouteToKey($key);
-        
+
         $type = $request->type;
         if (!$type) {
             abort(404);
@@ -316,25 +318,25 @@ class FrontendController extends Controller
         $imgJson = @getPageSections()->$key->$type->images;
         $validationRule = [];
         $validation_message = [];
-        
+
         // Handle image validation - check if images exist in section config
         if ($imgJson) {
             foreach ($imgJson as $imgValKey => $imgJsonVal) {
                 // Professional Banner: 5MB max, allowed formats, MIME check
                 if ($key == 'banner') {
                     $allowedTypes = BannerService::ALLOWED_EXTENSIONS;
-                    $validationRule['image_input.'.$imgValKey] = ['nullable', 'file', 'max:5120', new FileTypeValidate($allowedTypes)];
-                    $validation_message['image_input.'.$imgValKey.'.max'] = 'Banner file must not exceed 5MB.';
+                    $validationRule['image_input.' . $imgValKey] = ['nullable', 'file', 'max:5120', new FileTypeValidate($allowedTypes)];
+                    $validation_message['image_input.' . $imgValKey . '.max'] = 'Banner file must not exceed 5MB.';
                 } elseif ($key === 'social_icon' && $type === 'element') {
-                    $validationRule['image_input.'.$imgValKey] = ['nullable', 'file', 'max:2048', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp', 'svg'])];
-                    $validation_message['image_input.'.$imgValKey.'.max'] = 'Custom logo must not exceed 2MB.';
+                    $validationRule['image_input.' . $imgValKey] = ['nullable', 'file', 'max:2048', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp', 'svg'])];
+                    $validation_message['image_input.' . $imgValKey . '.max'] = 'Custom logo must not exceed 2MB.';
                 } else {
-                    $validationRule['image_input.'.$imgValKey] = ['nullable','image',new FileTypeValidate(['jpg','jpeg','png'])];
+                    $validationRule['image_input.' . $imgValKey] = ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])];
                 }
-                $validation_message['image_input.'.$imgValKey.'.file'] = keyToTitle($imgValKey).' must be a valid file';
+                $validation_message['image_input.' . $imgValKey . '.file'] = keyToTitle($imgValKey) . ' must be a valid file';
             }
         }
-        
+
         // For banner: require image when (a) creating new, or (b) updating empty slot (first upload)
         if ($key == 'banner' && $type == 'element' && isset($imgJson->image)) {
             $hasFile = $request->hasFile('image_input.image');
@@ -351,7 +353,7 @@ class FrontendController extends Controller
                 $validationRule['image_input.image'] = ['required', 'file', 'max:5120', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp'])];
             }
         }
-        
+
         // Handle other fields validation
         foreach ($request->except('_token', 'video', 'image_input', 'has_image', 'has_image[]') as $input_field => $val) {
             if ($input_field == 'seo_image') {
@@ -405,7 +407,7 @@ class FrontendController extends Controller
                 $validationRule[$input_field] = 'nullable|string';
             }
         }
-        
+
         // Only validate if there are rules
         if (!empty($validationRule)) {
             try {
@@ -424,7 +426,7 @@ class FrontendController extends Controller
                 if (!$content) {
                     $content = new Frontend();
                     $content->data_keys = $expectedDataKeys;
-                    $content->data_values = (object)[];
+                    $content->data_values = (object) [];
                     $content->save();
                 }
             }
@@ -435,14 +437,14 @@ class FrontendController extends Controller
             if (in_array($key, $multiElementKeys, true) && $request->type == 'element') {
                 $content = new Frontend();
                 $content->data_keys = $key . '.element';
-                $content->data_values = (object)[];
+                $content->data_values = (object) [];
                 $content->save();
             } else {
                 $content = Frontend::where('data_keys', $expectedDataKeys)->orderBy('id', 'desc')->first();
                 if (!$content) {
                     $content = new Frontend();
                     $content->data_keys = $expectedDataKeys;
-                    $content->data_values = (object)[];
+                    $content->data_values = (object) [];
                     $content->save();
                 }
             }
@@ -451,30 +453,30 @@ class FrontendController extends Controller
             $inputContentValue['image'] = @$content->data_values->image;
             if ($request->hasFile('image_input')) {
                 try {
-                    $inputContentValue['image'] = fileUploader($request->image_input,getFilePath('seo'), getFileSize('seo'), @$content->data_values->image);
+                    $inputContentValue['image'] = fileUploader($request->image_input, getFilePath('seo'), getFileSize('seo'), @$content->data_values->image);
                 } catch (\Exception $exp) {
                     $notify[] = ['error', 'Couldn\'t upload the image'];
                     return back()->withNotify($notify);
                 }
             }
-        }else{
+        } else {
             if ($imgJson) {
                 foreach ($imgJson as $imgKey => $imgValue) {
                     // Check if file is uploaded for this image key
-                    if ($request->hasFile('image_input.'.$imgKey)) {
+                    if ($request->hasFile('image_input.' . $imgKey)) {
                         try {
-                            $uploadedFile = $request->file('image_input.'.$imgKey);
+                            $uploadedFile = $request->file('image_input.' . $imgKey);
                             // Ensure directory exists
                             $uploadPath = public_path('assets/images/frontend/' . $key);
                             if (!is_dir($uploadPath)) {
                                 mkdir($uploadPath, 0755, true);
                             }
-                            
+
                             // Professional banner: store in desktop/ + thumb/; 5MB validated above
                             if ($key == 'banner') {
                                 $inputContentValue[$imgKey] = $this->storeBannerImage($uploadedFile, @$content->data_values->$imgKey);
                             } else {
-                                $inputContentValue[$imgKey] = $this->storeImage($imgJson,$type,$key,$uploadedFile,$imgKey,@$content->data_values->$imgKey);
+                                $inputContentValue[$imgKey] = $this->storeImage($imgJson, $type, $key, $uploadedFile, $imgKey, @$content->data_values->$imgKey);
                             }
                         } catch (\Exception $exp) {
                             $notify[] = ['error', 'Couldn\'t upload the image: ' . $exp->getMessage()];
@@ -529,20 +531,21 @@ class FrontendController extends Controller
 
         // Banner content: merge existing data_values; ensure slider settings and dimensions always valid
         if ($key == 'banner' && $type == 'content') {
-            $existing = (array) ($content->data_values ?? (object)[]);
+            $existing = (array) ($content->data_values ?? (object) []);
             foreach ($existing as $ek => $ev) {
                 if (!array_key_exists($ek, $inputContentValue) && $ev !== null && $ev !== '') {
                     $inputContentValue[$ek] = $ev;
                 }
             }
-            $sec = (int)($inputContentValue['slide_interval_seconds'] ?? $request->input('slide_interval_seconds', 5));
+            $sec = (int) ($inputContentValue['slide_interval_seconds'] ?? $request->input('slide_interval_seconds', 5));
             $inputContentValue['slide_interval_seconds'] = ($sec >= 1 && $sec <= 60) ? $sec : 5;
-            $inputContentValue['autoplay'] = isset($inputContentValue['autoplay']) ? (int)$inputContentValue['autoplay'] : (int)($request->input('autoplay', 1));
-            if ($inputContentValue['autoplay'] !== 0) $inputContentValue['autoplay'] = 1;
-            if (empty($inputContentValue['banner_width']) || (int)($inputContentValue['banner_width'] ?? 0) < 100) {
+            $inputContentValue['autoplay'] = isset($inputContentValue['autoplay']) ? (int) $inputContentValue['autoplay'] : (int) ($request->input('autoplay', 1));
+            if ($inputContentValue['autoplay'] !== 0)
+                $inputContentValue['autoplay'] = 1;
+            if (empty($inputContentValue['banner_width']) || (int) ($inputContentValue['banner_width'] ?? 0) < 100) {
                 $inputContentValue['banner_width'] = 2560;
             }
-            if (empty($inputContentValue['banner_height']) || (int)($inputContentValue['banner_height'] ?? 0) < 50) {
+            if (empty($inputContentValue['banner_height']) || (int) ($inputContentValue['banner_height'] ?? 0) < 50) {
                 $inputContentValue['banner_height'] = 900;
             }
         }
@@ -653,7 +656,7 @@ class FrontendController extends Controller
                 $inputContentValue['social_login_buttons'] = $existing['social_login_buttons'];
             }
         }
-        
+
         if ($key == 'seo' && $type == 'data') {
             $additional = preg_split('/[\s,]+/m', $request->input('additional_keywords', ''), -1, PREG_SPLIT_NO_EMPTY);
             $additional = array_map('trim', array_filter($additional));
@@ -684,7 +687,7 @@ class FrontendController extends Controller
 
         $content->data_values = $inputContentValue;
         $content->save();
-        
+
         if (in_array($key, ['footer', 'contact_us', 'social_icon', 'policy_pages', 'service'])) {
             clearFooterCache();
         }
@@ -760,10 +763,10 @@ class FrontendController extends Controller
                 }
             }
         }
-        
+
         // Map clean route names to internal keys
         $key = $this->mapRouteToKey($key);
-        
+
         $section = @getPageSections()->$key;
         if (!$section) {
             return abort(404);
@@ -802,7 +805,7 @@ class FrontendController extends Controller
         ]);
 
         $banner = Frontend::findOrFail($request->id);
-        
+
         if ($banner->data_keys !== 'banner.element') {
             return response()->json([
                 'success' => false,
@@ -810,10 +813,10 @@ class FrontendController extends Controller
             ], 400);
         }
 
-        $dataValues = $banner->data_values ?? (object)[];
-        
+        $dataValues = $banner->data_values ?? (object) [];
+
         if ($request->field === 'display_order') {
-            $dataValues->display_order = (int)$request->value;
+            $dataValues->display_order = (int) $request->value;
         } elseif ($request->field === 'url') {
             $dataValues->url = $request->value;
         } elseif ($request->field === 'animation_type') {
@@ -834,7 +837,7 @@ class FrontendController extends Controller
         ]);
     }
 
-    protected function storeImage($imgJson,$type,$key,$image,$imgKey,$old_image = null)
+    protected function storeImage($imgJson, $type, $key, $image, $imgKey, $old_image = null)
     {
         $path = 'assets/images/frontend/' . $key;
         if ($type == 'element' || $type == 'content') {
@@ -842,7 +845,7 @@ class FrontendController extends Controller
             ->$imgKey->size;
             $thumb = @$imgJson
             ->$imgKey->thumb;
-        }else{
+        } else {
             $path = getFilePath($key);
             $size = getFileSize($key);
             $thumb = @fileManager()->$key()->thumb;
@@ -1132,7 +1135,7 @@ class FrontendController extends Controller
             'ticker' => 'ticker',
             'scrollbar' => 'scrollbar',
         ];
-        
+
         return $mapping[$routeKey] ?? $routeKey;
     }
 
@@ -1142,7 +1145,7 @@ class FrontendController extends Controller
         if ($key === null) {
             // Try to get from route parameter first
             $key = request()->route('key');
-            
+
             // If still null, try to get from route name
             if ($key === null) {
                 $routeName = request()->route()->getName();
@@ -1152,26 +1155,26 @@ class FrontendController extends Controller
                 }
             }
         }
-        
+
         // Map clean route names to internal keys
         $key = $this->mapRouteToKey($key);
-        
+
         // Scrollbar: custom headline/ticker (does not depend on sections.json)
         if ($key == 'scrollbar') {
             return $this->scrollbarView();
         }
-        
+
         // Banner: use banner_element view (does not depend on sections.json for view)
         if ($key == 'banner') {
             return $this->bannerElementView();
         }
-        
+
         $section = @getPageSections()->$key;
         if (!$section) {
             return abort(404);
         }
-        
-        $content = Frontend::where('data_keys', $key . '.content')->orderBy('id','desc')->first();
+
+        $content = Frontend::where('data_keys', $key . '.content')->orderBy('id', 'desc')->first();
         if ($key == 'login' && !$content) {
             $content = new Frontend();
             $content->data_keys = 'login.content';
@@ -1196,6 +1199,46 @@ class FrontendController extends Controller
         return view('admin.frontend.index', compact('section', 'content', 'elements', 'key', 'pageTitle'));
     }
 
+    /**
+     * Single source of truth for storefront icon keys (navbar, mobile menu, product UI).
+     * field = DB key for SVG/fallback name; image stored as {field}_image.
+     */
+    protected function headerIconSlotDefinitions(): array
+    {
+        return [
+            'search' => ['label' => __('Search (submit)'), 'default' => 'search', 'field' => 'search_icon', 'group' => 'search'],
+            'voice_search' => ['label' => __('Voice search'), 'default' => 'microphone', 'field' => 'voice_search_icon', 'group' => 'search'],
+            'image_search' => ['label' => __('Image / camera search'), 'default' => 'scan', 'field' => 'image_search_icon', 'group' => 'search'],
+            'home' => ['label' => __('Home'), 'default' => 'home', 'field' => 'home_icon', 'group' => 'nav'],
+            'categories' => ['label' => __('Categories (mobile bar)'), 'default' => 'th-large', 'field' => 'categories_icon', 'group' => 'nav'],
+            'products' => ['label' => __('Products'), 'default' => 'box', 'field' => 'products_icon', 'group' => 'nav'],
+            'contact' => ['label' => __('Contact'), 'default' => 'phone', 'field' => 'contact_icon', 'group' => 'nav'],
+            'track_order' => ['label' => __('Track order'), 'default' => 'shipping-fast', 'field' => 'track_order_icon', 'group' => 'nav'],
+            'language' => ['label' => __('Language'), 'default' => 'language', 'field' => 'language_icon', 'group' => 'nav'],
+            'notification' => ['label' => __('Notifications'), 'default' => 'bell', 'field' => 'notification_icon', 'group' => 'nav'],
+            'wishlist' => ['label' => __('Wishlist'), 'default' => 'heart', 'field' => 'wishlist_icon', 'group' => 'nav'],
+            'compare' => ['label' => __('Compare'), 'default' => 'exchange-alt', 'field' => 'compare_icon', 'group' => 'nav'],
+            'cart' => ['label' => __('Cart'), 'default' => 'shopping-cart', 'field' => 'cart_icon', 'group' => 'nav'],
+            'buy_now' => ['label' => __('Buy now / add to cart'), 'default' => 'cart-plus', 'field' => 'buy_now_icon', 'group' => 'product'],
+            'orders' => ['label' => __('My orders'), 'default' => 'list-alt', 'field' => 'orders_icon', 'group' => 'nav'],
+            'login' => ['label' => __('Login / account chip'), 'default' => 'user', 'field' => 'login_icon', 'group' => 'nav'],
+            'register' => ['label' => __('Register'), 'default' => 'user-plus', 'field' => 'register_icon', 'group' => 'account'],
+            'transactions' => ['label' => __('Transactions'), 'default' => 'money-bill-wave', 'field' => 'transactions_icon', 'group' => 'account'],
+            'messages' => ['label' => __('Messages'), 'default' => 'comments', 'field' => 'messages_icon', 'group' => 'account'],
+            'mail' => ['label' => __('Email / envelope'), 'default' => 'envelope', 'field' => 'mail_icon', 'group' => 'nav'],
+            'review' => ['label' => __('Review products'), 'default' => 'haykal', 'field' => 'review_icon', 'group' => 'account'],
+            'profile' => ['label' => __('Profile'), 'default' => 'user-tie', 'field' => 'profile_icon', 'group' => 'account'],
+            'change_password' => ['label' => __('Change password'), 'default' => 'key', 'field' => 'change_password_icon', 'group' => 'account'],
+            'logout' => ['label' => __('Logout'), 'default' => 'sign-out-alt', 'field' => 'logout_icon', 'group' => 'account'],
+            'quick_view' => ['label' => __('Quick view (product card)'), 'default' => 'eye', 'field' => 'quick_view_icon', 'group' => 'product'],
+            'policy_payment' => ['label' => __('Product page: payment policy link'), 'default' => 'credit-card', 'field' => 'policy_payment_icon', 'group' => 'product'],
+            'policy_shipping' => ['label' => __('Product page: shipping policy link'), 'default' => 'shipping-fast', 'field' => 'policy_shipping_icon', 'group' => 'product'],
+            'policy_order' => ['label' => __('Product page: order procedure link'), 'default' => 'list-alt', 'field' => 'policy_order_icon', 'group' => 'product'],
+            'section_brand' => ['label' => __('Section title: brand / tag'), 'default' => 'tag', 'field' => 'section_brand_icon', 'group' => 'product'],
+            'scroll_top' => ['label' => __('Scroll to top button'), 'default' => 'angle-double-up', 'field' => 'scroll_top_icon', 'group' => 'nav'],
+        ];
+    }
+
     public function headerIcons()
     {
         $pageTitle = __('Header Icons');
@@ -1209,19 +1252,7 @@ class FrontendController extends Controller
             $content->save();
         }
 
-        $slots = [
-            'products' => ['label' => __('Products'), 'default' => 'box', 'field' => 'products_icon'],
-            'contact' => ['label' => __('Contact'), 'default' => 'phone', 'field' => 'contact_icon'],
-            'track_order' => ['label' => __('Track Order'), 'default' => 'shipping-fast', 'field' => 'track_order_icon'],
-            'language' => ['label' => __('Language'), 'default' => 'language', 'field' => 'language_icon'],
-            'notification' => ['label' => __('Notifications'), 'default' => 'bell', 'field' => 'notification_icon'],
-            'wishlist' => ['label' => __('Wishlist'), 'default' => 'heart', 'field' => 'wishlist_icon'],
-            'compare' => ['label' => __('Compare'), 'default' => 'exchange-alt', 'field' => 'compare_icon'],
-            'cart' => ['label' => __('Cart'), 'default' => 'shopping-cart', 'field' => 'cart_icon'],
-            'buy_now' => ['label' => __('Buy Now'), 'default' => 'cart-plus', 'field' => 'buy_now_icon'],
-            'orders' => ['label' => __('Orders'), 'default' => 'list-alt', 'field' => 'orders_icon'],
-            'login' => ['label' => __('Login'), 'default' => 'user', 'field' => 'login_icon'],
-        ];
+        $slots = $this->headerIconSlotDefinitions();
         $customButtons = Frontend::where('data_keys', 'custom_buttons.element')
             ->orderBy('id', 'desc')
             ->get();
@@ -1231,11 +1262,12 @@ class FrontendController extends Controller
 
     public function headerIconsSave(Request $request)
     {
-        $slots = ['products', 'contact', 'track_order', 'language', 'notification', 'wishlist', 'compare', 'cart', 'buy_now', 'orders', 'login'];
+        $slots = $this->headerIconSlotDefinitions();
         $rules = [];
         foreach ($slots as $slot) {
-            $rules[$slot . '_icon'] = 'nullable|string|max:100';
-            $rules[$slot . '_icon_image'] = ['nullable', new FileTypeValidate(['jpg', 'jpeg', 'png', 'svg', 'webp'])];
+            $iconField = $slot['field'];
+            $rules[$iconField] = 'nullable|string|max:100';
+            $rules[$iconField . '_image'] = ['nullable', new FileTypeValidate(['jpg', 'jpeg', 'png', 'svg', 'webp'])];
         }
         $request->validate($rules);
 
@@ -1252,34 +1284,67 @@ class FrontendController extends Controller
             @mkdir(public_path($uploadPath), 0755, true);
         }
 
+        // 1. Identify which icons have fresh uploads or requested deletions
+        $iconToNewFileMap = [];
+        $iconToDeleteMap = [];
         foreach ($slots as $slot) {
-            $iconField = $slot . '_icon';
-            $imageField = $slot . '_icon_image';
-            $deleteField = $slot . '_icon_image_delete';
-            $storedImageKey = $imageField;
+            $iconField = $slot['field'];
+            $imageField = $iconField . '_image';
+            $deleteField = $imageField . '_delete';
+            $defaultIcon = $slot['default'] ?? null;
+
+            if ($request->hasFile($imageField)) {
+                $old = trim((string) ($values[$imageField] ?? ''));
+                $newFile = fileUploader($request->file($imageField), $uploadPath, null, $old);
+                $values[$imageField] = $newFile;
+                if ($defaultIcon) {
+                    $iconToNewFileMap[$defaultIcon] = $newFile;
+                }
+            }
+
+            if ((string) $request->input($deleteField, '0') === '1') {
+                if ($defaultIcon) {
+                    $iconToDeleteMap[$defaultIcon] = true;
+                }
+                $old = trim((string) ($values[$imageField] ?? ''));
+                if ($old !== '' && !isset($iconToNewFileMap[$defaultIcon])) {
+                    $primary = public_path($uploadPath . '/' . $old);
+                    $legacy = dirname(base_path()) . '/' . $uploadPath . '/' . $old;
+                    @unlink($primary);
+                    if ($primary !== $legacy && file_exists($legacy) && is_file($legacy)) {
+                        @unlink($legacy);
+                    }
+                }
+                $values[$imageField] = '';
+            }
+        }
+
+        // 2. Propagate changes to identical icons and update text fields
+        foreach ($slots as $slot) {
+            $iconField = $slot['field'];
+            $imageField = $iconField . '_image';
+            $defaultIcon = $slot['default'] ?? null;
 
             $values[$iconField] = trim((string) $request->input($iconField, ($values[$iconField] ?? '')));
 
-            if ((string) $request->input($deleteField, '0') === '1') {
-                $old = trim((string) ($values[$storedImageKey] ?? ''));
-                if ($old !== '') {
-                    @unlink(public_path($uploadPath . '/' . $old));
+            if ($defaultIcon) {
+                if (isset($iconToNewFileMap[$defaultIcon])) {
+                    $values[$imageField] = $iconToNewFileMap[$defaultIcon];
+                } elseif (isset($iconToDeleteMap[$defaultIcon])) {
+                    $values[$imageField] = '';
                 }
-                $values[$storedImageKey] = '';
-            }
-
-            if ($request->hasFile($imageField)) {
-                $old = trim((string) ($values[$storedImageKey] ?? ''));
-                $values[$storedImageKey] = fileUploader($request->file($imageField), $uploadPath, null, $old);
             }
         }
 
         $content->data_values = (object) $values;
         $content->save();
 
-        $notify[] = ['success', __('Header icons updated successfully')];
+        mirror_header_icons_public_to_legacy();
+
+        $notify[] = ['success', __('Header icons updated successfully (shared icons unified)')];
         return back()->withNotify($notify);
     }
+
 
     public function headerButtonStore(Request $request)
     {
@@ -1387,7 +1452,7 @@ class FrontendController extends Controller
         $newOrder = $totalBanners + 1;
         $newBanner = new Frontend();
         $newBanner->data_keys = 'banner.element';
-        $newBanner->data_values = (object)[
+        $newBanner->data_values = (object) [
             'display_order' => $newOrder,
             'animation_type' => 'none',
             'image' => null,
@@ -1414,7 +1479,7 @@ class FrontendController extends Controller
             return redirect()->route('admin.frontend.sections.banner')->withNotify($notify);
         }
         $newOrder = $totalBanners + 1;
-        $dv = (array) ($bar->data_values ?? (object)[]);
+        $dv = (array) ($bar->data_values ?? (object) []);
         $oldImage = $dv['image'] ?? null;
         if ($oldImage && is_string($oldImage)) {
             $desktopPath = BannerService::uploadPath(BannerService::DESKTOP_DIR);
@@ -1457,7 +1522,7 @@ class FrontendController extends Controller
             $section = null;
         }
         if (!$section) {
-            $section = (object)['name' => 'Banner Section', 'builder' => true];
+            $section = (object) ['name' => 'Banner Section', 'builder' => true];
         }
         // Legacy: Add New Banner via ?add_new=1 (redirect to dedicated route)
         if (request()->get('add_new') == '1') {
@@ -1472,7 +1537,7 @@ class FrontendController extends Controller
         if (!$bannerContent) {
             $bannerContent = new Frontend();
             $bannerContent->data_keys = 'banner.content';
-            $bannerContent->data_values = (object)[
+            $bannerContent->data_values = (object) [
                 'slide_interval_seconds' => 5,
                 'autoplay' => 1,
                 'banner_width' => 2560,
@@ -1480,9 +1545,9 @@ class FrontendController extends Controller
             ];
             $bannerContent->save();
         } else {
-            $vals = (array) ($bannerContent->data_values ?? (object)[]);
+            $vals = (array) ($bannerContent->data_values ?? (object) []);
             $updated = false;
-            if (empty($vals['slide_interval_seconds']) || (int)($vals['slide_interval_seconds'] ?? 0) < 1 || (int)($vals['slide_interval_seconds'] ?? 0) > 60) {
+            if (empty($vals['slide_interval_seconds']) || (int) ($vals['slide_interval_seconds'] ?? 0) < 1 || (int) ($vals['slide_interval_seconds'] ?? 0) > 60) {
                 $vals['slide_interval_seconds'] = 5;
                 $updated = true;
             }
@@ -1499,7 +1564,7 @@ class FrontendController extends Controller
                 $updated = true;
             }
             if ($updated) {
-                $bannerContent->data_values = (object)$vals;
+                $bannerContent->data_values = (object) $vals;
                 $bannerContent->save();
             }
         }
@@ -1517,13 +1582,13 @@ class FrontendController extends Controller
                 ->get();
             $bannerElements = $bannerElements->sortBy(function ($b) {
                 $order = $b->data_values->display_order ?? 999;
-                return is_numeric($order) ? (int)$order : 999;
+                return is_numeric($order) ? (int) $order : 999;
             })->values();
             $search = trim((string) request()->get('search', ''));
             if ($search !== '') {
                 $bannerElements = $bannerElements->filter(function ($b) use ($search) {
-                    $dv = $b->data_values ?? (object)[];
-                    $bc = $dv->banner_content ?? (object)[];
+                    $dv = $b->data_values ?? (object) [];
+                    $bc = $dv->banner_content ?? (object) [];
                     $text = implode(' ', [
                         $bc->title ?? '',
                         $bc->subtitle ?? '',
@@ -1572,7 +1637,7 @@ class FrontendController extends Controller
                 ->get();
             $bars = $bars->sortBy(function ($b) {
                 try {
-                    $dv = $b->data_values ?? (object)[];
+                    $dv = $b->data_values ?? (object) [];
                     $order = is_object($dv) ? ($dv->display_order ?? 999) : ($dv['display_order'] ?? 999);
                     return is_numeric($order) ? (int) $order : 999;
                 } catch (\Throwable $e) {
@@ -1582,16 +1647,16 @@ class FrontendController extends Controller
             $search = trim((string) request()->get('search', ''));
             if ($search !== '') {
                 $bars = $bars->filter(function ($bar) use ($search) {
-                    $dv = $bar->data_values ?? (object)[];
+                    $dv = $bar->data_values ?? (object) [];
                     $items = is_object($dv) ? ($dv->items ?? []) : ($dv['items'] ?? []);
-                    $items = is_array($items) ? $items : (array)$items;
+                    $items = is_array($items) ? $items : (array) $items;
                     foreach ($items as $it) {
-                        $it = is_array($it) ? $it : (array)$it;
-                        $text = (string)($it['content'] ?? $it['content_text'] ?? '');
+                        $it = is_array($it) ? $it : (array) $it;
+                        $text = (string) ($it['content'] ?? $it['content_text'] ?? '');
                         if (!empty($it['segments']) && is_array($it['segments'])) {
                             foreach ($it['segments'] as $s) {
-                                $s = is_array($s) ? $s : (array)$s;
-                                $text .= ' ' . (string)($s['text'] ?? '');
+                                $s = is_array($s) ? $s : (array) $s;
+                                $text .= ' ' . (string) ($s['text'] ?? '');
                             }
                         }
                         if (stripos($text, $search) !== false) {
@@ -1666,7 +1731,7 @@ class FrontendController extends Controller
         }
         $dv = is_array($dv) ? $dv : [];
         $rawItems = $dv['items'] ?? [];
-        $rawItems = is_array($rawItems) ? array_values($rawItems) : array_values((array)$rawItems);
+        $rawItems = is_array($rawItems) ? array_values($rawItems) : array_values((array) $rawItems);
         $items = [];
         foreach ($rawItems as $rawIt) {
             $arr = ScrollbarService::itemToArray($rawIt);
@@ -1677,8 +1742,8 @@ class FrontendController extends Controller
             if (($arr['content_text'] ?? '') === '' && !empty($arr['segments']) && is_array($arr['segments'])) {
                 $parts = [];
                 foreach ($arr['segments'] as $s) {
-                    $s = is_array($s) ? $s : (array)$s;
-                    $txt = trim((string)($s['text'] ?? ''));
+                    $s = is_array($s) ? $s : (array) $s;
+                    $txt = trim((string) ($s['text'] ?? ''));
                     if ($txt !== '') {
                         $parts[] = $txt;
                     }
@@ -1694,7 +1759,7 @@ class FrontendController extends Controller
             'title' => $dv['title'] ?? '',
             'position' => $dv['position'] ?? 'header_below',
             'template' => $dv['template'] ?? 'glass',
-            'status' => (int)($dv['status'] ?? 1),
+            'status' => (int) ($dv['status'] ?? 1),
             'visibility' => $dv['visibility'] ?? 'public',
             'visibility_users' => $dv['visibility_users'] ?? 'all',
             'visibility_pages' => $dv['visibility_pages'] ?? 'all',
@@ -1702,15 +1767,15 @@ class FrontendController extends Controller
             'custom_url_mode' => $dv['custom_url_mode'] ?? 'contains',
             'schedule_start' => $dv['schedule_start'] ?? '',
             'schedule_end' => $dv['schedule_end'] ?? '',
-            'display_order' => (int)($dv['display_order'] ?? $bar->id),
-            'scroll_speed' => (int)($dv['scroll_speed'] ?? 45),
+            'display_order' => (int) ($dv['display_order'] ?? $bar->id),
+            'scroll_speed' => (int) ($dv['scroll_speed'] ?? 45),
             'page_speeds' => is_array($dv['page_speeds'] ?? null) ? $dv['page_speeds'] : [],
             'scroll_direction' => $dv['scroll_direction'] ?? 'ltr',
             'loop_mode' => $dv['loop_mode'] ?? 'infinite',
-            'pause_on_hover' => (int)($dv['pause_on_hover'] ?? 1),
-            'gap_between_items' => (int)($dv['gap_between_items'] ?? 8),
+            'pause_on_hover' => (int) ($dv['pause_on_hover'] ?? 1),
+            'gap_between_items' => (int) ($dv['gap_between_items'] ?? 8),
             'animation_type' => $dv['animation_type'] ?? 'linear',
-            'bar_height' => (int)($dv['bar_height'] ?? 52),
+            'bar_height' => (int) ($dv['bar_height'] ?? 52),
             'bar_size' => $dv['bar_size'] ?? 'medium',
             'bar_thickness' => $dv['bar_thickness'] ?? 'normal',
             'default_text_size' => $dv['default_text_size'] ?? 'normal',
@@ -1723,17 +1788,17 @@ class FrontendController extends Controller
             'bar_background_value' => $dv['bar_background_value'] ?? '',
             'bar_border' => $dv['bar_border'] ?? '',
             'bar_shadow' => $dv['bar_shadow'] ?? '',
-            'hide_on_mobile' => (int)($dv['hide_on_mobile'] ?? 0),
-            'hide_on_desktop' => (int)($dv['hide_on_desktop'] ?? 0),
+            'hide_on_mobile' => (int) ($dv['hide_on_mobile'] ?? 0),
+            'hide_on_desktop' => (int) ($dv['hide_on_desktop'] ?? 0),
             'container_mode' => $dv['container_mode'] ?? 'full',
             'align' => $dv['align'] ?? 'center',
-            'z_index' => (int)($dv['z_index'] ?? 10),
-            'sticky' => (int)($dv['sticky'] ?? 0),
+            'z_index' => (int) ($dv['z_index'] ?? 10),
+            'sticky' => (int) ($dv['sticky'] ?? 0),
             'offset_top' => $dv['offset_top'] ?? '0px',
-            'custom_x_percent' => (float)($dv['custom_x_percent'] ?? 0),
-            'custom_y_px' => (int)($dv['custom_y_px'] ?? 0),
-            'custom_width_percent' => (int)($dv['custom_width_percent'] ?? 100),
-            'loop_delay' => (float)($dv['loop_delay'] ?? 0),
+            'custom_x_percent' => (float) ($dv['custom_x_percent'] ?? 0),
+            'custom_y_px' => (int) ($dv['custom_y_px'] ?? 0),
+            'custom_width_percent' => (int) ($dv['custom_width_percent'] ?? 100),
+            'loop_delay' => (float) ($dv['loop_delay'] ?? 0),
             'item_animation' => $dv['item_animation'] ?? 'none',
             'icon_animation' => $dv['icon_animation'] ?? 'none',
             'hover_effect' => $dv['hover_effect'] ?? 'pause',
@@ -1758,9 +1823,9 @@ class FrontendController extends Controller
         }
         $request->merge(['id' => $bar->id]); // reuse existing mapping
         $pageTitle = __('Edit Scroll Bar 2');
-        $dv = is_object($bar->data_values) ? json_decode(json_encode($bar->data_values), true) : (array)($bar->data_values ?? []);
+        $dv = is_object($bar->data_values) ? json_decode(json_encode($bar->data_values), true) : (array) ($bar->data_values ?? []);
         $rawItems = $dv['items'] ?? [];
-        $rawItems = is_array($rawItems) ? array_values($rawItems) : array_values((array)$rawItems);
+        $rawItems = is_array($rawItems) ? array_values($rawItems) : array_values((array) $rawItems);
         $items = [];
         foreach ($rawItems as $rawIt) {
             $arr = ScrollbarService::itemToArray($rawIt);
@@ -1773,21 +1838,21 @@ class FrontendController extends Controller
             'title' => $dv['title'] ?? '',
             'position' => $dv['position'] ?? 'custom',
             'template' => $dv['template'] ?? 'glass',
-            'status' => (int)($dv['status'] ?? 1),
+            'status' => (int) ($dv['status'] ?? 1),
             'visibility' => $dv['visibility'] ?? 'public',
             'visibility_users' => $dv['visibility_users'] ?? 'all',
             'visibility_pages' => $dv['visibility_pages'] ?? 'custom_urls',
             'custom_urls' => $dv['custom_urls'] ?? '',
             'custom_url_mode' => $dv['custom_url_mode'] ?? 'contains',
-            'display_order' => (int)($dv['display_order'] ?? $bar->id),
-            'scroll_speed' => (int)($dv['scroll_speed'] ?? 45),
+            'display_order' => (int) ($dv['display_order'] ?? $bar->id),
+            'scroll_speed' => (int) ($dv['scroll_speed'] ?? 45),
             'page_speeds' => is_array($dv['page_speeds'] ?? null) ? $dv['page_speeds'] : [],
             'scroll_direction' => $dv['scroll_direction'] ?? 'ltr',
             'loop_mode' => $dv['loop_mode'] ?? 'infinite',
-            'pause_on_hover' => (int)($dv['pause_on_hover'] ?? 1),
-            'gap_between_items' => (int)($dv['gap_between_items'] ?? 8),
+            'pause_on_hover' => (int) ($dv['pause_on_hover'] ?? 1),
+            'gap_between_items' => (int) ($dv['gap_between_items'] ?? 8),
             'animation_type' => $dv['animation_type'] ?? 'linear',
-            'bar_height' => (int)($dv['bar_height'] ?? 52),
+            'bar_height' => (int) ($dv['bar_height'] ?? 52),
             'bar_size' => $dv['bar_size'] ?? 'medium',
             'bar_thickness' => $dv['bar_thickness'] ?? 'normal',
             'default_text_size' => $dv['default_text_size'] ?? 'normal',
@@ -1797,16 +1862,16 @@ class FrontendController extends Controller
             'bar_background_value' => $dv['bar_background_value'] ?? '',
             'bar_border' => $dv['bar_border'] ?? '',
             'bar_shadow' => $dv['bar_shadow'] ?? '',
-            'hide_on_mobile' => (int)($dv['hide_on_mobile'] ?? 0),
-            'hide_on_desktop' => (int)($dv['hide_on_desktop'] ?? 0),
+            'hide_on_mobile' => (int) ($dv['hide_on_mobile'] ?? 0),
+            'hide_on_desktop' => (int) ($dv['hide_on_desktop'] ?? 0),
             'container_mode' => $dv['container_mode'] ?? 'full',
             'align' => $dv['align'] ?? 'center',
-            'z_index' => (int)($dv['z_index'] ?? 10),
-            'sticky' => (int)($dv['sticky'] ?? 0),
+            'z_index' => (int) ($dv['z_index'] ?? 10),
+            'sticky' => (int) ($dv['sticky'] ?? 0),
             'offset_top' => $dv['offset_top'] ?? '0px',
-            'custom_x_percent' => (float)($dv['custom_x_percent'] ?? 0),
-            'custom_y_px' => (int)($dv['custom_y_px'] ?? 0),
-            'custom_width_percent' => (int)($dv['custom_width_percent'] ?? 100),
+            'custom_x_percent' => (float) ($dv['custom_x_percent'] ?? 0),
+            'custom_y_px' => (int) ($dv['custom_y_px'] ?? 0),
+            'custom_width_percent' => (int) ($dv['custom_width_percent'] ?? 100),
             'items' => $items,
         ]);
         $isCustomMode = true;
@@ -1876,14 +1941,14 @@ class FrontendController extends Controller
             'title' => 'nullable|string|max:100',
             'position' => 'required|in:' . implode(',', \App\Services\ScrollbarService::positionValues()),
             'template' => 'required|in:glass,solid,minimal,dark,breaking_news,offer,alert,info',
-            'status'   => 'nullable|in:0,1',
+            'status' => 'nullable|in:0,1',
             'visibility' => 'nullable|in:public,private',
             'visibility_users' => 'nullable|in:all,guest,logged_in',
             'visibility_pages' => 'nullable|in:all,home,product,category,all_products,product_detail,cart,checkout,custom_urls',
             'custom_urls' => 'nullable|string|max:5000',
             'custom_url_mode' => 'nullable|in:contains,exact,path',
             'schedule_start' => 'nullable|date',
-            'schedule_end'   => 'nullable|date|after_or_equal:schedule_start',
+            'schedule_end' => 'nullable|date|after_or_equal:schedule_start',
             'scroll_speed' => 'nullable|integer|min:1|max:100',
             'page_speeds' => 'nullable|array',
             'page_speeds.home' => 'nullable|integer|min:1|max:100',
@@ -1909,19 +1974,19 @@ class FrontendController extends Controller
             'bar_shadow' => 'nullable|string|max:100',
             'hide_on_mobile' => 'nullable|in:0,1',
             'hide_on_desktop' => 'nullable|in:0,1',
-            'items'    => 'nullable|array',
-            'items.*.type'    => 'required_with:items|in:text,emoji,image',
-            'items.*.content_text'  => 'nullable|string|max:2000',
+            'items' => 'nullable|array',
+            'items.*.type' => 'required_with:items|in:text,emoji,image',
+            'items.*.content_text' => 'nullable|string|max:2000',
             'items.*.content' => 'nullable|string|max:2000',
             'items.*.content_image' => 'nullable|string|max:255',
-            'items.*.color'  => 'nullable|string|max:20',
+            'items.*.color' => 'nullable|string|max:20',
             'items.*.font_family' => 'nullable|string|max:100',
-            'items.*.font_style'  => 'nullable|in:normal,bold,italic',
-            'items.*.font_size'   => 'nullable|string|max:30',
+            'items.*.font_style' => 'nullable|in:normal,bold,italic',
+            'items.*.font_size' => 'nullable|string|max:30',
             'items.*.font_weight' => 'nullable|string|max:10',
             'items.*.letter_spacing' => 'nullable|string|max:20',
             'items.*.text_transform' => 'nullable|in:none,uppercase,lowercase,capitalize',
-            'items.*.is_active'   => 'nullable|in:0,1',
+            'items.*.is_active' => 'nullable|in:0,1',
             'width_type' => 'nullable|in:full,custom',
             'width_value' => 'nullable|string|max:50',
             'max_width' => 'nullable|string|max:50',
@@ -1954,7 +2019,7 @@ class FrontendController extends Controller
                 $segments = [];
                 foreach ($decoded as $seg) {
                     $seg = is_array($seg) ? $seg : [];
-                    $txtRaw = (string)($seg['text'] ?? '');
+                    $txtRaw = (string) ($seg['text'] ?? '');
                     $txtRaw = str_replace(["\r\n", "\r", "\n", "\t"], ' ', $txtRaw);
                     if (trim($txtRaw) === '') {
                         continue;
@@ -1962,34 +2027,38 @@ class FrontendController extends Controller
                     $segments[] = [
                         // Keep user typed spacing to prevent unwanted emoji/text gap.
                         'text' => $txtRaw,
-                        'color' => (string)($seg['color'] ?? '#333333'),
-                        'weight' => (string)($seg['weight'] ?? '400'),
-                        'font_family' => (string)($seg['font_family'] ?? 'inherit'),
-                        'font_size' => (string)($seg['font_size'] ?? ''),
+                        'color' => (string) ($seg['color'] ?? '#333333'),
+                        'weight' => (string) ($seg['weight'] ?? '400'),
+                        'font_family' => (string) ($seg['font_family'] ?? 'inherit'),
+                        'font_size' => (string) ($seg['font_size'] ?? ''),
                     ];
                 }
                 if (!empty($segments) || $richContent !== '') {
-                    $rawItems = [[
-                        'type' => 'text',
-                        'content_text' => $richContent,
-                        'content' => $richContent,
-                        'color' => '#333333',
-                        'font_weight' => '400',
-                        'is_active' => 1,
-                        'segments' => $segments,
-                    ]];
+                    $rawItems = [
+                        [
+                            'type' => 'text',
+                            'content_text' => $richContent,
+                            'content' => $richContent,
+                            'color' => '#333333',
+                            'font_weight' => '400',
+                            'is_active' => 1,
+                            'segments' => $segments,
+                        ]
+                    ];
                     $isRichMode = true;
                 }
             }
         } elseif ($richContent !== '' && empty($rawItems)) {
-            $rawItems = [[
-                'type' => 'text',
-                'content_text' => $richContent,
-                'content' => $richContent,
-                'color' => '#333333',
-                'font_weight' => '400',
-                'is_active' => 1,
-            ]];
+            $rawItems = [
+                [
+                    'type' => 'text',
+                    'content_text' => $richContent,
+                    'content' => $richContent,
+                    'color' => '#333333',
+                    'font_weight' => '400',
+                    'is_active' => 1,
+                ]
+            ];
             $isRichMode = true;
         }
         $existingBar = $request->id ? Frontend::where('data_keys', $dataKey)->find($request->id) : null;
@@ -1997,7 +2066,7 @@ class FrontendController extends Controller
         if ($existingBar && !empty($existingBar->data_values)) {
             $dv = $existingBar->data_values;
             $raw = is_object($dv) ? ($dv->items ?? []) : ($dv['items'] ?? []);
-            $raw = is_array($raw) ? $raw : (array)$raw;
+            $raw = is_array($raw) ? $raw : (array) $raw;
             $existingItems = array_values(array_map(function ($e) {
                 return ScrollbarService::itemToArray($e);
             }, $raw));
@@ -2027,7 +2096,7 @@ class FrontendController extends Controller
                     $item['content_image'] = $filename;
                     $item['content'] = $filename;
                 } elseif (!empty($existingItems[$idx]) && ($existingItems[$idx]['type'] ?? '') === 'image') {
-                    $item['content'] = (string)($existingItems[$idx]['content'] ?? '');
+                    $item['content'] = (string) ($existingItems[$idx]['content'] ?? '');
                     $item['content_image'] = $item['content'];
                 }
             } else {
@@ -2036,7 +2105,7 @@ class FrontendController extends Controller
                 if ($contentText !== null && $contentText !== '') {
                     $item['content_text'] = is_string($contentText) ? $contentText : (string) $contentText;
                 }
-                $item['content'] = trim((string)($item['content_text'] ?? $item['content'] ?? ''));
+                $item['content'] = trim((string) ($item['content_text'] ?? $item['content'] ?? ''));
             }
             $normalized = ScrollbarService::normalizeItem($item, $idx, $existingItems);
             if ($normalized !== null) {
@@ -2094,7 +2163,7 @@ class FrontendController extends Controller
         $positionLabel = (string) ($positionLabelMap[$selectedPosition] ?? $selectedPosition ?: 'Scroll Bar');
         $titleInput = trim((string) $request->input('title', ''));
         $autoTitle = $titleInput !== '' ? $titleInput : ('[' . $positionLabel . '] ' . now()->format('Y-m-d H:i'));
-        $bar->data_values = (object) array_merge((array) ($bar->data_values ?? (object)[]), [
+        $bar->data_values = (object) array_merge((array) ($bar->data_values ?? (object) []), [
             'title' => $autoTitle,
             'display_order' => $displayOrder,
             'position' => $request->position,
@@ -2106,7 +2175,7 @@ class FrontendController extends Controller
             'custom_urls' => $isCustomMode ? trim((string) $request->input('custom_urls', '')) : '',
             'custom_url_mode' => $isCustomMode ? $request->input('custom_url_mode', 'contains') : 'contains',
             'schedule_start' => $request->input('schedule_start') ?: null,
-            'schedule_end'   => $request->input('schedule_end') ?: null,
+            'schedule_end' => $request->input('schedule_end') ?: null,
             'scroll_speed' => $scrollSpeed,
             'page_speeds' => $pageSpeeds,
             'scroll_direction' => $request->input('scroll_direction', 'ltr'),
@@ -2159,7 +2228,7 @@ class FrontendController extends Controller
     public function scrollbarToggleStatus(Request $request, $id)
     {
         $bar = Frontend::where('data_keys', ScrollbarService::DATA_KEY)->findOrFail($id);
-        $dv = $bar->data_values ?? (object)[];
+        $dv = $bar->data_values ?? (object) [];
         $current = (int) ($dv->status ?? 1);
         $dv->status = $current === 1 ? 0 : 1;
         $bar->data_values = $dv;
@@ -2175,7 +2244,7 @@ class FrontendController extends Controller
     public function scrollbarToggleVisibility(Request $request, $id)
     {
         $bar = Frontend::where('data_keys', ScrollbarService::DATA_KEY)->findOrFail($id);
-        $dv = $bar->data_values ?? (object)[];
+        $dv = $bar->data_values ?? (object) [];
         $current = (string) ($dv->visibility ?? 'public');
         $dv->visibility = $current === 'private' ? 'public' : 'private';
         $bar->data_values = $dv;
@@ -2193,13 +2262,13 @@ class FrontendController extends Controller
         $bar = Frontend::where('data_keys', ScrollbarService::DATA_KEY)->findOrFail($id);
         $newBar = new Frontend();
         $newBar->data_keys = ScrollbarService::DATA_KEY;
-        $dv = $bar->data_values ?? (object)[];
-        $dv = is_object($dv) ? (array)$dv : $dv;
+        $dv = $bar->data_values ?? (object) [];
+        $dv = is_object($dv) ? (array) $dv : $dv;
         $title = $dv['title'] ?? '';
         $dv['title'] = $title ? $title . ' (Copy)' : 'Scroll Bar (Copy)';
         $dv['display_order'] = (int) (Frontend::where('data_keys', ScrollbarService::DATA_KEY)->max('id') ?? 0) + 1;
         $dv['status'] = 0;
-        $newBar->data_values = (object)$dv;
+        $newBar->data_values = (object) $dv;
         $newBar->save();
         Cache::forget(ScrollbarService::CACHE_KEY_RAW);
         $notify[] = ['success', 'Scroll bar duplicated. You can edit and publish the copy.'];
@@ -2221,16 +2290,16 @@ class FrontendController extends Controller
         }
         $dv = is_array($dv) ? $dv : [];
         $rawItems = $dv['items'] ?? [];
-        $rawItems = is_array($rawItems) ? $rawItems : (array)$rawItems;
+        $rawItems = is_array($rawItems) ? $rawItems : (array) $rawItems;
         $items = [];
         foreach ($rawItems as $rawIt) {
             $item = ScrollbarService::itemToArray($rawIt);
             // Ensure content is never empty when we have segments or raw text
-            $content = trim((string)($item['content'] ?? ''));
+            $content = trim((string) ($item['content'] ?? ''));
             if ($content === '' && !empty($item['segments']) && is_array($item['segments'])) {
                 $parts = [];
                 foreach ($item['segments'] as $s) {
-                    $parts[] = trim((string)(is_array($s) ? ($s['text'] ?? '') : ($s->text ?? '')));
+                    $parts[] = trim((string) (is_array($s) ? ($s['text'] ?? '') : ($s->text ?? '')));
                 }
                 $item['content'] = implode(' ', $parts);
             }
@@ -2241,7 +2310,7 @@ class FrontendController extends Controller
             'title' => $dv['title'] ?? '',
             'position' => $dv['position'] ?? 'header_below',
             'template' => $dv['template'] ?? 'glass',
-            'status' => (int)($dv['status'] ?? 1),
+            'status' => (int) ($dv['status'] ?? 1),
             'visibility' => $dv['visibility'] ?? 'public',
             'visibility_users' => $dv['visibility_users'] ?? 'all',
             'visibility_pages' => $dv['visibility_pages'] ?? 'all',
@@ -2249,15 +2318,15 @@ class FrontendController extends Controller
             'custom_url_mode' => $dv['custom_url_mode'] ?? 'contains',
             'schedule_start' => $dv['schedule_start'] ?? '',
             'schedule_end' => $dv['schedule_end'] ?? '',
-            'display_order' => (int)($dv['display_order'] ?? $bar->id),
-            'scroll_speed' => (int)($dv['scroll_speed'] ?? 45),
+            'display_order' => (int) ($dv['display_order'] ?? $bar->id),
+            'scroll_speed' => (int) ($dv['scroll_speed'] ?? 45),
             'page_speeds' => is_array($dv['page_speeds'] ?? null) ? $dv['page_speeds'] : [],
             'scroll_direction' => $dv['scroll_direction'] ?? 'ltr',
             'loop_mode' => $dv['loop_mode'] ?? 'infinite',
-            'pause_on_hover' => (int)($dv['pause_on_hover'] ?? 1),
-            'gap_between_items' => (int)($dv['gap_between_items'] ?? 8),
+            'pause_on_hover' => (int) ($dv['pause_on_hover'] ?? 1),
+            'gap_between_items' => (int) ($dv['gap_between_items'] ?? 8),
             'animation_type' => $dv['animation_type'] ?? 'linear',
-            'bar_height' => (int)($dv['bar_height'] ?? 52),
+            'bar_height' => (int) ($dv['bar_height'] ?? 52),
             'bar_size' => $dv['bar_size'] ?? 'medium',
             'bar_thickness' => $dv['bar_thickness'] ?? 'normal',
             'default_text_size' => $dv['default_text_size'] ?? 'normal',
@@ -2270,17 +2339,17 @@ class FrontendController extends Controller
             'bar_background_value' => $dv['bar_background_value'] ?? '',
             'bar_border' => $dv['bar_border'] ?? '',
             'bar_shadow' => $dv['bar_shadow'] ?? '',
-            'hide_on_mobile' => (int)($dv['hide_on_mobile'] ?? 0),
-            'hide_on_desktop' => (int)($dv['hide_on_desktop'] ?? 0),
+            'hide_on_mobile' => (int) ($dv['hide_on_mobile'] ?? 0),
+            'hide_on_desktop' => (int) ($dv['hide_on_desktop'] ?? 0),
             'container_mode' => $dv['container_mode'] ?? 'full',
             'align' => $dv['align'] ?? 'center',
-            'z_index' => (int)($dv['z_index'] ?? 10),
-            'sticky' => (int)($dv['sticky'] ?? 0),
+            'z_index' => (int) ($dv['z_index'] ?? 10),
+            'sticky' => (int) ($dv['sticky'] ?? 0),
             'offset_top' => $dv['offset_top'] ?? '0px',
-            'custom_x_percent' => (float)($dv['custom_x_percent'] ?? 0),
-            'custom_y_px' => (int)($dv['custom_y_px'] ?? 0),
-            'custom_width_percent' => (int)($dv['custom_width_percent'] ?? 100),
-            'loop_delay' => (float)($dv['loop_delay'] ?? 0),
+            'custom_x_percent' => (float) ($dv['custom_x_percent'] ?? 0),
+            'custom_y_px' => (int) ($dv['custom_y_px'] ?? 0),
+            'custom_width_percent' => (int) ($dv['custom_width_percent'] ?? 100),
+            'loop_delay' => (float) ($dv['loop_delay'] ?? 0),
             'item_animation' => $dv['item_animation'] ?? 'none',
             'icon_animation' => $dv['icon_animation'] ?? 'none',
             'hover_effect' => $dv['hover_effect'] ?? 'pause',
@@ -2319,8 +2388,10 @@ class FrontendController extends Controller
         $settings = Frontend::where('data_keys', 'banner.content')->orderBy('id', 'desc')->first();
         $bannerWidth = $settings ? (int) (@$settings->data_values->banner_width ?? 2560) : 2560;
         $bannerHeight = $settings ? (int) (@$settings->data_values->banner_height ?? 900) : 900;
-        if ($bannerWidth < 100) $bannerWidth = 2560;
-        if ($bannerHeight < 50) $bannerHeight = 900;
+        if ($bannerWidth < 100)
+            $bannerWidth = 2560;
+        if ($bannerHeight < 50)
+            $bannerHeight = 900;
         $slideIntervalSeconds = $settings ? (int) (@$settings->data_values->slide_interval_seconds ?? 5) : 5;
         return view('admin.frontend.banner_preview', [
             'bannerElement' => $banner,
@@ -2437,15 +2508,15 @@ class FrontendController extends Controller
             return redirect()->route('admin.frontend.sections.scrollbar')->withNotify($notify);
         }
         $path = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, ScrollbarService::getScrollbarImagePath()), DIRECTORY_SEPARATOR);
-        $dv = $bar->data_values ?? (object)[];
+        $dv = $bar->data_values ?? (object) [];
         $items = $dv->items ?? $dv['items'] ?? [];
         if (is_object($items)) {
-            $items = (array)$items;
+            $items = (array) $items;
         }
         foreach ($items as $item) {
-            $it = is_array($item) ? $item : (array)$item;
+            $it = is_array($item) ? $item : (array) $item;
             if (($it['type'] ?? '') === 'image' && !empty($it['content'])) {
-                $filename = preg_replace('/[^a-zA-Z0-9_.-]/', '', (string)$it['content']);
+                $filename = preg_replace('/[^a-zA-Z0-9_.-]/', '', (string) $it['content']);
                 if ($filename !== '') {
                     $f = $path . DIRECTORY_SEPARATOR . $filename;
                     if (file_exists($f) && is_file($f)) {

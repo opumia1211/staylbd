@@ -159,6 +159,11 @@
         "no_selection": true,
         "name": "Header Icons",
         "content": {
+            "search_icon": "text",
+            "voice_search_icon": "text",
+            "image_search_icon": "text",
+            "home_icon": "text",
+            "categories_icon": "text",
             "products_icon": "text",
             "contact_icon": "text",
             "track_order_icon": "text",
@@ -169,7 +174,21 @@
             "cart_icon": "text",
             "buy_now_icon": "text",
             "orders_icon": "text",
-            "login_icon": "text"
+            "login_icon": "text",
+            "register_icon": "text",
+            "transactions_icon": "text",
+            "messages_icon": "text",
+            "mail_icon": "text",
+            "review_icon": "text",
+            "profile_icon": "text",
+            "change_password_icon": "text",
+            "logout_icon": "text",
+            "quick_view_icon": "text",
+            "policy_payment_icon": "text",
+            "policy_shipping_icon": "text",
+            "policy_order_icon": "text",
+            "section_brand_icon": "text",
+            "scroll_top_icon": "text"
         }
     }
 }

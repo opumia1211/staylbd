@@ -74,6 +74,81 @@
     }
 }
 
+/* মোবাইল/ট্যাব ফিল্টার সাইডবার: ডেস্কটপ গ্রিডের মতো গোল ক্যাটাগরি স্ট্রিপ */
+.all-categories-sidebar-cats {
+    padding: 0.65rem 0.75rem 0.85rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    margin-bottom: 0.25rem;
+    background: #f8fafc;
+}
+
+.all-categories-sidebar-cats__title {
+    font-size: 0.6875rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin: 0 0 0.5rem;
+    padding: 0 2px;
+}
+
+.all-categories-sidebar-cats__scroll {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+}
+
+.all-categories-sidebar-cats__item {
+    flex: 0 0 auto;
+    width: 4.6rem;
+    max-width: 4.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    color: #0f172a;
+    text-align: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.all-categories-sidebar-cats__ring.all-category-card__ring {
+    width: 3.35rem !important;
+    min-width: 3.35rem !important;
+    max-width: 3.35rem !important;
+}
+
+.all-categories-sidebar-cats__label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    width: 100%;
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .all-categories-sidebar-cats__item {
+        width: 5rem;
+        max-width: 5rem;
+    }
+    .all-categories-sidebar-cats__ring.all-category-card__ring {
+        width: 3.75rem !important;
+        min-width: 3.75rem !important;
+        max-width: 3.75rem !important;
+    }
+}
+
 /* ---------- Header: একটাই বার, ভেতরে উপরে ব্রেডক্রাম্ব ---------- */
 .cat-page-header {
     margin-top: 0;
@@ -664,6 +739,7 @@
     margin-right: 0 !important;
     --bs-gutter-x: 0 !important;
     --bs-gutter-y: 0 !important;
+    align-items: start !important;
 }
 
 /* জুম/ভিউপোর্ট অনুযায়ী: Ctrl+ = কম কলাম, Ctrl- = বেশি কলাম */
@@ -699,16 +775,27 @@
     padding-right: 0 !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
 }
 
-/* ফ্রেম সামান্য বড় – মিনিমাম সাইজ যাতে ছোট না দেখায় */
+/*
+ * ডেস্কটপ গ্রিড = মোবাইল হাবের মতো: গোল ইমেজ (pink ring) + নিচে নাম।
+ * ১:১ রিং + object-fit: cover → সব ডিভাইসে সাদা ব্যান্ড/ভেঙে যাওয়া কমে।
+ */
 .all-categories-grid .all-category-card.product-card {
+    display: block !important;
     height: auto !important;
-    min-height: 280px !important;
+    min-height: 0 !important;
     max-height: none !important;
     overflow: visible;
     border: 1px solid rgba(0, 0, 0, 0.06) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.65rem 0.45rem 0.75rem;
+    box-sizing: border-box;
 }
 
 .all-category-card:hover {
@@ -716,46 +803,77 @@
 }
 
 .all-category-card__link {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.45rem;
+    width: 100%;
+    height: auto;
+    line-height: 1.25;
+    text-align: center;
+    box-sizing: border-box;
 }
 
 .all-category-card__link:hover {
     color: inherit;
 }
 
-/* ইমেজ এরিয়া: ফ্রেমের ভেতরে বেশি জায়গা – প্রোডাক্ট বড় দেখাবে */
-.all-categories-grid .all-category-card .product-card__img-wrap {
+.all-category-card__ring-wrap {
     position: relative;
-    width: 100%;
-    min-height: 220px;
-    aspect-ratio: 4/3;
-    overflow: hidden;
-    border-radius: 8px 8px 0 0;
-    background: #f5f5f5;
-    flex: 1 1 auto;
-    border: none;
+    margin: 0 auto;
 }
 
-.all-categories-grid .all-category-card .product-card__img-wrap .product-card__img {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* গোল রিং: আকার ভিউপোর্টে clamp — ছবি সবসময় রিং পূরণ করে */
+.all-category-card__ring {
+    display: block;
+    width: clamp(4.25rem, 22vw, 7.5rem);
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f1f5f9;
+    border: 2px solid rgba(236, 72, 153, 0.38);
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.all-category-card__photo {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    display: block;
+    object-fit: cover;
     object-position: center;
+    vertical-align: top;
+}
+
+.all-category-card__label {
+    width: 100%;
+    max-width: 100%;
+    font-size: clamp(0.625rem, 1.9vw, 0.8125rem);
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+    word-break: break-word;
+    hyphens: auto;
+    padding: 0 0.15rem;
+    box-sizing: border-box;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .all-category-card__badge {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    font-size: 0.6875rem;
+    top: -2px;
+    right: -2px;
+    font-size: 0.5625rem;
     font-weight: 600;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
+    padding: 0.15rem 0.35rem;
+    border-radius: 6px;
+    line-height: 1.2;
+    z-index: 2;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.15);
 }
 
 .all-category-card__badge--featured {
@@ -764,69 +882,57 @@
     border: none;
 }
 
-/* ইনফো সেকশন আরও চিকন – বর্ডার ও প্যাডিং মিনিমাল */
-.all-category-card__body {
-    padding: 0.28rem 0.5rem 0.35rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    flex: 0 0 auto;
-    min-height: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+@media (min-width: 992px) {
+    .all-category-card__ring {
+        width: clamp(5rem, 12vw, 6.5rem);
+    }
 }
 
-.all-category-card__title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #0f172a;
-    margin: 0;
-    line-height: 1.2;
-    display: block;
+@media (min-width: 1400px) {
+    .all-category-card__ring {
+        width: clamp(5.5rem, 10vw, 7.25rem);
+    }
 }
 
-.all-category-card__meta {
-    font-size: 0.625rem;
-    color: #64748b;
-    margin: 0;
+/* মোবাইল হাব: প্রফেশনাল অ্যাপ স্কেল — ছোট রিং, কার্ড-জাতীয় ভারি বক্স নয় */
+#catMobileHub .all-category-card__ring {
+    border-width: 1.5px;
 }
 
-.all-category-subcats {
-    margin-top: 0.15rem;
+#catMobileHub .cat-mobile-hub__cat-ring.all-category-card__ring {
+    width: 2.35rem !important;
+    min-width: 2.35rem !important;
+    max-width: 2.35rem !important;
 }
 
-.all-category-subcat-badge {
-    font-size: 0.5rem;
-    font-weight: 500;
-    padding: 0.1rem 0.25rem;
-    border-radius: 2px;
-    background: #f1f5f9;
-    color: #475569;
-    border: none;
+#catMobileHub .cat-mobile-hub__sub-ring.all-category-card__ring {
+    width: 3rem !important;
+    min-width: 3rem !important;
+    max-width: 3rem !important;
+    background: #fff !important;
+    border-color: rgba(236, 72, 153, 0.32) !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
-.all-category-subcat-more {
-    font-size: 0.5rem;
-    background: #e2e8f0;
-    color: #64748b;
-    border: none;
+@media (min-width: 576px) and (max-width: 991.98px) {
+    #catMobileHub .cat-mobile-hub__cat-ring.all-category-card__ring {
+        width: 2.55rem !important;
+        min-width: 2.55rem !important;
+        max-width: 2.55rem !important;
+    }
+    #catMobileHub .cat-mobile-hub__sub-ring.all-category-card__ring {
+        width: 3.2rem !important;
+        min-width: 3.2rem !important;
+        max-width: 3.2rem !important;
+    }
 }
 
-/* বাটন আরও চিকন */
-.all-category-card__cta {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    color: var(--base, #6366f1);
-    margin-top: 0.25rem;
-    padding: 0.2rem 0.3rem;
-    display: inline-flex;
-    align-items: center;
-    min-height: auto;
-    box-sizing: border-box;
-}
-
-.all-category-card__link:hover .all-category-card__cta {
-    color: var(--base, #6366f1);
-    text-decoration: underline;
+@media (max-width: 380px) {
+    #catMobileHub .cat-mobile-hub__sub-ring.all-category-card__ring {
+        width: 2.7rem !important;
+        min-width: 2.7rem !important;
+        max-width: 2.7rem !important;
+    }
 }
 
 /* ---------- List view: এক লাইনে একটা কার্ড ---------- */
@@ -839,40 +945,29 @@
 }
 
 .all-categories-grid[data-view="list"] .all-category-card__link {
-    display: flex !important;
-    flex-direction: row;
-    align-items: stretch;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    gap: 0.85rem;
+    padding: 0.15rem 0;
+}
+
+.all-categories-grid[data-view="list"] .all-category-card__ring-wrap {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.all-categories-grid[data-view="list"] .all-category-card__ring {
+    width: clamp(3.75rem, 12vw, 5rem);
+}
+
+.all-categories-grid[data-view="list"] .all-category-card__label {
+    -webkit-line-clamp: 3;
     text-align: left;
-}
-
-.all-categories-grid[data-view="list"] .all-category-card__img.product-card__img-wrap {
-    flex: 0 0 200px;
-    width: 200px;
-    min-height: 140px;
-    aspect-ratio: auto;
-    border-radius: 8px 0 0 8px;
-}
-
-.all-categories-grid[data-view="list"] .all-category-card .product-card__img-wrap .product-card__img {
-    object-fit: contain;
-}
-
-.all-categories-grid[data-view="list"] .all-category-card__body {
-    flex: 1;
-    justify-content: center;
-    padding: 1rem 1.25rem;
-}
-
-@media (max-width: 575px) {
-    .all-categories-grid[data-view="list"] .all-category-card__link {
-        flex-direction: column;
-    }
-    .all-categories-grid[data-view="list"] .all-category-card__img.product-card__img-wrap {
-        flex: 0 0 auto;
-        width: 100%;
-        min-height: 140px;
-        border-radius: 8px 8px 0 0;
-    }
+    padding: 0;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 /* ---------- Mobile filter button ---------- */
@@ -897,6 +992,226 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+}
+
+/* Desktop: sidebar + card grid — Bootstrap d-lg-block এখানে নেই, তাই নিজস্ব ব্রেকপয়েন্ট */
+.all-categories-desktop-only {
+    display: none !important;
+}
+
+@media (min-width: 992px) {
+    .all-categories-desktop-only {
+        display: block !important;
+    }
+}
+
+/* ---------- Mobile / tablet: two-pane category hub (reference app style) ---------- */
+.cat-mobile-hub {
+    display: flex;
+    flex-direction: column;
+    min-height: min(70vh, calc(100dvh - 200px));
+    margin: 0 -0.25rem;
+    padding-bottom: 0.5rem;
+}
+
+.cat-mobile-hub__body {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 0;
+    align-items: flex-start;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.cat-mobile-hub__rail {
+    flex: 0 0 4.85rem;
+    width: 4.85rem;
+    max-width: 28vw;
+    align-self: stretch;
+    max-height: min(72vh, 34rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    background: #fafafa;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+}
+
+.cat-mobile-hub__cat {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.35rem 0.2rem;
+    border: 0;
+    border-left: 3px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    text-align: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    color: #334155;
+}
+
+.cat-mobile-hub__cat.is-active {
+    background: #fff;
+    border-left-color: #ec4899;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.cat-mobile-hub__cat-name {
+    font-size: 0.5rem;
+    line-height: 1.12;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    max-width: 100%;
+    padding: 0 1px;
+}
+
+.cat-mobile-hub__content {
+    flex: 1 1 0%;
+    min-width: 0;
+    align-self: flex-start;
+    width: 100%;
+    max-width: 100%;
+    max-height: min(72vh, 34rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0.45rem 1rem;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+.cat-mobile-hub__panel[hidden] {
+    display: none !important;
+}
+
+.cat-mobile-hub__panel.is-active {
+    display: block;
+}
+
+.cat-mobile-hub__section-title {
+    font-size: 0.9375rem;
+    font-weight: 800;
+    color: #475569;
+    margin: 0 0 0.65rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #f1f5f9;
+    letter-spacing: -0.02em;
+}
+
+.cat-mobile-hub__section-title:first-child {
+    margin-top: 0;
+}
+
+.cat-mobile-hub__subgrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 0.5rem;
+    row-gap: 0.85rem;
+    justify-items: center;
+    align-content: start;
+    width: 100%;
+}
+
+.cat-mobile-hub__sub {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    width: 100%;
+    max-width: 5.25rem;
+    margin: 0 auto;
+    text-decoration: none;
+    color: #334155;
+    text-align: center;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: break-word;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cat-mobile-hub__sub-label {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    width: 100%;
+}
+
+.cat-mobile-hub__empty {
+    padding: 1.5rem 0.5rem;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.8125rem;
+}
+
+.cat-mobile-hub__cta {
+    display: inline-flex;
+    margin-top: 0.65rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: var(--base, #6366f1);
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 0.6875rem;
+    font-weight: 700;
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .cat-mobile-hub__rail {
+        flex-basis: 5.25rem;
+        width: 5.25rem;
+        max-width: 26vw;
+    }
+    .cat-mobile-hub__subgrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 0.65rem;
+        row-gap: 1rem;
+    }
+    .cat-mobile-hub__sub {
+        max-width: 5.75rem;
+    }
+    .cat-mobile-hub__cat-name {
+        font-size: 0.53125rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .cat-mobile-hub__rail {
+        flex-basis: 4.35rem;
+        width: 4.35rem;
+        max-width: 30vw;
+    }
+    .cat-mobile-hub__subgrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 0.35rem;
+        row-gap: 0.65rem;
+    }
+    .cat-mobile-hub__sub {
+        max-width: 4.5rem;
+        font-size: 0.5rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .all-categories-section #catMobileHub.cat-mobile-hub,
+    #catMobileHub.cat-mobile-hub {
+        display: none !important;
+    }
 }
 
 /* ---------- Override filter sidebar first title (no extra top border) ---------- */

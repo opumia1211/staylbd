@@ -16,6 +16,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -40,6 +41,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         try {
+            // XAMPP/সাবফোল্ডার: ব্রাউজারে index.php ছাড়া পরিষ্কার লিঙ্ক (route()/asset URL জেনারেশন)
+            if (!$this->app->runningInConsole()) {
+                try {
+                    $root = rtrim(request()->root(), '/');
+                    if ($root !== '' && str_ends_with($root, '/index.php')) {
+                        URL::forceRootUrl(substr($root, 0, -strlen('/index.php')));
+                    }
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+            }
+
             $general                         = gs();
             $activeTemplate                  = activeTemplate();
             $viewShare['general']            = $general;
@@ -140,6 +153,11 @@ class AppServiceProvider extends ServiceProvider
                     Frontend::firstOrCreate(
                         ['data_keys' => 'header_icons.content'],
                         ['data_values' => (object) [
+                            'search_icon' => 'search',
+                            'voice_search_icon' => 'microphone',
+                            'image_search_icon' => 'scan',
+                            'home_icon' => 'home',
+                            'categories_icon' => 'th-large',
                             'products_icon' => 'box',
                             'contact_icon' => 'phone',
                             'track_order_icon' => 'shipping-fast',
@@ -148,11 +166,26 @@ class AppServiceProvider extends ServiceProvider
                             'wishlist_icon' => 'heart',
                             'compare_icon' => 'exchange-alt',
                             'cart_icon' => 'shopping-cart',
+                            'buy_now_icon' => 'cart-plus',
                             'orders_icon' => 'list-alt',
                             'login_icon' => 'user',
+                            'register_icon' => 'user-plus',
+                            'transactions_icon' => 'money-bill-wave',
+                            'messages_icon' => 'comments',
+                            'mail_icon' => 'envelope',
+                            'review_icon' => 'haykal',
+                            'profile_icon' => 'user-tie',
+                            'change_password_icon' => 'key',
+                            'logout_icon' => 'sign-out-alt',
+                            'quick_view_icon' => 'eye',
+                            'policy_payment_icon' => 'credit-card',
+                            'policy_shipping_icon' => 'shipping-fast',
+                            'policy_order_icon' => 'list-alt',
+                            'section_brand_icon' => 'tag',
+                            'scroll_top_icon' => 'angle-double-up',
                         ]]
                     );
-                    $headerIconRow = Frontend::where('data_keys', 'header_icons.content')->first();
+                    $headerIconRow = Frontend::where('data_keys', 'header_icons.content')->orderBy('id', 'desc')->first();
                     if ($headerIconRow && $headerIconRow->data_values) {
                         $vals = (array) $headerIconRow->data_values;
                         $currentOrders = trim((string) ($vals['orders_icon'] ?? ''));

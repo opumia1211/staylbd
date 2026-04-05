@@ -19,8 +19,8 @@ use Illuminate\Support\Str;
 
 function systemDetails()
 {
-    $system['name']          = 'dealshop';
-    $system['version']       = '2.0';
+    $system['name'] = 'dealshop';
+    $system['version'] = '2.0';
     $system['build_version'] = '4.4.3';
 
     return $system;
@@ -69,7 +69,8 @@ function product_detail_url_for_id(int $productId, ?string $fallbackName = null)
 function verificationCode($length)
 {
 
-    if ($length == 0) return 0;
+    if ($length == 0)
+        return 0;
     $min = pow(10, $length - 1);
     $max = (int) ($min - 1) . '9';
     return random_int($min, $max);
@@ -91,7 +92,8 @@ function getNumber($length = 8)
 function activeTemplate($asset = false)
 {
     $template = gs('active_template') ?: 'basic';
-    if ($asset) return 'assets/templates/' . $template . '/';
+    if ($asset)
+        return 'assets/templates/' . $template . '/';
     return 'templates.' . $template . '.';
 }
 
@@ -290,7 +292,7 @@ function getLogo($type = 'logo', $size = null)
                 'standard' => 'logo_standard',
                 'maximum' => 'logo_maximum',
             ];
-            
+
             if (isset($sizeMap[$size])) {
                 $filename = gs($sizeMap[$size]);
                 $logoPath = getLogoIconPath();
@@ -299,14 +301,14 @@ function getLogo($type = 'logo', $size = null)
                 }
             }
         }
-        
+
         // Try to get the requested type
         $filename = gs($type);
         $logoPath = getLogoIconPath();
         if ($filename && file_exists($logoPath . '/' . $filename)) {
             return asset('assets/images/logoIcon/' . $filename) . '?v=' . filemtime($logoPath . '/' . $filename);
         }
-        
+
         // Fallback: if requesting logo and size not found, try standard sizes
         if ($type === 'logo' && !$size) {
             $standardLogo = gs('logo_standard');
@@ -350,7 +352,7 @@ function getResponsiveLogo($preferredSize = 'standard')
         if ($logo) {
             return $logo;
         }
-        
+
         // Fallback order: standard -> maximum -> minimum -> legacy
         $fallbackOrder = ['standard', 'maximum', 'minimum'];
         foreach ($fallbackOrder as $size) {
@@ -361,7 +363,7 @@ function getResponsiveLogo($preferredSize = 'standard')
                 }
             }
         }
-        
+
         // Last resort: legacy logo
         return getLogo('logo');
     } catch (\Exception $e) {
@@ -396,13 +398,14 @@ function getLogoStyle()
     try {
         $general = gs();
         $styles = [];
-        
-        if (isset($general->logo_opacity) && $general->logo_opacity && (float)$general->logo_opacity != 1.0) {
-            $styles[] = 'opacity: ' . (float)$general->logo_opacity;
+
+        if (isset($general->logo_opacity) && $general->logo_opacity && (float) $general->logo_opacity != 1.0) {
+            $styles[] = 'opacity: ' . (float) $general->logo_opacity;
         }
-        
+
         return implode('; ', $styles);
-    } catch (\Exception $e) {}
+    } catch (\Exception $e) {
+    }
     return '';
 }
 
@@ -410,7 +413,7 @@ function getLogoMaxWidth()
 {
     try {
         $general = gs();
-        return isset($general->logo_max_width) ? (int)$general->logo_max_width : 200;
+        return isset($general->logo_max_width) ? (int) $general->logo_max_width : 200;
     } catch (\Exception $e) {
         return 200;
     }
@@ -420,7 +423,7 @@ function getLogoMaxHeight()
 {
     try {
         $general = gs();
-        return isset($general->logo_max_height) ? (int)$general->logo_max_height : 60;
+        return isset($general->logo_max_height) ? (int) $general->logo_max_height : 60;
     } catch (\Exception $e) {
         return 60;
     }
@@ -430,7 +433,7 @@ function getFooterLogoHeight()
 {
     try {
         $general = gs();
-        return isset($general->footer_logo_height) ? (int)$general->footer_logo_height : 35;
+        return isset($general->footer_logo_height) ? (int) $general->footer_logo_height : 35;
     } catch (\Exception $e) {
         return 35;
     }
@@ -597,19 +600,25 @@ function paginateLinks($data)
 
 function menuActive($routeName, $type = null, $param = null)
 {
-    if ($type == 3) $class = 'side-menu--open';
-    elseif ($type == 2) $class = 'sidebar-submenu__open';
-    else $class = 'active';
+    if ($type == 3)
+        $class = 'side-menu--open';
+    elseif ($type == 2)
+        $class = 'sidebar-submenu__open';
+    else
+        $class = 'active';
 
     if (is_array($routeName)) {
         foreach ($routeName as $key => $value) {
-            if (request()->routeIs($value)) return $class;
+            if (request()->routeIs($value))
+                return $class;
         }
     } elseif (request()->routeIs($routeName)) {
         if ($param) {
             $routeParam = array_values(@request()->route()->parameters ?? []);
-            if (strtolower(@$routeParam[0]) == strtolower($param)) return $class;
-            else return;
+            if (strtolower(@$routeParam[0]) == strtolower($param))
+                return $class;
+            else
+                return;
         }
         return $class;
     }
@@ -617,30 +626,31 @@ function menuActive($routeName, $type = null, $param = null)
 
 function fileUploader($file, $location, $size = null, $old = null, $thumb = null)
 {
-    $fileManager        = new FileManager($file);
-    $pathNormalized     = ltrim(str_replace('\\', '/', trim((string) $location)), '/');
-    $primaryRoot        = function_exists('public_path') ? public_path($pathNormalized) : $pathNormalized;
-    $projectRoot        = dirname(base_path());
-    $legacyRoot         = rtrim($projectRoot, '/\\') . '/' . $pathNormalized;
+    $fileManager = new FileManager($file);
+    $pathNormalized = ltrim(str_replace('\\', '/', trim((string) $location)), '/');
+    $primaryRoot = function_exists('public_path') ? public_path($pathNormalized) : $pathNormalized;
+    $projectRoot = dirname(base_path());
+    $legacyRoot = rtrim($projectRoot, '/\\') . '/' . $pathNormalized;
 
-    $fileManager->path  = $primaryRoot;
-    $fileManager->size  = $size;
-    $fileManager->old   = $old;
+    $fileManager->path = $primaryRoot;
+    $fileManager->size = $size;
+    $fileManager->old = $old;
     $fileManager->thumb = $thumb;
     $fileManager->upload();
 
     $savedName = $fileManager->filename;
     $primaryFile = rtrim($primaryRoot, '/\\') . '/' . $savedName;
-    $legacyDir   = rtrim($legacyRoot, '/\\');
+    $legacyDir = rtrim($legacyRoot, '/\\');
     if (is_file($primaryFile) && !is_dir($legacyDir)) {
-        @mkdir($legacyDir, 0755, true);
+        mkdir($legacyDir, 0755, true);
     }
     if (is_file($primaryFile) && is_dir($legacyDir)) {
         $legacyFile = $legacyDir . '/' . $savedName;
         if (!file_exists($legacyFile)) {
-            @copy($primaryFile, $legacyFile);
+            copy($primaryFile, $legacyFile);
         }
     }
+
     return $fileManager->filename;
 }
 
@@ -732,8 +742,8 @@ function getDistrictLabels(): object
     return (object) [
         'label_en' => $v->label_en ?? 'District',
         'label_bn' => $v->label_bn ?? 'জেলা',
-        'help_en'  => $v->help_en ?? 'All Bangladesh districts — select for delivery charge',
-        'help_bn'  => $v->help_bn ?? 'বাংলাদেশের সব জেলা — ডেলিভারি চার্জের জন্য নির্বাচন করুন',
+        'help_en' => $v->help_en ?? 'All Bangladesh districts — select for delivery charge',
+        'help_bn' => $v->help_bn ?? 'বাংলাদেশের সব জেলা — ডেলিভারি চার্জের জন্য নির্বাচন করুন',
     ];
 }
 
@@ -823,7 +833,7 @@ function getDivisionList(): array
         }
         $rows = $query->get();
         if ($rows->isNotEmpty()) {
-            return $rows->map(fn ($d) => ['id' => $d->id, 'name_en' => $d->name_en, 'name_bn' => $d->name_bn ?? ''])->toArray();
+            return $rows->map(fn($d) => ['id' => $d->id, 'name_en' => $d->name_en, 'name_bn' => $d->name_bn ?? ''])->toArray();
         }
     }
     return [
@@ -861,8 +871,14 @@ function getDistrictsByDivision(): array
     $all = getDistrictList();
     $divisionList = getDivisionList();
     $byName = [
-        'Dhaka' => 1, 'Chittagong' => 2, 'Rajshahi' => 3, 'Khulna' => 4,
-        'Barisal' => 5, 'Sylhet' => 6, 'Rangpur' => 7, 'Mymensingh' => 8,
+        'Dhaka' => 1,
+        'Chittagong' => 2,
+        'Rajshahi' => 3,
+        'Khulna' => 4,
+        'Barisal' => 5,
+        'Sylhet' => 6,
+        'Rangpur' => 7,
+        'Mymensingh' => 8,
     ];
     $out = [];
     foreach (array_column($divisionList, 'id') as $id) {
@@ -884,17 +900,70 @@ function getDistrictsByDivision(): array
 function getDefaultDistrictToDivisionMap(): array
 {
     return [
-        'Bagerhat' => 4, 'Bandarban' => 2, 'Barguna' => 5, 'Barisal' => 5, 'Bhola' => 5, 'Bogra' => 3, 'Brahmanbaria' => 1,
-        'Chandpur' => 1, 'Chapainawabganj' => 3, 'Chittagong' => 2, 'Chuadanga' => 4, 'Comilla' => 1, 'Cox\'s Bazar' => 2,
-        'Dhaka' => 1, 'Dinajpur' => 7, 'Faridpur' => 1, 'Feni' => 2, 'Gaibandha' => 7, 'Gazipur' => 1, 'Gopalganj' => 1,
-        'Habiganj' => 6, 'Jamalpur' => 8, 'Jessore' => 4, 'Jhalokati' => 5, 'Jhenaidah' => 4, 'Joypurhat' => 3,
-        'Khagrachhari' => 2, 'Khulna' => 4, 'Kishoreganj' => 1, 'Kurigram' => 7, 'Kushtia' => 4, 'Lakshmipur' => 1,
-        'Lalmonirhat' => 7, 'Madaripur' => 1, 'Magura' => 4, 'Manikganj' => 1, 'Meherpur' => 4, 'Moulvibazar' => 6,
-        'Munshiganj' => 1, 'Mymensingh' => 8, 'Naogaon' => 3, 'Narail' => 4, 'Narayanganj' => 1, 'Narsingdi' => 1,
-        'Natore' => 3, 'Netrokona' => 8, 'Nilphamari' => 7, 'Noakhali' => 1, 'Pabna' => 3, 'Panchagarh' => 7,
-        'Patuakhali' => 5, 'Pirojpur' => 5, 'Rajbari' => 1, 'Rajshahi' => 3, 'Rangamati' => 2, 'Rangpur' => 7,
-        'Satkhira' => 4, 'Shariatpur' => 1, 'Sherpur' => 8, 'Sirajganj' => 3, 'Sunamganj' => 6, 'Sylhet' => 6,
-        'Tangail' => 1, 'Thakurgaon' => 7,
+        'Bagerhat' => 4,
+        'Bandarban' => 2,
+        'Barguna' => 5,
+        'Barisal' => 5,
+        'Bhola' => 5,
+        'Bogra' => 3,
+        'Brahmanbaria' => 1,
+        'Chandpur' => 1,
+        'Chapainawabganj' => 3,
+        'Chittagong' => 2,
+        'Chuadanga' => 4,
+        'Comilla' => 1,
+        'Cox\'s Bazar' => 2,
+        'Dhaka' => 1,
+        'Dinajpur' => 7,
+        'Faridpur' => 1,
+        'Feni' => 2,
+        'Gaibandha' => 7,
+        'Gazipur' => 1,
+        'Gopalganj' => 1,
+        'Habiganj' => 6,
+        'Jamalpur' => 8,
+        'Jessore' => 4,
+        'Jhalokati' => 5,
+        'Jhenaidah' => 4,
+        'Joypurhat' => 3,
+        'Khagrachhari' => 2,
+        'Khulna' => 4,
+        'Kishoreganj' => 1,
+        'Kurigram' => 7,
+        'Kushtia' => 4,
+        'Lakshmipur' => 1,
+        'Lalmonirhat' => 7,
+        'Madaripur' => 1,
+        'Magura' => 4,
+        'Manikganj' => 1,
+        'Meherpur' => 4,
+        'Moulvibazar' => 6,
+        'Munshiganj' => 1,
+        'Mymensingh' => 8,
+        'Naogaon' => 3,
+        'Narail' => 4,
+        'Narayanganj' => 1,
+        'Narsingdi' => 1,
+        'Natore' => 3,
+        'Netrokona' => 8,
+        'Nilphamari' => 7,
+        'Noakhali' => 1,
+        'Pabna' => 3,
+        'Panchagarh' => 7,
+        'Patuakhali' => 5,
+        'Pirojpur' => 5,
+        'Rajbari' => 1,
+        'Rajshahi' => 3,
+        'Rangamati' => 2,
+        'Rangpur' => 7,
+        'Satkhira' => 4,
+        'Shariatpur' => 1,
+        'Sherpur' => 8,
+        'Sirajganj' => 3,
+        'Sunamganj' => 6,
+        'Sylhet' => 6,
+        'Tangail' => 1,
+        'Thakurgaon' => 7,
     ];
 }
 
@@ -911,7 +980,7 @@ function getDistrictList(): array
         }
         $rows = $query->get();
         if ($rows->isNotEmpty()) {
-            return $rows->map(fn ($d) => ['en' => $d->name_en, 'bn' => $d->name_bn])->toArray();
+            return $rows->map(fn($d) => ['en' => $d->name_en, 'bn' => $d->name_bn])->toArray();
         }
     }
     $row = \App\Models\Frontend::where('data_keys', 'district.list')->first();
@@ -973,18 +1042,20 @@ function getThanaList(string $districtEn): array
 function getThanaListByDistrict(): array
 {
     if (\Illuminate\Support\Facades\Schema::hasTable('districts') && \Illuminate\Support\Facades\Schema::hasTable('thanas')) {
-        $districtQuery = \App\Models\District::with(['thanas' => function ($q) {
-            if (\Illuminate\Support\Facades\Schema::hasColumn('thanas', 'status')) {
-                $q->where('status', 1);
+        $districtQuery = \App\Models\District::with([
+            'thanas' => function ($q) {
+                if (\Illuminate\Support\Facades\Schema::hasColumn('thanas', 'status')) {
+                    $q->where('status', 1);
+                }
             }
-        }])->orderBy('division_id')->orderBy('sort_order')->orderBy('name_en');
+        ])->orderBy('division_id')->orderBy('sort_order')->orderBy('name_en');
         if (\Illuminate\Support\Facades\Schema::hasColumn('districts', 'status')) {
             $districtQuery->where('status', 1);
         }
         $districts = $districtQuery->get();
         $byDistrict = [];
         foreach ($districts as $d) {
-            $byDistrict[$d->name_en] = $d->thanas->map(fn ($t) => [
+            $byDistrict[$d->name_en] = $d->thanas->map(fn($t) => [
                 'en' => $t->name_en,
                 'bn' => $t->name_bn,
                 'postal_code' => $t->postal_code ?? null,
@@ -1111,6 +1182,152 @@ function getContent($dataKeys, $singleQuery = false, $limit = null, $orderById =
 }
 
 /**
+ * data_values for header_icons.content (storefront + admin icon manager).
+ * No request-static cache: avoids stale icons after admin save; safe for Octane/long-lived workers.
+ */
+function header_icon_values(): array
+{
+    $content = getContent('header_icons.content', true);
+    if (!$content) {
+        return [];
+    }
+
+    return (array) ($content->data_values ?? []);
+}
+
+/**
+ * Resolve uploaded header icon file (public first, then project-root assets/ mirror — same URLs as asset() on typical XAMPP subfolder installs).
+ */
+function header_icon_storage_absolute_path(string $safeBasename): ?string
+{
+    $safeBasename = basename($safeBasename);
+    if ($safeBasename === '' || str_contains($safeBasename, '..')) {
+        return null;
+    }
+    $rel = 'assets/images/frontend/header_icons/' . $safeBasename;
+    $public = public_path($rel);
+    if (is_file($public) && is_readable($public)) {
+        return $public;
+    }
+    $legacy = rtrim(dirname(base_path()), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $rel);
+    if (is_file($legacy) && is_readable($legacy)) {
+        return $legacy;
+    }
+
+    return null;
+}
+
+/**
+ * Copy all files from core/public header_icons dir to project-root assets/… so /{app}/assets/… URLs resolve (mirrors fileUploader behaviour after upload).
+ */
+function mirror_header_icons_public_to_legacy(): void
+{
+    $pubDir = public_path('assets/images/frontend/header_icons');
+    if (!is_dir($pubDir)) {
+        return;
+    }
+    $legacyDir = rtrim(dirname(base_path()), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'frontend' . DIRECTORY_SEPARATOR . 'header_icons';
+    if (!is_dir($legacyDir) && !@mkdir($legacyDir, 0755, true)) {
+        return;
+    }
+    foreach (glob($pubDir . DIRECTORY_SEPARATOR . '*') ?: [] as $file) {
+        if (!is_file($file)) {
+            continue;
+        }
+        $dest = $legacyDir . DIRECTORY_SEPARATOR . basename($file);
+        @copy($file, $dest);
+    }
+}
+
+/**
+ * Public URL for an uploaded header icon file (cache-bust from disk mtime).
+ */
+function header_icon_uploaded_asset_url(?string $filename): string
+{
+    if ($filename === null) {
+        return '';
+    }
+    $filename = trim($filename);
+    if ($filename === '') {
+        return '';
+    }
+    $safe = basename($filename);
+    if ($safe === '' || str_contains($safe, '..')) {
+        return '';
+    }
+    $path = header_icon_storage_absolute_path($safe);
+    $v = ($path && is_file($path)) ? filemtime($path) : time();
+
+    return asset('assets/images/frontend/header_icons/' . $safe) . '?v=' . $v;
+}
+
+function header_icon_svg(string $key, string $fallback): string
+{
+    $v = trim((string) (header_icon_values()[$key] ?? ''));
+
+    return $v !== '' ? $v : $fallback;
+}
+
+function header_icon_uploaded(string $key): ?string
+{
+    $file = trim((string) (header_icon_values()[$key . '_image'] ?? ''));
+
+    return $file !== '' ? $file : null;
+}
+
+/**
+ * Inline SVG for uploaded header icons so Lucide currentColor follows parent text/icon color (img tags cannot).
+ */
+function header_icon_inline_svg_html(string $iconKey, string $imgClass, int $w, int $h, string $alt = ''): ?string
+{
+    $file = header_icon_uploaded($iconKey);
+    if ($file === null || $file === '') {
+        return null;
+    }
+    if (!preg_match('/\.svg$/i', $file)) {
+        return null;
+    }
+    $safe = basename($file);
+    if ($safe === '' || str_contains($safe, '..')) {
+        return null;
+    }
+    $path = header_icon_storage_absolute_path($safe);
+    if ($path === null) {
+        return null;
+    }
+    $raw = @file_get_contents($path);
+    if ($raw === false || $raw === '') {
+        return null;
+    }
+    if (preg_match('/<script[\s>]/i', $raw) || preg_match('/\bon\w+\s*=/i', $raw)) {
+        return null;
+    }
+    $raw = preg_replace('/<\?xml[^?]*\?>\s*/i', '', $raw);
+    $raw = trim($raw);
+    if (!preg_match('/^<\s*svg\b/is', $raw)) {
+        return null;
+    }
+    $replaced = preg_replace_callback(
+        '/<\s*svg\b([^>]*)>/is',
+        static function (array $m) use ($imgClass, $w, $h, $alt): string {
+            $inner = $m[1];
+            $inner = preg_replace('/\s+(width|height)="[^"]*"/i', '', $inner);
+            $inner = is_string($inner) ? $inner : '';
+            $a11y = $alt !== ''
+                ? ' role="img" aria-label="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '"'
+                : ' aria-hidden="true"';
+            $cls = htmlspecialchars(trim($imgClass), ENT_QUOTES, 'UTF-8');
+
+            return '<svg class="' . $cls . '" width="' . (int) $w . '" height="' . (int) $h . '" focusable="false"' . $a11y . $inner . '>';
+        },
+        $raw,
+        1
+    );
+
+    return is_string($replaced) ? $replaced : null;
+}
+
+/**
  * Default registration form fields. 1 = enabled, 0 = disabled.
  * Existing/core fields default 1; future/extra fields default 0.
  */
@@ -1210,18 +1427,18 @@ function isProfileFieldEnabled($field)
 function quickOrderFieldsList()
 {
     return [
-        'guest_phone'                   => __('Mobile Number'),
-        'guest_name'                    => __('Full Name'),
-        'guest_email'                   => __('Email'),
-        'guest_alternate_phone'         => __('Alternate Phone'),
-        'guest_preferred_contact_time'   => __('Preferred contact time'),
-        'guest_address'                 => __('Delivery Address'),
-        'guest_area_city'               => __('Area / City'),
-        'guest_landmark'                => __('Landmark / Nearby place'),
-        'postal_code'                   => __('Postal Code'),
-        'guest_delivery_note'           => __('Delivery instructions'),
+        'guest_phone' => __('Mobile Number'),
+        'guest_name' => __('Full Name'),
+        'guest_email' => __('Email'),
+        'guest_alternate_phone' => __('Alternate Phone'),
+        'guest_preferred_contact_time' => __('Preferred contact time'),
+        'guest_address' => __('Delivery Address'),
+        'guest_area_city' => __('Area / City'),
+        'guest_landmark' => __('Landmark / Nearby place'),
+        'postal_code' => __('Postal Code'),
+        'guest_delivery_note' => __('Delivery instructions'),
         'guest_preferred_delivery_time' => __('Preferred delivery time'),
-        'guest_order_note'              => __('Order note / Special request'),
+        'guest_order_note' => __('Order note / Special request'),
     ];
 }
 
@@ -1232,36 +1449,36 @@ function quickOrderFieldsGrouped()
 {
     return [
         'contact' => [
-            'title'   => __('Contact Information'),
-            'icon'    => 'las la-phone-volume',
+            'title' => __('Contact Information'),
+            'icon' => 'las la-phone-volume',
             'summary' => __('Phone, name, email and when to contact'),
-            'fields'  => [
-                'guest_phone'                 => ['label' => __('Mobile Number'), 'required' => true],
-                'guest_name'                  => ['label' => __('Full Name'), 'required' => true],
-                'guest_email'                 => ['label' => __('Email'), 'required' => false],
-                'guest_alternate_phone'       => ['label' => __('Alternate Phone'), 'required' => false],
-                'guest_preferred_contact_time'=> ['label' => __('Preferred contact time'), 'required' => false],
+            'fields' => [
+                'guest_phone' => ['label' => __('Mobile Number'), 'required' => true],
+                'guest_name' => ['label' => __('Full Name'), 'required' => true],
+                'guest_email' => ['label' => __('Email'), 'required' => false],
+                'guest_alternate_phone' => ['label' => __('Alternate Phone'), 'required' => false],
+                'guest_preferred_contact_time' => ['label' => __('Preferred contact time'), 'required' => false],
             ],
         ],
         'address' => [
-            'title'   => __('Delivery Address'),
-            'icon'    => 'las la-map-marker-alt',
+            'title' => __('Delivery Address'),
+            'icon' => 'las la-map-marker-alt',
             'summary' => __('Address, area, landmark and postal code'),
-            'fields'  => [
-                'guest_address'   => ['label' => __('Delivery Address'), 'required' => true],
-                'guest_area_city'  => ['label' => __('Area / City'), 'required' => true],
-                'guest_landmark'   => ['label' => __('Landmark / Nearby place'), 'required' => false],
-                'postal_code'      => ['label' => __('Postal Code'), 'required' => false],
+            'fields' => [
+                'guest_address' => ['label' => __('Delivery Address'), 'required' => true],
+                'guest_area_city' => ['label' => __('Area / City'), 'required' => true],
+                'guest_landmark' => ['label' => __('Landmark / Nearby place'), 'required' => false],
+                'postal_code' => ['label' => __('Postal Code'), 'required' => false],
             ],
         ],
         'delivery' => [
-            'title'   => __('Delivery & Notes'),
-            'icon'    => 'las la-truck',
+            'title' => __('Delivery & Notes'),
+            'icon' => 'las la-truck',
             'summary' => __('Instructions, time preference and order notes'),
-            'fields'  => [
-                'guest_delivery_note'           => ['label' => __('Delivery instructions'), 'required' => false],
+            'fields' => [
+                'guest_delivery_note' => ['label' => __('Delivery instructions'), 'required' => false],
                 'guest_preferred_delivery_time' => ['label' => __('Preferred delivery time'), 'required' => false],
-                'guest_order_note'             => ['label' => __('Order note / Special request'), 'required' => false],
+                'guest_order_note' => ['label' => __('Order note / Special request'), 'required' => false],
             ],
         ],
     ];
@@ -1274,7 +1491,7 @@ function quickOrderFieldsGrouped()
 function quickOrderSettings()
 {
     $default = (object) [
-        'subtitle'           => __('Place your order in seconds — no account needed. Our team will confirm by phone.'),
+        'subtitle' => __('Place your order in seconds — no account needed. Our team will confirm by phone.'),
         'show_register_link' => true,
     ];
 
@@ -1293,7 +1510,7 @@ function quickOrderSettings()
         : $default->show_register_link;
 
     return (object) [
-        'subtitle'           => $subtitle,
+        'subtitle' => $subtitle,
         'show_register_link' => $showRegister,
     ];
 }
@@ -1584,11 +1801,11 @@ function getLoginContent()
 function defaultSocialLoginButtons()
 {
     return [
-        'google'   => 1,
+        'google' => 1,
         'facebook' => 1,
-        'twitter'  => 1,
-        'apple'    => 1,
-        'github'   => 1,
+        'twitter' => 1,
+        'apple' => 1,
+        'github' => 1,
     ];
 }
 
@@ -1827,10 +2044,11 @@ function getCachedHomeSectionData()
         $sortByOrder = function ($items) {
             $getOrder = function ($row) {
                 $dv = $row->data_values;
-                if (is_array($dv)) return (int) ($dv['display_order'] ?? 999);
+                if (is_array($dv))
+                    return (int) ($dv['display_order'] ?? 999);
                 return (int) ($dv->display_order ?? 999);
             };
-            return $items->sort(fn ($a, $b) => $getOrder($a) <=> $getOrder($b) ?: $a->id <=> $b->id)->values();
+            return $items->sort(fn($a, $b) => $getOrder($a) <=> $getOrder($b) ?: $a->id <=> $b->id)->values();
         };
 
         $topFeatures = collect();
@@ -2172,8 +2390,8 @@ function discountText($product, $general)
         } else {
             $discount = showAmount($general->discount) . '%';
         }
-    }else{
-        $discount = '0'.'%';
+    } else {
+        $discount = '0' . '%';
     }
 
 
@@ -2282,11 +2500,11 @@ function normalizeDataValues($dataValues)
     if (is_string($dataValues)) {
         return json_decode($dataValues);
     } elseif (is_array($dataValues)) {
-        return (object)$dataValues;
+        return (object) $dataValues;
     } elseif (is_object($dataValues)) {
         return $dataValues;
     }
-    return (object)[];
+    return (object) [];
 }
 
 /**
@@ -2314,7 +2532,7 @@ function getFrontendSectionRoute($key, $type = 'sections')
         'ticker' => 'admin.frontend.sections.ticker',
         'scrollbar' => 'admin.frontend.sections.scrollbar',
     ];
-    
+
     if ($type == 'content') {
         $contentMapping = [
             'banner' => 'admin.frontend.sections.content.banner',
@@ -2427,7 +2645,7 @@ function getScrollbars($position = null, array $options = [])
         }
 
         $bars = $bars->filter(function ($bar) use ($position, $now, $userLoggedIn, $currentPage) {
-            $dv = $bar->data_values ?? (object)[];
+            $dv = $bar->data_values ?? (object) [];
             if (isset($dv->status) && (int) $dv->status !== 1) {
                 return false;
             }
@@ -2449,15 +2667,16 @@ function getScrollbars($position = null, array $options = [])
             }
             $visPages = $dv->visibility_pages ?? 'all';
             if ($visPages === 'custom_urls') {
-                $rawCustom = (string)($dv->custom_urls ?? '');
+                $rawCustom = (string) ($dv->custom_urls ?? '');
                 $lines = preg_split('/\r\n|\r|\n/', $rawCustom);
-                $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+                $lines = array_values(array_filter(array_map('trim', $lines), function ($v) {
+                    return $v !== ''; }));
                 if (empty($lines)) {
                     return false;
                 }
                 $currentUrl = url()->current();
                 $currentPath = request()->path();
-                $mode = (string)($dv->custom_url_mode ?? 'contains');
+                $mode = (string) ($dv->custom_url_mode ?? 'contains');
                 $matched = false;
                 foreach ($lines as $rule) {
                     if ($mode === 'exact' && strcasecmp($currentUrl, $rule) === 0) {
@@ -2491,7 +2710,7 @@ function getScrollbars($position = null, array $options = [])
         });
         $bars = $bars->sortBy(function ($b) {
             try {
-                $dv = $b->data_values ?? (object)[];
+                $dv = $b->data_values ?? (object) [];
                 $order = $dv->display_order ?? 999;
                 return is_numeric($order) ? (int) $order : 999;
             } catch (\Throwable $e) {
@@ -2512,7 +2731,7 @@ function getScrollbarVisibilityReasons($bar, array $options = [])
 {
     $reasons = [];
     $visible = true;
-    $dv = $bar->data_values ?? (object)[];
+    $dv = $bar->data_values ?? (object) [];
     $now = now()->format('Y-m-d');
     $userLoggedIn = $options['user_logged_in'] ?? (\Illuminate\Support\Facades\Auth::check());
     $currentPage = $options['page'] ?? null;
@@ -2544,21 +2763,31 @@ function getScrollbarVisibilityReasons($bar, array $options = [])
     }
     $visPages = $dv->visibility_pages ?? 'all';
     if ($visPages === 'custom_urls') {
-        $rawCustom = (string)($dv->custom_urls ?? '');
+        $rawCustom = (string) ($dv->custom_urls ?? '');
         $lines = preg_split('/\r\n|\r|\n/', $rawCustom);
-        $lines = array_values(array_filter(array_map('trim', $lines), function ($v) { return $v !== ''; }));
+        $lines = array_values(array_filter(array_map('trim', $lines), function ($v) {
+            return $v !== ''; }));
         if (empty($lines)) {
             $visible = false;
             $reasons[] = __('Custom URL list is empty');
         } else {
             $currentUrl = function_exists('url') ? url()->current() : '';
             $currentPath = function_exists('request') ? request()->path() : '';
-            $mode = (string)($dv->custom_url_mode ?? 'contains');
+            $mode = (string) ($dv->custom_url_mode ?? 'contains');
             $matched = false;
             foreach ($lines as $rule) {
-                if ($mode === 'exact' && strcasecmp($currentUrl, $rule) === 0) { $matched = true; break; }
-                if ($mode === 'path' && trim($currentPath, '/') === trim(parse_url($rule, PHP_URL_PATH) ?: $rule, '/')) { $matched = true; break; }
-                if ($mode === 'contains' && stripos($currentUrl, $rule) !== false) { $matched = true; break; }
+                if ($mode === 'exact' && strcasecmp($currentUrl, $rule) === 0) {
+                    $matched = true;
+                    break;
+                }
+                if ($mode === 'path' && trim($currentPath, '/') === trim(parse_url($rule, PHP_URL_PATH) ?: $rule, '/')) {
+                    $matched = true;
+                    break;
+                }
+                if ($mode === 'contains' && stripos($currentUrl, $rule) !== false) {
+                    $matched = true;
+                    break;
+                }
             }
             if (!$matched) {
                 $visible = false;
@@ -2839,11 +3068,13 @@ function get_offer_timer_page_from_route(): string
     if (str_contains($name, 'product.detail')) {
         return 'product_detail';
     }
-    if ($name === 'products' || str_contains($name, 'category.products') || str_contains($name, 'subcategory.products')
+    if (
+        $name === 'products' || str_contains($name, 'category.products') || str_contains($name, 'subcategory.products')
         || str_contains($name, 'brand.products') || str_contains($name, 'all.products')
         || str_contains($name, 'products.featured') || str_contains($name, 'product.hot.deal')
         || str_contains($name, 'products.best.selling') || str_contains($name, 'products.new')
-        || str_contains($name, 'product.today.deal') || str_contains($name, 'products.discount')) {
+        || str_contains($name, 'product.today.deal') || str_contains($name, 'products.discount')
+    ) {
         return 'category';
     }
     if (str_starts_with($name, 'user.') && $name !== 'user.login' && $name !== 'user.register') {

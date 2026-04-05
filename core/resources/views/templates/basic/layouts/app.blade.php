@@ -16,6 +16,29 @@
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
+    {{-- Bottom-nav নতুন ট্যাব: mb=1 শুধু একবার সিগনাল; ঠিকানা বারে mb দেখাব না; একই ট্যাবে পরের পেজে শেল ধরে রাখতে sessionStorage --}}
+    <script>
+    (function () {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('mb') === '1') {
+                sessionStorage.setItem('stayl_mobile_tab_shell', '1');
+                params.delete('mb');
+                var qs = params.toString();
+                var path = window.location.pathname;
+                if (/\/index\.php$/i.test(path)) {
+                    path = path.replace(/\/index\.php$/i, '/');
+                    if (path === '') path = '/';
+                }
+                var next = path + (qs ? '?' + qs : '') + window.location.hash;
+                window.history.replaceState(null, '', next);
+            }
+            if (sessionStorage.getItem('stayl_mobile_tab_shell') === '1') {
+                document.documentElement.classList.add('mobile-tab-shell');
+            }
+        } catch (e) {}
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -67,6 +90,34 @@
             /* main.css .overlay is also z-index 9999 and comes after the nav in DOM — steals taps on small screens */
             .overlay:not(.active){pointer-events:none!important}
         }
+        /* নিচের মেনু নতুন ট্যাব: ক্লাস html-এ (mb কুয়েরি replaceState-এ সরানোর পরও শেল থাকে) */
+        html.mobile-tab-shell body{
+            background:linear-gradient(180deg,#e8edf4 0%,#f1f5f9 45%,#eef2f7 100%)!important;
+        }
+        html.mobile-tab-shell main .main-container{
+            background:#fff;
+            border-radius:14px 14px 0 0;
+            box-shadow:0 -4px 24px rgba(15,23,42,.07);
+            padding-top:12px;
+            padding-bottom:12px;
+            min-height:45vh;
+        }
+        @media (min-width:992px){
+            html.mobile-tab-shell main .main-container{
+                border-radius:14px;
+                margin-top:12px;
+                margin-bottom:28px;
+                max-width:min(1180px,calc(100vw - 32px));
+                box-shadow:0 8px 32px rgba(15,23,42,.08);
+            }
+        }
+        @media (max-width:991.98px){
+            html.mobile-tab-shell .main-container{
+                max-width:100%;
+                padding-left:max(10px,env(safe-area-inset-left,0px));
+                padding-right:max(10px,env(safe-area-inset-right,0px));
+            }
+        }
         /*
          * Unified public-page shell:
          * - Desktop/ultrawide: fixed professional max width with light side gaps
@@ -94,6 +145,11 @@
         .glass-header__shell{width:100%;min-width:0;max-width:var(--stayl-content-max);margin-left:auto;margin-right:auto;padding-left:calc(var(--stayl-pad-x) + env(safe-area-inset-left,0px));padding-right:calc(var(--stayl-pad-x) + env(safe-area-inset-right,0px));box-sizing:border-box}
         .glass-header__max{width:100%;max-width:100%;min-width:0;margin-left:auto;margin-right:auto;box-sizing:border-box}
         .main-container svg,.main-container i{max-width:44px;max-height:44px}
+        /* PDP: override cap so qty +/- & action icons are not squeezed / blurred */
+        .pro-detail-page .pdp-cart-action-row .ui-icon,
+        .pro-detail-page .pdp-cart-action-row svg.ui-icon{max-width:18px!important;max-height:18px!important;width:18px!important;height:18px!important;min-width:14px!important;min-height:14px!important}
+        .pro-detail-page .pro-detail-similar-card .ui-icon,
+        .pro-detail-page .pro-detail-similar-card svg{max-width:28px!important;max-height:28px!important}
         main{min-width:0;max-width:none;width:100%}
         main [class*="col-"]{min-width:0}
         .main-container img,.main-container video{max-width:100%;height:auto}
@@ -147,8 +203,7 @@
         @endif
     </style>
 
-    {{-- Single compiled storefront stylesheet (Bootstrap + legacy + Tailwind @tailwind) — fewer round trips, long cache --}}
-    <link rel="stylesheet" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}" crossorigin="anonymous">
+    {{-- tailwind-storefront linked once above (line ~37); duplicate link removed — halves CSS download/parse on every page --}}
 
     @stack('style-lib')
 
@@ -431,7 +486,7 @@
     @include($activeTemplate . 'partials.custom_site_messages')
     @include($activeTemplate . 'partials.cookie_banner')
 
-    <button type="button" class="scrollToTop">@include($activeTemplate . 'partials.icon', ['name' => 'angle-double-up'])</button>
+    <button type="button" class="scrollToTop">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'scroll_top_icon', 'fallback' => 'angle-double-up', 'width' => 22, 'height' => 22, 'alt' => ''])</button>
     <!-- jQuery + Bootstrap (required for Quick View modal, guest checkout modal) -->
     @if(empty($disableLegacyJquery))
     <script src="{{ asset('assets/global/js/jquery-3.6.0.min.js') }}?v={{ $assetVersion }}"></script>
@@ -765,7 +820,7 @@
         (function () {
             try {
                 var accountBtn = document.getElementById('mobile-account-btn');
-                if (!accountBtn || accountBtn.dataset.boundClick === '1') return;
+                if (!accountBtn || accountBtn.tagName !== 'BUTTON' || accountBtn.dataset.boundClick === '1') return;
                 accountBtn.dataset.boundClick = '1';
                 function openGuestAccountModal(e) {
                     try {

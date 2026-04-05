@@ -1,16 +1,5 @@
 {{-- Restored baseline-safe header structure --}}
 @php
-    $headerIconsContent = getContent('header_icons.content', true);
-    $iconValues = (array) ($headerIconsContent->data_values ?? []);
-    $headerIcon = function (string $key, string $fallback) use ($iconValues): string {
-        $value = trim((string) ($iconValues[$key] ?? ''));
-        return $value !== '' ? $value : $fallback;
-    };
-    $headerIconImage = function (string $key) use ($iconValues): ?string {
-        $imageKey = $key . '_image';
-        $file = trim((string) ($iconValues[$imageKey] ?? ''));
-        return $file !== '' ? $file : null;
-    };
     $customButtonsAll = \App\Models\Frontend::where('data_keys', 'custom_buttons.element')->orderBy('id', 'asc')->get();
     $customHeaderButtons = $customButtonsAll->filter(function ($row) {
         $dv = (array) ($row->data_values ?? []);
@@ -74,14 +63,10 @@
                                data-search-url="{{ url('/search/universal') }}"
                                data-placeholder-listening="@lang('Listening… speak now')">
                         <button type="button" class="glass-search-icon glass-search-voice shrink-0" id="voiceSearchBtn" title="@lang('Voice Search')" aria-label="@lang('Voice Search')">
-                            @include('templates.basic.partials.icon', ['name' => 'microphone', 'class' => 'icon-bold'])
+                            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'voice_search_icon', 'fallback' => 'microphone', 'svgClass' => 'icon-bold', 'width' => 20, 'height' => 20, 'alt' => ''])
                         </button>
                         <button type="submit" class="glass-search-icon glass-search-submit shrink-0" title="@lang('Search')" aria-label="@lang('Search')">
-                            @if($headerIconImage('search_icon'))
-                                <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('search_icon')) }}" alt="" class="ui-icon" width="20" height="20" decoding="async" loading="eager">
-                            @else
-                                @include('templates.basic.partials.icon', ['name' => 'search', 'class' => 'icon-bold'])
-                            @endif
+                            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'search_icon', 'fallback' => 'search', 'svgClass' => 'icon-bold', 'width' => 20, 'height' => 20, 'alt' => '', 'loading' => 'eager'])
                         </button>
                     </div>
                     <input type="file" id="imageSearchInput" accept="image/*" hidden tabindex="-1" aria-hidden="true">
@@ -89,32 +74,20 @@
                     <div class="glass-search-results" id="searchResults"></div>
                 </form>
                 <button type="button" class="glass-icon-btn glass-header-camera-btn shrink-0" id="cameraSearchBtn" title="@lang('Search by image')" aria-label="@lang('Search by image')">
-                    @include($activeTemplate . 'partials.icon', ['name' => 'scan'])
+                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'image_search_icon', 'fallback' => 'scan', 'width' => 22, 'height' => 22, 'alt' => ''])
                 </button>
             </div>
             
             <!-- Navigation: icon-only links -->
             <nav class="glass-header-nav items-center gap-[10px] shrink-0 whitespace-nowrap">
                 <a href="{{ route('products') }}" class="glass-nav-btn {{ menuActive('products') }}" title="@lang('Products')" aria-label="@lang('Products')">
-                    @if($headerIconImage('products_icon'))
-                        <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('products_icon')) }}" alt="@lang('Products')" class="ui-icon" width="22" height="22" decoding="async">
-                    @else
-                        @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('products_icon', 'box')])
-                    @endif
+                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'products_icon', 'fallback' => 'box', 'alt' => __('Products')])
                 </a>
                 <a href="{{ route('contact') }}" class="glass-nav-btn {{ request()->routeIs('contact') ? 'active' : '' }}" title="@lang('Contact')" aria-label="@lang('Contact')">
-                    @if($headerIconImage('contact_icon'))
-                        <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('contact_icon')) }}" alt="@lang('Contact')" class="ui-icon" width="22" height="22" decoding="async">
-                    @else
-                        @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('contact_icon', 'phone')])
-                    @endif
+                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'contact_icon', 'fallback' => 'phone', 'alt' => __('Contact')])
                 </a>
                 <a href="{{ route('track.order') }}" class="glass-nav-btn {{ menuActive('track-order') }}" title="@lang('Track Order')" aria-label="@lang('Track Order')">
-                    @if($headerIconImage('track_order_icon'))
-                        <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('track_order_icon')) }}" alt="@lang('Track Order')" class="ui-icon" width="22" height="22" decoding="async">
-                    @else
-                        @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('track_order_icon', 'shipping-fast')])
-                    @endif
+                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'alt' => __('Track Order')])
                 </a>
                 @foreach($headerButtonsByPosition['nav'] as $btn)
                     @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
@@ -150,11 +123,7 @@
                     @endphp
                     <div class="dropdown glass-dropdown-wrapper glass-lang-dropdown-wrap inline-flex shrink-0">
                         <button type="button" class="glass-icon-btn glass-lang-btn js-lang-dropdown-toggle" aria-expanded="false" title="{{ __($currentLang->name ?? 'EN') }}" aria-label="@lang('Language')">
-                            @if($headerIconImage('language_icon'))
-                                <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('language_icon')) }}" alt="@lang('Language')" class="ui-icon" width="22" height="22" decoding="async">
-                            @else
-                                @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('language_icon', 'language')])
-                            @endif
+                            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'language_icon', 'fallback' => 'language', 'alt' => __('Language')])
                             <span class="glass-badge-text d-none">{{ __($currentLang->name ?? 'EN') }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end glass-dropdown glass-lang-dropdown-menu">
@@ -172,11 +141,7 @@
                 <!-- Notifications -->
                 @auth
                     <a href="{{ route('user.notifications') }}" class="glass-icon-btn glass-notification-btn" title="@lang('Notifications')">
-                        @if($headerIconImage('notification_icon'))
-                            <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('notification_icon')) }}" alt="@lang('Notifications')" class="ui-icon" width="22" height="22" decoding="async">
-                        @else
-                            @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('notification_icon', 'bell')])
-                        @endif
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'alt' => __('Notifications')])
                         @if(($userNotificationCount ?? 0) > 0)
                             <span class="glass-badge show-notification-count">{{ $userNotificationCount }}</span>
                         @else
@@ -190,42 +155,26 @@
 
                 <!-- Wishlist – same URL for guest and logged-in -->
                 <a href="{{ route('user.wishlist') }}" id="header-wishlist" class="glass-icon-btn glass-wishlist-btn" title="@lang('Wishlist')" @auth data-dashboard-link="1" @endauth>
-                    @if($headerIconImage('wishlist_icon'))
-                        <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('wishlist_icon')) }}" alt="@lang('Wishlist')" class="ui-icon" width="22" height="22" decoding="async">
-                    @else
-                        @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('wishlist_icon', 'heart')])
-                    @endif
+                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'alt' => __('Wishlist')])
                     <span class="glass-badge show-wishlist-count">0</span>
                 </a>
 
                 <!-- Compare – same URL for guest and logged-in -->
                 <a href="{{ route('user.compare') }}" id="header-compare" class="glass-icon-btn glass-compare-btn" title="@lang('Compare')" @auth data-dashboard-link="1" @endauth>
-                    @if($headerIconImage('compare_icon'))
-                        <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('compare_icon')) }}" alt="@lang('Compare')" class="ui-icon" width="22" height="22" decoding="async">
-                    @else
-                        @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('compare_icon', 'exchange-alt')])
-                    @endif
+                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'alt' => __('Compare')])
                     <span class="glass-badge show-compare-count">0</span>
                 </a>
 
                 <!-- Cart – same URL for guest and logged-in -->
                 <a href="{{ route('user.cart') }}" id="header-cart" class="glass-icon-btn glass-cart-btn" title="@lang('Cart')" @auth data-dashboard-link="1" @endauth>
-                    @if($headerIconImage('cart_icon'))
-                        <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('cart_icon')) }}" alt="@lang('Cart')" class="ui-icon" width="22" height="22" decoding="async">
-                    @else
-                        @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('cart_icon', 'shopping-cart')])
-                    @endif
+                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'alt' => __('Cart')])
                     <span class="glass-badge show-cart-count">0</span>
                 </a>
 
                 <!-- Orders/Bags -->
                 @auth
                     <a href="{{ route('user.order.index') }}" class="glass-icon-btn glass-orders-btn" title="@lang('My Orders')">
-                        @if($headerIconImage('orders_icon'))
-                            <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('orders_icon')) }}" alt="@lang('My Orders')" class="ui-icon" width="22" height="22" decoding="async">
-                        @else
-                            @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('orders_icon', 'list-alt')])
-                        @endif
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'list-alt', 'alt' => __('My Orders')])
                     </a>
                 @else
                     <!-- Empty space for alignment when not logged in -->
@@ -246,11 +195,7 @@
                     </a>
                 @else
                     <a href="{{ route('user.login') }}" class="glass-icon-btn glass-login-btn" title="@lang('Login')" role="button">
-                        @if($headerIconImage('login_icon'))
-                            <img src="{{ asset('assets/images/frontend/header_icons/' . $headerIconImage('login_icon')) }}" alt="@lang('Login')" class="ui-icon" width="22" height="22" decoding="async">
-                        @else
-                            @include($activeTemplate . 'partials.icon', ['name' => $headerIcon('login_icon', 'user')])
-                        @endif
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'login_icon', 'fallback' => 'user', 'alt' => __('Login')])
                     </a>
                 @endauth
             </div>
@@ -283,20 +228,30 @@
             <form action="{{ route('products') }}" method="GET" class="glass-mobile-search-form">
                 <div class="glass-mobile-search-inner">
                     <input type="text" name="search" class="glass-mobile-search-input" placeholder="@lang('Search here')" value="{{ request()->search ?? null }}" autocomplete="off">
+                    @php
+                        $drawerSearchImg = header_icon_uploaded('search_icon');
+                        $drawerSearchInline = header_icon_inline_svg_html('search_icon', 'glass-mobile-search-submit__img ui-icon', 20, 20, '');
+                    @endphp
                     <button type="submit" class="glass-mobile-search-submit" aria-label="@lang('Search')">
-                        <svg class="glass-mobile-search-submit__svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+                        @if($drawerSearchInline)
+                            {!! $drawerSearchInline !!}
+                        @elseif($drawerSearchImg)
+                            <img src="{{ header_icon_uploaded_asset_url($drawerSearchImg) }}" alt="" width="20" height="20" class="glass-mobile-search-submit__img" decoding="async" aria-hidden="true">
+                        @else
+                            <svg class="glass-mobile-search-submit__svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+                        @endif
                     </button>
                 </div>
             </form>
         </div>
         <nav class="glass-mobile-nav">
-            <a href="{{ route('home') }}" class="{{ menuActive('home') }}">@include($activeTemplate . 'partials.icon', ['name' => 'home'])@lang('Home')</a>
-            <a href="{{ route('products') }}" class="{{ menuActive('products') }}">@include($activeTemplate . 'partials.icon', ['name' => 'box'])@lang('Products')</a>
-            <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">@include($activeTemplate . 'partials.icon', ['name' => 'phone'])@lang('Contact')</a>
-            <a href="{{ route('track.order') }}" class="{{ menuActive('track-order') }}">@include($activeTemplate . 'partials.icon', ['name' => 'shipping-fast'])@lang('Track Order')</a>
+            <a href="{{ route('home') }}" class="{{ menuActive('home') }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'home_icon', 'fallback' => 'home', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Home')</a>
+            <a href="{{ route('products') }}" class="{{ menuActive('products') }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'products_icon', 'fallback' => 'box', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Products')</a>
+            <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'contact_icon', 'fallback' => 'phone', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Contact')</a>
+            <a href="{{ route('track.order') }}" class="{{ menuActive('track-order') }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Track Order')</a>
             @guest
-                <a href="{{ route('user.login') }}" role="button">@include($activeTemplate . 'partials.icon', ['name' => 'sign-in-alt'])@lang('Login')</a>
-                <a href="{{ route('user.register') }}" role="button">@include($activeTemplate . 'partials.icon', ['name' => 'user-plus'])@lang('Register')</a>
+                <a href="{{ route('user.login') }}" role="button">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'login_icon', 'fallback' => 'sign-in-alt', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Login')</a>
+                <a href="{{ route('user.register') }}" role="button">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'register_icon', 'fallback' => 'user-plus', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Register')</a>
             @endguest
         </nav>
 
@@ -305,21 +260,21 @@
         <div class="glass-mobile-user-section">
             <div class="glass-mobile-user-menu-title">@lang('My Account')</div>
             <nav class="glass-mobile-nav glass-mobile-user-nav">
-                <a href="{{ route('user.home') }}" class="{{ menuActive('user.home') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'home'])@lang('Dashboard')</a>
-                <a href="{{ route('user.track.order') }}" class="{{ menuActive('user.track.order') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'shipping-fast'])@lang('Track Order')</a>
-                <a href="{{ route('user.notifications') }}" class="{{ menuActive('user.notifications') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'bell'])@lang('Notifications')</a>
-                <a href="{{ route('user.order.index') }}" class="{{ menuActive('user.order.index') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'shopping-bag'])@lang('My Orders')</a>
-                <a href="{{ route('user.transactions') }}" class="{{ menuActive('user.transactions') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'money-bill-wave'])@lang('Transactions History')</a>
-                <a href="{{ route('message.index') }}" class="{{ menuActive('message*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'comments'])@lang('My Messages')</a>
-                <a href="{{ route('user.cart') }}" class="{{ menuActive('user.cart') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'shopping-cart'])@lang('Cart')</a>
-                <a href="{{ route('user.wishlist') }}" class="{{ menuActive('user.wishlist') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'heart'])@lang('Wishlist')</a>
-                <a href="{{ route('user.compare') }}" class="{{ menuActive('user.compare') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'exchange-alt'])@lang('Compare')</a>
-                <a href="{{ route('user.review.index') }}" class="{{ menuActive('user.review*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'haykal'])@lang('Review Products')</a>
-                <a href="{{ route('user.profile.setting') }}" class="{{ menuActive('user.profile.setting') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'user-tie'])@lang('Profile')</a>
-                <a href="{{ route('user.change.password') }}" class="{{ menuActive('user.change.password') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.icon', ['name' => 'key'])@lang('Change Password')</a>
+                <a href="{{ route('user.home') }}" class="{{ menuActive('user.home') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'home_icon', 'fallback' => 'home', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Dashboard')</a>
+                <a href="{{ route('user.track.order') }}" class="{{ menuActive('user.track.order') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Track Order')</a>
+                <a href="{{ route('user.notifications') }}" class="{{ menuActive('user.notifications') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Notifications')</a>
+                <a href="{{ route('user.order.index') }}" class="{{ menuActive('user.order.index') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'shopping-bag', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('My Orders')</a>
+                <a href="{{ route('user.transactions') }}" class="{{ menuActive('user.transactions') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'transactions_icon', 'fallback' => 'money-bill-wave', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Transactions History')</a>
+                <a href="{{ route('message.index') }}" class="{{ menuActive('message*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'messages_icon', 'fallback' => 'comments', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('My Messages')</a>
+                <a href="{{ route('user.cart') }}" class="{{ menuActive('user.cart') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Cart')</a>
+                <a href="{{ route('user.wishlist') }}" class="{{ menuActive('user.wishlist') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Wishlist')</a>
+                <a href="{{ route('user.compare') }}" class="{{ menuActive('user.compare') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Compare')</a>
+                <a href="{{ route('user.review.index') }}" class="{{ menuActive('user.review*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'review_icon', 'fallback' => 'haykal', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Review Products')</a>
+                <a href="{{ route('user.profile.setting') }}" class="{{ menuActive('user.profile.setting') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'profile_icon', 'fallback' => 'user-tie', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Profile')</a>
+                <a href="{{ route('user.change.password') }}" class="{{ menuActive('user.change.password') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'change_password_icon', 'fallback' => 'key', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Change Password')</a>
                 <form method="POST" action="{{ route('user.logout') }}" class="glass-mobile-logout-form">
                     @csrf
-                    <button type="submit" class="glass-mobile-logout-btn" aria-label="@lang('Logout')">@include($activeTemplate . 'partials.icon', ['name' => 'sign-out-alt'])@lang('Logout')</button>
+                    <button type="submit" class="glass-mobile-logout-btn" aria-label="@lang('Logout')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'logout_icon', 'fallback' => 'sign-out-alt', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Logout')</button>
                 </form>
             </nav>
         </div>
@@ -508,6 +463,22 @@
 #glassSidebar.glass-mobile-menu .glass-mobile-search-submit__svg {
     display: block !important;
     pointer-events: none;
+}
+#glassSidebar.glass-mobile-menu .glass-mobile-search-submit__img {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    object-fit: contain !important;
+    pointer-events: none;
+    filter: brightness(0) invert(1);
+}
+/* Inline Lucide (currentColor) — no bitmap filter */
+#glassSidebar.glass-mobile-menu svg.glass-mobile-search-submit__img {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    pointer-events: none;
+    color: #fff !important;
 }
 
 @media (max-width: 991.98px) {

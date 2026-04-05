@@ -11,18 +11,19 @@
 @endphp
 @push('head-meta')
     <style id="pdp-critical-cart">
-        .pro-detail-page .pdp-cart-action-row{display:flex;flex-wrap:nowrap;align-items:center;gap:4px;width:100%;min-width:0;overflow:hidden}
-        .pro-detail-page .pdp-cart-action-row .action-buttons{display:flex;flex-wrap:nowrap;flex:1;min-width:0;gap:3px;overflow:hidden}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .btn{box-sizing:border-box;min-width:0;flex:1 1 0%;height:clamp(30px,7.2vw,38px);display:flex;align-items:center;justify-content:center;gap:3px;font-size:clamp(8px,1.95vw,12px);font-weight:600;border-radius:5px;padding:0 3px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+        /* এক লাইন, হরিজন্টাল স্ক্রলবার নয় — ফ্লেক্স শ্রিঙ্ক + কমপ্যাক্ট; ক্লিপ/ভাসমান product-details.css */
+        .pro-detail-page .pdp-cart-action-row{display:flex;flex-wrap:nowrap;align-items:center;gap:clamp(2px,.75vw,6px);width:100%;min-width:0;overflow:visible;padding:0;background:transparent;box-shadow:none;border-radius:0;position:relative;z-index:2}
+        .pro-detail-page .pdp-cart-action-row .action-buttons.pdp-actions-scroll{display:flex;flex-wrap:nowrap;flex:1 1 0%;min-width:0;min-height:0;width:0;max-width:100%;gap:clamp(2px,.5vw,5px);align-items:center;overflow-x:hidden;overflow-y:visible;scrollbar-width:none;padding:0;background:transparent;box-shadow:none}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .btn{box-sizing:border-box;flex:1 1 0%;min-width:0;height:clamp(28px,5.8vw,34px);display:flex;align-items:center;justify-content:center;gap:2px;font-size:clamp(7.5px,1.5vw,10.5px);font-weight:600;border-radius:clamp(6px,1vw,9px);padding:0 clamp(3px,.9vw,9px);overflow:visible;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 1px 2px rgba(15,23,42,.07),0 1px 3px rgba(15,23,42,.05);position:relative;z-index:2}
         .pro-detail-page .pdp-cart-action-row .action-buttons .btn>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .cart-btn{flex:1.28 1 0%;background:#16a34a;color:#fff;border:1px solid #15803d;font-weight:700}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .cart-btn.in-cart{background:#dc3545;border-color:#b02a37;color:#fff}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .compare-btn{background:#e5e7eb;color:#111827;border:1px solid #d1d5db}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .compare-btn.in-compare{background:#dc3545;border-color:#b02a37;color:#fff}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn{background:#10b981;color:#fff;border:1px solid #059669;text-decoration:none}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn.added,.pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn.active{background:#dc3545;border-color:#b02a37}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .chat-btn{background:#f3f4f6;color:#111827;border:1px solid #e5e7eb;text-decoration:none}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .chat-btn.pdp-chat-active{background:#dc3545;border-color:#b02a37;color:#fff}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .cart-btn{flex:1.22 1 0%;background:linear-gradient(155deg,rgba(16,185,129,.88),rgba(5,150,105,.92));color:#fff;border:1px solid rgba(255,255,255,.55);font-weight:700}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .cart-btn.in-cart{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .compare-btn{background:#fff;color:#0f172a;border:1px solid rgba(148,163,184,.65)}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .compare-btn.in-compare{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn{background:linear-gradient(155deg,rgba(16,185,129,.85),rgba(4,120,87,.9));color:#fff;border:1px solid rgba(255,255,255,.52);text-decoration:none}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn.added,.pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn.active{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .chat-btn{background:#fff;color:#0f172a;border:1px solid rgba(148,163,184,.62);text-decoration:none}
+        .pro-detail-page .pdp-cart-action-row .action-buttons .chat-btn.pdp-chat-active{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
     </style>
 @endpush
 
@@ -466,14 +467,14 @@
                                             data-product_id="{{ $product->id }}"
                                             id="addToCartBtn"
                                             title="{{ __('Add to cart — click again when red to remove') }}">
-                                        @include($activeTemplate . 'partials.icon', ['name' => 'shopping-cart'])
+                                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 20, 'height' => 20, 'alt' => ''])
                                         <span>@lang('Add To Cart')</span>
                                     </button>
                                     <button type="button"
                                             class="btn compare-btn btn-compare add-to-compare"
                                             data-product_id="{{ $product->id }}"
                                             title="{{ __('In compare list — click again to remove') }}">
-                                        @include($activeTemplate . 'partials.icon', ['name' => 'sync-alt'])
+                                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'sync-alt', 'width' => 20, 'height' => 20, 'alt' => ''])
                                         <span>@lang('Compare')</span>
                                     </button>
                                     <a href="javascript:void(0)"
@@ -481,7 +482,7 @@
                                        data-product_id="{{ $product->id }}"
                                        role="button"
                                        title="{{ __('Wishlist — click again when red to remove') }}">
-                                        @include($activeTemplate . 'partials.icon', ['name' => 'heart'])
+                                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'width' => 20, 'height' => 20, 'alt' => ''])
                                         <span>@lang('Wishlist')</span>
                                     </a>
                                     <button type="button"
@@ -489,16 +490,16 @@
                                             id="pdpChatToggleBtn"
                                             data-product_id="{{ $product->id }}"
                                             title="{{ __('Open chat — click again to close') }}">
-                                        @include($activeTemplate . 'partials.icon', ['name' => 'comments'])
+                                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'messages_icon', 'fallback' => 'comments', 'width' => 20, 'height' => 20, 'alt' => ''])
                                         <span>@lang('Chat')</span>
                                     </button>
                                 </div>
                             </div>
                             <div class="pro-detail-buy-now-wrap mb-2">
                                 @if($detailMaxQty > 0)
-                                <a class="cmn--btn buy-now w-100 justify-content-center" href="#0" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.icon', ['name' => 'bolt', 'class' => 'me-1']) @lang('Buy Now')</a>
+                                <a class="cmn--btn buy-now w-100 justify-content-center" href="#0" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
                                 @else
-                                <span class="cmn--btn w-100 justify-content-center disabled" style="cursor:not-allowed; opacity:0.7;">@include($activeTemplate . 'partials.icon', ['name' => 'bolt', 'class' => 'me-1']) @lang('Out Of Stock')</span>
+                                <span class="cmn--btn w-100 justify-content-center disabled" style="cursor:not-allowed; opacity:0.7;">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
                                 @endif
                             </div>
                             @guest
@@ -507,7 +508,7 @@
                                    class="cmn--btn w-100 justify-content-center btn-outline--base buy-now"
                                    id="openGuestCheckoutFromProduct"
                                    data-product_id="{{ $product->id }}">
-                                    @include($activeTemplate . 'partials.icon', ['name' => 'bolt', 'class' => 'me-1']) @lang('Quick Order')
+                                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Quick Order')
                                 </a>
                                 <p class="mb-0 mt-1 text-muted small text-center">{{ __('Quick Order – no login required. We will confirm by phone.') }}</p>
                             </div>
@@ -524,19 +525,19 @@
                             @endphp
                             <div class="pro-detail-service-links">
                                 @if($policyPayment)
-                                    <a href="{{ route('policy.pages.short', $policyPayment->id) }}">@include($activeTemplate . 'partials.icon', ['name' => 'credit-card']) @lang('Payment Method')</a>
+                                    <a href="{{ route('policy.pages.short', $policyPayment->id) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_payment_icon', 'fallback' => 'credit-card', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Payment Method')</a>
                                 @else
-                                    <a href="{{ route('policy.pages.short', 1) }}">@include($activeTemplate . 'partials.icon', ['name' => 'credit-card']) @lang('Payment Method')</a>
+                                    <a href="{{ route('policy.pages.short', 1) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_payment_icon', 'fallback' => 'credit-card', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Payment Method')</a>
                                 @endif
                                 @if($policyShipping)
-                                    <a href="{{ route('policy.pages.short', $policyShipping->id) }}">@include($activeTemplate . 'partials.icon', ['name' => 'shipping-fast']) @lang('Shipping & Charge')</a>
+                                    <a href="{{ route('policy.pages.short', $policyShipping->id) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_shipping_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Shipping & Charge')</a>
                                 @else
-                                    <a href="{{ route('policy.pages.short', 2) }}">@include($activeTemplate . 'partials.icon', ['name' => 'shipping-fast']) @lang('Shipping & Charge')</a>
+                                    <a href="{{ route('policy.pages.short', 2) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_shipping_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Shipping & Charge')</a>
                                 @endif
                                 @if($policyOrder)
-                                    <a href="{{ route('policy.pages.short', $policyOrder->id) }}">@include($activeTemplate . 'partials.icon', ['name' => 'list-alt']) @lang('Order Procedure')</a>
+                                    <a href="{{ route('policy.pages.short', $policyOrder->id) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_order_icon', 'fallback' => 'list-alt', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Order Procedure')</a>
                                 @else
-                                    <a href="{{ route('policy.pages.short', 3) }}">@include($activeTemplate . 'partials.icon', ['name' => 'list-alt']) @lang('Order Procedure')</a>
+                                    <a href="{{ route('policy.pages.short', 3) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_order_icon', 'fallback' => 'list-alt', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Order Procedure')</a>
                                 @endif
                             </div>
                             <div class="mt-2 small text-muted">
@@ -550,7 +551,7 @@
                                 <span>@lang('Share'):</span>
                                 <ul class="social-icons">
                                     <li><a href="https://wa.me/?text={{ urlencode(__($product->name) . ' ' . $shareUrl) }}" target="_blank" rel="noopener" style="background:#25D366" title="WhatsApp">@include($activeTemplate . 'partials.icon', ['name' => 'whatsapp'])</a></li>
-                                    <li><a href="mailto:?subject={{ urlencode(__($product->name)) }}&body={{ urlencode($shareUrl) }}" style="background:#ea4335" title="@lang('Email')">@include($activeTemplate . 'partials.icon', ['name' => 'envelope'])</a></li>
+                                    <li><a href="mailto:?subject={{ urlencode(__($product->name)) }}&body={{ urlencode($shareUrl) }}" style="background:#ea4335" title="@lang('Email')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'mail_icon', 'fallback' => 'envelope', 'width' => 18, 'height' => 18, 'alt' => ''])</a></li>
                                     <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}" target="_blank" rel="noopener" style="background:#1877f2" title="@lang('Facebook')">@include($activeTemplate . 'partials.icon', ['name' => 'facebook-f'])</a></li>
                                     <li><a href="https://twitter.com/intent/tweet?text={{ urlencode(__($product->name)) }}&url={{ urlencode($shareUrl) }}" target="_blank" rel="noopener" style="background:#000" title="@lang('Twitter')">@include($activeTemplate . 'partials.icon', ['name' => 'twitter'])</a></li>
                                     <li><a href="javascript:window.print()" style="background:#6c757d" title="@lang('Print')">@include($activeTemplate . 'partials.icon', ['name' => 'print'])</a></li>
@@ -558,19 +559,36 @@
                                 </ul>
                             </div>
                             <div class="d-grid gap-2 mt-2">
-                                <a href="{{ route('contact.live') }}?open_contact=1" class="btn btn-outline-secondary js-contact-panel-open" role="button" data-contact-live-url="{{ route('contact.live') }}?open_contact=1">@include($activeTemplate . 'partials.icon', ['name' => 'comments', 'class' => 'me-1']) @lang('Chat with us')</a>
+                                <a href="{{ route('contact.live') }}?open_contact=1" class="btn btn-outline-secondary js-contact-panel-open" role="button" data-contact-live-url="{{ route('contact.live') }}?open_contact=1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'messages_icon', 'fallback' => 'comments', 'class' => 'me-1', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Chat with us')</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Right: Similar products (reference: clean white cards, image + name + price + actions) --}}
+                {{-- Right: Similar products — up to 4 items (category first, then same brand, then you may also like) --}}
                 <div class="col-lg-3 order-lg-3">
-                    @if ($relatedProduct->count() > 0)
+                    @php
+                        $similarSidebarProducts = $relatedProduct->values();
+                        $similarIdsUsed = collect([$product->id])->merge($similarSidebarProducts->pluck('id'))->unique()->filter();
+                        foreach ([$sameBrandProducts ?? collect(), $youMayAlsoLike ?? collect()] as $similarPool) {
+                            if ($similarSidebarProducts->count() >= 4) {
+                                break;
+                            }
+                            $need = 4 - $similarSidebarProducts->count();
+                            $extra = $similarPool->whereNotIn('id', $similarIdsUsed)->take($need);
+                            if ($extra->isEmpty()) {
+                                continue;
+                            }
+                            $similarSidebarProducts = $similarSidebarProducts->concat($extra)->unique('id')->values();
+                            $similarIdsUsed = $similarIdsUsed->merge($similarSidebarProducts->pluck('id'))->unique()->filter();
+                        }
+                        $similarSidebarProducts = $similarSidebarProducts->take(4);
+                    @endphp
+                    @if ($similarSidebarProducts->isNotEmpty())
                         <div class="pro-detail-similar-wrap">
                             <h5>@lang('Similar Products')</h5>
                             <div class="pro-detail-similar-list">
-                                @foreach ($relatedProduct->take(4) as $singleProduct)
+                                @foreach ($similarSidebarProducts as $singleProduct)
                                     @php
                                         $spPrice = productPrice($singleProduct);
                                         $spQty = (int) ($singleProduct->quantity ?? 0);
@@ -580,10 +598,25 @@
                                             <span class="pro-detail-similar-card-img">
                                                 <img src="{{ getImageWebP(getFilePath('product') . '/' . $singleProduct->image, getFileSize('product')) }}" alt="{{ __($singleProduct->name) }}" loading="lazy" decoding="async" width="200" height="200">
                                             </span>
-                                            <span class="pro-detail-similar-card-body">
+                                            <div class="pro-detail-similar-card-body">
                                                 <span class="pro-detail-similar-card-title">{{ __($singleProduct->name) }}</span>
                                                 <span class="pro-detail-similar-card-price">{{ $general->cur_sym }}{{ showAmount($spPrice) }}</span>
-                                            </span>
+                                                @if(!empty($singleProduct->category) || !empty($singleProduct->brand))
+                                                    <span class="pro-detail-similar-card-meta">
+                                                        @if(!empty($singleProduct->category)){{ __($singleProduct->category->name) }}@endif
+                                                        @if(!empty($singleProduct->category) && !empty($singleProduct->brand)) · @endif
+                                                        @if(!empty($singleProduct->brand)){{ __($singleProduct->brand->name) }}@endif
+                                                    </span>
+                                                @endif
+                                                @if(!empty($singleProduct->product_sku))
+                                                    <span class="pro-detail-similar-card-sku">@lang('SKU'): {{ $singleProduct->product_sku }}</span>
+                                                @endif
+                                                @if($spQty > 0)
+                                                    <span class="pro-detail-similar-card-stock">@lang('In stock')</span>
+                                                @else
+                                                    <span class="pro-detail-similar-card-stock pro-detail-similar-card-stock--out">@lang('Out of stock')</span>
+                                                @endif
+                                            </div>
                                         </a>
                                         <div class="pro-detail-similar-card-actions">
                                             @if($spQty > 0)
@@ -592,8 +625,8 @@
                                             @else
                                             <span class="pro-detail-similar-btn disabled">@lang('Out Of Stock')</span>
                                             @endif
-                                            <button type="button" class="pro-detail-similar-icon add-to-compare" data-product_id="{{ $singleProduct->id }}" title="@lang('Compare')">@include($activeTemplate . 'partials.icon', ['name' => 'exchange-alt'])</button>
-                                            <button type="button" class="pro-detail-similar-icon quickView" data-product_id="{{ $singleProduct->id }}" title="@lang('Quick view')">@include($activeTemplate . 'partials.icon', ['name' => 'eye'])</button>
+                                            <button type="button" class="pro-detail-similar-icon add-to-compare btn-compare" data-product_id="{{ $singleProduct->id }}" title="@lang('Compare')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'width' => 18, 'height' => 18, 'alt' => ''])</button>
+                                            <button type="button" class="pro-detail-similar-icon quickView" data-product_id="{{ $singleProduct->id }}" title="@lang('Quick view')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'quick_view_icon', 'fallback' => 'eye', 'width' => 18, 'height' => 18, 'alt' => ''])</button>
                                         </div>
                                     </div>
                                 @endforeach
@@ -754,7 +787,7 @@
                         <div class="pro-detail-related-section">
                             @include($activeTemplate . 'partials.product_carousel_section', [
                                 'products' => $relatedProduct,
-                                'sectionTitle' => view($activeTemplate . 'partials.icon', ['name' => 'th-large', 'class' => 'me-1'])->render() . __('Related Products'),
+                                'sectionTitle' => view($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'categories_icon', 'fallback' => 'th-large', 'class' => 'me-1', 'width' => 18, 'height' => 18, 'alt' => ''])->render() . __('Related Products'),
                                 'sectionLink' => $product->category ? route('category.products', [slug($product->category->name), $product->category->id]) : null,
                                 'sectionLinkText' => __('View all'),
                                 'sectionClass' => 'pro-section pro-section--tight',
@@ -767,7 +800,7 @@
                         <div class="pro-detail-related-section mt-4">
                             @include($activeTemplate . 'partials.product_carousel_section', [
                                 'products' => $sameBrandProducts,
-                                'sectionTitle' => view($activeTemplate . 'partials.icon', ['name' => 'tag', 'class' => 'me-1'])->render() . __('From same brand'),
+                                'sectionTitle' => view($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'section_brand_icon', 'fallback' => 'tag', 'class' => 'me-1', 'width' => 18, 'height' => 18, 'alt' => ''])->render() . __('From same brand'),
                                 'sectionLink' => null,
                                 'sectionClass' => 'pro-section pro-section--tight',
                                 'sectionId' => 'same-brand-section',
@@ -779,7 +812,7 @@
                         <div class="pro-detail-related-section mt-4">
                             @include($activeTemplate . 'partials.product_carousel_section', [
                                 'products' => $youMayAlsoLike,
-                                'sectionTitle' => view($activeTemplate . 'partials.icon', ['name' => 'heart', 'class' => 'me-1'])->render() . __('You may also like'),
+                                'sectionTitle' => view($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'class' => 'me-1', 'width' => 18, 'height' => 18, 'alt' => ''])->render() . __('You may also like'),
                                 'sectionLink' => route('products'),
                                 'sectionLinkText' => __('Browse all'),
                                 'sectionClass' => 'pro-section pro-section--tight',
@@ -797,7 +830,7 @@
                         <div class="pro-section pro-section--tight">
                             <div class="pro-section__head d-flex align-items-center justify-content-between mb-3">
                                 <h4 class="pro-section__title mb-0">
-                                    @include($activeTemplate . 'partials.icon', ['name' => 'th-large', 'class' => 'me-1'])
+                                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'categories_icon', 'fallback' => 'th-large', 'class' => 'me-1', 'width' => 18, 'height' => 18, 'alt' => ''])
                                     {{ __('More Products For You') }}
                                 </h4>
                                 <a href="{{ route('products') }}" class="small text-decoration-none">{{ __('View all') }}</a>
@@ -825,10 +858,10 @@
                     <span class="cur_sym">{{ $general->cur_sym }}</span><span class="sticky-price-amount">{{ showAmount($detailPrice) }}</span>
                 </div>
                 @if($detailMaxQtySticky > 0)
-                <button type="button" class="btn btn--base flex-grow-1 add-to-cart" data-product_id="{{ $product->id }}" id="addToCartStickyBtn">@include($activeTemplate . 'partials.icon', ['name' => 'shopping-cart', 'class' => 'me-1']) @lang('Add To Cart')</button>
-                <a href="#0" class="btn btn-outline--base buy-now" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.icon', ['name' => 'bolt', 'class' => 'me-1']) @lang('Buy Now')</a>
+                <button type="button" class="btn btn--base flex-grow-1 add-to-cart" data-product_id="{{ $product->id }}" id="addToCartStickyBtn">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Add To Cart')</button>
+                <a href="#0" class="btn btn-outline--base buy-now" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
                 @else
-                <span class="btn btn-secondary disabled flex-grow-1">@include($activeTemplate . 'partials.icon', ['name' => 'shopping-cart', 'class' => 'me-1']) @lang('Out Of Stock')</span>
+                <span class="btn btn-secondary disabled flex-grow-1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
                 @endif
             </div>
         </div>

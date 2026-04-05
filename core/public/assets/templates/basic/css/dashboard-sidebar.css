@@ -80,6 +80,19 @@
     text-align: center;
     flex-shrink: 0;
 }
+
+#user-dashboard-root .dashboard__sidebar .side__menu li a .ui-icon,
+.dashboard-section .dashboard__sidebar .side__menu li a .ui-icon,
+#user-dashboard-root .dashboard__sidebar .side__menu__logout-btn .ui-icon,
+.dashboard-section .dashboard__sidebar .side__menu__logout-btn .ui-icon {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+#user-dashboard-root .dashboard__sidebar .side__menu li a:hover .ui-icon,
+.dashboard-section .dashboard__sidebar .side__menu li a:hover .ui-icon {
+    transform: scale(1.08);
+    opacity: 1;
+}
 #user-dashboard-root .dashboard__sidebar .side__menu li a.active i,
 .dashboard-section .dashboard__sidebar .side__menu li a.active i { opacity: 1; }
 

@@ -599,6 +599,17 @@
                             if (response && response.items && response.items.length > 0) localStorage.setItem(GUEST_CART_KEY, JSON.stringify(response.items));
                             else localStorage.removeItem(GUEST_CART_KEY);
                         } catch (e) {}
+                        var items = (response && Array.isArray(response.items)) ? response.items : [];
+                        var pidInCart = {};
+                        items.forEach(function(it) {
+                            var p = it && (it.product_id != null) ? parseInt(it.product_id, 10) : 0;
+                            if (p > 0) pidInCart[p] = true;
+                        });
+                        $('.cart-btn, .add-to-cart').each(function() {
+                            var $b = $(this);
+                            var pid = parseInt($b.attr('data-product_id') || $b.data('product_id'), 10);
+                            $b.toggleClass('in-cart', pid > 0 && !!pidInCart[pid]);
+                        });
                     }
                 });
             }

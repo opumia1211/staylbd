@@ -461,6 +461,47 @@ class CartController extends Controller
         }
 
         $userId = auth()->id();
+
+        if ($request->boolean('all')) {
+            $pid = (int) $request->product_id;
+            if ($userId) {
+                Cart::where('user_id', $userId)->where('product_id', $pid)->delete();
+            } else {
+                $cart = session()->get('cart', []);
+                if (is_array($cart)) {
+                    foreach (array_keys($cart) as $key) {
+                        $row = $cart[$key] ?? null;
+                        $rowPid = null;
+                        if (is_array($row)) {
+                            $rowPid = isset($row['product_id']) ? (int) $row['product_id'] : null;
+                        } elseif (is_object($row) && isset($row->product_id)) {
+                            $rowPid = (int) $row->product_id;
+                        }
+                        if ($rowPid === $pid) {
+                            unset($cart[$key]);
+                        }
+                    }
+                    session()->put('cart', $cart);
+                }
+            }
+
+            $product = Product::find($pid);
+            activity_log(\App\Models\UserActivityLog::CART_REMOVE, $product ? 'Removed from cart: ' . $product->name : 'Removed from cart', 'product', $pid);
+
+            try {
+                $abandonedService = app(AbandonedCartService::class);
+                if ($userId) {
+                    $abandonedService->recordUserCart($userId, $request);
+                } else {
+                    $abandonedService->recordGuestCart($request);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::channel('single')->debug('Abandoned cart record failed', ['message' => $e->getMessage()]);
+            }
+
+            return response()->json(['success' => __('Product was successfully removed.')]);
+        }
+
         $variantId = $request->variant_id ? (int) $request->variant_id : null;
         $variantDetails = $request->filled('variant_details') ? trim($request->variant_details) : null;
 
