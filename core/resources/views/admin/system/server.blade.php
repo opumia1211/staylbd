@@ -302,8 +302,7 @@
 </div>
 @endsection
 @push('style')
-<style>
-.table td code { font-size: 0.9em; }
-.text-break { word-break: break-all; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

@@ -4,16 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@lang('Delivery Confirmed')</title>
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 2rem; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f5f5f5; }
-        .box { max-width: 400px; text-align: center; padding: 2rem; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .box h1 { font-size: 1.5rem; color: #023047; margin-bottom: 0.5rem; }
-        .box p { color: #666; margin: 0.5rem 0; }
-        .box .order-no { font-weight: 600; color: #219ebc; }
-        .icon { font-size: 3rem; margin-bottom: 1rem; }
-    </style>
+    <link rel="stylesheet" href="{{ storefront_compiled_stylesheet_url('critical-storefront') }}" crossorigin="anonymous">
+
 </head>
-<body>
+<body class="st-order-delivery-scanned">
     <div class="box">
         <div class="icon">✅</div>
         @if($justScanned)

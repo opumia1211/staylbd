@@ -359,22 +359,9 @@
 @endsection
 
 @push('style')
-<style>
-/* Admin list — clean UI */
-.admin-add-card .admin-add-card-header { background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); border: none; border-radius: 0.375rem 0.375rem 0 0; }
-.admin-add-card .admin-add-card-title { color: #fff !important; font-weight: 600; font-size: 1rem; }
-.admin-sections-box { max-height: 320px; overflow-y: auto; border-radius: 0.375rem; }
-.admin-sections-inner { background: #fff !important; border: 1px solid #dee2e6 !important; }
-.admin-section-label { font-size: 0.95rem; font-weight: 600; color: #1a1a1a !important; cursor: pointer; }
-.admin-sections-inner .form-check-input { width: 1.1em; height: 1.1em; cursor: pointer; flex-shrink: 0; }
-.admin-section-link { font-size: 0.9rem; color: #0d6efd; text-decoration: none; }
-.admin-section-link:hover { color: #0a58ca; }
-.admin-form #adminRoleSelect { min-width: 200px; }
-.admin-list-table tbody tr:hover { background-color: #f8f9fa; }
-.admin-list-table .table-light th { font-weight: 600; }
-.card { border-radius: 0.5rem; }
-.card-header.bg-light { border-bottom: 1px solid rgba(0,0,0,.06); }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

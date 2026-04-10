@@ -179,57 +179,12 @@
 </div>
 
 @push('style')
-<style>
-    .hp-pro__head { background: #fafbfc; border-color: #e5e7eb !important; }
-    .hp-pro__head-icon {
-        width: 44px; height: 44px;
-        background: #eef2ff;
-        color: var(--primary, #6366f1);
-    }
-    .hp-pro__head-title { font-size: 1.125rem; font-weight: 700; color: #111827; letter-spacing: -0.02em; }
-    .hp-pro__head-lead { font-size: .8125rem; color: #6b7280; line-height: 1.45; }
-    .hp-pro__head-steps {
-        display: flex; flex-wrap: wrap; gap: .5rem 1.25rem;
-        font-size: .75rem; color: #4b5563; line-height: 1.4;
-    }
-    .hp-pro__head-steps li { display: inline-flex; align-items: center; gap: .4rem; }
-    .hp-pro__step-n {
-        display: inline-flex; align-items: center; justify-content: center;
-        min-width: 1.35rem; height: 1.35rem; padding: 0 .25rem;
-        border-radius: 6px; background: #e5e7eb; color: #374151;
-        font-size: .65rem; font-weight: 800;
-    }
-    .hp-pro__head-meta strong { font-weight: 700; }
-    .hp-pro__hint-bar { background: #f9fafb; }
-    .hp-pro__card { border-radius: 14px; overflow: hidden; }
-    .hp-pro__card-head { background: #fff; border-bottom: 1px solid #f3f4f6 !important; }
-    .hp-pro__card-icon {
-        width: 38px; height: 38px;
-        background: #f0f4ff;
-        color: var(--primary, #6366f1);
-        font-size: 1.1rem;
-    }
-    .hp-pro__pos { font-size: 0.65rem; font-weight: 700; background: #e2e8f0; color: #475569; padding: 0.2rem 0.5rem; }
-    .hp-pro__empty-icon { width: 88px; height: 88px; background: #f1f5f9; }
-    .hp-pro__table thead th { border-bottom: 2px solid #e2e8f0; font-weight: 600; font-size: 0.65rem; }
-    .letter-spacing-half { letter-spacing: 0.04em; }
-    .hp-layout-sortable .hp-layout-item { cursor: grab; transition: background .15s, box-shadow .15s; border-color: #eef0f3 !important; }
-    .hp-layout-sortable .hp-layout-item:hover { background: #fafbfc; }
-    .hp-layout-sortable .hp-layout-item.sortable-ghost { opacity: 0.45; background: #e0e7ff; }
-    .hp-layout-sortable .hp-layout-item.sortable-chosen { cursor: grabbing; box-shadow: 0 6px 20px rgba(0,0,0,.08); }
-    .hp-layout-item--pulse { animation: hpPulse 1.2s ease 2; box-shadow: inset 0 0 0 2px rgba(34,197,94,.5); }
-    @keyframes hpPulse { 0%, 100% { background: #fff; } 50% { background: #ecfdf5; } }
-    .hp-layout-drag { cursor: grab; }
-    .hp-layout-move .btn { min-width: 30px; color: #64748b; line-height: 1.1; }
-    .hp-layout-move .btn:hover { color: var(--primary, #6366f1); background: #f8fafc !important; }
-    .hp-layout-settings .form-control-sm { border-radius: 10px; }
-    .hp-layout-item { padding-top: .65rem !important; padding-bottom: .65rem !important; }
-    .hp-layout-edit-btn { border-radius: 999px; padding: .2rem .55rem; font-weight: 600; }
-    .hp-layout-item--removed { opacity: .55; background: #fff7ed; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 @push('script')
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" crossorigin="anonymous"></script>
+<script src="{{ asset('assets/admin/js/vendor/sortable.min.js') }}?v={{ $assetVersion ?? config('app.version') }}"></script>
 <script>
 (function() {
     var el = document.getElementById('hpLayoutSortable');

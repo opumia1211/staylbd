@@ -1,0 +1,4 @@
+/* PDP, grids, filters — deferred. Cart styles: tailwind-storefront-deferred-cart on cart routes only. */
+@import "../../../public/assets/templates/basic/css/professional-filter.css";
+@import "../../../public/assets/templates/basic/css/products-listing.css";
+@import "../../../public/assets/templates/basic/css/product-details.css";

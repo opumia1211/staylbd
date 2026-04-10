@@ -512,96 +512,10 @@
     <script src="{{ asset('assets/admin/js/image-uploader.min.js') }}"></script>
 @endpush
 
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/image-uploader.min.css') }}">
-@endpush
-
 @push('style')
-<style>
-    /* বাধ্যতামূলক ঘর খালি থাকলে স্পষ্ট লাল – পূরণ না করা পর্যন্ত থাকবে */
-    #productCreateForm .product-group-error {
-        background-color: rgba(220, 53, 69, 0.06) !important;
-        border-left: 4px solid #dc3545 !important;
-        padding-left: 8px !important;
-        margin-left: -8px !important;
-        padding-top: 4px !important;
-        padding-bottom: 4px !important;
-        border-radius: 4px;
-    }
-    #productCreateForm .product-field-error,
-    #productCreateForm .product-field-error:focus,
-    #productCreateForm input.product-field-error,
-    #productCreateForm select.product-field-error,
-    #productCreateForm textarea.product-field-error {
-        border: 2px solid #dc3545 !important;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.35) !important;
-        background-color: #fff5f5 !important;
-    }
-    #productCreateForm .product-group-error .form-control,
-    #productCreateForm .product-group-error .input-group .form-control,
-    #productCreateForm .input-group .form-control.product-field-error {
-        border: 2px solid #dc3545 !important;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.35) !important;
-        background-color: #fff5f5 !important;
-    }
-    #productCreateForm .product-group-error > label,
-    #productCreateForm .product-group-error label:first-child { color: #b02a37 !important; font-weight: 600 !important; }
-    #productCreateForm .profile-uploader.product-group-error { border: 3px solid #dc3545 !important; border-radius: 8px; padding: 10px !important; background: #fff5f5 !important; }
-    #productCreateForm .gallery-uploader.product-group-error { border: 3px solid #dc3545 !important; border-radius: 8px; padding: 10px !important; background: #fff5f5 !important; }
-    .product-create-toolbar { position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-    /* Card headers – সাদা ব্যাকগ্রাউন্ড, কালো টেক্সট (simple & readable) */
-    .product-create-card-header {
-        background-color: #fff !important;
-        color: #212529 !important;
-        border-bottom: 1px solid #dee2e6;
-    }
-    /* Select2 ও সাধারণ select লাল */
-    #productCreateForm .select2-container.product-field-error .select2-selection,
-    #productCreateForm .select2-container.product-field-error.select2-container--default .select2-selection,
-    #productCreateForm .product-group-error .select2-container .select2-selection {
-        border: 2px solid #dc3545 !important;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.35) !important;
-        background-color: #fff5f5 !important;
-    }
-    /* Size & Stock – compact, professional grid */
-    .size-stock-grid { gap: 0.25rem !important; }
-    .size-stock-label { font-size: 0.75rem; line-height: 1.2; }
-    .size-stock-input { max-width: 5rem; font-size: 0.8rem; padding: 0.2rem 0.35rem; height: 1.75rem; }
-    .size-stock-grid .col-4, .size-stock-grid .col-sm-3, .size-stock-grid .col-md-2 { padding: 0 0.25rem; }
-    /* Advanced quick nav – pill buttons, hover state */
-    .quick-nav-btn {
-        text-decoration: none !important;
-        border: 1px solid rgba(0,0,0,.15);
-        background: #fff;
-        color: #212529;
-        transition: all .2s ease;
-    }
-    .quick-nav-btn:hover {
-        background: var(--primary, #0d6efd);
-        color: #fff;
-        border-color: var(--primary, #0d6efd);
-        transform: translateY(-1px);
-    }
-    .quick-nav-btn .section-badge { font-size: 0.65rem; }
-    /* Section card – when highlighted after shortcut */
-    .section-card.scroll-highlight { animation: sectionPulse 1.5s ease; }
-    @keyframes sectionPulse {
-        0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4); }
-        70% { box-shadow: 0 0 0 12px rgba(13, 110, 253, 0); }
-        100% { box-shadow: none; }
-    }
-    .section-fill-hint { font-size: 0.9rem; border-left: 4px solid #dc3545; }
-    .section-fill-hint.alert-warning { border-left-color: #ffc107; }
-    .section-fill-hint.alert-info { border-left-color: #0dcaf0; }
-    .advanced-upload-hint { font-size: 0.9rem; }
-    .check-section-btn { font-size: 0.8rem; }
-    .product-create-toolbar { will-change: transform; contain: layout style; }
-    #section-seo .card-header { border-left: 3px solid var(--success, #198754); }
-    @media (max-width: 991.98px) {
-        #clothingQuickNav .quick-nav-btn .section-badge { display: none; }
-        #clothingQuickNav .quick-nav-btn { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
-    }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

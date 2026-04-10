@@ -275,98 +275,9 @@
                 @endif
 
                 <div class="footer__bottom__widget footer-newsletter-widget">
-                    <style>
-                        .custom-newsletter-heading {
-                            font-family: 'Inter', sans-serif;
-                            font-weight: 700;
-                            color: #0f172a;
-                            font-size: 15px;
-                            margin-bottom: 4px;
-                            letter-spacing: -0.01em;
-                        }
-                        .custom-newsletter-subtitle {
-                            font-family: 'Inter', sans-serif;
-                            font-size: 13px;
-                            color: #475569;
-                            margin-bottom: 12px;
-                            line-height: 1.45;
-                        }
-                        .custom-newsletter-input-group {
-                            display: flex;
-                            align-items: stretch;
-                            background: rgba(255, 255, 255, 0.95);
-                            border-radius: 8px;
-                            border: 1px solid rgba(148, 163, 184, 0.4);
-                            overflow: hidden;
-                            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02), 0 2px 8px rgba(0,0,0,0.04);
-                            transition: all 0.25s ease;
-                            position: relative;
-                            z-index: 30;
-                            height: 42px;
-                            width: 100%;
-                        }
-                        .custom-newsletter-input-group:focus-within {
-                            border-color: #3b82f6;
-                            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-                        }
-                        .custom-newsletter-icon {
-                            padding: 0 6px 0 12px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            color: #64748b;
-                            font-size: 15px;
-                            pointer-events: none;
-                        }
-                        .custom-newsletter-input {
-                            flex: 1 1 auto;
-                            min-width: 50px;
-                            width: 100%;
-                            border: none !important;
-                            background: transparent !important;
-                            padding: 0 10px 0 2px;
-                            font-family: 'Inter', sans-serif;
-                            font-size: 14px !important;
-                            color: #0f172a !important;
-                            -webkit-text-fill-color: #0f172a !important;
-                            font-weight: 500;
-                            outline: none !important;
-                            box-shadow: none !important;
-                            caret-color: #3b82f6 !important;
-                            height: 100%;
-                            pointer-events: auto;
-                            z-index: 30;
-                        }
-                        .custom-newsletter-input::placeholder {
-                            color: #94a3b8 !important;
-                            -webkit-text-fill-color: #94a3b8 !important;
-                            font-weight: 400;
-                        }
-                        .custom-newsletter-btn {
-                            flex: 0 0 48px !important;
-                            width: 48px !important;
-                            border: none;
-                            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-                            color: #ffffff;
-                            padding: 0 !important;
-                            font-size: 15px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            cursor: pointer;
-                            transition: all 0.2s ease;
-                            margin: 0;
-                            height: 100%;
-                            pointer-events: auto;
-                            z-index: 30;
-                        }
-                        .custom-newsletter-btn:hover {
-                            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                        }
-                        .custom-newsletter-btn:active {
-                            transform: scale(0.95);
-                        }
-                    </style>
+                    
+{{-- inline style moved to critical-storefront.css --}}
+
                     <div class="footer-newsletter-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
                         <h6 class="custom-newsletter-heading footer-col-title">@lang('Subscribe Newsletter')</h6>
                         @php $subT = $subscribeSubtitle ? __($subscribeSubtitle) : ''; $mainT = __($subscribeTitle); @endphp
@@ -493,7 +404,8 @@
                                     @elseif($useCustomImg)
                                         <img src="{{ getImage($customIconRel, '96x96') }}" alt="" class="stayl-footer-social-img object-contain" width="22" height="22" loading="lazy" decoding="async">
                                     @elseif($useLibraryIcon)
-                                        <span class="stayl-footer-social-inline-wrap inline-flex items-center justify-center shrink-0 text-lg leading-none" aria-hidden="true"><i class="{{ e($iconClassSafe) }}"></i></span>
+                                        {{-- Font icon CSS removed from storefront; map admin-stored FA/LA classes to Lucide SVG --}}
+                                        @include($activeTemplate . 'partials.icon', ['name' => $socialIconName, 'class' => 'w-5 h-5'])
                                     @elseif(str_contains($iconStored, '<i ') && $socialIconName === 'link')
                                         <span class="stayl-footer-social-inline-wrap inline-flex items-center justify-center shrink-0">{!! $iconStored !!}</span>
                                     @else

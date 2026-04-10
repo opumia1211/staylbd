@@ -242,10 +242,8 @@
 @endsection
 
 @push('style')
-<style>
-.nav-tabs--location .nav-link { font-weight: 600; }
-.nav-tabs--location .nav-link.active { color: var(--base); border-color: var(--base); }
-.style--two thead th { background: #f8f9fa; font-size: 0.75rem; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 

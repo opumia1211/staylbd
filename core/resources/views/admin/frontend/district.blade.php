@@ -296,14 +296,7 @@
 @endpush
 
 @push('style')
-<style>
-    .border--primary-light { border-color: #e2e8f0 !important; }
-    .border--primary-light:focus { border-color: #4634ff !important; box-shadow: 0 0 0 0.25rem rgba(70, 52, 255, 0.1) !important; }
-    .style--two thead th { background: #f8f9fa; color: #6c757d; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 12px 15px; }
-    .style--two tbody td { padding: 12px 15px; vertical-align: middle; border-bottom: 1px solid #f1f1f1; }
-    .card-header.bg--primary { background: linear-gradient(45deg, #4634ff, #7367f0) !important; }
-    .card-header.bg--dark { background: #34495e !important; }
-    .btn-lg { padding: 12px 30px; border-radius: 8px; font-weight: 600; }
-    .form-select-lg { font-size: 0.95rem; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

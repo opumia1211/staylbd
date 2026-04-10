@@ -27,18 +27,9 @@
 </div>
 
 @push('style')
-<style>
-.sticky-add-to-cart-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 998; background: #fff; box-shadow: 0 -2px 12px rgba(0,0,0,.12); transform: translateY(100%); transition: transform .25s ease; }
-.sticky-add-to-cart-bar.is-visible { transform: translateY(0); }
-.sticky-add-to-cart-bar[aria-hidden="false"] { transform: translateY(0); }
-.sticky-add-to-cart-bar__img { object-fit: cover; }
-.cart-plus-minus--sticky input { width: 50px; text-align: center; }
-.sticky-add-to-cart-btn.in-cart {
-    background: rgba(220, 53, 69, 0.92) !important;
-    border-color: rgba(176, 42, 55, 0.85) !important;
-    color: #fff !important;
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @push('script')

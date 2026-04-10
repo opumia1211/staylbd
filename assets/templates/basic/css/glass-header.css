@@ -167,7 +167,7 @@
     max-height: 56px;
     padding-top: 0;
     padding-bottom: 0;
-    transition: all 0.1s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, background-color;
     width: 100% !important;
     max-width: 100% !important;
@@ -270,7 +270,7 @@
     border: none;
     padding: 8px;
     cursor: pointer;
-    transition: all 0.1s ease-out;
+    transition: all 0.3s;
     visibility: visible !important;
     opacity: 1 !important;
 }
@@ -280,7 +280,7 @@
     height: 2px;
     background: #333;
     border-radius: 2px;
-    transition: all 0.1s ease-out;
+    transition: all 0.3s;
 }
 
 .glass-menu-toggle:hover span {
@@ -297,7 +297,7 @@
     align-items: center;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.1s ease-out;
+    transition: all 0.3s ease;
 }
 
 .glass-logo a:hover {
@@ -309,7 +309,7 @@
     height: 35px;
     width: auto;
     object-fit: contain;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.3s;
 }
 
 .glass-logo img:hover {
@@ -393,7 +393,7 @@
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
-    transition: all 0.1s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     min-height: 40px;
@@ -402,6 +402,8 @@
     width: 40px;
     max-width: 40px;
     max-height: 40px;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 40px;
     flex-shrink: 0;
     box-sizing: border-box !important;
 }
@@ -411,14 +413,6 @@
     line-height: 1;
     font-weight: 600;
     margin: 0;
-}
-
-.glass-nav-btn .ui-icon {
-    width: 20px;
-    height: 20px;
-    display: block;
-    stroke-width: 1.8px;
-    flex-shrink: 0;
 }
 
 .glass-nav-btn:hover {
@@ -453,7 +447,7 @@
     border-radius: 999px; /* pill shape */
     padding: 6px 12px 6px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03), inset 0 2px 4px rgba(255, 255, 255, 0.5);
-    transition: all 0.1s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 10;
     overflow: visible !important;
     min-width: 0;
@@ -467,16 +461,35 @@
 .glass-search-wrapper--card {
     flex: 1 1 auto;
     flex-wrap: nowrap !important;
-    background: rgba(255, 255, 255, 0.6) !important;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    border: 1px solid rgba(15, 23, 42, 0.07) !important;
     border-radius: 999px !important;
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.55) !important;
     backdrop-filter: blur(12px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-    padding: 4px 8px 4px 20px !important;
+    padding: 4px 5px 4px 20px !important;
+    gap: 10px !important;
     min-height: 48px;
     max-height: 48px;
     align-items: center;
+}
+
+/* Mic + submit: locked as a unit, flush inside the pill (fixes uneven right padding) */
+.glass-search-trailing {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+    gap: 4px !important;
+    padding: 0 0 0 6px !important;
+    margin: 0 !important;
+    border-left: 1px solid rgba(15, 23, 42, 0.06);
+    min-height: 40px;
+    flex-shrink: 0 !important;
+}
+
+.glass-search-trailing .glass-search-icon {
+    margin: 0 !important;
 }
 
 .glass-search-wrapper .glass-search-icon,
@@ -497,7 +510,7 @@
     min-width: 0;
     border: none;
     background: transparent !important;
-    padding: 8px 10px 8px 0 !important;
+    padding: 8px 6px 8px 0 !important;
     font-size: 16px !important; /* Professional standard size */
     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
     color: #0f172a !important;
@@ -515,6 +528,15 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     opacity: 1 !important;
+}
+
+/* Native search input: hide WebKit decorations for a cleaner card */
+.glass-search-input::-webkit-search-decoration,
+.glass-search-input::-webkit-search-cancel-button,
+.glass-search-input::-webkit-search-results-button,
+.glass-search-input::-webkit-search-results-decoration {
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
 
 .glass-search-input::placeholder {
@@ -539,45 +561,49 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    min-height: 38px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     border: none;
     background: transparent;
     color: #64748b;
     cursor: pointer;
-    transition: all 0.1s ease-out;
+    transition: all 0.2s ease;
     border-radius: 50%;
-    margin: 0 2px;
+    margin: 0;
     font-size: 16px;
     flex-shrink: 0;
     box-sizing: border-box !important;
 }
 
 .glass-search-voice.glass-search-icon {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    min-height: 38px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
 }
 
 .glass-search-voice .ui-icon {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
+    stroke-width: 2px;
 }
 
 .glass-search-submit {
-    background: var(--main, #4FC4F7) !important;
+    background: linear-gradient(165deg, var(--main, #4FC4F7) 0%, #2eb0e6 100%) !important;
     color: #fff !important;
-    box-shadow: 0 4px 10px rgba(79, 196, 247, 0.3) !important;
+    box-shadow: 0 3px 10px rgba(79, 196, 247, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    align-self: center;
 }
 
 .glass-search-submit .ui-icon,
 .glass-search-submit__icon {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     color: #fff;
+    stroke: #fff;
+    stroke-width: 2px;
 }
 
 .glass-search-submit img.ui-icon {
@@ -651,8 +677,10 @@
 }
 
 .glass-header-camera-btn .ui-icon {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
+    display: block;
+    stroke-width: 1.8px;
 }
 
 @media (max-width: 991.98px) {
@@ -719,7 +747,7 @@
     cursor: pointer;
     border-radius: 50%;
     margin: 0;
-    transition: all 0.1s ease-out;
+    transition: all 0.2s;
     flex-shrink: 0;
     box-sizing: border-box !important;
 }
@@ -748,7 +776,7 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.1s ease-out;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
 }
 
@@ -764,7 +792,7 @@
     border-radius: 12px;
     margin-bottom: 4px;
     cursor: pointer;
-    transition: all 0.1s ease-out;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -885,8 +913,10 @@ button.glass-icon-btn {
     height: 40px !important;
     max-width: 40px !important;
     max-height: 40px !important;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 40px;
     padding: 0 !important;
-    margin: 0 2px; /* Small margin for floating effect */
+    margin: 0 !important;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -895,7 +925,7 @@ button.glass-icon-btn {
     color: #333;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.1s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 15px;
     font-weight: 600;
     white-space: nowrap;
@@ -928,13 +958,6 @@ button.glass-icon-btn {
     font-weight: 600;
 }
 
-.glass-icon-btn .ui-icon {
-    width: 22px;
-    height: 22px;
-    display: block;
-    flex-shrink: 0;
-}
-
 .glass-badge-text {
     font-size: 14px;
     white-space: nowrap;
@@ -960,6 +983,8 @@ button.glass-icon-btn {
     height: 40px !important;
     max-width: 40px !important;
     max-height: 40px !important;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 40px;
     padding: 0 !important;
     justify-content: center !important;
     box-sizing: border-box !important;
@@ -975,8 +1000,10 @@ button.glass-icon-btn {
     min-width: 40px !important;
     width: 40px !important;
     height: 40px !important;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 40px;
     padding: 0 !important;
-    margin: 0 2px !important;
+    margin: 0 !important;
     background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(12px);
     color: #333 !important;
@@ -1130,7 +1157,7 @@ button.glass-icon-btn {
 .glass-dropdown .dropdown-item {
     padding: 10px 15px;
     border-radius: 8px;
-    transition: all 0.1s ease-out;
+    transition: all 0.2s;
     color: #333;
     font-size: 14px;
 }
@@ -1250,8 +1277,7 @@ button.glass-icon-btn {
     -webkit-backdrop-filter: blur(8px);
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    will-change: opacity;
+    transition: opacity 0.35s ease;
 }
 
 .glass-mobile-menu.active .glass-mobile-menu-overlay {
@@ -1275,9 +1301,7 @@ button.glass-icon-btn {
     overflow-x: hidden;
     transform: translateX(-100%);
     transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
-    will-change: transform;
     -webkit-overflow-scrolling: touch;
-    contain: content;
     /* Safe area for notched devices (iPhone X, etc.) */
     padding-top: env(safe-area-inset-top, 0);
     padding-bottom: env(safe-area-inset-bottom, 0);
@@ -1316,7 +1340,7 @@ button.glass-icon-btn {
     cursor: pointer;
     font-size: 22px;
     color: #333;
-    transition: all 0.1s ease-out;
+    transition: all 0.25s ease;
 }
 
 .glass-mobile-menu-close:hover {
@@ -1409,7 +1433,7 @@ button.glass-icon-btn {
     gap: 14px;
     font-size: 15px;
     font-weight: 600;
-    transition: all 0.1s ease-out;
+    transition: all 0.2s ease;
 }
 
 .glass-mobile-nav a:hover,
@@ -1418,16 +1442,11 @@ button.glass-icon-btn {
     color: var(--main, #4FC4F7);
 }
 
-.glass-mobile-nav a i,
-.glass-mobile-nav a .ui-icon {
+.glass-mobile-nav a i {
     font-size: 20px;
     width: 24px;
-    height: 20px;
     text-align: center;
     flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 
 /* Logged-in user menu section in mobile sidebar (Dashboard, Orders, Profile, Logout) */
@@ -1469,7 +1488,7 @@ button.glass-icon-btn {
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.1s ease-out;
+    transition: all 0.2s ease;
     font-family: inherit;
 }
 
@@ -2055,7 +2074,7 @@ button.glass-icon-btn {
         display: flex !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
-        transition: all 0.1s ease-out;
+        transition: all 0.3s ease;
     }
     .glass-header:has(.glass-search-input:focus) .glass-search-form,
     .glass-header.glass-mobile-search-mode .glass-search-form,
@@ -2077,7 +2096,7 @@ button.glass-icon-btn {
         box-sizing: border-box !important;
         max-height: 38px !important;
         border-radius: 24px !important;
-        transition: all 0.1s ease-out;
+        transition: all 0.3s ease;
         border: 1px solid rgba(0, 0, 0, 0.1);
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     }
@@ -2093,7 +2112,7 @@ button.glass-icon-btn {
     
     .glass-search-input {
         font-size: 16px !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
         padding: 6px 3px 6px 0 !important;
         flex: 1 1 0 !important;
         min-width: 0 !important;
@@ -2160,6 +2179,10 @@ button.glass-icon-btn {
         object-fit: contain;
     }
     
+    .glass-logo .logo-text {
+        font-size: 14px;
+    }
+    
     .glass-header-right {
         gap: 4px !important;
         flex-shrink: 0 !important; /* সব বাটন দেখা যাবে - scroll দিয়ে */
@@ -2184,6 +2207,7 @@ button.glass-icon-btn {
         height: 32px !important;
         max-width: 32px !important;
         max-height: 32px !important;
+        flex: 0 0 32px !important;
         padding: 0 !important;
         flex-shrink: 0;
         display: flex !important;
@@ -2205,6 +2229,7 @@ button.glass-icon-btn {
         height: 32px !important;
         max-width: 32px !important;
         max-height: 32px !important;
+        flex: 0 0 32px !important;
         padding: 0 !important;
     }
     
@@ -2222,8 +2247,9 @@ button.glass-icon-btn {
         max-width: 32px !important;
         width: 32px !important;
         height: 32px !important;
+        flex: 0 0 32px !important;
         padding: 0 !important; /* No padding - icon only */
-        margin: 0 1px !important; /* Small margin for floating effect */
+        margin: 0 !important;
         flex-shrink: 0 !important;
         display: flex !important;
         visibility: visible !important;
@@ -2296,6 +2322,7 @@ button.glass-icon-btn {
         width: 32px !important;
         max-width: 32px !important;
         max-height: 32px !important;
+        flex: 0 0 32px !important;
         flex-shrink: 0;
     }
     
@@ -2371,6 +2398,10 @@ button.glass-icon-btn {
         max-width: 60px;
     }
     
+    .glass-logo .logo-text {
+        font-size: 11px;
+    }
+    
     /* সার্চ বক্স – 575px এও দেখা যাবে */
     .glass-header-center {
         min-width: 110px !important;
@@ -2418,7 +2449,7 @@ button.glass-icon-btn {
     /* টাইপ করা লেখা স্পষ্ট দেখা যাবে – কালো কালার, system-ui ফন্ট */
     .glass-search-input {
         font-size: 16px !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
         padding: 6px 2px 6px 0 !important;
         min-width: 0 !important;
         flex: 1 1 0 !important;
@@ -2479,6 +2510,7 @@ button.glass-icon-btn {
         width: 28px !important;
         max-width: 28px !important;
         max-height: 28px !important;
+        flex: 0 0 28px !important;
         padding: 0 !important;
         display: flex !important;
         visibility: visible !important;
@@ -2499,6 +2531,7 @@ button.glass-icon-btn {
         height: 28px !important;
         max-width: 28px !important;
         max-height: 28px !important;
+        flex: 0 0 28px !important;
         padding: 0 !important;
     }
     
@@ -2516,8 +2549,9 @@ button.glass-icon-btn {
         max-width: 28px !important;
         width: 28px !important;
         height: 28px !important;
+        flex: 0 0 28px !important;
         padding: 0 !important; /* No padding - icon only */
-        margin: 0 1px !important; /* Small margin for floating effect */
+        margin: 0 !important;
         display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
@@ -2590,6 +2624,7 @@ button.glass-icon-btn {
         width: 28px;
         max-width: 28px;
         max-height: 28px;
+        flex: 0 0 28px !important;
     }
     
     .glass-nav-btn i {
@@ -2627,7 +2662,7 @@ button.glass-icon-btn {
     overflow: visible !important;
     position: relative !important;
     object-fit: contain !important;
-    box-sizing: border-box !important;
+    box-sizing: content-box !important;
 }
 
 @media (max-width: 767px) {
@@ -2646,34 +2681,34 @@ button.glass-icon-btn {
     }
 }
 
-/* Block FontAwesome pseudoelements to prevent double icons/ghosting with our new solid SVGs */
-.glass-icon-btn i,
-.glass-icon-btn::before,
-.glass-icon-btn::after,
-.glass-search-icon i,
-.glass-search-icon::before,
-.glass-search-icon::after,
-.glass-nav-btn i,
-.glass-nav-btn::before,
-.glass-nav-btn::after {
-    display: none !important;
-    content: none !important;
+@media (max-width: 575px) {
+    .glass-header .glass-nav-btn .ui-icon,
+    .glass-header .glass-icon-btn .ui-icon,
+    .glass-header .glass-lang-btn .ui-icon,
+    .glass-header .glass-login-btn .ui-icon,
+    .glass-header .glass-notification-btn .ui-icon,
+    .glass-header .glass-header-left .glass-nav-btn .ui-icon,
+    .glass-header .glass-header-left .glass-custom-btn .ui-icon,
+    .glass-header .glass-header-right .glass-custom-btn .ui-icon {
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        min-height: 16px !important;
+    }
 }
 
-.glass-icon-btn, 
-.glass-search-icon, 
-.glass-nav-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    overflow: visible !important;
+/* Vector toolbar icons: crisp strokes + light depth (not search row — avoids muddy submit glyph) */
+.glass-header .glass-nav-btn .staylbd-inline-svg,
+.glass-header .glass-icon-btn .staylbd-inline-svg,
+.glass-header .glass-lang-btn .staylbd-inline-svg,
+.glass-header .glass-login-btn .staylbd-inline-svg,
+.glass-header .glass-header-camera-btn .staylbd-inline-svg {
+    shape-rendering: geometricPrecision;
+    filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.08));
 }
 
-.glass-icon-btn .ui-icon,
-.glass-search-icon .ui-icon,
-.glass-nav-btn .ui-icon {
-    margin: 0 !important;
-    display: block !important;
+.glass-header .glass-search-icon .staylbd-inline-svg {
+    shape-rendering: geometricPrecision;
 }
 
 /* Scroll Effect - Header becomes more opaque on scroll */

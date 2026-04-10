@@ -1,10 +1,9 @@
 @extends('admin.layouts.app')
 
 @push('style')
-<style>
-    .autoai-rules-table tbody td { background-color: #fff !important; }
-    .autoai-rules-table tbody td .auto-reply-text { color: #212529 !important; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @section('panel')

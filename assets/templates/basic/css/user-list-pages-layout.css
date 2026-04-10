@@ -1,0 +1,128 @@
+/**
+ * Unified layout: /user/cart, /user/wishlist, /user/compare
+ * Full-width responsive; identical UI/UX across pages.
+ * No 881px or other fixed width; flexible containers.
+ */
+
+/* 1. Page container – full width, flex column */
+.compare-container,
+.cart-container,
+.wishlist-container,
+.compare-page,
+.cart-page,
+.wishlist-page {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. Inner container – flexible, no fixed width */
+.compare-page .container,
+.cart-page .container,
+.wishlist-page .container,
+.compare-container .container,
+.cart-container .container,
+.wishlist-container .container {
+    width: 100%;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+/* 3. Page content area */
+.page-content,
+#dashboard-ajax-content .compare-page,
+#dashboard-ajax-content .cart-page,
+#dashboard-ajax-content .wishlist-page {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 4. Page wrapper – sidebar + content alignment */
+.page-wrapper,
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+/* List pages (cart, wishlist, compare): prevent flex min-height from breaking mobile/tablet */
+#dashboard-ajax-content:has(.cart-page),
+#dashboard-ajax-content:has(.wishlist-page),
+#dashboard-ajax-content:has(.compare-page) {
+    min-height: 0;
+    overflow: visible;
+}
+
+/* 5. Table wrapper – responsive stability */
+.table-wrapper,
+.cart-page__table-wrap,
+.cart-table-wrapper,
+.compare-table-wrap,
+.wishlist-table-wrap,
+.wishlist-page .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cart-page__table-wrap table,
+.cart-page__table-wrap .cart-page__table,
+.compare-table-wrap table,
+.compare-page .compare-compact-table,
+.wishlist-page .dashboard-compact-table,
+.wishlist-page .wishlist-compact-table {
+    width: 100%;
+    min-width: 900px;
+}
+
+/* 6. Prevent UI collapse on small devices */
+@media (max-width: 1024px) {
+    .page-wrapper,
+    .dashboard-wrapper {
+        padding: 8px;
+    }
+    .compare-page .container,
+    .cart-page .container,
+    .wishlist-page .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-wrapper,
+    .cart-page__table-wrap,
+    .compare-table-wrap,
+    .wishlist-table-wrap,
+    .wishlist-page .table-responsive {
+        overflow-x: auto;
+    }
+    .compare-page .container,
+    .cart-page .container,
+    .wishlist-page .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .compare-page .container,
+    .cart-page .container,
+    .wishlist-page .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .compare-page .container,
+    .cart-page .container,
+    .wishlist-page .container {
+        padding-left: 0.35rem;
+        padding-right: 0.35rem;
+    }
+}

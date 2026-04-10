@@ -90,23 +90,7 @@
 @endif
 
 @push('style')
-<style>
-/* Power Zone – এক লাইনে সব ফিচার, একই সাইজের কার্ড (ব্যানার নিচের কার্ডের মতো) */
-.power-zone-section--compact { padding: 12px 0 16px; background: linear-gradient(180deg, #fafbfc 0%, #fff 100%); border-bottom: 1px solid rgba(0,0,0,.06); }
-.power-zone-unified-row { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: stretch; }
-@media (min-width: 576px) { .power-zone-unified-row { gap: 16px 18px; } }
-@media (min-width: 768px) { .power-zone-unified-row { gap: 18px; } }
-/* কার্ডের বাহ্যিক সাইজ আগের মতো – ভিতরের ছবি 120x140px (কার্ড একই রাখতে ছবি কন্টেইনার 120x140, কার্ডে overflow) */
-.power-zone-unified-card { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 110px; min-height: 120px; padding: 8px 6px; background: #fff; border-radius: 14px; border: 1px solid rgba(0,0,0,.08); box-shadow: 0 2px 8px rgba(0,0,0,.06); text-decoration: none; color: #1f2937; text-align: center; transition: transform .2s, box-shadow .2s, border-color .2s; flex: 0 0 auto; overflow: hidden; }
-@media (min-width: 576px) { .power-zone-unified-card { min-width: 120px; min-height: 130px; padding: 8px 6px; } }
-@media (min-width: 768px) { .power-zone-unified-card { min-width: 130px; min-height: 140px; padding: 8px 6px; } }
-.power-zone-unified-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.1); border-color: rgba(0,0,0,.12); color: var(--base, #6366f1); }
-.power-zone-unified-card__media { width: 120px; height: 140px; border-radius: 12px; background: rgba(0,0,0,.04); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 1.8rem; color: #374151; flex-shrink: 0; }
-.power-zone-unified-card__media--img { padding: 0; overflow: hidden; width: 120px; height: 140px; }
-.power-zone-unified-card__media--img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.power-zone-unified-card:hover .power-zone-unified-card__media { color: var(--base, #6366f1); background: rgba(99,102,241,.08); }
-.power-zone-unified-card:hover .power-zone-unified-card__media--img { background: rgba(99,102,241,.08); }
-.power-zone-unified-card__label { line-height: 1.3; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.power-zone-unified-card__meta { font-size: 0.8rem; font-weight: 700; color: var(--base, #6366f1); margin-top: 4px; }
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush

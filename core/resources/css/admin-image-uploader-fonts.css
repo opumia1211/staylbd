@@ -1,0 +1,11 @@
+/* image-uploader.min.css uses ../../font/ — invalid when merged into serve-css bundle; use webroot paths */
+@font-face {
+    font-family: 'Image Uploader Icons';
+    src: url(../assets/admin/font/iu.eot);
+    src: url(../assets/admin/font/iu.eot) format('embedded-opentype'),
+        url(../assets/admin/font/iu.ttf) format('truetype'),
+        url(../assets/admin/font/iu.woff) format('woff'),
+        url(../assets/admin/font/iu.svg) format('svg');
+    font-weight: 400;
+    font-style: normal;
+}

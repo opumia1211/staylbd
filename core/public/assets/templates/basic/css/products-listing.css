@@ -346,11 +346,11 @@
     justify-content: flex-start;
     align-items: stretch;
 }
-.product-card-col--home .product-card,
-.product-grid .product-card-col .product-card,
-.products-grid .product-card-col .product-card,
-.products-home-grid .product-card-col .product-card,
-.product-card {
+.product-card-col--home .product-card:not(.product-card-glass),
+.product-grid .product-card-col .product-card:not(.product-card-glass),
+.products-grid .product-card-col .product-card:not(.product-card-glass),
+.products-home-grid .product-card-col .product-card:not(.product-card-glass),
+.product-card:not(.product-card-glass) {
     position: relative;
     width: 100%;
     min-width: 0;
@@ -367,8 +367,88 @@
     content-visibility: auto;
     box-sizing: border-box;
 }
-.product-card:hover {
+/* গ্লাস কার্ড: লেআউট একই, কিন্তু কোনো ফ্রেম বা ধূসর শেলফ নয় */
+.product-card.product-card-glass {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    display: block !important;
+    overflow: hidden;
+    content-visibility: auto;
+    box-sizing: border-box;
+    isolation: isolate;
+}
+.product-card:not(.product-card-glass):hover {
     border-color: rgba(0, 0, 0, 0.1);
+}
+/* Tailwind glass card (card.blade.php): জিরো বর্ডার/ছায়া; ইমেজ জোন সম্পূর্ণ #fff */
+.product-card.product-card-glass,
+.product-grid .product-card-col .product-card.product-card-glass,
+.products-grid .product-card-col .product-card.product-card-glass,
+.products-home-grid .product-card-col .product-card.product-card-glass {
+    border: none !important;
+    border-width: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+.product-card.product-card-glass:hover,
+.product-grid .product-card-col .product-card.product-card-glass:hover,
+.products-grid .product-card-col .product-card.product-card-glass:hover,
+.products-home-grid .product-card-col .product-card.product-card-glass:hover {
+    border: none !important;
+    box-shadow: none !important;
+}
+.product-card.product-card-glass .product-card-glass__media-link {
+    border: none !important;
+    border-width: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+.product-card.product-card-glass .product-card-glass__info {
+    border: none !important;
+    border-width: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+.product-card.product-card-glass .product-card-glass__media {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-width: 0 !important;
+    outline: none !important;
+    background: #f1f5f9 !important;
+    background-color: #f1f5f9 !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    flex: none !important;
+    box-shadow: none !important;
+}
+.product-card.product-card-glass .product-card-glass__photo-zone {
+    background: #f1f5f9 !important;
+    background-color: #f1f5f9 !important;
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+.product-card.product-card-glass .product-card-glass__media .main-img-card,
+.product-card.product-card-glass .product-card-glass__media img.product-card-glass__photo {
+    background: transparent !important;
+    background-color: transparent !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
 }
 /* Carousel: allow auto height so slider looks correct */
 .product-carousel__item .product-card {
@@ -401,7 +481,7 @@
     z-index: 0;
 }
 @media (hover: hover) {
-    .product-card:hover {
+    .product-card:not(.product-card-glass):hover {
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     }
 }
@@ -1568,7 +1648,7 @@
 .product-card .product-card__row--reviews *,
 .product-card .product-card__cta,
 .product-card .buy-now-cta {
-    font-family: "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif !important;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
     font-kerning: normal !important;
     font-feature-settings: "kern" 1, "liga" 1 !important;
     -webkit-text-size-adjust: 100% !important;

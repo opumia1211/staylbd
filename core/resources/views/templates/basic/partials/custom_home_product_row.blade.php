@@ -2,7 +2,7 @@
     $r = $rowModel;
     $sectionKey = $r->sectionKey();
     $link = $r->view_all_url ? trim((string) $r->view_all_url) : null;
-    $linkLabel = $r->view_all_label ? __($r->view_all_label) : __('Show All');
+    $linkLabel = $r->view_all_label ? __($r->view_all_label) : __('View All');
     if (!$link && $r->source_type === 'category' && $r->category_id) {
         $cat = $r->relationLoaded('category') ? $r->category : \App\Models\Category::query()->find($r->category_id);
         if ($cat) {

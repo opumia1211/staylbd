@@ -239,11 +239,9 @@
 @endpush
 
 @push('style')
-<style>
-.attr-stat-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
-.attr-stat-icon--primary { background: rgba(13, 110, 253, 0.12); color: #0d6efd; }
-.attr-stat-icon--success { background: rgba(25, 135, 84, 0.12); color: #198754; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

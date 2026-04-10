@@ -130,60 +130,9 @@
 </div>
 
 @push('style')
-<style>
-.quickorder-control-board { max-width: 960px; }
-.qo-compact-header .badge.bg-primary-soft {
-    background: #eff6ff;
-    border-radius: 999px;
-    padding: 0.25rem 0.5rem;
-}
-.qo-compact-header .btn-xs {
-    padding: 0.15rem 0.45rem;
-    font-size: 0.75rem;
-    line-height: 1.3;
-}
-.qo-url {
-    max-width: 260px;
-}
-.qo-group:last-of-type { border-bottom: none !important; }
-.qo-group-header { background: #fafbfc; padding-top: 0.75rem; padding-bottom: 0.5rem; }
-.qo-field-item {
-    display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 10px;
-    border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer;
-    transition: border-color .15s, background .15s, box-shadow .15s; min-height: 40px;
-}
-.qo-field-item:hover { border-color: #cbd5e1; background: #f8fafc; }
-.qo-field-item--on { border-color: #0d6efd; background: #eff6ff; box-shadow: 0 0 0 1px rgba(13,110,253,.2); }
-.qo-field-item .form-check-input { flex-shrink: 0; width: 18px; height: 18px; margin: 0; }
-.qo-field-label { flex: 1; font-size: 0.9rem; font-weight: 500; color: #334155; }
-.qo-field-badge { font-size: 0.7rem; font-weight: 500; }
-.qo-header-input {
-    resize: vertical;
-    min-height: 44px;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    border-radius: 8px;
-    border-color: #e2e8f0;
-}
-.qo-header-help {
-    font-size: 0.75rem;
-    color: #6b7280;
-}
-.qo-compact-header .form-check.form-switch .form-check-input {
-    width: 2.2rem;
-    height: 1.1rem;
-}
-.qo-compact-header .form-check.form-switch .form-check-input:checked {
-    background-color: #2563eb;
-    border-color: #2563eb;
-}
-.qo-compact-header .form-check.form-switch .form-check-label {
-    cursor: pointer;
-}
-@media (max-width: 575.98px) {
-    .quickorder-control-board { max-width: 100%; }
-}
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

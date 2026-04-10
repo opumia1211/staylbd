@@ -435,17 +435,10 @@
 @push('script-lib')
 <script src="{{ asset('assets/admin/js/image-uploader.min.js') }}" defer></script>
 @endpush
-@push('style-lib')
-<link rel="stylesheet" href="{{ asset('assets/admin/css/image-uploader.min.css') }}">
-@endpush
 @push('style')
-<style>
-    #import-from-website .card-header { border-left: 4px solid #0dcaf0; }
-    #create2QuickNav .btn { font-size: 0.8rem; }
-    #create2QuickNav .btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .nav-tabs-custom .nav-link { font-weight: 500; }
-    .nav-tabs-custom .nav-link.active { border-bottom: 2px solid var(--primary); }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

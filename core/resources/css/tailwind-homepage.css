@@ -1,0 +1,14 @@
+/*
+ * Homepage-only storefront CSS (smaller blocking bundle).
+ * Product / category / cart / PDP use tailwind-product.css.
+ */
+@import "./imports/storefront-vendor.css";
+@import "./imports/storefront-home-legacy.css";
+@import "./home-banner-slider.css";
+@import "./storefront-lucide.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "./storefront-tailwind-overrides.css";

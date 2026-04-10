@@ -22,6 +22,8 @@ use App\Models\User;
 use App\Models\UserLogin;
 use App\Rules\FileTypeValidate;
 use App\Services\DashboardService;
+use App\Services\BusinessDashboardService;
+use App\Services\AdminAiAssistantService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -76,6 +78,24 @@ class AdminController extends Controller
             'delivered', 'trxReport', 'plusTrx', 'minusTrx', 'order', 'orders', 'recentOrders',
             'lowStockProducts', 'recentOrdersForActivity', 'recentUsersForActivity', 'recentDepositsForActivity',
             'dashboard'
+        ));
+    }
+
+    /**
+     * Advanced Business Intelligence & AI Insights.
+     */
+    public function businessInsights(BusinessDashboardService $biService, AdminAiAssistantService $aiService)
+    {
+        $pageTitle = 'Business Intelligence & AI Insights';
+        
+        $revenueTrends = $biService->getRevenueTrends();
+        $conversionRate = $biService->getConversionRate();
+        $averageCLV = $biService->getAverageCLV();
+        $funnel = $biService->getFunnelAnalysis();
+        $aiSummary = $aiService->getSalesInsights();
+
+        return view('admin.business_insights', compact(
+            'pageTitle', 'revenueTrends', 'conversionRate', 'averageCLV', 'funnel', 'aiSummary'
         ));
     }
 

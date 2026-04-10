@@ -40,7 +40,11 @@ return [
     |--------------------------------------------------------------------------
     | Admin 2FA (Owner/SuperAdmin mandatory)
     |--------------------------------------------------------------------------
+    | Global switch: when false, password login skips verify/setup (dev convenience).
+    | Override via Security dashboard (DB) or .env ADMIN_TWO_FACTOR_ENABLED.
+    |--------------------------------------------------------------------------
     */
+    'admin_two_factor_enabled' => filter_var(env('ADMIN_TWO_FACTOR_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
     'two_factor_mandatory_roles' => ['owner', 'super_admin'],
     'admin_2fa_attempt_limit'    => 5,
     'admin_2fa_attempt_decay'    => 60, // seconds

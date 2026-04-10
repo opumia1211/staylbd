@@ -47,7 +47,7 @@ class SiteController extends Controller
         $todayDealProducts = Cache::remember('homepage.today_deals', 600, function () {
             return Product::available()
                 ->todayDeal()
-                ->with(['category:id,name', 'brand:id,name'])
+                ->with(['category:id,name', 'brand:id,name', 'activeVariants'])
                 ->withCount(['reviews' => fn ($r) => $r->visibleOnProduct()])
                 ->latest('id')
                 ->take(8)
@@ -127,7 +127,11 @@ class SiteController extends Controller
             $adSlotsById = [];
         }
 
-        $response = response()->view($this->activeTemplate . 'home', array_merge(compact('pageTitle', 'todayDealProducts', 'bannerData', 'homeData', 'homeSectionData', 'bannerModuleData', 'customRowsById', 'adSlotsById'), $bannerPrecomputed));
+        $response = response()->view($this->activeTemplate . 'home', array_merge(
+            compact('pageTitle', 'todayDealProducts', 'bannerData', 'homeData', 'homeSectionData', 'bannerModuleData', 'customRowsById', 'adSlotsById'),
+            $bannerPrecomputed,
+            ['storefrontDeferredBundle' => 'tailwind-storefront-deferred-home']
+        ));
         if (request()->get('open') === 'login' || request()->get('open') === 'register') {
             $response->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
             $response->header('Pragma', 'no-cache');
@@ -153,7 +157,7 @@ class SiteController extends Controller
                     if ($isCustom) {
                         return;
                     }
-                    $allowed = ['hot_deal', 'featured', 'best_selling', 'trending', 'new_arrivals', 'recommended'];
+                    $allowed = ['hot_deal', 'featured', 'best_selling', 'trending', 'new_arrivals', 'recommended', 'today_deals'];
                     if (!in_array($value, $allowed, true)) {
                         $fail(__('Invalid section.'));
                     }

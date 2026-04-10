@@ -17,7 +17,7 @@
                         <label>@lang('Password') <span class="text-danger">*</span></label>
                         <input type="password" name="password" class="form-control" required>
                     </div>
-                    @if(auth()->guard('admin')->user()?->hasTwoFactorEnabled())
+                    @if(auth()->guard('admin')->user()?->hasTwoFactorEnabled() && config('admin.admin_two_factor_enabled', true))
                     <div class="form-group mb-3">
                         <label>@lang('2FA Code')</label>
                         <input type="text" name="code" class="form-control" placeholder="000000" maxlength="6" inputmode="numeric">

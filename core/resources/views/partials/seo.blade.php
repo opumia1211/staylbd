@@ -93,7 +93,7 @@
     {"@context":"https://schema.org","@type":"Organization","name":{{ json_encode($general->sitename ?? '') }},"url":{{ json_encode(url('/')) }}}
     </script>
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebSite","name":{{ json_encode($general->sitename ?? '') }},"url":{{ json_encode(url('/')) }},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":{{ json_encode(url('/search/universal') . '?search={search_term_string}') }}},"query-input":"required name=search_term_string"}}
+    {"@context":"https://schema.org","@type":"WebSite","name":{{ json_encode($general->sitename ?? '') }},"url":{{ json_encode(url('/')) }},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":{{ json_encode(route('products') . '?search={search_term_string}') }}},"query-input":"required name=search_term_string"}}
     </script>
     @endif
 @endif

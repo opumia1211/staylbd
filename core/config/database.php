@@ -58,11 +58,22 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => env('DB_STRICT', true),
-            'engine' => null,
-            // Production: enable opcache (php.ini). Optional: MYSQL_ATTR_PERSISTENT => true for connection pooling.
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'engine' => 'InnoDB',
+            'options' => extension_loaded('pdo_mysql') ? (static function () {
+                $opts = [
+                    PDO::ATTR_PERSISTENT => filter_var(
+                        env('DB_PERSISTENT', true),
+                        FILTER_VALIDATE_BOOLEAN
+                    ),
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ];
+                $sslCa = env('MYSQL_ATTR_SSL_CA');
+                if (! empty($sslCa)) {
+                    $opts[PDO::MYSQL_ATTR_SSL_CA] = $sslCa;
+                }
+
+                return $opts;
+            })() : [],
         ],
 
         'pgsql' => [

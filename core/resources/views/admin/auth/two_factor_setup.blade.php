@@ -65,7 +65,7 @@
 </div>
 
 @push('script')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ asset('assets/admin/js/vendor/qrcode.min.js') }}?v={{ $assetVersion ?? config('app.version') }}"></script>
 <script>
 (function() {
     var otpauthUrl = @json($otpauthUrl);

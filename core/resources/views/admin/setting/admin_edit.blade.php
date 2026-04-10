@@ -121,11 +121,9 @@
 @endsection
 
 @push('style')
-<style>
-.admin-sections-edit-box { max-height: 320px; overflow-y: auto; }
-.admin-sections-edit-box .form-check-input { width: 1.1em; height: 1.1em; cursor: pointer; flex-shrink: 0; }
-.admin-sections-edit-box .form-check-label { cursor: pointer; font-size: 0.95rem; color: #1a1a1a !important; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

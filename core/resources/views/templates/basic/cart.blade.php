@@ -5,6 +5,11 @@
     }
 @endphp
 @extends($activeTemplate . 'layouts.frontend')
+
+@push('head-meta')
+    @include('partials.storefront_deferred_bundle', ['bundle' => 'tailwind-storefront-deferred-cart'])
+@endpush
+
 @section('content')
     @include($activeTemplate . 'partials.cart_page_content')
 @endsection

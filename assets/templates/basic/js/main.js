@@ -129,21 +129,48 @@
     $(".menu-area").toggleClass("active");
   });
 
-  $(".dashboard-sidebar-toggler").on("click", function () {
-    $(".dashboard__sidebar").toggleClass("active");
-    $(".overlay").toggleClass("active");
-  });
-  $(".close-dashboard-sidebar").on("click", function () {
+  function toggleDashboardSidebar() {
+    var isOpen = $(".dashboard__sidebar").toggleClass("active").hasClass("active");
+    $(".overlay").toggleClass("active", isOpen);
+    if (window.innerWidth < 992) {
+      document.body.classList.toggle("dashboard-sidebar-open", isOpen);
+    }
+  }
+  function closeDashboardSidebar() {
     $(".dashboard__sidebar").removeClass("active");
     $(".overlay").removeClass("active");
+    document.body.classList.remove("dashboard-sidebar-open");
+  }
+  var dashboardTogglerTouchHandled = false;
+  $(document).on("click", ".dashboard-sidebar-toggler", function (e) {
+    if (dashboardTogglerTouchHandled) {
+      dashboardTogglerTouchHandled = false;
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    toggleDashboardSidebar();
   });
+  $(document).on("touchend", ".dashboard-sidebar-toggler", function (e) {
+    var el = e.target.closest && e.target.closest(".dashboard-sidebar-toggler");
+    if (el) {
+      if (e.cancelable) e.preventDefault();
+      dashboardTogglerTouchHandled = true;
+      setTimeout(function () { dashboardTogglerTouchHandled = false; }, 400);
+      toggleDashboardSidebar();
+    }
+  });
+  $(".close-dashboard-sidebar").on("click", closeDashboardSidebar);
+  $(document).on("click", ".close-dashboard-sidebar", closeDashboardSidebar);
   $(".menu-close").on("click", function () {
     $(".overlay, .menu-area, .header-bar").removeClass("active");
+    document.body.classList.remove("dashboard-sidebar-open");
   });
   $(".overlay, .close-searchbar").on("click", function () {
     $(
       ".overlay, .dashboard-menu, .header-bar, .dashboard__sidebar, .menu-area, .filter--sidebar"
     ).removeClass("active");
+    document.body.classList.remove("dashboard-sidebar-open");
   });
   $(".close--sidebar").on("click", function () {
     $(".filter--sidebar, .overlay").removeClass("active");

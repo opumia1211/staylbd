@@ -222,20 +222,8 @@ function displaySearchResults(results, container) {
     $('[data-bs-toggle="tooltip"]').tooltip()
   })
 
-  // responsive sidebar expand js - Enhanced with proper event handling
-  $(document).on('click', '.res-sidebar-open-btn', function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    $('.sidebar').addClass('open');
-    $('body').addClass('sidebar-open');
-  }); 
-
-  $(document).on('click', '.res-sidebar-close-btn', function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    $('.sidebar').removeClass('open');
-    $('body').removeClass('sidebar-open');
-  }); 
+  // Sidebar open/close is handled in admin/layouts/master.blade.php
+  // Keep a single source of truth to avoid duplicate toggles.
 
 /* Get the documentElement (<html>) to display the page in fullscreen */
 let elem = document.documentElement;

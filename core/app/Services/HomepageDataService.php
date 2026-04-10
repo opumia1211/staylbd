@@ -124,7 +124,7 @@ class HomepageDataService
      */
     public static function getSectionProducts(string $section, int $offset = 0, int $limit = 8)
     {
-        $baseWith = ['category:id,name', 'brand:id,name'];
+        $baseWith = ['category:id,name', 'brand:id,name', 'activeVariants'];
         $reviewCount = fn ($r) => $r->visibleOnProduct();
 
         if (preg_match('/^custom_row_(\d+)$/', $section, $m)) {
@@ -132,6 +132,15 @@ class HomepageDataService
         }
 
         switch ($section) {
+            case 'today_deals':
+                return self::newProductQuery()
+                    ->todayDeal()
+                    ->with($baseWith)
+                    ->withCount(['reviews' => $reviewCount])
+                    ->latest('id')
+                    ->skip($offset)
+                    ->take($limit)
+                    ->get();
             case 'hot_deal':
                 $q = self::newProductQuery()->hotDeal()->latest('id');
                 $fallback = self::newProductQuery()->notSpotlight()->latest('id');
@@ -185,7 +194,7 @@ class HomepageDataService
      */
     public static function getCustomRowProducts(int $rowId, int $offset, int $limit, ?array $baseWith = null, $reviewCount = null): \Illuminate\Support\Collection
     {
-        $baseWith = $baseWith ?? ['category:id,name', 'brand:id,name'];
+        $baseWith = $baseWith ?? ['category:id,name', 'brand:id,name', 'activeVariants'];
         $reviewCount = $reviewCount ?? fn ($r) => $r->visibleOnProduct();
         $row = HomepageCustomProductRow::query()->where('id', $rowId)->where('is_active', true)->first();
         if (!$row) {
@@ -260,7 +269,7 @@ class HomepageDataService
 
     protected static function loadAll(): array
     {
-        $baseWith = ['category:id,name', 'brand:id,name'];
+        $baseWith = ['category:id,name', 'brand:id,name', 'activeVariants'];
         $reviewCount = fn ($r) => $r->visibleOnProduct();
         $sectionLimit = self::SECTION_LIMIT;
         $usedIds = [];

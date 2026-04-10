@@ -22,6 +22,9 @@ class Kernel extends ConsoleKernel
         // Auto delete trashed uploads + temp cache (delayed-delete)
         $schedule->command('staylbd:cleanup-trashed-files --temp')->daily()->at('04:05');
 
+        // Database Backups (runs daily at midnight)
+        $schedule->command('database:backup')->daily()->at('00:00');
+
         $schedule->command('search:cleanup')->daily()->at('04:15');
         $schedule->command('maintenance:clean-logs', ['--keep-days' => config('maintenance.log_keep_days', 7)])->daily()->at('04:30');
         $schedule->command('maintenance:run-full', ['--skip-db' => true])->weeklyOn(0, '05:00');

@@ -78,7 +78,9 @@
 @endsection
 
 @push('style')
-    <style>.status-info { cursor: pointer; } .order-card { transition: box-shadow 0.2s; } .order-card:hover { box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1) !important; }</style>
+    
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @push('script')

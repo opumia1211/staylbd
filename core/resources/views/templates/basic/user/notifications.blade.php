@@ -78,12 +78,9 @@
 @endsection
 
 @push('style')
-<style>
-.notifications-page--compact .notification-item__inner { padding: 0.4rem 0.5rem !important; }
-.notifications-page--compact .notification-item:hover { background-color: rgba(0,0,0,.04); }
-.notification-item__message { color: #333 !important; }
-.notification-btn-expand { cursor: pointer; text-decoration: none; }
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @push('script')

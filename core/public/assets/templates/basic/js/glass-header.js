@@ -643,6 +643,9 @@
     const searchForm = document.querySelector('#universalSearchForm');
     const SEARCH_CACHE_KEY = 'staylbd_recent_search_terms_v1';
     const SEARCH_CACHE_LIMIT = 8;
+    const SEARCH_DEBOUNCE_MS = 300;
+    var trendingKeywordsCache = null;
+    var trendingLoadPromise = null;
 
     function readRecentSearchTerms() {
         try {
@@ -671,23 +674,85 @@
         return list.filter(function(t) { return String(t).toLowerCase().indexOf(q) !== -1; }).slice(0, 5);
     }
 
-    function showRecentSearchSuggestions(query) {
-        var resultsContainer = document.querySelector('#searchResults');
-        if (!resultsContainer || !searchForm) return false;
-        var matches = getRecentMatches(query);
-        if (!matches.length) return false;
-        var productsUrl = searchForm.getAttribute('action') || (window.location.origin + '/products');
-        var html = '<div class="glass-search-recent-head px-2 py-1 small text-muted">Recent Searches</div>';
-        matches.forEach(function(term) {
-            html += '<a href="' + productsUrl + '?search=' + encodeURIComponent(term) + '" class="glass-search-result-item glass-search-result-item--recent text-decoration-none d-block">' +
-                '<div class="glass-search-result-item-content">' +
-                '<div class="glass-search-result-item-title">' + iconSvg('search', 'me-2') + escapeHtml(term) + '</div>' +
-                '<div class="glass-search-result-item-meta"><span class="glass-search-result-item-type">Recent</span></div>' +
-                '</div></a>';
+    function productsSearchBaseUrl() {
+        var productsUrl = (searchForm && searchForm.getAttribute('action')) ? searchForm.getAttribute('action') : (window.location.origin + '/products');
+        if (productsUrl.indexOf('?') !== -1) productsUrl = productsUrl.split('?')[0];
+        return productsUrl;
+    }
+
+    function fetchTrendingKeywords(done) {
+        if (trendingKeywordsCache !== null) {
+            done(trendingKeywordsCache);
+            return;
+        }
+        if (trendingLoadPromise) {
+            trendingLoadPromise.then(function() { done(trendingKeywordsCache); });
+            return;
+        }
+        var url = searchForm && searchForm.getAttribute('data-trending-url');
+        if (!url) {
+            trendingKeywordsCache = [];
+            done(trendingKeywordsCache);
+            return;
+        }
+        trendingLoadPromise = fetch(url, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+            .then(function(r) { return r.ok ? r.json() : { success: false, keywords: [] }; })
+            .then(function(data) {
+                trendingKeywordsCache = (data && data.success && Array.isArray(data.keywords)) ? data.keywords : [];
+            })
+            .catch(function() { trendingKeywordsCache = []; })
+            .finally(function() { trendingLoadPromise = null; });
+        trendingLoadPromise.then(function() { done(trendingKeywordsCache); });
+    }
+
+    function renderTrendingBlock(keywords) {
+        if (!keywords || !keywords.length) return '';
+        var productsUrl = productsSearchBaseUrl();
+        var part = '<div class="glass-search-trending-block mt-2 pt-2" style="border-top:1px solid rgba(15,23,42,0.08);"><div class="glass-search-recent-head px-2 py-1 small text-muted">Trending</div><div class="d-flex flex-wrap gap-1 px-1 pb-1">';
+        keywords.forEach(function(kw) {
+            part += '<a href="' + productsUrl + '?search=' + encodeURIComponent(kw) + '" class="glass-search-trending-chip text-decoration-none" style="font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(16,185,129,0.12);color:#047857;font-weight:600;">' + escapeHtml(kw) + '</a>';
         });
-        resultsContainer.innerHTML = html;
-        resultsContainer.classList.add('active');
-        return true;
+        part += '</div></div>';
+        return part;
+    }
+
+    function finalizeSearchPanel(html) {
+        var resultsContainer = document.querySelector('#searchResults');
+        if (!resultsContainer) return;
+        fetchTrendingKeywords(function(keywords) {
+            resultsContainer.innerHTML = html + renderTrendingBlock(keywords);
+            resultsContainer.classList.add('active');
+        });
+    }
+
+    function showDiscoveryPanel(query) {
+        var resultsContainer = document.querySelector('#searchResults');
+        if (!resultsContainer || !searchForm) return;
+        var matches = getRecentMatches(query);
+        var productsUrl = searchForm.getAttribute('action') || (window.location.origin + '/products');
+        if (productsUrl.indexOf('?') !== -1) productsUrl = productsUrl.split('?')[0];
+        var html = '';
+        if (matches.length) {
+            html += '<div class="glass-search-recent-head px-2 py-1 small text-muted">Recent searches</div>';
+            matches.forEach(function(term) {
+                html += '<a href="' + productsUrl + '?search=' + encodeURIComponent(term) + '" class="glass-search-result-item glass-search-result-item--recent text-decoration-none d-block">' +
+                    '<div class="glass-search-result-item-content">' +
+                    '<div class="glass-search-result-item-title">' + iconSvg('search', 'me-2') + escapeHtml(term) + '</div>' +
+                    '<div class="glass-search-result-item-meta"><span class="glass-search-result-item-type">Recent</span></div>' +
+                    '</div></a>';
+            });
+        }
+        fetchTrendingKeywords(function(keywords) {
+            html += renderTrendingBlock(keywords);
+            if (!html.trim()) {
+                html = '<div class="glass-search-no-results small py-2">Type to search products, categories, brands…</div>';
+            }
+            resultsContainer.innerHTML = html;
+            resultsContainer.classList.add('active');
+        });
     }
 
     if (searchForm) {
@@ -727,16 +792,21 @@
         searchInputField.addEventListener('input', function() {
             var q = this.value.trim();
             clearTimeout(searchTimeout);
-            if (!q) { showRecentSearchSuggestions(''); return; }
-            showRecentSearchSuggestions(q);
-            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, 120);
+            if (!q) {
+                showDiscoveryPanel('');
+                return;
+            }
+            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, SEARCH_DEBOUNCE_MS);
         });
 
         searchInputField.addEventListener('focus', function() {
             var q = this.value.trim();
-            if (!q) { showRecentSearchSuggestions(''); return; }
-            showRecentSearchSuggestions(q);
-            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, 60);
+            clearTimeout(searchTimeout);
+            if (!q) {
+                showDiscoveryPanel('');
+                return;
+            }
+            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, SEARCH_DEBOUNCE_MS);
         });
 
         var resultsEl = document.querySelector('#searchResults');
@@ -773,7 +843,6 @@
         .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
         .then(function(data) {
             if (data.success) {
-                if (query && query.trim()) saveRecentSearchTerm(query);
                 displaySearchResults(data.results, query);
             }
             else if (resEl) { resEl.innerHTML = '<div class="glass-search-no-results">' + (data.message || 'No results') + '</div>'; resEl.classList.add('active'); }
@@ -803,16 +872,14 @@
             var msg = (query && query.length > 0) ? 'No results for "' + escapeHtml(query) + '". Try different keywords or check spelling.' : 'Type to search products, categories, brands, pages...';
             var didYouMean = (results && results.did_you_mean && results.did_you_mean.length > 0);
             if (didYouMean) {
-                var productsUrl = (searchForm && searchForm.action) ? searchForm.action : (window.location.origin + '/products');
-                if (productsUrl.indexOf('?') !== -1) productsUrl = productsUrl.split('?')[0];
+                var productsUrl = productsSearchBaseUrl();
                 msg += '<div class="glass-search-did-you-mean mt-2 pt-2" style="border-top:1px solid rgba(0,0,0,0.06);"><strong>Did you mean?</strong> ';
                 results.did_you_mean.forEach(function(s) {
                     msg += '<a href="' + productsUrl + '?search=' + encodeURIComponent(s) + '" class="d-inline-block me-2 mt-1" style="color:var(--theme-color,#4fc4f7);">' + escapeHtml(s) + '</a>';
                 });
                 msg += '</div>';
             }
-            resultsContainer.innerHTML = '<div class="glass-search-no-results">' + msg + '</div>';
-            resultsContainer.classList.add('active');
+            finalizeSearchPanel('<div class="glass-search-no-results">' + msg + '</div>');
             return;
         }
 
@@ -865,8 +932,7 @@
             });
         }
 
-        resultsContainer.innerHTML = html;
-        resultsContainer.classList.add('active');
+        finalizeSearchPanel(html);
     }
 
     function escapeHtml(str) {
@@ -972,7 +1038,7 @@
                 e.preventDefault();
                 const target = document.querySelector(href);
                 if (target) {
-                    const headerHeight = header ? header.offsetHeight : 60;
+                    const headerHeight = header ? header.offsetHeight : 72;
                     const targetPosition = target.offsetTop - headerHeight;
                     window.scrollTo({
                         top: targetPosition,

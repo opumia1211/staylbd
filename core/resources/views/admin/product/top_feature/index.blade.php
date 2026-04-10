@@ -275,15 +275,9 @@
 @endsection
 
 @push('style')
-<style>
-/* Top Feature Modal – সবসময় সামনে ও ক্লিকযোগ্য */
-#topFeatureModal { z-index: 10620 !important; }
-#topFeatureModal .modal-dialog { z-index: 10621 !important; position: relative; }
-#topFeatureModal .modal-content { z-index: 10621 !important; }
-body.modal-open #topFeatureModal ~ .modal-backdrop,
-body.modal-open .modal-backdrop { z-index: 10615 !important; }
-#topFeatureModal .modal-body { max-height: min(70vh, 500px); overflow-y: auto; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')
@@ -485,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
 @endpush
 
 @push('script-lib')
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="{{ asset('assets/admin/js/vendor/sortable.min.js') }}?v={{ $assetVersion ?? config('app.version') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof $ !== 'undefined' && $.fn.select2) {

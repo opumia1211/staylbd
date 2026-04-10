@@ -132,8 +132,7 @@
 @endpush
 
 @push('style')
-<style>
-.gateway-stat-icon { width: 48px; height: 48px; }
-.gateway-stat-card .card-body { padding: 1rem 1.25rem; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

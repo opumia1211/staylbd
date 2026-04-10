@@ -284,18 +284,9 @@
 @endpush
 
 @push('style')
-    <style>
-        #cuModal { z-index: 10600 !important; position: fixed !important; }
-        #cuModal .modal-dialog { z-index: 10602 !important; position: relative; }
-        body.modal-open .modal-backdrop { z-index: 10598 !important; }
-        #cuModal .modal-content { position: relative; z-index: 1; pointer-events: auto; }
-        .datepickers-container { z-index: 99999999; }
-        .coupon-code-copy:hover { background: #e0e0e0 !important; }
-    </style>
-@endpush
+    
+{{-- inline style moved to critical-admin.css --}}
 
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/datepicker.min.css') }}">
 @endpush
 
 @push('script-lib')

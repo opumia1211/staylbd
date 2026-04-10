@@ -1,0 +1,226 @@
+/**
+ * Lucide storefront: sizing, 3D chrome, palette (primary / accent / danger).
+ */
+:root {
+    --stayl-icon-primary: #00b894;
+    --stayl-icon-accent: #0984e3;
+    --stayl-icon-danger: #ff4757;
+}
+
+.stayl-lucide-wrap {
+    vertical-align: middle;
+    line-height: 0;
+}
+
+.stayl-lucide-wrap svg.lucide,
+.stayl-lucide-wrap .stayl-lucide-glyph {
+    width: var(--stayl-lucide-size, 20px);
+    height: var(--stayl-lucide-size-y, var(--stayl-lucide-size, 20px));
+}
+
+.stayl-lucide-wrap svg.lucide {
+    flex-shrink: 0;
+    color: inherit;
+}
+
+.stayl-lucide-wrap--flat svg.lucide {
+    stroke: currentColor;
+}
+
+/* Premium 3D tile (product card actions, emphasis zones) */
+.icon-3d {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    box-shadow:
+        4px 4px 10px rgba(0, 0, 0, 0.4),
+        -2px -2px 6px rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.icon-3d svg.lucide {
+    stroke: var(--stayl-icon-primary);
+}
+
+.icon-3d:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow:
+        6px 6px 15px rgba(0, 0, 0, 0.5),
+        -2px -2px 8px rgba(255, 255, 255, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .icon-3d {
+        transition: none;
+    }
+
+    .icon-3d:hover {
+        transform: none;
+    }
+}
+
+.icon-3d--accent svg.lucide {
+    stroke: var(--stayl-icon-accent);
+}
+
+.icon-3d--danger svg.lucide {
+    stroke: var(--stayl-icon-danger);
+}
+
+.icon-3d--neutral svg.lucide {
+    stroke: #e2e8f0;
+}
+
+/* Light tile on white/glass cards */
+.icon-3d--light {
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    box-shadow:
+        4px 4px 12px rgba(15, 23, 42, 0.12),
+        -2px -2px 8px rgba(255, 255, 255, 0.95);
+}
+
+.icon-3d--light svg.lucide {
+    stroke: #0f172a;
+}
+
+.icon-3d--light:hover {
+    box-shadow:
+        6px 6px 18px rgba(15, 23, 42, 0.16),
+        -2px -2px 10px rgba(255, 255, 255, 1);
+}
+
+.icon-3d.icon-3d--sm {
+    padding: 4px;
+    border-radius: 10px;
+}
+
+/* Compact 3D for 36–40px circular header buttons (nested inside .glass-icon-btn) */
+.glass-icon-btn > .icon-3d,
+.glass-nav-btn > .icon-3d,
+.glass-search-icon > .icon-3d {
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.glass-search-icon > .stayl-lucide-wrap--flat svg.lucide {
+    stroke: currentColor;
+}
+
+/* Glass header / nav: 3D-style tiles without per-include flags */
+.glass-icon-btn > .stayl-lucide-wrap--flat,
+.glass-nav-btn > .stayl-lucide-wrap--flat,
+.glass-header-camera-btn > .stayl-lucide-wrap--flat {
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow:
+        3px 3px 8px rgba(15, 23, 42, 0.1),
+        -1px -1px 5px rgba(255, 255, 255, 0.9);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-icon-btn:hover > .stayl-lucide-wrap--flat,
+.glass-nav-btn:hover > .stayl-lucide-wrap--flat,
+.glass-header-camera-btn:hover > .stayl-lucide-wrap--flat {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow:
+        4px 4px 12px rgba(15, 23, 42, 0.14),
+        -2px -2px 8px rgba(255, 255, 255, 1);
+}
+
+.glass-icon-btn > .stayl-lucide-wrap--flat svg.lucide,
+.glass-nav-btn > .stayl-lucide-wrap--flat svg.lucide,
+.glass-header-camera-btn > .stayl-lucide-wrap--flat svg.lucide {
+    stroke: var(--stayl-icon-primary);
+}
+
+button.glass-search-icon > .stayl-lucide-wrap--flat {
+    background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow:
+        2px 2px 6px rgba(15, 23, 42, 0.08),
+        -1px -1px 4px rgba(255, 255, 255, 0.85);
+}
+
+button.glass-search-icon:hover > .stayl-lucide-wrap--flat {
+    transform: translateY(-1px) scale(1.03);
+}
+
+button.glass-search-icon > .stayl-lucide-wrap--flat svg.lucide {
+    stroke: #334155;
+}
+
+.scrollToTop > .stayl-lucide-wrap--flat {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow:
+        4px 4px 10px rgba(0, 0, 0, 0.35),
+        -2px -2px 6px rgba(255, 255, 255, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.scrollToTop:hover > .stayl-lucide-wrap--flat {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow:
+        6px 6px 15px rgba(0, 0, 0, 0.45),
+        -2px -2px 8px rgba(255, 255, 255, 0.08);
+}
+
+.scrollToTop > .stayl-lucide-wrap--flat svg.lucide {
+    stroke: var(--stayl-icon-primary);
+}
+
+.mobile-bottom-nav__item > .stayl-lucide-wrap--flat,
+.mobile-bottom-nav__icon-wrap > .stayl-lucide-wrap--flat {
+    padding: 4px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #f8fafc, #ffffff);
+    box-shadow:
+        2px 2px 6px rgba(15, 23, 42, 0.08),
+        -1px -1px 4px rgba(255, 255, 255, 0.95);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.mobile-bottom-nav__item:active > .stayl-lucide-wrap--flat,
+.mobile-bottom-nav__icon-wrap:active > .stayl-lucide-wrap--flat {
+    transform: scale(0.96);
+}
+
+.mobile-bottom-nav__item > .stayl-lucide-wrap--flat svg.lucide,
+.mobile-bottom-nav__icon-wrap > .stayl-lucide-wrap--flat svg.lucide {
+    stroke: var(--stayl-icon-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .glass-icon-btn:hover > .stayl-lucide-wrap--flat,
+    .glass-nav-btn:hover > .stayl-lucide-wrap--flat,
+    .glass-header-camera-btn:hover > .stayl-lucide-wrap--flat,
+    button.glass-search-icon:hover > .stayl-lucide-wrap--flat,
+    .scrollToTop:hover > .stayl-lucide-wrap--flat {
+        transform: none;
+    }
+}
+
+/* Product rating stars: unified stroke */
+.stayl-rating-stars svg {
+    stroke-width: 2;
+    stroke: #f59e0b;
+}
+
+.stayl-rating-stars .product-card__star--full {
+    fill: #f59e0b;
+    stroke: #f59e0b;
+}
+
+.stayl-rating-stars .product-card__star--half .product-card__star-fill {
+    fill: #f59e0b;
+    stroke: #f59e0b;
+}
+
+.stayl-rating-stars .product-card__star--empty {
+    fill: transparent;
+    stroke: #f59e0b;
+    opacity: 0.35;
+}

@@ -13,9 +13,20 @@
         'nav' => $customHeaderButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'nav')),
         'right' => $customHeaderButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'right')),
     ];
+    if (!isset($__staylHeaderCategories)) {
+        $__staylHeaderCategories = \Illuminate\Support\Facades\Cache::remember(
+            'storefront.header_nav_categories_v1',
+            300,
+            static fn () => \App\Models\Category::active()
+                ->with(['subcategories' => static fn ($q) => $q->active()])
+                ->orderByDesc('id')
+                ->limit(24)
+                ->get()
+        );
+    }
 @endphp
-{{-- Typography: Inter (app layout rsms.me/inter.css) + Tailwind theme font-sans; glass-header CSS is bundled in tailwind-storefront --}}
-<header class="glass-header font-sans antialiased fixed top-0 left-0 right-0 z-[99999] w-full">
+{{-- Typography: Inter subset + icons in compiled storefront CSS (see tailwind-storefront.css) --}}
+<header class="glass-header font-sans antialiased fixed top-0 left-0 right-0 z-[99999] w-full supports-[backdrop-filter]:backdrop-blur-md">
     <div class="glass-header__shell">
         <div class="glass-header__max flex items-center w-full min-h-[52px]">
         <div class="glass-header-wrapper flex items-center justify-between flex-nowrap w-full gap-4 min-h-[52px]">
@@ -27,7 +38,7 @@
                     <span></span>
                 </button>
                 <div class="glass-logo {{ getLogoEffectClasses() }}">
-                    <a href="{{ route('home') }}" title="@lang('Home')">
+                    <a href="{{ route('home') }}" title="@lang('Home')" class="rounded-lg transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
                         @php $headerLogo = getLogo('logo'); @endphp
                         @if($headerLogo)
                             <img src="{{ $headerLogo }}" alt="{{ gs('site_name') }}" class="site-logo-img" width="{{ getLogoMaxWidth() }}" height="{{ getLogoMaxHeight() }}" fetchpriority="high" loading="eager" decoding="async" style="max-width: {{ getLogoMaxWidth() }}px; max-height: {{ getLogoMaxHeight() }}px; {{ getLogoStyle() }}">
@@ -36,11 +47,42 @@
                         @endif
                     </a>
                 </div>
+
+                {{-- Desktop category menu (native &lt;details&gt; — keyboard + click-outside friendly) --}}
+                @if($__staylHeaderCategories->isNotEmpty())
+                <details class="group/cat relative hidden shrink-0 lg:block">
+                    <summary class="flex cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200/70 bg-white/30 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur-sm transition hover:bg-white/55 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 marker:hidden [&::-webkit-details-marker]:hidden">
+                        @include($activeTemplate . 'partials.icon', ['name' => 'th-large', 'class' => 'h-4 w-4 text-emerald-600'])
+                        @lang('Categories')
+                        <svg class="h-4 w-4 text-slate-500 transition group-open/cat:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                    </summary>
+                    <div class="absolute left-0 top-[calc(100%+8px)] z-[100220] hidden max-h-[min(28rem,72vh)] w-[min(20rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-slate-200/90 bg-white py-2 shadow-xl ring-1 ring-slate-900/5 group-open/cat:block" role="menu">
+                        @foreach($__staylHeaderCategories as $hc)
+                            <div class="border-b border-slate-100 px-2 pb-1 last:border-b-0">
+                                <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 transition hover:bg-emerald-50 focus:outline-none focus-visible:bg-emerald-50" role="menuitem">{{ __($hc->name) }}</a>
+                                @if($hc->subcategories && $hc->subcategories->isNotEmpty())
+                                    <ul class="pb-1 pl-1">
+                                        @foreach($hc->subcategories->take(10) as $sub)
+                                            <li>
+                                                <a href="{{ route('subcategory.products', [slug($sub->name), $sub->id]) }}" class="block rounded-md px-3 py-1.5 text-xs text-slate-600 transition hover:bg-slate-50 hover:text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40" role="menuitem">{{ __($sub->name) }}</a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </div>
+                        @endforeach
+                        <div class="px-2 pt-1">
+                            <a href="{{ route('category.all') }}" class="block rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 py-2.5 text-center text-xs font-bold text-white shadow-sm transition hover:from-emerald-500 hover:to-teal-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">@lang('View All Categories')</a>
+                        </div>
+                    </div>
+                </details>
+                @endif
+
                 @foreach($headerButtonsByPosition['left'] as $btn)
                     @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
                     <a href="{{ $href }}" class="glass-nav-btn glass-custom-btn" title="{{ $b['button_text'] ?? 'Button' }}">
                         @if(!empty($b['icon_image']))
-                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="ui-icon" width="22" height="22" loading="lazy" decoding="async">
+                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="staylbd-icon" width="22" height="22" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
                         @else
                             @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle')])
                         @endif
@@ -50,9 +92,9 @@
 
             <!-- Center: search pill (mic + search inside) + camera beside (same as other header round icons) -->
             <div class="glass-header-center glass-search-zone flex flex-[1_1_0%] min-w-0 max-w-[800px] mx-auto items-center self-center justify-center gap-2">
-                <form action="{{ route('products') }}" method="GET" class="glass-search-form flex flex-1 min-w-0 flex-col justify-center" id="universalSearchForm" data-search-url="{{ url('/search/universal') }}" data-image-search-url="{{ url('/search/image') }}">
-                    <div class="glass-search-wrapper glass-search-wrapper--card flex w-full min-w-0 flex-nowrap items-center">
-                        <input type="text"
+                <form action="{{ route('products') }}" method="GET" class="glass-search-form flex flex-1 min-w-0 flex-col justify-center" id="universalSearchForm" role="search" data-search-url="{{ url('/search/universal') }}" data-trending-url="{{ route('search.trending') }}" data-image-search-url="{{ url('/search/image') }}">
+                    <div class="glass-search-wrapper glass-search-wrapper--card flex w-full min-w-0 flex-nowrap items-center rounded-xl transition-shadow focus-within:ring-2 focus-within:ring-emerald-500/35">
+                        <input type="search"
                                class="glass-search-input font-sans min-w-0"
                                id="universalSearchInput"
                                name="search"
@@ -60,26 +102,33 @@
                                value="{{ request()->search ?? null }}"
                                autocomplete="off"
                                spellcheck="false"
+                               enterkeyhint="search"
                                data-search-url="{{ url('/search/universal') }}"
-                               data-placeholder-listening="@lang('Listening… speak now')">
+                               data-placeholder-listening="@lang('Listening… speak now')"
+                               aria-label="@lang('Search products, brands, and more')"
+                               onfocus="this.style.outline='none';this.style.boxShadow='none';this.style.border='none';"
+                               onblur="this.style.outline='none';this.style.boxShadow='none';this.style.border='none';"
+                               style="border:none !important;outline:none !important;box-shadow:none !important;-webkit-box-shadow:none !important;-moz-box-shadow:none !important;background:transparent !important;-webkit-appearance:none !important;appearance:none !important;">
+                        <div class="glass-search-trailing shrink-0 flex items-center flex-nowrap" role="group" aria-label="@lang('Search actions')">
                         <button type="button" class="glass-search-icon glass-search-voice shrink-0" id="voiceSearchBtn" title="@lang('Voice Search')" aria-label="@lang('Voice Search')">
                             @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'voice_search_icon', 'fallback' => 'microphone', 'svgClass' => 'icon-bold', 'width' => 20, 'height' => 20, 'alt' => ''])
                         </button>
                         <button type="submit" class="glass-search-icon glass-search-submit shrink-0" title="@lang('Search')" aria-label="@lang('Search')">
                             @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'search_icon', 'fallback' => 'search', 'svgClass' => 'icon-bold', 'width' => 20, 'height' => 20, 'alt' => '', 'loading' => 'eager'])
                         </button>
+                        </div>
                     </div>
                     <input type="file" id="imageSearchInput" accept="image/*" hidden tabindex="-1" aria-hidden="true">
                     <!-- Search Results Dropdown -->
                     <div class="glass-search-results" id="searchResults"></div>
                 </form>
-                <button type="button" class="glass-icon-btn glass-header-camera-btn shrink-0" id="cameraSearchBtn" title="@lang('Search by image')" aria-label="@lang('Search by image')">
+                <button type="button" class="glass-icon-btn glass-header-camera-btn shrink-0" id="cameraSearchBtn" title="@lang('Search by image')" aria-label="@lang('Search by image')" style="width:44px;height:44px;min-width:44px;min-height:44px;max-width:44px;max-height:44px;border-radius:9999px;aspect-ratio:1/1;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;padding:0;">
                     @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'image_search_icon', 'fallback' => 'scan', 'width' => 22, 'height' => 22, 'alt' => ''])
                 </button>
             </div>
             
             <!-- Navigation: icon-only links -->
-            <nav class="glass-header-nav items-center gap-[10px] shrink-0 whitespace-nowrap">
+            <nav class="glass-header-nav hidden items-center gap-[10px] shrink-0 whitespace-nowrap" aria-label="@lang('Quick links')">
                 <a href="{{ route('products') }}" class="glass-nav-btn {{ menuActive('products') }}" title="@lang('Products')" aria-label="@lang('Products')">
                     @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'products_icon', 'fallback' => 'box', 'alt' => __('Products')])
                 </a>
@@ -93,7 +142,7 @@
                     @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
                     <a href="{{ $href }}" class="glass-nav-btn glass-custom-btn" title="{{ $b['button_text'] ?? 'Button' }}">
                         @if(!empty($b['icon_image']))
-                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="ui-icon" width="22" height="22" loading="lazy" decoding="async">
+                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="staylbd-icon" width="22" height="22" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
                         @else
                             @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle')])
                         @endif
@@ -107,7 +156,7 @@
                     @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
                     <a href="{{ $href }}" class="glass-icon-btn glass-custom-btn" title="{{ $b['button_text'] ?? 'Button' }}">
                         @if(!empty($b['icon_image']))
-                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="ui-icon" width="22" height="22" loading="lazy" decoding="async">
+                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="staylbd-icon" width="22" height="22" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
                         @else
                             @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle')])
                         @endif
@@ -140,7 +189,7 @@
 
                 <!-- Notifications -->
                 @auth
-                    <a href="{{ route('user.notifications') }}" class="glass-icon-btn glass-notification-btn" title="@lang('Notifications')">
+                    <a href="{{ route('user.notifications') }}" class="glass-icon-btn glass-notification-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Notifications')">
                         @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'alt' => __('Notifications')])
                         @if(($userNotificationCount ?? 0) > 0)
                             <span class="glass-badge show-notification-count">{{ $userNotificationCount }}</span>
@@ -149,36 +198,34 @@
                         @endif
                     </a>
                 @else
-                    <!-- Empty space for alignment when not logged in -->
-                    <div class="w-0 h-0 shrink-0 overflow-hidden min-w-0" style="width:0;height:0;flex-shrink:0;overflow:hidden;min-width:0;" aria-hidden="true"></div>
+                    <a href="{{ route('user.login') }}" class="glass-icon-btn glass-notification-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Notifications')" aria-label="@lang('Sign in to view notifications')">
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'alt' => __('Notifications')])
+                    </a>
                 @endauth
 
                 <!-- Wishlist – same URL for guest and logged-in -->
-                <a href="{{ route('user.wishlist') }}" id="header-wishlist" class="glass-icon-btn glass-wishlist-btn" title="@lang('Wishlist')" @auth data-dashboard-link="1" @endauth>
+                <a href="{{ route('user.wishlist') }}" id="header-wishlist" class="glass-icon-btn glass-wishlist-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Wishlist')" @auth data-dashboard-link="1" @endauth>
                     @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'alt' => __('Wishlist')])
                     <span class="glass-badge show-wishlist-count">0</span>
                 </a>
 
-                <!-- Compare – same URL for guest and logged-in -->
-                <a href="{{ route('user.compare') }}" id="header-compare" class="glass-icon-btn glass-compare-btn" title="@lang('Compare')" @auth data-dashboard-link="1" @endauth>
+                <!-- Compare (secondary — available in mobile menu) -->
+                <a href="{{ route('user.compare') }}" id="header-compare" class="glass-icon-btn glass-compare-btn hidden transition-transform duration-200 hover:scale-105 2xl:inline-flex" title="@lang('Compare')" @auth data-dashboard-link="1" @endauth>
                     @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'alt' => __('Compare')])
                     <span class="glass-badge show-compare-count">0</span>
                 </a>
 
                 <!-- Cart – same URL for guest and logged-in -->
-                <a href="{{ route('user.cart') }}" id="header-cart" class="glass-icon-btn glass-cart-btn" title="@lang('Cart')" @auth data-dashboard-link="1" @endauth>
+                <a href="{{ route('user.cart') }}" id="header-cart" class="glass-icon-btn glass-cart-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Cart')" @auth data-dashboard-link="1" @endauth>
                     @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'alt' => __('Cart')])
                     <span class="glass-badge show-cart-count">0</span>
                 </a>
 
-                <!-- Orders/Bags -->
+                <!-- Orders (secondary — in account menu / mobile) -->
                 @auth
-                    <a href="{{ route('user.order.index') }}" class="glass-icon-btn glass-orders-btn" title="@lang('My Orders')">
+                    <a href="{{ route('user.order.index') }}" class="glass-icon-btn glass-orders-btn hidden transition-transform duration-200 hover:scale-105 2xl:inline-flex" title="@lang('My Orders')">
                         @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'list-alt', 'alt' => __('My Orders')])
                     </a>
-                @else
-                    <!-- Empty space for alignment when not logged in -->
-                    <div class="w-0 h-0 shrink-0 overflow-hidden min-w-0" style="width:0;height:0;flex-shrink:0;overflow:hidden;min-width:0;" aria-hidden="true"></div>
                 @endauth
 
                 <!-- User Profile - অ্যাভাটারে ক্লিক করলে ড্যাশবোর্ডে যাবে (ক্লিক নিশ্চিত) -->
@@ -186,7 +233,7 @@
                     @php
                         $avatarLetter = mb_strtoupper(mb_substr(trim(auth()->user()->fullname ?? auth()->user()->username ?? 'U'), 0, 1));
                     @endphp
-                    <a href="{{ route('user.home') }}" class="glass-profile-btn glass-profile-btn--logged d-flex align-items-center justify-content-center w-10 h-10 min-w-10 min-h-10 max-w-10 max-h-10 p-0 mx-[2px] rounded-full overflow-hidden box-border cursor-pointer shrink-0 no-underline" style="width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;max-height:40px;padding:0;margin:0 2px;border-radius:50%;overflow:hidden;box-sizing:border-box;cursor:pointer;flex-shrink:0;text-decoration:none;" aria-label="@lang('Dashboard')" title="@lang('Dashboard')">
+                    <a href="{{ route('user.home') }}" class="glass-profile-btn glass-profile-btn--logged d-flex align-items-center justify-content-center w-10 h-10 min-w-10 min-h-10 max-w-10 max-h-10 p-0 mx-[2px] rounded-full overflow-hidden box-border cursor-pointer shrink-0 no-underline transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" style="width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;max-height:40px;padding:0;margin:0 2px;border-radius:50%;overflow:hidden;box-sizing:border-box;cursor:pointer;flex-shrink:0;text-decoration:none;" aria-label="@lang('Dashboard')" title="@lang('Dashboard')">
                         @if(auth()->user()->image)
                             <span class="block w-10 h-10 min-w-10 min-h-10 max-w-10 max-h-10 rounded-full overflow-hidden shrink-0 pointer-events-none" style="display:block;width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;max-height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;pointer-events:none;"><img src="{{ getImage(getFilePath('userProfile') . '/' . auth()->user()->image, getFileSize('userProfile')) }}" alt="{{ auth()->user()->username }}" class="w-full h-full object-cover block pointer-events-none" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></span>
                         @else
@@ -194,7 +241,7 @@
                         @endif
                     </a>
                 @else
-                    <a href="{{ route('user.login') }}" class="glass-icon-btn glass-login-btn" title="@lang('Login')" role="button">
+                    <a href="{{ route('user.login') }}" class="glass-icon-btn glass-login-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Login')" role="button">
                         @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'login_icon', 'fallback' => 'user', 'alt' => __('Login')])
                     </a>
                 @endauth
@@ -228,18 +275,8 @@
             <form action="{{ route('products') }}" method="GET" class="glass-mobile-search-form">
                 <div class="glass-mobile-search-inner">
                     <input type="text" name="search" class="glass-mobile-search-input" placeholder="@lang('Search here')" value="{{ request()->search ?? null }}" autocomplete="off">
-                    @php
-                        $drawerSearchImg = header_icon_uploaded('search_icon');
-                        $drawerSearchInline = header_icon_inline_svg_html('search_icon', 'glass-mobile-search-submit__img ui-icon', 20, 20, '');
-                    @endphp
                     <button type="submit" class="glass-mobile-search-submit" aria-label="@lang('Search')">
-                        @if($drawerSearchInline)
-                            {!! $drawerSearchInline !!}
-                        @elseif($drawerSearchImg)
-                            <img src="{{ header_icon_uploaded_asset_url($drawerSearchImg) }}" alt="" width="20" height="20" class="glass-mobile-search-submit__img" decoding="async" aria-hidden="true">
-                        @else
-                            <svg class="glass-mobile-search-submit__svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
-                        @endif
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'search_icon', 'fallback' => 'search', 'width' => 20, 'height' => 20, 'alt' => ''])
                     </button>
                 </div>
             </form>
@@ -269,7 +306,7 @@
                 <a href="{{ route('user.cart') }}" class="{{ menuActive('user.cart') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Cart')</a>
                 <a href="{{ route('user.wishlist') }}" class="{{ menuActive('user.wishlist') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Wishlist')</a>
                 <a href="{{ route('user.compare') }}" class="{{ menuActive('user.compare') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Compare')</a>
-                <a href="{{ route('user.review.index') }}" class="{{ menuActive('user.review*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'review_icon', 'fallback' => 'haykal', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Review Products')</a>
+                <a href="{{ route('user.review.index') }}" class="{{ menuActive('user.review*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'review_icon', 'fallback' => 'star', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Review Products')</a>
                 <a href="{{ route('user.profile.setting') }}" class="{{ menuActive('user.profile.setting') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'profile_icon', 'fallback' => 'user-tie', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Profile')</a>
                 <a href="{{ route('user.change.password') }}" class="{{ menuActive('user.change.password') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'change_password_icon', 'fallback' => 'key', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Change Password')</a>
                 <form method="POST" action="{{ route('user.logout') }}" class="glass-mobile-logout-form">
@@ -280,356 +317,24 @@
         </div>
         @endauth
 
-        {{-- Product categories removed per user request --}}
+        @if($__staylHeaderCategories->isNotEmpty())
+        <div class="border-t border-slate-200/60 px-3 py-3">
+            <div class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">@lang('Categories')</div>
+            <div class="-mx-1 flex max-h-48 flex-wrap gap-2 overflow-y-auto">
+                @foreach($__staylHeaderCategories->take(16) as $mc)
+                    <a href="{{ route('category.products', [slug($mc->name), $mc->id]) }}" class="inline-flex max-w-full items-center rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+                        <span class="truncate">{{ __($mc->name) }}</span>
+                    </a>
+                @endforeach
+            </div>
+            <a href="{{ route('category.all') }}" class="mt-3 block rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 py-2.5 text-center text-xs font-bold text-white shadow-sm">@lang('View All Categories')</a>
+        </div>
+        @endif
     </div>
 </div>
 <!-- Old header completely hidden - replaced by glass header -->
 @push('style')
-<style>
-/* Safety: never show edge launcher on desktop/large screens */
-.glass-sidebar-edge-toggle {
-    display: none !important;
-}
 
-/*
- * Mobile drawer: always apply (not only <992px) so base glass-header.css flex rules
- * never win. Inter via font-sans + layout app; Tailwind bundle loads separately.
- */
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-content {
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-    contain: layout style;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-header {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 4 !important;
-    display: grid !important;
-    grid-template-columns: 1fr auto 1fr !important;
-    align-items: center !important;
-    column-gap: 8px !important;
-    padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 12px !important;
-    margin: 0 !important;
-    min-height: 52px !important;
-    background: rgba(255, 255, 255, 0.97) !important;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-header__brand {
-    grid-column: 2 !important;
-    justify-self: center !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    flex-wrap: nowrap !important;
-    min-width: 0 !important;
-    max-width: min(220px, 72vw) !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-logo {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-width: 0 !important;
-    max-width: 150px !important;
-    text-decoration: none !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-logo__img {
-    display: block !important;
-    max-height: 28px !important;
-    width: auto !important;
-    height: auto !important;
-    max-width: 100% !important;
-    object-fit: contain !important;
-    object-position: center center !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-logo__text {
-    font-weight: 700 !important;
-    font-size: 0.875rem !important;
-    color: #0f172a !important;
-    font-family: inherit !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-title {
-    font-weight: 700 !important;
-    font-size: 0.9375rem !important;
-    color: #64748b !important;
-    white-space: nowrap !important;
-    font-family: inherit !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-close {
-    grid-column: 3 !important;
-    justify-self: end !important;
-    align-self: start !important;
-    position: relative !important;
-    inset: auto !important;
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    border-radius: 10px !important;
-    background: rgba(15, 23, 42, 0.07) !important;
-    color: #0f172a !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-close:hover {
-    background: rgba(239, 68, 68, 0.12) !important;
-    color: #b91c1c !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-menu-close__icon {
-    display: block !important;
-    flex-shrink: 0;
-}
-/* Search: single pill row — override legacy .glass-mobile-search form / input rules */
-#glassSidebar.glass-mobile-menu .glass-mobile-search {
-    padding: 10px 14px 12px !important;
-}
-#glassSidebar.glass-mobile-menu form.glass-mobile-search-form {
-    display: block !important;
-    width: 100% !important;
-    margin: 0 !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-search-inner {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    min-height: 44px !important;
-    padding: 3px 4px 3px 12px !important;
-    gap: 6px !important;
-    border-radius: 9999px !important;
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
-    background: #fff !important;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-search-inner:focus-within {
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12) !important;
-}
-#glassSidebar.glass-mobile-menu input.glass-mobile-search-input[type="text"] {
-    flex: 1 1 0% !important;
-    min-width: 0 !important;
-    width: auto !important;
-    max-width: none !important;
-    border: 0 !important;
-    outline: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-    padding: 8px 4px 8px 0 !important;
-    margin: 0 !important;
-    font-size: 0.9375rem !important;
-    line-height: 1.35 !important;
-    font-family: inherit !important;
-    -webkit-appearance: none;
-    appearance: none;
-}
-#glassSidebar.glass-mobile-menu input.glass-mobile-search-input::placeholder {
-    color: #94a3b8 !important;
-}
-#glassSidebar.glass-mobile-menu button.glass-mobile-search-submit[type="submit"] {
-    flex: 0 0 36px !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 9999px !important;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-    color: #fff !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.28) !important;
-    transition: transform 0.1s ease, filter 0.1s ease !important;
-}
-#glassSidebar.glass-mobile-menu button.glass-mobile-search-submit:active {
-    transform: scale(0.96);
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-search-submit__svg {
-    display: block !important;
-    pointer-events: none;
-}
-#glassSidebar.glass-mobile-menu .glass-mobile-search-submit__img {
-    display: block !important;
-    width: 20px !important;
-    height: 20px !important;
-    object-fit: contain !important;
-    pointer-events: none;
-    filter: brightness(0) invert(1);
-}
-/* Inline Lucide (currentColor) — no bitmap filter */
-#glassSidebar.glass-mobile-menu svg.glass-mobile-search-submit__img {
-    display: block !important;
-    width: 20px !important;
-    height: 20px !important;
-    pointer-events: none;
-    color: #fff !important;
-}
+{{-- inline style moved to critical-storefront.css --}}
 
-@media (max-width: 991.98px) {
-    .glass-header > .w-full {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
-    .glass-header {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 99999 !important;
-    }
-    .glass-header .glass-header-wrapper {
-        gap: 10px !important;
-    }
-    .glass-header .glass-header-right,
-    .glass-header .glass-header-nav {
-        display: none !important;
-    }
-    .glass-header .glass-logo,
-    .glass-header .glass-header-left .glass-nav-btn {
-        display: none !important;
-    }
-    .glass-header .glass-header-left {
-        gap: 0 !important;
-        flex: 0 0 42px !important;
-        min-width: 42px !important;
-    }
-    .glass-header .glass-header-center {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
-        max-width: none !important;
-        margin-inline: 0 !important;
-        overflow: visible !important;
-    }
-    .glass-header .glass-search-wrapper {
-        min-height: 40px !important;
-        max-height: 46px !important;
-        border-radius: 999px !important;
-        padding-left: 12px !important;
-        padding-right: 4px !important;
-        width: 100% !important;
-    }
-    .glass-header .glass-search-input {
-        padding-right: 2.5rem !important;
-    }
-    .glass-header .glass-search-icon,
-    .glass-header .glass-search-submit,
-    .glass-header .glass-header-camera-btn {
-        z-index: 3 !important;
-        pointer-events: auto !important;
-    }
-    /* Faster drawer (Tailwind bundle may use longer transition) */
-    #glassSidebar.glass-mobile-menu .glass-mobile-menu-content {
-        transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1) !important;
-    }
-    .glass-header .glass-menu-toggle {
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        min-height: 42px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    .glass-sidebar-edge-toggle {
-        position: fixed;
-        top: 50%;
-        left: 2px;
-        transform: translateY(-50%);
-        width: 28px;
-        height: 44px;
-        border: 0;
-        border-radius: 0 10px 10px 0;
-        background: rgba(15, 23, 42, 0.86);
-        color: #fff;
-        z-index: 100001;
-        display: inline-flex !important;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 6px 20px rgba(2, 6, 23, 0.22);
-        opacity: .96;
-        transition: opacity .18s ease, transform .22s ease, box-shadow .22s ease;
-        font-size: 0 !important;
-        line-height: 0 !important;
-        overflow: hidden !important;
-    }
-    .glass-sidebar-edge-toggle:hover {
-        opacity: 1;
-        transform: translateY(-50%) translateX(1px);
-        box-shadow: 0 8px 24px rgba(2, 6, 23, 0.26);
-    }
-    body.glass-sidebar-open .glass-sidebar-edge-toggle {
-        opacity: 0;
-        transform: translateY(-50%) translateX(-8px);
-        pointer-events: none;
-    }
-    .glass-mobile-menu.active + .glass-sidebar-edge-toggle {
-        opacity: 0 !important;
-        transform: translateY(-50%) translateX(-8px) !important;
-        pointer-events: none !important;
-    }
-    .glass-sidebar-edge-toggle .ui-icon {
-        transform: rotate(0deg);
-    }
-    body.glass-sidebar-open .glass-sidebar-edge-toggle .ui-icon {
-        transform: rotate(180deg);
-    }
-    .glass-sidebar-edge-toggle .ui-icon {
-        width: 14px;
-        height: 14px;
-        transition: transform .15s ease;
-        display: block !important;
-        flex: 0 0 14px !important;
-    }
-}
-
-/* Submit = same neutral icon treatment as mic (no fill color) */
-.glass-search-submit.glass-search-icon {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-}
-.glass-search-submit .ui-icon,
-.glass-search-submit__icon {
-    width: 20px;
-    height: 20px;
-    color: #5f6368;
-    stroke: #5f6368;
-}
-.glass-search-submit img.ui-icon {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    display: block;
-}
-@media (max-width: 575.98px) {
-    .glass-search-submit.glass-search-icon {
-        width: 30px !important;
-        height: 30px !important;
-        min-width: 30px !important;
-        min-height: 30px !important;
-    }
-    .glass-search-submit .ui-icon,
-    .glass-search-submit__icon {
-        width: 17px;
-        height: 17px;
-    }
-}
-</style>
 @endpush

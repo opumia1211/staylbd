@@ -1,0 +1,5 @@
+/*
+ * Cart-only legacy CSS — load async on cart routes (guest + user dashboard cart).
+ */
+@import "../../public/assets/templates/basic/css/cart-page.css";
+@import "../../public/assets/templates/basic/css/cart-responsive.css";

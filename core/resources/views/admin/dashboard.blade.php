@@ -1,398 +1,6 @@
 @extends('admin.layouts.app')
 
 @section('panel')
-@push('style')
-<link rel="stylesheet" href="{{ asset('assets/admin/css/dashboard-glass.css') }}">
-<style id="dashboard-inline-css">
-/* StayLBD Admin Dashboard – Premium, single-line buttons, 3D light focus */
-#dashboard-app.dashboard-glass,
-.dashboard-glass {
-    --dash-bg: #eef0f3;
-    --dash-card: #ffffff;
-    --dash-border: rgba(0,0,0,0.07);
-    --dash-text: #0f1419;
-    --dash-muted: #52636f;
-    --dash-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
-    --dash-shadow-3d: 0 2px 4px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
-    --dash-shadow-hover: 0 4px 8px rgba(0,0,0,0.05), 0 12px 24px rgba(0,0,0,0.07);
-    --dash-gap: 14px;
-    --dash-radius: 10px;
-    --dash-card-pad: 14px;
-    --dash-card-w: 200px;
-    --dash-card-h: 100px;
-    box-sizing: border-box;
-    background: var(--dash-bg);
-    padding: clamp(8px, 1.5vw, 16px);
-    margin: 0;
-    min-height: 100%;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    font-smoothing: antialiased;
-    -webkit-font-smoothing: antialiased;
-}
-.dashboard-glass *,
-.dashboard-glass *::before,
-.dashboard-glass *::after { box-sizing: border-box; }
-.dashboard-glass .card,
-.dashboard-glass .dashboard-stat-card,
-.dashboard-glass a.dashboard-stat-card {
-    box-shadow: var(--dash-shadow) !important;
-}
-.dashboard-glass .card:hover,
-.dashboard-glass a.dashboard-stat-card:hover {
-    box-shadow: var(--dash-shadow-hover) !important;
-}
-
-.dashboard-section {
-    margin-bottom: clamp(12px, 2vw, 18px);
-    display: block;
-}
-.dashboard-section--compact { margin-bottom: 10px; }
-.dashboard-section__title {
-    font-size: 0.65rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--dash-muted);
-    margin: 0 0 8px 0;
-    padding-left: 8px;
-    border-left: 3px solid rgba(0,0,0,0.12);
-    line-height: 1.3;
-}
-
-/* CSS Grid – ফ্লেক্সিবল, সব ডিভাইসে ভাঙবে না */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(var(--dash-card-w), 100%), 1fr));
-    gap: var(--dash-gap);
-    width: 100%;
-    max-width: 100%;
-    min-height: 0;
-    align-items: stretch;
-}
-.dashboard-grid > * {
-    min-width: 0;
-}
-@media (max-width: 576px) {
-    .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-}
-@media (min-width: 577px) and (max-width: 768px) {
-    .dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-}
-
-/* Stat cards – সমস্ত ফ্রেম একই উইডথ/হাইট (লাল মার্কের মতো), সামান্য বড় */
-.dashboard-stat-card,
-a.dashboard-stat-card {
-    display: flex;
-    flex-direction: column;
-    min-height: var(--dash-card-h);
-    background: var(--dash-card);
-    border: 1px solid var(--dash-border);
-    border-radius: var(--dash-radius);
-    padding: var(--dash-card-pad);
-    box-shadow: var(--dash-shadow);
-    transition: box-shadow 0.2s ease;
-    text-decoration: none;
-    color: var(--dash-text);
-    min-width: 0;
-}
-a.dashboard-stat-card:hover {
-    box-shadow: var(--dash-shadow-hover);
-    color: var(--dash-text);
-}
-.dashboard-stat-card__icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-    color: var(--dash-muted);
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-.dashboard-stat-card__body {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-.dashboard-stat-card__value {
-    display: block;
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--dash-text);
-    line-height: 1.3;
-    -webkit-font-smoothing: antialiased;
-}
-.dashboard-stat-card__title {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--dash-muted);
-    margin-top: 2px;
-    line-height: 1.3;
-}
-.dashboard-stat-card__link {
-    margin-top: 6px;
-    font-size: 0.7rem;
-    color: var(--dash-muted);
-}
-a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text); }
-
-/* Revenue/KPI cards – স্ট্যাট গ্রিডে, একই সাইজ */
-.dashboard-grid--stats > .card.border-0 {
-    min-height: var(--dash-card-h);
-    padding: 0;
-    border-radius: var(--dash-radius);
-    border: 1px solid var(--dash-border);
-    box-shadow: var(--dash-shadow);
-    min-width: 0;
-    display: flex;
-    align-items: stretch;
-}
-.dashboard-grid--stats > .card.border-0 .card-body {
-    padding: var(--dash-card-pad);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-    min-width: 0;
-}
-.dashboard-grid--stats > .card.border-0 .rounded-3.bg-light {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    padding: 10px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px !important;
-}
-.dashboard-grid--stats > .card.border-0 .rounded-3.bg-light i { font-size: 1.2rem !important; }
-.dashboard-grid--stats > .card.border-0 .small { font-size: 0.75rem !important; }
-.dashboard-grid--stats > .card.border-0 .fw-bold.fs-5 { font-size: 1.1rem !important; }
-
-/* Quick actions & Critical Alerts – সব বাটন এক লাইনে (single row, no wrap) */
-.dashboard-quick-actions,
-.dashboard-alerts-bar {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 8px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 4px;
-    scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
-    min-width: 0;
-}
-.dashboard-quick-actions::-webkit-scrollbar,
-.dashboard-alerts-bar::-webkit-scrollbar { height: 5px; }
-.dashboard-quick-actions::-webkit-scrollbar-thumb,
-.dashboard-alerts-bar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
-.dashboard-quick-actions .btn,
-.dashboard-alerts-bar .btn,
-.dashboard-alerts-bar a.btn {
-    flex-shrink: 0;
-    white-space: nowrap;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-.dashboard-alerts-bar-wrapper {
-    min-width: 0;
-    overflow: hidden;
-}
-.dashboard-actions-row {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    width: 100%;
-    min-width: 0;
-}
-.dashboard-actions-row .dashboard-quick-actions {
-    flex: 1 1 auto;
-    min-width: 0;
-    justify-content: flex-end;
-}
-@media (max-width: 991px) {
-    .dashboard-actions-row { flex-wrap: wrap; }
-    .dashboard-actions-row .dashboard-quick-actions { flex: 1 1 100%; justify-content: flex-start; overflow-x: auto; }
-}
-
-/* লাল মার্ক জায়গা: Welcome + বাটন দুই লাইনে, সমস্ত বাটন এক সাইজ, ফ্লেক্সিবল */
-.dashboard-glass .dashboard-actions-card,
-.dashboard-actions-card {
-    overflow: visible !important;
-}
-.dashboard-actions-card .card-body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: var(--dash-card-pad) !important;
-    overflow: visible;
-}
-.dashboard-welcome-row .dashboard-welcome-text {
-    font-size: clamp(0.9rem, 1.8vw, 1.05rem);
-    font-weight: 600;
-    color: var(--dash-text);
-    letter-spacing: 0.01em;
-}
-.dashboard-welcome-row .dashboard-welcome-meta {
-    font-size: clamp(0.7rem, 1.2vw, 0.78rem);
-    color: var(--dash-muted);
-    margin-top: 1px;
-}
-.dashboard-actions-two-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    min-width: 0;
-}
-.dashboard-actions-line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    min-width: 0;
-}
-.dashboard-action-btn {
-    flex: 0 0 auto;
-    min-width: clamp(100px, 12vw, 140px);
-    height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 10px;
-    font-size: clamp(0.72rem, 1.2vw, 0.8125rem);
-    font-weight: 500;
-    white-space: nowrap;
-    border-radius: 6px;
-    gap: 6px;
-}
-.dashboard-action-btn i { font-size: clamp(0.8rem, 1.2vw, 0.9rem); }
-.dashboard-action-btn .badge { font-size: 0.7em; padding: 0.12em 0.4em; }
-@media (max-width: 768px) {
-    .dashboard-actions-line { gap: 6px; }
-    .dashboard-action-btn {
-        min-width: clamp(90px, 14vw, 130px);
-        height: 36px;
-        font-size: 0.75rem;
-    }
-}
-@media (max-width: 576px) {
-    .dashboard-action-btn {
-        min-width: 100px;
-        height: 34px;
-        padding: 0 8px;
-        font-size: 0.7rem;
-    }
-}
-
-/* Premium 3D cards – হালকা শেডো, স্পষ্ট ফোকাস */
-.dashboard-glass .card,
-.dashboard-card-premium {
-    background: var(--dash-card) !important;
-    border: 1px solid var(--dash-border) !important;
-    border-radius: var(--dash-radius);
-    box-shadow: var(--dash-shadow) !important;
-    overflow: hidden;
-    transition: box-shadow 0.2s ease;
-}
-.dashboard-glass .card:hover,
-.dashboard-card-premium:hover {
-    box-shadow: var(--dash-shadow-3d) !important;
-}
-.dashboard-welcome-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--dash-text) !important;
-    letter-spacing: 0.01em;
-    margin: 0 0 2px 0;
-    line-height: 1.35;
-}
-.dashboard-welcome-date {
-    font-size: 0.8rem;
-    color: var(--dash-muted) !important;
-    margin: 0;
-    font-weight: 500;
-}
-.dashboard-avatar {
-    width: 52px;
-    height: 52px;
-    font-size: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-}
-.dashboard-glass .card-header {
-    background: rgba(0,0,0,0.02) !important;
-    border-bottom: 1px solid var(--dash-border) !important;
-    color: var(--dash-text) !important;
-    padding: 8px 12px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
-}
-.dashboard-glass .card-body {
-    color: var(--dash-text);
-    padding: var(--dash-card-pad);
-}
-.dashboard-glass .card-body.d-flex.gap-3 { gap: 10px !important; padding: 10px 12px !important; }
-.dashboard-glass .rounded-3.p-3 { padding: 8px !important; }
-.dashboard-glass .rounded-3.bg-light .text-secondary { font-size: 1.1rem !important; }
-.dashboard-glass .fw-bold.fs-5 { font-size: 1rem !important; }
-.dashboard-glass .dashboard-section__title,
-.dashboard-glass .card-header h5,
-.dashboard-glass .card-header h6 {
-    color: var(--dash-text) !important;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-}
-
-/* Tables & lists – কম্প্যাক্ট */
-.dashboard-glass .table { width: 100%; font-size: 0.85rem; }
-.dashboard-glass .table th,
-.dashboard-glass .table td { padding: 6px 10px; border-color: var(--dash-border); color: var(--dash-text); }
-.dashboard-glass .table-light { background: rgba(0,0,0,0.02) !important; }
-.dashboard-glass .list-group-item { border-color: var(--dash-border); color: var(--dash-text); padding: 6px 12px; font-size: 0.85rem; }
-
-/* Revenue KPI row */
-.dashboard-glass .rounded-3.bg-light {
-    background: rgba(0,0,0,0.06) !important;
-    border-radius: 10px;
-}
-.dashboard-glass .fw-bold.fs-5 { color: var(--dash-text) !important; }
-.dashboard-glass .text-muted { color: var(--dash-muted) !important; }
-
-/* Responsive: 2fr 1fr and 3-col grids stack on small */
-@media (max-width: 768px) {
-    .dashboard-grid[style*="2fr 1fr"] { grid-template-columns: 1fr !important; }
-    .dashboard-grid[style*="repeat(3, 1fr)"] { grid-template-columns: 1fr !important; }
-}
-
-/* ড্যাশবোর্ড পুরো প্রস্থ নেবে, ফাঁকা জায়গা থাকবে না */
-.dashboard-glass { width: 100%; max-width: 100%; }
-.body-wrapper:has(.dashboard-glass),
-.body-wrapper .bodywrapper__inner:has(.dashboard-glass) {
-    overflow-x: hidden;
-    min-width: 0;
-    max-width: 100%;
-}
-</style>
-@endpush
-
 @php
     $d = $dashboard ?? [];
     $alerts = $d['alerts'] ?? [
@@ -451,13 +59,13 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
         </div>
     @endif
 
-    {{-- 1. লাল মার্ক জায়গা: Welcome + বাটন দুই লাইনে, সমস্ত বাটন এক সাইজ --}}
+    {{-- 1. à¦²à¦¾à¦² à¦®à¦¾à¦°à§à¦• à¦œà¦¾à¦¯à¦¼à¦—à¦¾: Welcome + à¦¬à¦¾à¦Ÿà¦¨ à¦¦à§à¦‡ à¦²à¦¾à¦‡à¦¨à§‡, à¦¸à¦®à¦¸à§à¦¤ à¦¬à¦¾à¦Ÿà¦¨ à¦à¦• à¦¸à¦¾à¦‡à¦œ --}}
     <div class="dashboard-section dashboard-section--compact">
         <div class="card border-0 dashboard-card-premium dashboard-actions-card">
             <div class="card-body py-3 px-3">
                 <div class="dashboard-welcome-row">
                     <span class="dashboard-welcome-text">@lang('Welcome back'), {{ auth('admin')->user()->name ?? 'Admin' }}</span>
-                    <span class="dashboard-welcome-meta">{{ now()->format('l, F j, Y · H:i') }}</span>
+                    <span class="dashboard-welcome-meta">{{ now()->format('l, F j, Y Â· H:i') }}</span>
                 </div>
                 <div class="dashboard-actions-two-rows">
                     <div class="dashboard-actions-line dashboard-actions-line-1">
@@ -490,67 +98,38 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
     <div class="dashboard-section">
         <h2 class="dashboard-section__title">@lang('Revenue Overview')</h2>
         <div class="dashboard-grid dashboard-grid--stats">
-            <div class="card border-0">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-light p-3">
-                        <i class="fas fa-wallet text-secondary" style="font-size: 1.35rem;"></i>
-                    </div>
-                    <div>
-                        <span class="text-muted small d-block">@lang("Today's Revenue")</span>
-                        <span class="fw-bold fs-5 text-dark" data-stat="today_revenue">{{ optional($general)->cur_sym ?? '' }}{{ showAmount($widget['today_revenue'] ?? 0) }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card border-0">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-light p-3">
-                        <i class="las la-shopping-cart text-secondary" style="font-size: 1.35rem;"></i>
-                    </div>
-                    <div>
-                        <span class="text-muted small d-block">@lang('Orders Today')</span>
-                        <span class="fw-bold fs-5 text-dark" data-stat="orders_today">{{ $widget['orders_today'] ?? 0 }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card border-0">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-light p-3">
-                        <i class="las la-user-plus text-secondary" style="font-size: 1.35rem;"></i>
-                    </div>
-                    <div>
-                        <span class="text-muted small d-block">@lang('New Customers Today')</span>
-                        <span class="fw-bold fs-5 text-dark" data-stat="new_users_today">{{ $widget['new_users_today'] ?? 0 }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card border-0">
-                @php
-                    $weekChange = $revenue['revenue_week_change_percent'] ?? 0;
-                @endphp
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-light p-3">
-                        <i class="las la-chart-line text-secondary" style="font-size: 1.35rem;"></i>
-                    </div>
-                    <div>
-                        <span class="text-muted small d-block">@lang('Revenue This Week vs Last')</span>
-                        <span class="fw-bold fs-5 {{ $weekChange >= 0 ? 'text-success' : 'text-danger' }}" data-stat="revenue_week_change">{{ $weekChange >= 0 ? '+' : '' }}{{ $weekChange }}%</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card border-0">
-                @php
-                    $todayVsYesterday = $revenue['revenue_today_vs_yesterday_percent'] ?? 0;
-                @endphp
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-light p-3">
-                        <i class="las la-calendar-day text-secondary" style="font-size: 1.35rem;"></i>
-                    </div>
-                    <div>
-                        <span class="text-muted small d-block">@lang('Today vs Yesterday')</span>
-                        <span class="fw-bold fs-5 {{ $todayVsYesterday >= 0 ? 'text-success' : 'text-danger' }}" data-stat="revenue_today_vs_yesterday">{{ $todayVsYesterday >= 0 ? '+' : '' }}{{ $todayVsYesterday }}%</span>
-                    </div>
-                </div>
-            </div>
+            <x-stat-card 
+                title="Today's Revenue" 
+                :value="(optional($general)->cur_sym ?? '') . showAmount($widget['today_revenue'] ?? 0)" 
+                icon="fas fa-wallet" 
+                :link="route('admin.report.transaction')" 
+            />
+            <x-stat-card 
+                title="Orders Today" 
+                :value="$widget['orders_today'] ?? 0" 
+                icon="las la-shopping-cart" 
+                :link="route('admin.orders.pending')" 
+            />
+            <x-stat-card 
+                title="New Customers Today" 
+                :value="$widget['new_users_today'] ?? 0" 
+                icon="las la-user-plus" 
+                :link="route('admin.users.all')" 
+            />
+            @php
+                $weekChange = $revenue['revenue_week_change_percent'] ?? 0;
+                $todayVsYesterday = $revenue['revenue_today_vs_yesterday_percent'] ?? 0;
+            @endphp
+            <x-stat-card 
+                title="Revenue This Week vs Last" 
+                :value="($weekChange >= 0 ? '+' : '') . $weekChange . '%'" 
+                icon="las la-chart-line" 
+            />
+            <x-stat-card 
+                title="Today vs Yesterday" 
+                :value="($todayVsYesterday >= 0 ? '+' : '') . $todayVsYesterday . '%'" 
+                icon="las la-calendar-day" 
+            />
         </div>
     </div>
 
@@ -695,7 +274,7 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
     <div class="dashboard-section">
         <div class="card border-0">
             <div class="card-header bg-transparent border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <h6 class="mb-0 text-dark"><i class="las la-exclamation-triangle text-warning me-2"></i> @lang('Low Stock Alert') — @lang('Top 5 products by quantity')</h6>
+                <h6 class="mb-0 text-dark"><i class="las la-exclamation-triangle text-warning me-2"></i> @lang('Low Stock Alert') â€” @lang('Top 5 products by quantity')</h6>
                 <a href="{{ route('admin.product.index') }}?low_stock=1" class="btn btn-sm btn-outline-secondary">@lang('View All')</a>
             </div>
             <div class="card-body p-0">
@@ -715,13 +294,13 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
 
     {{-- Charts --}}
     <div class="dashboard-section">
-        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
-            <div class="card border-0" style="grid-column: 1 / -1;">
+        <div class="dashboard-grid dashboard-grid--fluid-charts">
+            <div class="card border-0 dashboard-grid--span-full">
                 <div class="card-header bg-transparent border-bottom py-3">
                     <h5 class="mb-0 text-dark">@lang('Monthly Sale Report') (@lang('Last 12 Month'))</h5>
                 </div>
                 <div class="card-body pt-0">
-                    <div id="apex-bar-chart" style="min-height: 320px;"></div>
+                    <div id="apex-bar-chart" class="dashboard-chart-slot"></div>
                 </div>
             </div>
             <div class="card border-0">
@@ -729,7 +308,7 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
                     <h5 class="mb-0 text-dark">@lang('Transactions Report') (@lang('Last 30 Days'))</h5>
                 </div>
                 <div class="card-body pt-0">
-                    <div id="apex-line" style="min-height: 320px;"></div>
+                    <div id="apex-line" class="dashboard-chart-slot"></div>
                 </div>
             </div>
             <div class="card border-0">
@@ -737,7 +316,7 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
                     <h5 class="mb-0 text-dark">@lang('Last 30 days Orders History')</h5>
                 </div>
                 <div class="card-body pt-0">
-                    <div id="deposit-line" style="min-height: 320px;"></div>
+                    <div id="deposit-line" class="dashboard-chart-slot"></div>
                 </div>
             </div>
             <div class="card border-0">
@@ -745,7 +324,7 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
                     <h5 class="mb-0 text-dark">@lang('Last 30 days Sales History')</h5>
                 </div>
                 <div class="card-body pt-0">
-                    <div id="withdraw-line" style="min-height: 320px;"></div>
+                    <div id="withdraw-line" class="dashboard-chart-slot"></div>
                 </div>
             </div>
         </div>
@@ -753,7 +332,7 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
 
     {{-- Latest Orders + Recent Activity --}}
     <div class="dashboard-section">
-        <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+        <div class="dashboard-grid dashboard-grid--split-2-1">
             <div class="card border-0">
                 <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <h5 class="mb-0 text-dark">@lang('Latest Orders')</h5>
@@ -834,7 +413,7 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
 
     {{-- Login analytics --}}
     <div class="dashboard-section">
-        <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="dashboard-grid dashboard-grid--cols-3">
             <div class="card border-0">
                 <div class="card-header bg-transparent border-bottom py-3">
                     <h5 class="mb-0 text-dark">@lang('Login By Browser') (@lang('Last 30 days'))</h5>
@@ -865,8 +444,8 @@ a.dashboard-stat-card:hover .dashboard-stat-card__link { color: var(--dash-text)
 @endsection
 
 @push('script')
-    <script src="{{ asset('assets/global/js/apexcharts.min.js') }}" defer></script>
-    <script src="{{ asset('assets/global/js/chart.js.2.8.0.js') }}" defer></script>
+    <script src="{{ asset('assets/global/js/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('assets/global/js/chart.js.2.8.0.js') }}"></script>
     <script>
     "use strict";
     (function() {

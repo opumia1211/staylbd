@@ -2,6 +2,6 @@
 @foreach($products as $product)
 <div class="product-card-col product-card-col--home product-carousel__item">
     @php $fp = $loop->iteration <= 8 ? 'high' : 'low'; @endphp
-    @include($activeTemplate . 'products.partials.card', ['product' => $product, 'general' => $general, 'fetchpriority' => $fp])
+    @include($activeTemplate . 'products.partials.home_product_card', ['product' => $product, 'general' => $general, 'activeTemplate' => $activeTemplate, 'fetchpriority' => $fp])
 </div>
 @endforeach

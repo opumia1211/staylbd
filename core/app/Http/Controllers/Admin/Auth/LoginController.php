@@ -385,26 +385,28 @@ class LoginController extends Controller
                     $notify[] = ['error', __('Your IP is not in the whitelist. Contact administrator.')];
                     return back()->withNotify($notify)->withInput($request->only('username'));
                 }
-                $userAgent = $request->userAgent() ?? '';
-                $fingerprint = $request->input('device_fingerprint'); // optional client-side fingerprint
-                $deviceTrusted = TrustedAdminDevice::isTrusted($admin->id, $userAgent, $ip, $fingerprint);
-                if (!$deviceTrusted && !$admin->hasTwoFactorEnabled()) {
-                    $this->guard()->logout();
-                    $request->session()->put('admin_2fa_pending_id', $admin->id);
-                    $request->session()->put('admin_2fa_remember', $request->boolean('remember'));
-                    return redirect()->route('admin.2fa.setup');
-                }
-                if ($admin->hasTwoFactorEnabled()) {
-                    $this->guard()->logout();
-                    $request->session()->put('admin_2fa_pending_id', $admin->id);
-                    $request->session()->put('admin_2fa_remember', $request->boolean('remember'));
-                    return redirect()->route('admin.2fa.verify');
-                }
-                if ($admin->mustHaveTwoFactor() && !$admin->hasTwoFactorEnabled()) {
-                    $this->guard()->logout();
-                    $request->session()->put('admin_2fa_pending_id', $admin->id);
-                    $request->session()->put('admin_2fa_remember', $request->boolean('remember'));
-                    return redirect()->route('admin.2fa.setup');
+                if (config('admin.admin_two_factor_enabled', true)) {
+                    $userAgent = $request->userAgent() ?? '';
+                    $fingerprint = $request->input('device_fingerprint'); // optional client-side fingerprint
+                    $deviceTrusted = TrustedAdminDevice::isTrusted($admin->id, $userAgent, $ip, $fingerprint);
+                    if (!$deviceTrusted && !$admin->hasTwoFactorEnabled()) {
+                        $this->guard()->logout();
+                        $request->session()->put('admin_2fa_pending_id', $admin->id);
+                        $request->session()->put('admin_2fa_remember', $request->boolean('remember'));
+                        return redirect()->route('admin.2fa.setup');
+                    }
+                    if ($admin->hasTwoFactorEnabled()) {
+                        $this->guard()->logout();
+                        $request->session()->put('admin_2fa_pending_id', $admin->id);
+                        $request->session()->put('admin_2fa_remember', $request->boolean('remember'));
+                        return redirect()->route('admin.2fa.verify');
+                    }
+                    if ($admin->mustHaveTwoFactor() && !$admin->hasTwoFactorEnabled()) {
+                        $this->guard()->logout();
+                        $request->session()->put('admin_2fa_pending_id', $admin->id);
+                        $request->session()->put('admin_2fa_remember', $request->boolean('remember'));
+                        return redirect()->route('admin.2fa.setup');
+                    }
                 }
             }
             return $this->sendLoginResponse($request);

@@ -1,17 +1,9 @@
 @extends('admin.layouts.app')
 
 @push('style')
-<style>
-    /* Add New Brand মডাল ভাসমান – সাইডবার/হেডারের উপরে, হিডেন হবে না */
-    #cuModal { z-index: 10600 !important; position: fixed !important; }
-    #cuModal .modal-dialog { z-index: 10602 !important; position: relative; }
-    #cuModal .modal-content { position: relative; z-index: 1; pointer-events: auto; }
-    body.modal-open .modal-backdrop { z-index: 10598 !important; }
-    /* ব্র্যান্ড ইমেজ টেবিলে স্কয়ার, একটু বড় – কোন ফটো আপলোড হয়েছে স্পষ্ট বোঝা যাবে */
-    .brand-img-cell { display: inline-block; }
-    .brand-img-cell .brand-thumb-square { width: 80px; height: 80px; border-radius: 0; overflow: hidden; border: 1px solid rgba(0,0,0,0.08); background: #f8f9fa; display: flex; align-items: center; justify-content: center; }
-    .brand-img-cell .brand-thumb-square img { width: 100%; height: 100%; object-fit: contain; display: block; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @section('panel')

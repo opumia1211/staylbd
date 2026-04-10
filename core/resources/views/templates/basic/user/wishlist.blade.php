@@ -1,4 +1,9 @@
 @extends($activeTemplate . 'layouts.master')
+
+@push('head-meta')
+    @include('partials.storefront_deferred_bundle', ['bundle' => 'tailwind-storefront-deferred-compare'])
+@endpush
+
 @section('dashboard_page_title')
     @php
         $wishlistHeaderActions = $headerActions ?? '';

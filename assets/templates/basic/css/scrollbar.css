@@ -14,8 +14,13 @@
 
 .scrollbar-section--banner_below {
     margin-top: 0;
-    padding: 6px 0;
+    padding: 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Keep banner ticker running and flush under banner */
+.scrollbar-section--banner_below .scrollbar-content {
+    animation-play-state: running !important;
 }
 
 .scrollbar-section--footer_above,
@@ -31,10 +36,12 @@
 .scrollbar-section--product_detail_below,
 .scrollbar-section--custom { padding: 6px 0; }
 
+/* হেডার ↔ মেইন / ব্যানার: উপরে ফাঁক নয়; নিচে সামান্য শ্বাস */
 .scrollbar-section--header_below {
     padding: 0 0 6px;
 }
 
+/* মেইনের প্রথম টিকার: উপরে ফাঁক নয় (হেডার-পরবর্তী লাইন ↔ ব্যানার) */
 main > .scrollbar-section--content_top:first-of-type {
     padding-top: 0;
 }
@@ -53,7 +60,7 @@ main > .scrollbar-section--content_top:first-of-type {
     overflow: hidden;
     padding: 8px 16px;
     line-height: 1.4;
-    min-height: 52px; /* overridden by inline style from bar_height (16–120px) */
+    min-height: 52px; /* overridden by inline style from bar_height (8–120px) */
     display: flex;
     align-items: center;
     box-sizing: border-box;
@@ -61,13 +68,13 @@ main > .scrollbar-section--content_top:first-of-type {
     margin-right: auto;
 }
 
-/* Bar size: minimal padding so bar stays thin when bar_height is 16–24px */
+/* Bar size: minimal padding so bar stays thin when bar_height is 8–24px */
 .scrollbar--size-extra-small {
-    padding: 2px 8px !important;
+    padding: 0 6px !important;
 }
-.scrollbar--size-extra-small .scrollbar-track { font-size: 0.8rem; }
+.scrollbar--size-extra-small .scrollbar-track { font-size: 0.72rem; line-height: 1.1; }
 .scrollbar--size-small {
-    padding: 4px 10px !important;
+    padding: 2px 8px !important;
 }
 .scrollbar--size-small .scrollbar-track { font-size: 0.9rem; }
 .scrollbar--size-large {
@@ -117,7 +124,7 @@ main > .scrollbar-section--content_top:first-of-type {
 .scrollbar--text-size-extra-large .scrollbar-segment--text,
 .scrollbar--text-size-extra-large .scrollbar-rich-chunk { font-size: 1.55rem; }
 
-/* Default text weight (bar-level): light .. extrabold */
+/* Default text weight (bar-level): normal / bold */
 .scrollbar--text-weight-light .scrollbar-segment--text,
 .scrollbar--text-weight-light .scrollbar-rich-chunk { font-weight: 300; }
 .scrollbar--text-weight-normal .scrollbar-segment--text,
@@ -148,6 +155,36 @@ main > .scrollbar-section--content_top:first-of-type {
     padding-left: 100%;
     animation: scrollbar-scroll 45s linear infinite;
     will-change: transform;
+}
+.scrollbar-track--vertical {
+    position: relative;
+    display: block;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    white-space: normal;
+}
+.scrollbar-content--vertical {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-left: 0;
+    padding-top: 0;
+    min-height: 100%;
+    will-change: transform;
+}
+.scrollbar--dir-vertical .scrollbar-segment {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    white-space: nowrap;
+    line-height: 1.2;
+    min-height: var(--scrollbar-bar-height, 52px);
+    padding-inline: 8px;
+}
+.scrollbar--dir-vertical .scrollbar-segment::after {
+    content: none !important;
 }
 .scrollbar--ease .scrollbar-content { animation-timing-function: ease-in-out; }
 .scrollbar--fade .scrollbar-content { animation-name: scrollbar-scroll-fade; animation-timing-function: linear; }
@@ -195,6 +232,10 @@ main > .scrollbar-section--content_top:first-of-type {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
 }
+@keyframes scrollbar-scroll-vertical {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
 
 .scrollbar-segment {
     display: inline;
@@ -231,6 +272,19 @@ main > .scrollbar-section--content_top:first-of-type {
 
 .scrollbar-segment--text {
     font-size: 1.05rem;
+}
+
+/* Rich editor segments should keep exact user spacing (no forced margin/dot). */
+.scrollbar-rich-chunk {
+    display: inline;
+    margin: 0 !important;
+    white-space: pre;
+    vertical-align: baseline;
+    letter-spacing: inherit;
+}
+.scrollbar-rich-chunk::after {
+    content: none !important;
+    margin: 0 !important;
 }
 
 /* Glass template - full width, centered */
@@ -340,4 +394,46 @@ main > .scrollbar-section--content_top:first-of-type {
 }
 @media (min-width: 768px) {
     .scrollbar-hide-desktop { display: none !important; }
+}
+
+/* Admin WYSIWYG preview (scrollbar_preview.blade.php — loads serve-css/scrollbar only) */
+body.st-scrollbar-admin-preview {
+    margin: 0;
+    padding: 10px;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef4fa 100%);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+.st-scrollbar-admin-preview .preview-shell {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 10px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-segment--text {
+    text-shadow: none;
+    color: inherit;
+    font-weight: 500;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-wrapper {
+    min-height: 42px !important;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-track {
+    display: flex;
+    align-items: center;
+    min-height: 100%;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-content {
+    line-height: 1.4;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-wrapper[data-position="custom"] {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
 }

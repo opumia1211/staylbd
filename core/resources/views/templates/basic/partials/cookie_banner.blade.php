@@ -14,42 +14,9 @@
     $logo = getLogo('logo');
     $useLightBox = !empty($logo) && (($data->logo_box_style ?? 'light') === 'light');
 @endphp
-<style>
-/* Cookie banner logo – always visible size and border (avoids cache issues) */
-.gdpr-cookie-banner .gdpr-cookie-banner__icon {
-    width: 100px !important;
-    height: 100px !important;
-    min-width: 100px !important;
-    min-height: 100px !important;
-    border: 2px solid #94a3b8 !important;
-    border-radius: 14px !important;
-    box-sizing: border-box !important;
-}
-.gdpr-cookie-banner .gdpr-cookie-banner__icon--light {
-    background: #f1f5f9 !important;
-    border: 2px solid #94a3b8 !important;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
-}
-.gdpr-cookie-banner .gdpr-cookie-banner__icon .gdpr-cookie-banner__logo {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    padding: 8px !important;
-    box-sizing: border-box !important;
-}
-.gdpr-cookie-banner--compact .gdpr-cookie-banner__icon {
-    width: 92px !important;
-    height: 92px !important;
-    min-width: 92px !important;
-    min-height: 92px !important;
-}
-.gdpr-cookie-banner--minimal .gdpr-cookie-banner__icon {
-    width: 84px !important;
-    height: 84px !important;
-    min-width: 84px !important;
-    min-height: 84px !important;
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 <div class="gdpr-cookie-banner gdpr-cookie-banner--{{ $position }} gdpr-cookie-banner--{{ $style }} gdpr-cookie-banner--smart hide" data-delay="{{ $showDelay }}" role="dialog" aria-label="@lang('Cookie consent')">
     <div class="gdpr-cookie-banner__inner">
         <div class="gdpr-cookie-banner__icon {{ $useLightBox ? 'gdpr-cookie-banner__icon--light' : 'bg--base' }}" aria-hidden="true">

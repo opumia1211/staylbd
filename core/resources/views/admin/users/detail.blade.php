@@ -373,21 +373,9 @@
 @endpush
 
 @push('style')
-<style>
-.user-detail-page--compact .user-detail-avatar { width: 42px; height: 42px; }
-@media (min-width: 768px) { .user-detail-page--compact .user-detail-avatar { width: 48px; height: 48px; } }
-.user-detail-page .user-stat-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
-.user-detail-page .user-stat-card:hover { box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08) !important; }
-a.user-stat-card:hover { transform: translateY(-1px); }
-.user-detail-page .user-stat-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.user-detail-list .list-group-item:last-child { border-bottom: 0 !important; }
-.object-fit-cover { object-fit: cover; }
-.admin-detail-card .card-body { padding: 0.4rem 0.5rem; }
-.admin-detail-card .card-header { padding: 0.35rem 0.5rem; }
-#advancedProfileCollapse { border-top: 1px solid var(--bs-border-color-translucent, rgba(0,0,0,.075)); }
-.collapse-chevron { transition: transform .2s; display: inline-block; }
-[data-bs-toggle="collapse"]:not(.collapsed) .collapse-chevron { transform: rotate(180deg); }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

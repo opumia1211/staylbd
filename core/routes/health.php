@@ -24,13 +24,18 @@ Route::get('/health/queue', function () {
         $failed = \Illuminate\Support\Facades\DB::table('failed_jobs')->count();
         return response()->json([
             'status'  => 'ok',
-            'queue'   => config('queue.default'),
             'failed_jobs' => $failed,
         ], 200);
     } catch (\Throwable $e) {
+        if (config('app.debug')) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
         return response()->json([
-            'status'  => 'error',
-            'message' => $e->getMessage(),
+            'status' => 'error',
         ], 500);
     }
 });

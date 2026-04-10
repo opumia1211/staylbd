@@ -1,0 +1,11 @@
+/*
+ * User account / dashboard legacy CSS — load async on layouts.master routes only.
+ */
+@import "../../public/assets/templates/basic/css/dashboard.css";
+@import "../../public/assets/templates/basic/css/dashboard-sidebar.css";
+@import "../../public/assets/templates/basic/css/track-order.css";
+@import "../../public/assets/templates/basic/css/product-list-screenshot.css";
+@import "../../public/assets/templates/basic/css/user-pages.css";
+@import "../../public/assets/templates/basic/css/user-list-pages-layout.css";
+@import "../../public/assets/templates/basic/css/user-list-pages-common.css";
+@import "../../public/assets/templates/basic/css/main-legacy-widgets.css";

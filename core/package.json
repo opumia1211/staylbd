@@ -1,20 +1,29 @@
 {
     "private": true,
     "scripts": {
+        "build": "npm run production",
         "dev": "npm run development",
-        "development": "mix",
+        "sass:storefront": "sass resources/sass/bootstrap-storefront.scss public/css/bootstrap-storefront.css --load-path=node_modules --no-source-map",
+        "development": "npm run sass:storefront && mix",
         "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
         "prod": "npm run production",
-        "production": "mix --production"
+        "production": "npm run sass:storefront && mix --production",
+        "measure:css": "node tools/measure-storefront-css.cjs",
+        "split:main-css": "node tools/split-main-legacy-css.cjs"
     },
     "devDependencies": {
+        "@fullhuman/postcss-purgecss": "^5.0.0",
         "@popperjs/core": "^2.10.2",
+        "@tailwindcss/aspect-ratio": "^0.4.2",
+        "@tailwindcss/forms": "^0.5.11",
+        "@tailwindcss/typography": "^0.5.19",
         "autoprefixer": "^10.4.27",
         "axios": "^0.25",
         "bootstrap": "^5.1.3",
         "laravel-mix": "^6.0.6",
+        "line-awesome": "^1.3.0",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14",
         "postcss-import": "^16.1.1",
@@ -22,5 +31,11 @@
         "sass": "^1.32.11",
         "sass-loader": "^11.0.1",
         "tailwindcss": "^3.4.17"
+    },
+    "dependencies": {
+        "@fontsource/inter": "^5.2.8",
+        "laravel-echo": "^2.3.4",
+        "lucide": "^1.8.0",
+        "pusher-js": "^8.5.0"
     }
 }

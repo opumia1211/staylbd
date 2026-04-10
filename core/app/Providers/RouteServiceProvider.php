@@ -7,6 +7,8 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\ValidateIpnHmac;
+use App\Http\Middleware\VerifyCsrfToken;
 use Laramin\Utility\VugiChugi;
 
 class RouteServiceProvider extends ServiceProvider
@@ -38,13 +40,16 @@ class RouteServiceProvider extends ServiceProvider
             Route::prefix(env('API_PREFIX', 'api'))->middleware('api')->group(base_path('routes/api.php'));
 
             Route::namespace($this->namespace)->middleware(VugiChugi::mdNm())->group(function(){
-                Route::middleware(['web','maintenance','throttle:ipn'])
+                // Payment IPN: no CSRF (external POST). Optional HMAC when IPN_HMAC_SECRET is set.
+                Route::middleware(['web', 'maintenance', 'throttle:ipn', ValidateIpnHmac::class])
+                    ->withoutMiddleware([VerifyCsrfToken::class])
                     ->namespace('Gateway')
                     ->prefix('ipn')
                     ->name('ipn.')
                     ->group(base_path('routes/ipn.php'));
                 // Payment webhook (e.g. PoysaPay): https://yoursite.com/payment/webhook/poysapay
-                Route::middleware(['web','maintenance','throttle:ipn'])
+                Route::middleware(['web', 'maintenance', 'throttle:ipn'])
+                    ->withoutMiddleware([VerifyCsrfToken::class])
                     ->namespace('Webhook')
                     ->prefix('payment/webhook')
                     ->name('payment.webhook.')
@@ -78,7 +83,13 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            $perMin = max(30, min(500, (int) config('app.api_rate_limit_per_minute', 120)));
+
+            return Limit::perMinute($perMin)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('realtime_poll', function (Request $request) {
+            return Limit::perMinute(45)->by($request->ip());
         });
 
         // User login: progressive lockout in LoginController (5→1m, 10→3m, 15→5m). Throttle as safety: 25/min per IP.

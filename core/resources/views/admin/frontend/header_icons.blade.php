@@ -43,7 +43,7 @@
                 <div class="min-w-0">
                     <h6 class="mb-0">{{ __('Icons (single set)') }}</h6>
                     <p class="mb-0 text-muted small lh-sm mt-1" style="font-size:11px;">
-                        {{ __('PNG/SVG/WebP · each tile is square (same width & height). Optional pack: folder New1/lucide-ecommerce/.') }}
+                        {{ __('PNG/SVG/WebP · square tiles. If you remove an upload, the site falls back to bundled Lucide SVGs in public/assets/images/frontend/header_icons/bundled/ (ship-safe defaults).') }}
                     </p>
                 </div>
                 <span class="badge badge--primary flex-shrink-0" style="font-size:10px;">{{ __('Unified') }}</span>
@@ -224,83 +224,9 @@
 @endsection
 
 @push('style')
-<style>
-.hi-brand-card, .hi-intro-card { border-radius: 10px; }
-.hi-brand-thumb { max-width: 120px; max-height: 36px; width: auto; height: auto; object-fit: contain; }
-.hi-brand-file { max-width: 200px; min-width: 140px; }
-/* Square tiles: cell is 1:1; inner preview area stays square */
-.hi-icon-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
-    gap: 0.5rem;
-    align-items: stretch;
-}
-.hi-tile {
-    aspect-ratio: 1 / 1;
-    min-width: 0;
-}
-.hi-slot-card {
-    border-radius: 8px;
-    transition: box-shadow .15s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.hi-slot-card:hover { box-shadow: 0 .2rem .65rem rgba(15, 23, 42, .07) !important; }
-.hi-slot-card .card-body {
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: 0.35rem !important;
-}
-.hi-slot-head { flex-shrink: 0; margin-bottom: 2px; }
-.hi-slot-label { font-size: 9px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.hi-slot-badge { font-size: 7px !important; padding: 1px 4px !important; flex-shrink: 0; }
-.hi-drop {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1 1 0;
-    min-height: 0;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 1px dashed rgba(15, 23, 42, 0.14);
-    cursor: pointer;
-    transition: border-color .2s ease, background .2s ease;
-    margin-bottom: 0;
-}
-.hi-drop:hover {
-    border-color: rgba(37, 99, 235, 0.45);
-    background: #eff6ff;
-}
-.hi-drop__img {
-    width: 48px;
-    height: 48px;
-    max-width: 72%;
-    max-height: 72%;
-    object-fit: contain;
-    display: block;
-}
-.hi-drop__svg-fallback { width: 28px !important; height: 28px !important; max-width: 55% !important; max-height: 55% !important; opacity: .88; }
-/* If admin loads jQuery UI elsewhere, kill sprite bleed on inline SVG fallbacks */
-.hi-slot-card svg.ui-icon { background: none !important; background-image: none !important; }
-.hi-drop__cta { color: #64748b; font-weight: 600; font-size: 9px; line-height: 1.1; margin-top: 2px; }
-.hi-details-sum { font-size: 10px; outline: none; cursor: pointer; }
-.hi-fallback-input { font-size: 11px !important; height: 26px !important; }
-.hi-remove-wrap { line-height: 1.1; }
-.hi-remove-lbl { font-size: 9px !important; }
-.hi-save-hint { font-size: 11px; }
-.hi-sticky-save {
-    position: sticky;
-    bottom: 0;
-    z-index: 5;
-    margin-left: -4px;
-    margin-right: -4px;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-}
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

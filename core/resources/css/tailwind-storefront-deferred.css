@@ -1,0 +1,12 @@
+/*
+ * Core deferred storefront CSS — PDP, listings, category (no cart/account/compare-only sheets).
+ * Legacy main.css is split: main-legacy-widgets loads only with tailwind-storefront-deferred-account.
+ * jQuery UI / Owl / Slick / animate / lightbox2: off by default ($disableLegacy* in layouts/app.blade.php).
+ */
+@import "./imports/storefront-product-extra-legacy.css";
+@import "../../public/assets/templates/basic/css/main-legacy-shell.css";
+@import "../../public/assets/templates/basic/css/main-legacy-home.css";
+@import "../../public/assets/templates/basic/css/main-legacy-product.css";
+@import "../../public/assets/templates/basic/css/main-legacy-extras.css";
+@import "../../public/assets/templates/basic/css/main-legacy-classic.css";
+@import "../../public/assets/templates/basic/css/all-category.css";

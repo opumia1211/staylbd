@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'sync'),
+    'default' => env('QUEUE_CONNECTION', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -89,5 +89,13 @@ return [
         'database' => env('DB_CONNECTION', 'mysql'),
         'table' => 'failed_jobs',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retries & backoff (per-job)
+    |--------------------------------------------------------------------------
+    | Set $tries, $backoff, $maxExceptions on job classes. Horizon: config/horizon.php tries/timeout.
+    | Prune: php artisan queue:prune-failed / schedule Horizon metrics trim.
+    */
 
 ];

@@ -11,15 +11,15 @@
     function iconSvg(name, extraClass) {
         var cls = 'ui-icon ui-icon--runtime' + (extraClass ? (' ' + extraClass) : '');
         var icons = {
-            spinner: '<svg class="' + cls + ' ui-icon--spin" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2v4m0 12v4m8-8h-4M6 12H2m15.07-7.07l-2.83 2.83M7.76 16.24l-2.83 2.83m0-11.31l2.83 2.83m7.07 7.07l2.83 2.83"></path></svg>',
-            search: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>',
-            image: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path></svg>',
-            scan: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path><path d="M7 2L5.17 4H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.17L17 2H7zM5.83 6h12.34l1.83 2H22v10H2V8h4.17l-.34-2z"></path></svg>',
-            folder: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></svg>',
-            folderOpen: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"></path></svg>',
-            tag: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"></path></svg>',
-            link: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg>',
-            file: '<svg class="' + cls + '" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>'
+            spinner: '<svg class="' + cls + ' ui-icon--spin" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"></path></svg>',
+            search: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>',
+            image: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>',
+            scan: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10V6a2 2 0 0 1 2-2h3.5M16 4H18a2 2 0 0 1 2 2v3.5M20 14v4a2 2 0 0 1-2 2h-3.5M8 20H6a2 2 0 0 1-2-2v-3.5"></path><rect x="8.5" y="8.5" width="7" height="7" rx="1.2"></rect></svg>',
+            folder: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>',
+            folderOpen: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v1H3z"></path><path d="M3 11h18l-2 8H5z"></path></svg>',
+            tag: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 13l-7 7-9-9V4h7z"></path><circle cx="7.5" cy="7.5" r="1.2"></circle></svg>',
+            link: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 0 1 7 7L17 13"></path><path d="M14 11a5 5 0 0 1 0 7L12.5 19.5a5 5 0 0 1-7-7L7 11"></path></svg>',
+            file: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path></svg>'
         };
         return icons[name] || icons.file;
     }
@@ -643,6 +643,9 @@
     const searchForm = document.querySelector('#universalSearchForm');
     const SEARCH_CACHE_KEY = 'staylbd_recent_search_terms_v1';
     const SEARCH_CACHE_LIMIT = 8;
+    const SEARCH_DEBOUNCE_MS = 300;
+    var trendingKeywordsCache = null;
+    var trendingLoadPromise = null;
 
     function readRecentSearchTerms() {
         try {
@@ -671,23 +674,85 @@
         return list.filter(function(t) { return String(t).toLowerCase().indexOf(q) !== -1; }).slice(0, 5);
     }
 
-    function showRecentSearchSuggestions(query) {
-        var resultsContainer = document.querySelector('#searchResults');
-        if (!resultsContainer || !searchForm) return false;
-        var matches = getRecentMatches(query);
-        if (!matches.length) return false;
-        var productsUrl = searchForm.getAttribute('action') || (window.location.origin + '/products');
-        var html = '<div class="glass-search-recent-head px-2 py-1 small text-muted">Recent Searches</div>';
-        matches.forEach(function(term) {
-            html += '<a href="' + productsUrl + '?search=' + encodeURIComponent(term) + '" class="glass-search-result-item glass-search-result-item--recent text-decoration-none d-block">' +
-                '<div class="glass-search-result-item-content">' +
-                '<div class="glass-search-result-item-title">' + iconSvg('search', 'me-2') + escapeHtml(term) + '</div>' +
-                '<div class="glass-search-result-item-meta"><span class="glass-search-result-item-type">Recent</span></div>' +
-                '</div></a>';
+    function productsSearchBaseUrl() {
+        var productsUrl = (searchForm && searchForm.getAttribute('action')) ? searchForm.getAttribute('action') : (window.location.origin + '/products');
+        if (productsUrl.indexOf('?') !== -1) productsUrl = productsUrl.split('?')[0];
+        return productsUrl;
+    }
+
+    function fetchTrendingKeywords(done) {
+        if (trendingKeywordsCache !== null) {
+            done(trendingKeywordsCache);
+            return;
+        }
+        if (trendingLoadPromise) {
+            trendingLoadPromise.then(function() { done(trendingKeywordsCache); });
+            return;
+        }
+        var url = searchForm && searchForm.getAttribute('data-trending-url');
+        if (!url) {
+            trendingKeywordsCache = [];
+            done(trendingKeywordsCache);
+            return;
+        }
+        trendingLoadPromise = fetch(url, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+            .then(function(r) { return r.ok ? r.json() : { success: false, keywords: [] }; })
+            .then(function(data) {
+                trendingKeywordsCache = (data && data.success && Array.isArray(data.keywords)) ? data.keywords : [];
+            })
+            .catch(function() { trendingKeywordsCache = []; })
+            .finally(function() { trendingLoadPromise = null; });
+        trendingLoadPromise.then(function() { done(trendingKeywordsCache); });
+    }
+
+    function renderTrendingBlock(keywords) {
+        if (!keywords || !keywords.length) return '';
+        var productsUrl = productsSearchBaseUrl();
+        var part = '<div class="glass-search-trending-block mt-2 pt-2" style="border-top:1px solid rgba(15,23,42,0.08);"><div class="glass-search-recent-head px-2 py-1 small text-muted">Trending</div><div class="d-flex flex-wrap gap-1 px-1 pb-1">';
+        keywords.forEach(function(kw) {
+            part += '<a href="' + productsUrl + '?search=' + encodeURIComponent(kw) + '" class="glass-search-trending-chip text-decoration-none" style="font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(16,185,129,0.12);color:#047857;font-weight:600;">' + escapeHtml(kw) + '</a>';
         });
-        resultsContainer.innerHTML = html;
-        resultsContainer.classList.add('active');
-        return true;
+        part += '</div></div>';
+        return part;
+    }
+
+    function finalizeSearchPanel(html) {
+        var resultsContainer = document.querySelector('#searchResults');
+        if (!resultsContainer) return;
+        fetchTrendingKeywords(function(keywords) {
+            resultsContainer.innerHTML = html + renderTrendingBlock(keywords);
+            resultsContainer.classList.add('active');
+        });
+    }
+
+    function showDiscoveryPanel(query) {
+        var resultsContainer = document.querySelector('#searchResults');
+        if (!resultsContainer || !searchForm) return;
+        var matches = getRecentMatches(query);
+        var productsUrl = searchForm.getAttribute('action') || (window.location.origin + '/products');
+        if (productsUrl.indexOf('?') !== -1) productsUrl = productsUrl.split('?')[0];
+        var html = '';
+        if (matches.length) {
+            html += '<div class="glass-search-recent-head px-2 py-1 small text-muted">Recent searches</div>';
+            matches.forEach(function(term) {
+                html += '<a href="' + productsUrl + '?search=' + encodeURIComponent(term) + '" class="glass-search-result-item glass-search-result-item--recent text-decoration-none d-block">' +
+                    '<div class="glass-search-result-item-content">' +
+                    '<div class="glass-search-result-item-title">' + iconSvg('search', 'me-2') + escapeHtml(term) + '</div>' +
+                    '<div class="glass-search-result-item-meta"><span class="glass-search-result-item-type">Recent</span></div>' +
+                    '</div></a>';
+            });
+        }
+        fetchTrendingKeywords(function(keywords) {
+            html += renderTrendingBlock(keywords);
+            if (!html.trim()) {
+                html = '<div class="glass-search-no-results small py-2">Type to search products, categories, brands…</div>';
+            }
+            resultsContainer.innerHTML = html;
+            resultsContainer.classList.add('active');
+        });
     }
 
     if (searchForm) {
@@ -727,16 +792,21 @@
         searchInputField.addEventListener('input', function() {
             var q = this.value.trim();
             clearTimeout(searchTimeout);
-            if (!q) { showRecentSearchSuggestions(''); return; }
-            showRecentSearchSuggestions(q);
-            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, 120);
+            if (!q) {
+                showDiscoveryPanel('');
+                return;
+            }
+            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, SEARCH_DEBOUNCE_MS);
         });
 
         searchInputField.addEventListener('focus', function() {
             var q = this.value.trim();
-            if (!q) { showRecentSearchSuggestions(''); return; }
-            showRecentSearchSuggestions(q);
-            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, 60);
+            clearTimeout(searchTimeout);
+            if (!q) {
+                showDiscoveryPanel('');
+                return;
+            }
+            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, SEARCH_DEBOUNCE_MS);
         });
 
         var resultsEl = document.querySelector('#searchResults');
@@ -773,7 +843,6 @@
         .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
         .then(function(data) {
             if (data.success) {
-                if (query && query.trim()) saveRecentSearchTerm(query);
                 displaySearchResults(data.results, query);
             }
             else if (resEl) { resEl.innerHTML = '<div class="glass-search-no-results">' + (data.message || 'No results') + '</div>'; resEl.classList.add('active'); }
@@ -803,16 +872,14 @@
             var msg = (query && query.length > 0) ? 'No results for "' + escapeHtml(query) + '". Try different keywords or check spelling.' : 'Type to search products, categories, brands, pages...';
             var didYouMean = (results && results.did_you_mean && results.did_you_mean.length > 0);
             if (didYouMean) {
-                var productsUrl = (searchForm && searchForm.action) ? searchForm.action : (window.location.origin + '/products');
-                if (productsUrl.indexOf('?') !== -1) productsUrl = productsUrl.split('?')[0];
+                var productsUrl = productsSearchBaseUrl();
                 msg += '<div class="glass-search-did-you-mean mt-2 pt-2" style="border-top:1px solid rgba(0,0,0,0.06);"><strong>Did you mean?</strong> ';
                 results.did_you_mean.forEach(function(s) {
                     msg += '<a href="' + productsUrl + '?search=' + encodeURIComponent(s) + '" class="d-inline-block me-2 mt-1" style="color:var(--theme-color,#4fc4f7);">' + escapeHtml(s) + '</a>';
                 });
                 msg += '</div>';
             }
-            resultsContainer.innerHTML = '<div class="glass-search-no-results">' + msg + '</div>';
-            resultsContainer.classList.add('active');
+            finalizeSearchPanel('<div class="glass-search-no-results">' + msg + '</div>');
             return;
         }
 
@@ -865,8 +932,7 @@
             });
         }
 
-        resultsContainer.innerHTML = html;
-        resultsContainer.classList.add('active');
+        finalizeSearchPanel(html);
     }
 
     function escapeHtml(str) {
@@ -972,7 +1038,7 @@
                 e.preventDefault();
                 const target = document.querySelector(href);
                 if (target) {
-                    const headerHeight = header ? header.offsetHeight : 60;
+                    const headerHeight = header ? header.offsetHeight : 72;
                     const targetPosition = target.offsetTop - headerHeight;
                     window.scrollTo({
                         top: targetPosition,

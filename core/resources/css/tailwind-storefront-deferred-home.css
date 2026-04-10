@@ -1,0 +1,9 @@
+/*
+ * Homepage-only deferred: omits main-legacy-product + main-legacy-widgets (PDP/account dashboard widgets).
+ */
+@import "./imports/storefront-home-extra-legacy.css";
+@import "../../public/assets/templates/basic/css/main-legacy-shell.css";
+@import "../../public/assets/templates/basic/css/main-legacy-home.css";
+@import "../../public/assets/templates/basic/css/main-legacy-extras.css";
+@import "../../public/assets/templates/basic/css/main-legacy-classic.css";
+@import "../../public/assets/templates/basic/css/all-category.css";

@@ -5,6 +5,11 @@
     }
 @endphp
 @extends($activeTemplate . 'layouts.master')
+
+@push('head-meta')
+    @include('partials.storefront_deferred_bundle', ['bundle' => 'tailwind-storefront-deferred-cart'])
+@endpush
+
 @section('dashboard_page_title')
     @php
         $cartHeaderActions = '<a href="' . e(route('products')) . '" class="btn btn-sm btn-outline-primary">' . view($activeTemplate . 'partials.icon', ['name' => 'shopping-bag', 'class' => 'me-1'])->render() . e(__('Continue Shopping')) . '</a>';

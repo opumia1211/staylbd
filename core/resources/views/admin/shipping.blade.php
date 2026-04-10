@@ -262,18 +262,9 @@
 @endpush
 
 @push('style')
-    <style>
-        #cuModal { z-index: 10600 !important; position: fixed !important; }
-        #cuModal .modal-dialog { z-index: 10602 !important; }
-        body.modal-open .modal-backdrop { z-index: 10598 !important; }
-        .shipping-hub-icon { min-width: 56px; text-align: center; }
-        .hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
-        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1) !important; }
-        .shipping-hub-icon.bg--primary.bg-opacity-10 { background: rgba(13, 110, 253, 0.12); }
-        .shipping-hub-icon.bg--info.bg-opacity-10 { background: rgba(23, 162, 184, 0.12); }
-        .shipping-hub-icon.bg--primary.bg-opacity-25 { background: rgba(13, 110, 253, 0.2); }
-        .card.bg--primary.bg-opacity-5 { background: rgba(13, 110, 253, 0.06); }
-    </style>
+    
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script-lib')

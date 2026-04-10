@@ -7,7 +7,7 @@
     $disableLegacyVisualLibs = $disableLegacyVisualLibs ?? true;
     $disableLegacyLightbox = $disableLegacyLightbox ?? true;
     $disableLegacyWow = $disableLegacyWow ?? true;
-    $disableLegacyCarouselJs = $disableLegacyCarouselJs ?? false;
+    $disableLegacyCarouselJs = $disableLegacyCarouselJs ?? true;
     $disableLegacyOwl = $disableLegacyOwl ?? true;
 @endphp
 <!doctype html>
@@ -44,20 +44,20 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     {{-- Short HTML cache speeds repeat views; assets use ?v= + long Cache-Control on serve-css --}}
     <meta http-equiv="Cache-Control" content="private, max-age=120, must-revalidate">
-    {{-- Fonts: Inter only (rsms.me). Blocking stylesheet + preload so text renders with intended face immediately; Tailwind = serve-css/tailwind-storefront only. --}}
-    <link rel="preconnect" href="https://rsms.me/" crossorigin>
-    <link rel="preload" href="https://rsms.me/inter/inter.css" as="style" crossorigin>
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" crossorigin>
-    {{-- Icon fonts: non-blocking (first paint uses Inter + tailwind-storefront only; icons apply right after load) --}}
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://maxst.icons8.com">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" as="style" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" media="print" onload="this.media='all'" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
-    <link rel="preload" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" as="style" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" media="print" onload="this.media='all'" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <noscript><link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
-    <link rel="stylesheet" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}" crossorigin="anonymous">
+    {{-- Critical CSS: Inter subset + icons + core template + Tailwind. Deferred legacy CSS loads async below. asset() respects ASSET_URL (CDN). --}}
+    @php
+        $storefrontCssBundle = $storefrontCssBundle ?? 'tailwind-product';
+        $storefrontCssHref = storefront_compiled_stylesheet_url($storefrontCssBundle);
+        $storefrontDeferredBundle = $storefrontDeferredBundle ?? 'tailwind-storefront-deferred';
+        $storefrontDeferredHref = storefront_compiled_stylesheet_url($storefrontDeferredBundle);
+    @endphp
+    @include('partials.inter-font-preload', ['assetVersion' => $assetVersion])
+    <link rel="preload" href="{{ $storefrontCssHref }}" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ $storefrontCssHref }}" crossorigin="anonymous">
+    {{-- Non-critical CSS: carousels, lightbox, account/dashboard, compare, etc. — async to improve LCP --}}
+    <link rel="preload" href="{{ $storefrontDeferredHref }}" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ $storefrontDeferredHref }}" media="print" onload="this.media='all'" crossorigin="anonymous">
+    <noscript><link rel="stylesheet" href="{{ $storefrontDeferredHref }}" crossorigin="anonymous"></noscript>
     @stack('head-meta')
     <title>{{ $general->siteName(__($pageTitle ?? 'Home')) }}</title>
     @include('partials.seo')
@@ -79,402 +79,21 @@
         @endif
     @endif
 
-    <!-- Instant load - hide preloader; versioned footer bg; UI from admin ui_settings -->
-    <style>
-        .preloader{display:none!important;visibility:hidden!important;opacity:0!important}
-        body.overflow-hidden{overflow-x:hidden!important;overflow-y:auto!important}
-        body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;overflow-x:hidden;max-width:100%;font-size:clamp(.875rem,1vw,1.125rem);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-        html{font-size:16px;overflow-x:hidden;max-width:100%;scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-        @media (max-width: 991.98px){
-            main{padding-bottom:80px!important}
-            /* main.css .overlay is also z-index 9999 and comes after the nav in DOM — steals taps on small screens */
-            .overlay:not(.active){pointer-events:none!important}
-        }
-        /* নিচের মেনু নতুন ট্যাব: ক্লাস html-এ (mb কুয়েরি replaceState-এ সরানোর পরও শেল থাকে) */
-        html.mobile-tab-shell body{
-            background:linear-gradient(180deg,#e8edf4 0%,#f1f5f9 45%,#eef2f7 100%)!important;
-        }
-        html.mobile-tab-shell main .main-container{
-            background:#fff;
-            border-radius:14px 14px 0 0;
-            box-shadow:0 -4px 24px rgba(15,23,42,.07);
-            padding-top:12px;
-            padding-bottom:12px;
-            min-height:45vh;
-        }
-        @media (min-width:992px){
-            html.mobile-tab-shell main .main-container{
-                border-radius:14px;
-                margin-top:12px;
-                margin-bottom:28px;
-                max-width:min(1180px,calc(100vw - 32px));
-                box-shadow:0 8px 32px rgba(15,23,42,.08);
-            }
-        }
-        @media (max-width:991.98px){
-            html.mobile-tab-shell .main-container{
-                max-width:100%;
-                padding-left:max(10px,env(safe-area-inset-left,0px));
-                padding-right:max(10px,env(safe-area-inset-right,0px));
-            }
-        }
-        /*
-         * Unified public-page shell:
-         * - Desktop/ultrawide: fixed professional max width with light side gaps
-         * - Tablet/mobile: near full-bleed with very small safe gutters
-         */
-        :root{
-            --fluid-space:clamp(8px,1.1vw,24px);
-            --stayl-pad-x:clamp(10px,1.2vw,20px);
-            --stayl-content-max:min(1920px,calc(100vw - 2 * var(--stayl-pad-x)));
-            --stayl-shell-pad-x:var(--stayl-pad-x);
-        }
-        @media (max-width: 991.98px){
-            :root{
-                --stayl-pad-x:clamp(2px,0.75vw,6px);
-                --stayl-content-max:calc(100vw - 2 * var(--stayl-pad-x));
-            }
-        }
-        @media (max-width: 575.98px){
-            :root{
-                --stayl-pad-x:clamp(1px,0.5vw,4px);
-                --stayl-content-max:calc(100vw - 2 * var(--stayl-pad-x));
-            }
-        }
-        .main-container{width:100%;min-width:0;max-width:var(--stayl-content-max);margin-left:auto;margin-right:auto;padding-left:calc(var(--stayl-pad-x) + env(safe-area-inset-left,0px));padding-right:calc(var(--stayl-pad-x) + env(safe-area-inset-right,0px));box-sizing:border-box}
-        .glass-header__shell{width:100%;min-width:0;max-width:var(--stayl-content-max);margin-left:auto;margin-right:auto;padding-left:calc(var(--stayl-pad-x) + env(safe-area-inset-left,0px));padding-right:calc(var(--stayl-pad-x) + env(safe-area-inset-right,0px));box-sizing:border-box}
-        .glass-header__max{width:100%;max-width:100%;min-width:0;margin-left:auto;margin-right:auto;box-sizing:border-box}
-        .main-container svg,.main-container i{max-width:44px;max-height:44px}
-        /* PDP: override cap so qty +/- & action icons are not squeezed / blurred */
-        .pro-detail-page .pdp-cart-action-row .ui-icon,
-        .pro-detail-page .pdp-cart-action-row svg.ui-icon{max-width:18px!important;max-height:18px!important;width:18px!important;height:18px!important;min-width:14px!important;min-height:14px!important}
-        .pro-detail-page .pro-detail-similar-card .ui-icon,
-        .pro-detail-page .pro-detail-similar-card svg{max-width:28px!important;max-height:28px!important}
-        main{min-width:0;max-width:none;width:100%}
-        main [class*="col-"]{min-width:0}
-        .main-container img,.main-container video{max-width:100%;height:auto}
-        .glass-header-wrapper,.glass-header-right,.glass-header-nav{flex-wrap:nowrap!important}
-        .glass-header-right{gap:clamp(4px,0.8vw,10px)!important}
-        .glass-search-result-item{transition:background-color .12s ease,border-color .12s ease}
-        .glass-search-result-item.glass-search-result-focused{background:rgba(15,118,110,.08)!important;border-color:rgba(15,118,110,.28)!important;outline:none}
-        /* Critical above-the-fold: glass header + first product-row action stack */
-        .glass-header{position:fixed;top:0;left:0;right:0;z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:stretch;height:56px;max-height:56px;padding-top:0!important;padding-bottom:0!important;box-sizing:border-box!important;background:rgba(255,255,255,.85);backdrop-filter:blur(25px) saturate(200%);-webkit-backdrop-filter:blur(25px) saturate(200%);border-bottom:1px solid rgba(255,255,255,.2);box-shadow:0 4px 24px rgba(31,38,135,.05)}
-        .glass-header .glass-header__shell{display:flex;align-items:center;flex:1 1 auto;min-height:0;min-width:0;width:100%}
-        .product-card .product-card__actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;z-index:12}
-        .product-card .product-card__action{width:38px;height:38px;min-width:38px;min-height:38px;max-width:38px;max-height:38px;aspect-ratio:1/1;flex:0 0 auto;line-height:0;border-radius:9999px;background:#fff;border:1px solid rgba(0,0,0,.08);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;transition:transform .1s cubic-bezier(0.4,0,0.2,1),background-color .12s ease,box-shadow .12s ease}
-        .product-card .product-card__action.stayl-action-pressed{transform:scale(0.88)}
-        .product-card .product-card__cta{transition:transform .1s cubic-bezier(0.4,0,0.2,1),filter .1s ease,background-color .12s ease}
-        .product-card .product-card__cta.stayl-action-pressed{transform:scale(0.97)}
-        .product-card .product-card__action svg.ui-icon{text-indent:0!important;overflow:visible!important;background:none!important;background-image:none!important;width:1.05rem!important;height:1.05rem!important;min-width:1.05rem!important;min-height:1.05rem!important;display:block!important;margin:0!important}
-        .product-card .product-card__stars-inline{display:inline-flex;align-items:center;gap:1px;color:var(--product-rating-color,#f59e0b)}
-        .product-card__img-wrap--skeleton{background:#f8fafc}
-        .product-card__img-wrap--skeleton .product-card__img{display:block;background:#f8fafc}
-        @media (max-width:575px){.product-card .product-card__action{width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;max-height:40px}.product-card .product-card__actions{right:6px;gap:7px}}
-        /* Product card – 3 lines; নাম স্পষ্ট (ব্লার নয়), স্টক/ডেলিভারি দৃশ্যমান */
-        .product-card__info{--pc-title:36px;--pc-gap:4px;--pc-price:18px;--pc-rating:20px;height:128px;min-height:128px;max-height:128px;display:flex;flex-direction:column;overflow:hidden}
-        .product-card__info-inner{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-rows:var(--pc-title) var(--pc-price) var(--pc-rating);row-gap:var(--pc-gap);padding:5px 6px 2px;align-content:start;align-items:start}
-        .product-card__info-inner .product-card__title{height:var(--pc-title);max-height:var(--pc-title);overflow:hidden!important;display:block!important;color:#0f172a!important;-webkit-font-smoothing:antialiased}
-        .product-card__title,.product-card__title a{font-size:clamp(.75rem,.9vw,.95rem);color:#0f172a!important}
-        .product-card__info-inner .product-card__row--price,.product-card__info-inner .product-card__row--footer,.product-card__info-inner .product-card__row--reviews{min-height:0;max-height:100%;overflow:hidden;align-self:start}
-        .product-card__row--price{margin-top:0!important}
-        .product-card__row,.product-card__row--oneline{flex-wrap:nowrap!important;overflow:hidden!important;white-space:nowrap}
-        .product-card__info-inner .product-card__row--footer,.product-card__info-inner .product-card__row--reviews{margin-top:0!important}
-        .product-card__stock,.product-card__shipping-badge{font-size:0.65rem;font-weight:500}
-        .product-card__cta,.buy-now-cta{flex:0 0 34px;flex-shrink:0;width:calc(100% - 12px);max-width:320px;margin:6px auto 0}
-        .show-cart-count.is-pulsing,.show-wishlist-count.is-pulsing{animation:badgePulse .32s ease}
-        @keyframes badgePulse{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1)}}
-        :root{
-            --footer-bg-image:url('{{ url("serve-css/img/footer-bg.png") }}?v={{ $assetVersion }}');
-            --product-card-bg:{{ optional($uiSettings)->product_card_bg ?? $general->product_card_color ?? '#ffffff' }};
-            --product-button-color:{{ optional($uiSettings)->product_button_color ?? $general->button_color ?? '#1f2937' }};
-            --product-button-hover:{{ optional($uiSettings)->product_buy_now_hover ?? $general->button_hover_color ?? '#374151' }};
-            --product-buy-now-color:{{ optional($uiSettings)->product_buy_now_color ?? '#0e9f90' }};
-            --product-buy-now-hover:{{ optional($uiSettings)->product_buy_now_hover ?? '#0c8a7d' }};
-            --product-price-color:{{ optional($uiSettings)->product_price_color ?? optional($uiSettings)->product_buy_now_color ?? '#0e9f90' }};
-            --product-rating-color:{{ optional($uiSettings)->rating_color ?? $general->rating_star_color ?? '#f59e0b' }};
-            --product-discount-badge:{{ optional($uiSettings)->discount_badge_color ?? $general->discount_badge_color ?? '#dc2626' }};
-            --product-stock-color:{{ optional($uiSettings)->stock_color ?? '#16a34a' }};
-            --product-shipping-color:{{ optional($uiSettings)->shipping_badge_color ?? '#2563eb' }};
-            @if(!empty(optional($uiSettings)->header_bg))--header-bg:{{ optional($uiSettings)->header_bg }};@endif
-            @if(!empty(optional($uiSettings)->footer_bg))--footer-bg-color:{{ optional($uiSettings)->footer_bg }};@endif
-        }
-        @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default')
-        body[data-theme="{{ optional($uiSettings)->theme_template }}"] { }
-        @endif
-    </style>
+    {{-- Early critical CSS: resources/css/critical-storefront-head.css (appended to tailwind-homepage / tailwind-product at build). Admin UI vars below. --}}
+    @include('partials.storefront_ui_variables')
 
-    {{-- tailwind-storefront linked once above (line ~37); duplicate link removed — halves CSS download/parse on every page --}}
+      {{-- tailwind-homepage (/) or tailwind-product (most routes): Inter + icons + template + Tailwind. Stack only page-specific overrides. --}}
 
     @stack('style-lib')
 
     @stack('style')
 
-    <style>
-        /* Minimal premium product card (Apple-style) */
-        .product-card {
-            font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
-            background: #FFFFFF !important;
-            border: 0 !important;
-            border-radius: 0.75rem !important; /* rounded-xl */
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.05) !important; /* shadow-sm/md */
-            overflow: hidden !important;
-        }
-        .product-card,
-        .product-card-col,
-        .product-card-col--home,
-        .product-carousel__item,
-        .product-card .product-card__img-wrap,
-        .product-card .product-card__img-link,
-        .product-card .product-card__info,
-        .product-card .product-card__info-inner {
-            background: #FFFFFF !important;
-            border: 0 !important;
-            box-shadow: none !important;
-            outline: 0 !important;
-        }
-        .product-card .product-card__img-wrap::before,
-        .product-card .product-card__img-wrap::after,
-        .product-card .product-card__info::before,
-        .product-card .product-card__info::after {
-            content: none !important;
-            display: none !important;
-        }
-
-        /* Image area */
-        .product-card .product-card__img-wrap {
-            position: relative !important;
-            height: 16rem !important; /* h-64 */
-            min-height: 16rem !important;
-            max-height: 16rem !important;
-            padding: 0.5rem !important;
-            margin: 0 !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            border-radius: 0.75rem 0.75rem 0 0 !important;
-        }
-        .product-card .product-card__img-link {
-            position: absolute !important;
-            inset: 0.5rem !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-        .product-card .product-card__img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain !important;
-            object-position: center !important;
-            aspect-ratio: 1 / 1 !important;
-            transform: scale(1.06) !important;
-        }
-
-        /* Badge */
-        .product-card .product-card__badges-top {
-            top: 0.5rem !important;
-            left: 0.5rem !important;
-            gap: 0.35rem !important;
-            transform: none !important;
-            max-width: calc(100% - 1rem) !important;
-        }
-        .product-card .product-card__badge {
-            font-size: 0.75rem !important; /* text-xs */
-            line-height: 1 !important;
-            padding: 0.25rem 0.5rem !important; /* px-2 py-1 */
-            border-radius: 0.375rem !important; /* rounded-md */
-            font-weight: 600 !important;
-            text-transform: none !important;
-            letter-spacing: 0 !important;
-            box-shadow: none !important;
-        }
-        .product-card .product-card__badge--discount-banner { background: #fee2e2 !important; color: #991b1b !important; }
-        .product-card .product-card__badge--custom { background: #dbeafe !important; color: #1e3a8a !important; }
-        .product-card .product-card__badge--new { background: #e0f2fe !important; color: #075985 !important; }
-        .product-card .product-card__badge--best { background: #fef3c7 !important; color: #92400e !important; }
-
-        /* Content area */
-        .product-card .product-card__info {
-            margin-top: 0.25rem !important;
-            padding: 0 0.625rem 0.04rem !important;
-            border-top: 0 !important;
-            min-height: 0 !important;
-            height: auto !important;
-            max-height: none !important;
-        }
-        .product-card .product-card__info-inner {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 0.2rem !important; /* equal gap for line 1-2-3 */
-            padding: 0 !important;
-        }
-        .product-card .product-card__title { order: 1 !important; }
-        .product-card .product-card__row--price { order: 2 !important; }
-        .product-card .product-card__row--reviews { order: 3 !important; }
-        .product-card .product-card__title,
-        .product-card .product-card__title a {
-            margin: 0 !important;
-            font-size: 0.78rem !important;
-            font-weight: 600 !important;   /* font-semibold */
-            line-height: 1.15 !important;
-            color: #1f2937 !important;      /* text-gray-800 */
-            display: block !important;
-            -webkit-line-clamp: 1 !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            white-space: nowrap !important;
-        }
-        .product-card .product-card__title {
-            min-height: 0 !important;
-            height: auto !important;
-            max-height: none !important;
-            padding: 0 !important;
-            margin-bottom: 0 !important;
-        }
-        .product-card .product-card__price {
-            font-size: 0.96rem !important;
-            font-weight: 700 !important;    /* font-bold */
-            color: #000000 !important;
-        }
-        .product-card .product-card__price-old {
-            font-size: 0.7rem !important;
-            color: #9ca3af !important;      /* text-gray-400 */
-            text-decoration: line-through !important;
-        }
-        .product-card .product-card__discount-once {
-            font-size: 0.75rem !important;
-            color: #b91c1c !important;
-            background: transparent !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
-        }
-        .product-card .product-card__row--price,
-        .product-card .product-card__row--reviews {
-            margin: 0 !important;
-            padding: 0 !important;
-            min-height: 0 !important;
-            max-height: none !important;
-            overflow: hidden !important;
-            border: 0 !important;
-            line-height: 1.05 !important;
-        }
-        .product-card .product-card__row--price { gap: 0.24rem !important; }
-        .product-card .product-card__row--reviews { gap: 0.2rem !important; }
-        .product-card .product-card__row--reviews .product-card__stock {
-            font-size: 0.68rem !important;  /* compact text-xs */
-            color: #16a34a !important;      /* text-green-600 */
-            font-weight: 600 !important;
-            background: transparent !important;
-            padding: 0 !important;
-            margin-left: 0 !important;
-        }
-        .product-card .product-card__row--reviews .product-card__reviews-count,
-        .product-card .product-card__stars {
-            font-size: 0.64rem !important;
-        }
-        .product-card .product-card__row--reviews .product-card__shipping-badge,
-        .product-card .free-delivery-badge,
-        .product-card .product-card__sep--delivery {
-            display: none !important;
-        }
-
-        /* CTA */
-        .product-card .product-card__cta.product-card__cta--cart {
-            order: 4 !important;
-            margin-top: 0.2rem !important; /* same visual gap after line 3 */
-            margin-bottom: 0 !important;
-            width: 100% !important;
-            border: 0 !important;
-            border-radius: 0.5rem !important; /* rounded-lg */
-            padding-top: 0.32rem !important;
-            padding-bottom: 0.32rem !important;
-            min-height: 0 !important;
-            height: auto !important;
-            line-height: 1.25 !important;
-            background: #16a34a !important;    /* bg-green-600 */
-            color: #ffffff !important;
-            font-size: 1rem !important;
-            font-weight: 800 !important;
-            letter-spacing: 0.01em !important;
-            box-shadow: none !important;
-            text-rendering: geometricPrecision !important;
-            -webkit-font-smoothing: antialiased !important;
-            -moz-osx-font-smoothing: grayscale !important;
-            gap: 0.42rem !important;
-        }
-        .product-card .product-card__cta.product-card__cta--cart .product-card__cta-label {
-            font-size: 1rem !important;
-            line-height: 1 !important;
-            font-weight: 800 !important;
-            color: #fff !important;
-            display: inline-block !important;
-        }
-        .product-card .product-card__cta .buy-now-cta__icon {
-            width: 1rem !important;
-            height: 1rem !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            flex: 0 0 1rem !important;
-        }
-        .product-card .product-card__cta .buy-now-cta__icon .ui-icon,
-        .product-card .product-card__cta .buy-now-cta__icon svg {
-            width: 1rem !important;
-            height: 1rem !important;
-            stroke-width: 2.2 !important;
-        }
-        .product-card .product-card__cta .buy-now-cta__icon .buy-now-cta__icon-img {
-            width: 1rem !important;
-            height: 1rem !important;
-            object-fit: contain !important;
-            display: block !important;
-        }
-        .product-card .product-card__cta.product-card__cta--cart:hover {
-            background: #15803d !important;    /* bg-green-700 */
-        }
-
-        /* Fly-to-header animation visuals */
-        .fly-to-header-clone {
-            position: fixed;
-            width: 60px;
-            height: 60px;
-            border-radius: 999px;
-            overflow: hidden;
-            z-index: 100200;
-            pointer-events: none;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-            background: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .fly-to-header-clone img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .header-icon-bounce {
-            animation: headerIconBounce .28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .counter-updated {
-            animation: headerCountPop .26s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes headerIconBounce {
-            0% { transform: scale(1); }
-            55% { transform: scale(1.14); }
-            100% { transform: scale(1); }
-        }
-        @keyframes headerCountPop {
-            0% { transform: scale(1); }
-            55% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ storefront_compiled_stylesheet_url('critical-storefront') }}" crossorigin="anonymous">
 
     @include('partials.tracking_scripts')
 </head>
 
-<body class="overflow-hidden font-sans antialiased" @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default') data-theme="{{ $uiSettings->theme_template }}" @endif>
+<body class="overflow-hidden font-sans antialiased" @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default') data-theme="{{ $uiSettings->theme_template }}" @endif @stack('body_attrs')>
     <!-- Preloader removed for instant page loads -->
     @yield('app')
     @include($activeTemplate . 'partials.mobile_bottom_nav')
@@ -516,6 +135,14 @@
     @elseif(empty($disableLegacyOwl))
     <script src="{{ asset($activeTemplateTrue . 'js/owl.min.js') }}?v={{ $assetVersion }}"></script>
     @endif
+    @php
+        try {
+            $staylLucideJs = mix('js/storefront-lucide.js');
+        } catch (\Throwable $e) {
+            $staylLucideJs = asset('js/storefront-lucide.js');
+        }
+    @endphp
+    <script src="{{ $staylLucideJs }}?v={{ $assetVersion }}" defer></script>
     {{-- Fly To Header & Product Carousel – defer for fast TTI --}}
     <script src="{{ url('serve-js/fly-to-header') }}?v={{ $assetVersion }}" defer></script>
     <script src="{{ url('serve-js/glass-header') }}?v={{ $assetVersion }}" defer></script>
@@ -594,6 +221,7 @@
 
         function bindCycle(card) {
             if (!card || initializedCards.has(card)) return;
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
             var galleryStr = card.getAttribute('data-gallery');
             if (!galleryStr) return;
@@ -602,7 +230,7 @@
             try { urls = JSON.parse(galleryStr); } catch (e) { return; }
             if (!Array.isArray(urls) || urls.length < 2) return;
 
-            var img = card.querySelector('.product-card__img--cycle');
+            var img = card.querySelector('.product-card-glass__cycle-img') || card.querySelector('.product-card__img--cycle');
             if (!img) return;
 
             initializedCards.add(card);
@@ -852,6 +480,7 @@
             }
         })();
     </script>
+    @include('partials.storefront_echo')
 </body>
 
 </html>

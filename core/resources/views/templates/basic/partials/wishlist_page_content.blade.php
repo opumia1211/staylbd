@@ -46,6 +46,10 @@
                             @php
                                 $price = productPrice($product);
                                 $stockQty = $product->has_variants && $product->activeVariants->isNotEmpty() ? $product->activeVariants->sum('quantity') : ($product->quantity ?? 0);
+                                $lowStockMax = (int) config('product_upload.low_stock_max', 20);
+                                $stockTier = $stockQty > $lowStockMax ? 'in' : ($stockQty >= 1 ? 'low' : 'out');
+                                $stockLabel = $stockTier === 'in' ? __('In Stock') : ($stockTier === 'low' ? __('Low Stock') : __('Out of Stock'));
+                                $canPurchase = $stockQty > 0;
                                 $isBest = $minPrice !== null && $count > 1 && abs($price - $minPrice) < 0.001;
                             @endphp
                             <tr class="dashboard-compact-row product-list-row wishlist-row" data-product-id="{{ $product->id }}">
@@ -61,10 +65,10 @@
                                 <td class="py-2 align-middle small text-muted">{{ __($product->category->name ?? '—') }}</td>
                                 <td class="py-2 align-middle small text-muted">{{ __($product->brand->name ?? '—') }}</td>
                                 <td class="py-2 align-middle">
-                                    <span class="badge {{ $stockQty > 0 ? 'bg-success' : 'bg-danger' }} wishlist-stock-badge">{{ $stockQty > 0 ? __('In Stock') : __('Out of Stock') }}</span>
+                                    <span class="badge wishlist-stock-badge staylbd-rt-stock {{ $stockTier === 'in' ? 'bg-success' : ($stockTier === 'low' ? 'bg-warning text-dark' : 'bg-danger') }}" data-stock-tier="{{ $stockTier }}">{{ $stockLabel }}</span>
                                 </td>
                                 <td class="py-2 text-end align-middle text--base fw-semibold wishlist-price-cell">
-                                    {{ $general->cur_sym }}{{ showAmount($price) }}
+                                    <span class="staylbd-rt-price">{{ $general->cur_sym }}{{ showAmount($price) }}</span>
                                     @if($isBest)<span class="badge bg-success ms-1 wishlist-best-badge">@lang('Best value')</span>@endif
                                 </td>
                                 <td class="py-2 text-center align-middle">
@@ -74,7 +78,7 @@
                                 <td class="py-2 pe-2 align-middle product-list-td-action">
                                     <div class="action-buttons product-list-row__action-btns d-flex flex-wrap gap-2 justify-content-end">
                                         <a href="{{ product_detail_url($product) }}" class="btn btn-primary list-page-action-btn wishlist-desktop-view-btn" title="@lang('View')" data-no-ajax>@lang('View')</a>
-                                        <button type="button" class="btn btn-success list-page-action-btn add-to-cart" data-product_id="{{ $product->id }}" title="@lang('Add to Cart')">@lang('Add to Cart')</button>
+                                        <button type="button" class="btn btn-success list-page-action-btn add-to-cart staylbd-rt-atc" data-product_id="{{ $product->id }}" title="@lang('Add to Cart')" @if(!$canPurchase) disabled aria-disabled="true" @endif>@lang('Add to Cart')</button>
                                         <span class="btn btn-warning list-page-action-btn disabled" aria-label="@lang('In Wishlist')">@lang('In Wishlist')</span>
                                         <button type="button" class="btn btn-danger list-page-action-btn wishlist-delete-btn" data-product_id="{{ $product->id }}" title="@lang('Remove')">@lang('Remove')</button>
                                     </div>
@@ -92,6 +96,10 @@
                 @php
                     $price = productPrice($product);
                     $stockQty = $product->has_variants && $product->activeVariants->isNotEmpty() ? $product->activeVariants->sum('quantity') : ($product->quantity ?? 0);
+                    $lowStockMax = (int) config('product_upload.low_stock_max', 20);
+                    $stockTier = $stockQty > $lowStockMax ? 'in' : ($stockQty >= 1 ? 'low' : 'out');
+                    $stockLabel = $stockTier === 'in' ? __('In Stock') : ($stockTier === 'low' ? __('Low Stock') : __('Out of Stock'));
+                    $canPurchase = $stockQty > 0;
                     $isBest = $minPrice !== null && $count > 1 && abs($price - $minPrice) < 0.001;
                 @endphp
                 <div class="wishlist-mobile-card card border-0 shadow-sm rounded-3 overflow-hidden wishlist-row" data-product-id="{{ $product->id }}">
@@ -106,17 +114,17 @@
                                     @if(!empty($product->product_sku))<span>@lang('SKU'): {{ $product->product_sku }}</span>@endif
                                     @if(!empty($product->category))<span>@lang('Category'): {{ __($product->category->name ?? '') }}</span>@endif
                                     @if(!empty($product->brand))<span>@lang('Brand'): {{ __($product->brand->name ?? '') }}</span>@endif
-                                    <span class="badge {{ $stockQty > 0 ? 'bg-success' : 'bg-danger' }}">{{ $stockQty > 0 ? __('In Stock') : __('Out of Stock') }}</span>
+                                    <span class="badge staylbd-rt-stock {{ $stockTier === 'in' ? 'bg-success' : ($stockTier === 'low' ? 'bg-warning text-dark' : 'bg-danger') }}" data-stock-tier="{{ $stockTier }}">{{ $stockLabel }}</span>
                                     @if($isBest)<span class="badge bg-success wishlist-mobile-card__best-badge">@lang('Best value')</span>@endif
                                 </div>
                                 <div class="wishlist-mobile-card__price-row d-flex align-items-center flex-wrap gap-2">
-                                    <span class="wishlist-mobile-card__price fw-bold text-success">{{ $general->cur_sym }}{{ showAmount($price) }}</span>
+                                    <span class="wishlist-mobile-card__price staylbd-rt-price fw-bold text-success">{{ $general->cur_sym }}{{ showAmount($price) }}</span>
                                     <span class="ratings d-inline-block">{!! showProductRatings($product->avg_rate ?? 0) !!}</span>
                                     <span class="small text-muted">({{ $product->reviews_count ?? ($product->reviews->count() ?? 0) }})</span>
                                 </div>
                                 <div class="wishlist-mobile-card__actions action-buttons d-flex flex-wrap gap-2">
                                     <a href="{{ product_detail_url($product) }}" class="btn btn-primary list-page-action-btn" data-no-ajax>@lang('View')</a>
-                                    <button type="button" class="btn btn-success list-page-action-btn add-to-cart" data-product_id="{{ $product->id }}">@lang('Add to Cart')</button>
+                                    <button type="button" class="btn btn-success list-page-action-btn add-to-cart staylbd-rt-atc" data-product_id="{{ $product->id }}" @if(!$canPurchase) disabled aria-disabled="true" @endif>@lang('Add to Cart')</button>
                                     <span class="btn btn-warning list-page-action-btn disabled">@lang('In Wishlist')</span>
                                     <button type="button" class="btn btn-danger list-page-action-btn wishlist-delete-btn" data-product_id="{{ $product->id }}">@lang('Remove')</button>
                                 </div>

@@ -169,83 +169,9 @@
 @endsection
 
 @push('style')
-<style>
-.register-compact .card-header { min-height: auto; }
-.register-compact .card-body { font-size: 0.8rem; }
-/* Fixed grid: no overlap, no jump - same column count everywhere */
-.reg-fields-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px 10px;
-}
-@media (max-width: 991px) {
-    .reg-fields-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 576px) {
-    .reg-fields-grid { grid-template-columns: repeat(2, 1fr); }
-}
-.reg-field-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0;
-    padding: 5px 8px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    background: #fff;
-    cursor: pointer;
-    min-height: 28px;
-    transition: background .1s ease;
-}
-.reg-field-item:hover { background: #f8f9fa; }
-.reg-field-item .form-check-input { flex-shrink: 0; width: 14px; height: 14px; margin: 0; }
-.reg-field-item .reg-field-label {
-    font-size: 0.7rem;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-}
-.register-preview-wrapper { position: relative; z-index: 5; }
-.register-preview-card { position: sticky; top: 70px; z-index: 10; }
-@media (max-width: 991.98px) { .register-preview-card { position: relative; top: 0; } }
-/* প্রিভিউতে লেখা স্পষ্ট দেখাতে - গাঢ় রঙ */
-.register-preview-box .preview-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #1a1a1a !important;
-    display: block;
-    margin-bottom: 2px;
-}
-.register-preview-box .preview-input,
-.register-preview-box .preview-input-sm {
-    font-size: 0.75rem;
-    min-height: 24px;
-    padding: 2px 8px;
-    background: #e9ecef !important;
-    border: 1px solid #adb5bd !important;
-    border-radius: 4px;
-    color: #212529 !important;
-    cursor: default;
-    pointer-events: none;
-}
-.register-preview-box .preview-input-sm { min-height: 20px; font-size: 0.7rem; }
-.register-preview-box .preview-captcha {
-    font-size: 0.7rem;
-    padding: 4px 8px;
-    background: #e9ecef !important;
-    border: 1px solid #adb5bd !important;
-    border-radius: 4px;
-    color: #212529 !important;
-}
-.register-preview-box .preview-checkbox-text { color: #212529 !important; font-size: 0.75rem; }
-.register-preview-box .preview-register-btn { color: #fff !important; }
-.card-header[data-bs-toggle="collapse"] { cursor: pointer; }
-.card-header[data-bs-toggle="collapse"] .collapse-icon { transition: transform .2s; }
-.card-header[data-bs-toggle="collapse"][aria-expanded="true"] .collapse-icon { transform: rotate(180deg); }
-.card { overflow: visible; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

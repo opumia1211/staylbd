@@ -309,79 +309,9 @@
 @endsection
 
 @push('style')
-<style>
-/* Checkout: professional layout, no cache (handled by controller headers) */
-.checkout-section { overflow-x: hidden; width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
-.checkout-container { max-width: var(--stayl-content-max, min(1920px, calc(100vw - 20px))); margin: 0 auto; width: 100%; box-sizing: border-box; padding-left: 12px; padding-right: 12px; }
-.checkout-container .row > [class*="col-"] { min-width: 0; }
-.checkout-trust-bar { background: #fff; border: 1px solid #eee; }
-.checkout-trust-pill { font-size: 0.75rem; color: #555; white-space: nowrap; }
-.checkout-trust-pill i { margin-right: 2px; }
-.checkout-card { border-radius: 12px; min-height: 0; }
-.checkout-card-header { background: #f8f9fa; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.checkout-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--base, #6366f1); color: #fff; font-size: 0.7rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.checkout-card-body { min-height: 0; overflow-wrap: break-word; word-wrap: break-word; overflow-x: hidden; }
-.checkout-section .form-control, .checkout-section .form-select { max-width: 100%; box-sizing: border-box; }
-/* Billing & Delivery: grouped, compact, same page size */
-.checkout-form-groups { display: flex; flex-direction: column; gap: 0.5rem; }
-.checkout-group { background: rgba(0,0,0,.02); border-radius: 8px; padding: 0.4rem 0.5rem; border: 1px solid rgba(0,0,0,.06); }
-.checkout-group-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; color: #555; margin-bottom: 0.35rem; padding-bottom: 0.2rem; border-bottom: 1px solid rgba(0,0,0,.06); display: flex; align-items: center; }
-.checkout-group-label i { opacity: 0.8; }
-.checkout-label { font-size: 0.75rem; margin-bottom: 0.15rem; font-weight: 500; color: #444; }
-.checkout-input,
-.checkout-section .checkout-card-body .form-control,
-.checkout-section .checkout-card-body .form-select,
-.checkout-section .checkout-card-body .form-control-sm,
-.checkout-section .checkout-card-body .form-select-sm { font-size: 0.8rem !important; padding: 0.22rem 0.4rem !important; min-height: 26px !important; height: auto !important; line-height: 1.3; border-radius: 6px; border-color: rgba(0,0,0,.12); transition: border-color .15s, box-shadow .15s; }
-.checkout-section .checkout-card-body .form-control:focus,
-.checkout-section .checkout-card-body .form-select:focus { border-color: var(--base, #6366f1); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15); outline: 0; }
-.checkout-section .checkout-card-body select.form-select,
-.checkout-section .checkout-card-body select.form-select-sm { padding-top: 0.2rem; padding-bottom: 0.2rem; }
-.checkout-section .checkout-card-body .form-control::placeholder { font-size: 0.75rem; color: #999; }
-.checkout-title { font-size: 1rem; }
-.checkout-hint { font-size: 0.75rem; }
-.checkout-card-title { font-size: 0.9rem; }
-.checkout-card-body .row.g-1 .col-12 { margin-bottom: 0.1rem; }
-.checkout-card-body .row.g-1 .col-12:last-child { margin-bottom: 0; }
-.checkout-save-address { margin-top: 0.15rem; }
-.checkout-save-address .form-check-label { font-weight: 400; }
-.checkout-shipping-display { background: rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,.08); color: #333; }
-.checkout-shipping-charge { font-size: 0.8rem; font-weight: 600; color: var(--base, #6366f1); }
-.checkout-shipping-days { font-size: 0.75rem; white-space: nowrap; }
-.checkout-delivery-charge-label { font-size: 0.75rem; }
-.checkout-thumb { width: 40px; height: 40px; background: #f0f0f0; flex-shrink: 0; }
-.checkout-product-row { max-width: 100%; min-width: 0; }
-.checkout-product-row .flex-grow-1 { min-width: 0; }
-.checkout-products .text-truncate { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.payment-methods .payment-option-card .min-w-0 { min-width: 0; overflow: hidden; }
-.payment-option-card { cursor: pointer; transition: border-color .15s, background .15s; min-width: 0; }
-.payment-option-card:hover, .payment-option-card:has(input:checked) { border-color: var(--base, #6366f1) !important; background: rgba(99, 102, 241, 0.06); }
-.btn-place-order { font-weight: 600; border-radius: 8px; }
-/* Tablet (768px - 991px) */
-@media (max-width: 991px) {
-    .checkout-section { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
-    .sticky-top { position: relative !important; }
-    .checkout-container { padding-left: 15px; padding-right: 15px; }
-    .checkout-container .row.align-items-stretch .col-lg-5, .checkout-container .row.align-items-stretch .col-lg-7 { align-self: stretch; }
-}
-/* Mobile (< 768px) */
-@media (max-width: 767px) {
-    .checkout-section { padding-top: 1rem !important; padding-bottom: 1rem !important; }
-    .checkout-container { padding-left: 10px; padding-right: 10px; max-width: 100%; }
-    .checkout-header h5 { font-size: 1.1rem; }
-    .checkout-trust-bar { gap: 6px; padding: 8px 10px !important; }
-    .checkout-trust-pill { font-size: 0.7rem; }
-    .checkout-card-header { padding: 10px 12px !important; }
-    .checkout-card-body { padding: 12px !important; }
-    .checkout-section .col-4 { flex: 0 0 33.333%; max-width: 33.333%; }
-    .btn-place-order { padding: 10px 16px; font-size: 0.95rem; }
-}
-/* Small mobile (< 576px) */
-@media (max-width: 575px) {
-    .checkout-section .col-4 { flex: 0 0 100%; max-width: 100%; }
-    .checkout-section .col-6 { flex: 0 0 100%; max-width: 100%; }
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @push('script')

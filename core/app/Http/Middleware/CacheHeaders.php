@@ -54,10 +54,10 @@ class CacheHeaders
     }
 
     /**
-     * Professional e-commerce: minimal cache.
-     * - HTML pages: no cache (fresh products, prices, stock). User always sees latest.
-     * - Static assets: max 60 seconds so updates (e.g. fly-to-header.js) load quickly.
-     * - Everything else: no cache.
+     * E-commerce cache policy (bust static via ?v= / APP_VERSION).
+     * - Authenticated / admin / api / checkout paths: no cache.
+     * - Public HTML (guest): short max-age + must-revalidate (default 15s).
+     * - Versioned static files: long max-age.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -78,8 +78,8 @@ class CacheHeaders
             if ($request->hasCookie($sessionCookie) || auth()->check() || auth()->guard('admin')->check()) {
                 return $this->addNoCacheHeaders($response);
             }
-            // Public HTML (no auth): short cache for instant repeat load (revalidate for fresh content)
-            return $this->addCacheHeaders($response, 30, false, true);
+            // Public HTML (no auth): short TTL so CMS/product changes show after quick refresh / revalidate
+            return $this->addCacheHeaders($response, 15, false, true);
         }
 
         if ($request->expectsJson() || $request->is('api/*')) {

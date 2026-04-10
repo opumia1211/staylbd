@@ -96,7 +96,9 @@
             var note = @json(__('Store these in a safe place. Each code works only once.'));
             var css = 'body{font:14px/1.45 system-ui,-apple-system,sans-serif;color:#111827;padding:24px;max-width:520px;margin:0 auto;}h1{font-size:15px;margin:0 0 6px;font-weight:600;}p{font-size:12px;color:#6b7280;margin:0 0 14px;}pre{font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:0;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;white-space:pre-wrap;word-break:break-all;}';
             var w = window.open('', '_blank');
-            w.document.write('<html><head><title>' + title + '</title><style>' + css + '</style></head><body><h1>' + h1 + '</h1><p>' + note + '</p><pre>' + (box.innerText || box.textContent || '') + '</pre></body></html>');
+            w.document.write('<html><head><title>' + title + '</title>
+{{-- inline style moved to critical-admin.css --}}
+</head><body><h1>' + h1 + '</h1><p>' + note + '</p><pre>' + (box.innerText || box.textContent || '') + '</pre></body></html>');
             w.document.close();
             w.print();
             w.close();

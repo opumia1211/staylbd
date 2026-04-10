@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\SecurityEvent;
 use App\Models\TrustedAdminDevice;
 use App\Services\TOTPService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -21,10 +22,41 @@ class TwoFactorController extends Controller
     }
 
     /**
+     * When 2FA is globally disabled, complete login from pending session (bookmark / mid-flow toggle).
+     */
+    protected function completeLoginBypassingTwoFactor(Request $request, Admin $admin): RedirectResponse
+    {
+        $remember = $request->session()->get('admin_2fa_remember', false);
+        $request->session()->forget(['admin_2fa_pending_id', 'admin_2fa_remember', 'admin_2fa_setup_secret', 'admin_2fa_setup_admin_id']);
+        Cache::forget('admin_2fa_attempts_' . $admin->id);
+        Cache::forget('admin_2fa_setup_attempts_' . $admin->id);
+        TrustedAdminDevice::markTrusted(
+            $admin->id,
+            $request->userAgent() ?? '',
+            $request->ip(),
+            $request->input('device_fingerprint')
+        );
+        Auth::guard('admin')->login($admin, $remember);
+        $request->session()->put('admin_just_logged_in', true);
+        $request->session()->put('admin_login_at', time());
+
+        return redirect()->intended(route('admin.dashboard'));
+    }
+
+    /**
      * 2FA verify form (after password login, before full auth).
      */
     public function verify(Request $request)
     {
+        if (!config('admin.admin_two_factor_enabled', true)) {
+            $adminId = $request->session()->get('admin_2fa_pending_id');
+            $admin = $adminId ? Admin::find($adminId) : null;
+            if ($admin) {
+                return $this->completeLoginBypassingTwoFactor($request, $admin);
+            }
+            return redirect()->route('admin.login');
+        }
+
         $adminId = $request->session()->get('admin_2fa_pending_id');
         if (!$adminId) {
             return redirect()->route('admin.login');
@@ -44,6 +76,15 @@ class TwoFactorController extends Controller
      */
     public function confirmVerify(Request $request)
     {
+        if (!config('admin.admin_two_factor_enabled', true)) {
+            $adminId = $request->session()->get('admin_2fa_pending_id');
+            $admin = $adminId ? Admin::find($adminId) : null;
+            if ($admin) {
+                return $this->completeLoginBypassingTwoFactor($request, $admin);
+            }
+            return redirect()->route('admin.login');
+        }
+
         $adminId = $request->session()->get('admin_2fa_pending_id');
         if (!$adminId) {
             return redirect()->route('admin.login');
@@ -111,6 +152,15 @@ class TwoFactorController extends Controller
      */
     public function setup(Request $request)
     {
+        if (!config('admin.admin_two_factor_enabled', true)) {
+            $adminId = $request->session()->get('admin_2fa_pending_id');
+            $admin = $adminId ? Admin::find($adminId) : null;
+            if ($admin) {
+                return $this->completeLoginBypassingTwoFactor($request, $admin);
+            }
+            return redirect()->route('admin.login');
+        }
+
         $adminId = $request->session()->get('admin_2fa_pending_id');
         if (!$adminId) {
             return redirect()->route('admin.login');
@@ -150,6 +200,16 @@ class TwoFactorController extends Controller
      */
     public function confirmSetup(Request $request)
     {
+        if (!config('admin.admin_two_factor_enabled', true)) {
+            $adminId = $request->session()->get('admin_2fa_pending_id')
+                ?? $request->session()->get('admin_2fa_setup_admin_id');
+            $admin = $adminId ? Admin::find($adminId) : null;
+            if ($admin) {
+                return $this->completeLoginBypassingTwoFactor($request, $admin);
+            }
+            return redirect()->route('admin.login');
+        }
+
         $adminId = $request->session()->get('admin_2fa_setup_admin_id');
         $encSecret = $request->session()->get('admin_2fa_setup_secret');
         if (!$adminId || !$encSecret) {

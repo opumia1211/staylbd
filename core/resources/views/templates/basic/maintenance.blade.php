@@ -112,47 +112,9 @@
 </section>
 
 @push('style')
-<style>
-.maintenance-wrapper { min-height: 80vh; display: flex; align-items: center; }
-.maintenance-card {
-    background: var(--card-bg, #fff);
-    border-radius: 16px;
-    padding: 3rem 2.5rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,.08);
-    text-align: center;
-}
-.maintenance-icon {
-    width: 80px; height: 80px;
-    margin: 0 auto 1.5rem;
-    background: linear-gradient(135deg, var(--base-color, #6366f1) 0%, #8b5cf6 100%);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-}
-.maintenance-icon i { font-size: 2.5rem; color: #fff; }
-.maintenance-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
-.maintenance-short-desc { color: #6b7280; font-size: 1.05rem; margin-bottom: 1.5rem; }
-.maintenance-description { text-align: left; color: #4b5563; }
-.countdown-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
-    max-width: 400px; margin: 0 auto;
-}
-.countdown-item {
-    background: rgba(var(--base-color-rgb, 99, 102, 241), 0.1);
-    border-radius: 12px; padding: 1rem;
-    text-align: center;
-}
-.countdown-value { display: block; font-size: 1.75rem; font-weight: 700; color: var(--base-color, #6366f1); }
-.countdown-label { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; }
-.progress-wrapper { max-width: 400px; margin: 0 auto; }
-.maintenance-email-form .input-group { max-width: 400px; margin: 0 auto; }
-.contact-link, .social-link { color: var(--base-color, #6366f1); text-decoration: none; }
-.contact-link:hover, .social-link:hover { opacity: 0.8; }
-.social-link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(var(--base-color-rgb, 99, 102, 241), 0.1); font-size: 1.25rem; }
-@media (max-width: 576px) {
-    .countdown-grid { grid-template-columns: repeat(2, 1fr); }
-    .maintenance-card { padding: 2rem 1.5rem; }
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @if($showCountdown && $countdownDatetime)

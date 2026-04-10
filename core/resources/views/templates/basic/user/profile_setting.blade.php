@@ -471,32 +471,9 @@
 </div>
 
 @push('style')
-<style>
-.profile-page .profile-header-card .profile-avatar-wrap { display: inline-block; position: relative; cursor: pointer; }
-.profile-page .profile-avatar-img, .profile-page .profile-avatar-placeholder { object-fit: cover; display: flex; align-items: center; justify-content: center; background: var(--bs-light); color: var(--bs-secondary); border: 2px solid var(--bs-border-color); }
-.profile-page.profile-page--compact .profile-avatar-wrap { width: 40px; height: 40px; }
-.profile-page.profile-page--compact .profile-avatar-img,
-.profile-page.profile-page--compact .profile-avatar-placeholder { width: 40px; height: 40px; font-size: 0.95rem; }
-.profile-page .profile-name { font-size: 0.95rem; }
-.profile-page .profile-username { font-size: 0.8rem; }
-.profile-page .profile-card { border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06) !important; }
-.profile-page .profile-section-title { font-size: 0.85rem; font-weight: 600; }
-.profile-page .profile-card-header { padding-top: 0.4rem; padding-bottom: 0.4rem; }
-.profile-page .profile-card-body { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.profile-page .profile-section { border-left: 3px solid transparent; }
-.profile-page .profile-section:nth-child(1) { border-left-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.35); }
-.profile-page .profile-section:nth-child(2) { border-left-color: rgba(25, 135, 84, 0.35); }
-.profile-page .profile-section:nth-child(3) { border-left-color: rgba(13, 202, 240, 0.35); }
-.profile-page .profile-section:nth-child(4) { border-left-color: rgba(111, 66, 193, 0.35); }
-.profile-page .profile-section:nth-child(5) { border-left-color: rgba(253, 126, 20, 0.35); }
-.profile-page .profile-section:nth-child(6) { border-left-color: rgba(214, 51, 132, 0.35); }
-.profile-page .saved-address-item .btn { font-size: 0.7rem; }
-.profile-page .saved-address-item { padding: 0.4rem 0.5rem !important; }
-.profile-page.profile-page--compact { margin-bottom: 0; padding-bottom: 0; }
-.profile-page .form-label.small { font-size: 0.75rem; }
-.profile-page .form-control-sm { min-height: 28px; font-size: 0.8rem; }
-.profile-page .form-select-sm { min-height: 28px; font-size: 0.8rem; }
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @push('script')

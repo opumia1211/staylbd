@@ -100,6 +100,7 @@ class SecurityDashboardController extends Controller
         $ipWhitelist = AdminIpWhitelist::isEnabled();
         $whitelistCount = AdminIpWhitelist::where('enabled', true)->count();
         $adminCaptcha = config('admin.admin_login_captcha', false);
+        $adminTwoFactor = config('admin.admin_two_factor_enabled', true);
 
         return [
             'app_env'         => $env,
@@ -112,6 +113,7 @@ class SecurityDashboardController extends Controller
             'ip_whitelist'    => $ipWhitelist,
             'whitelist_count' => $whitelistCount,
             'admin_captcha'   => $adminCaptcha,
+            'admin_two_factor' => $adminTwoFactor,
         ];
     }
 
@@ -120,7 +122,11 @@ class SecurityDashboardController extends Controller
         if (!\Illuminate\Support\Facades\Schema::hasTable('security_settings')) {
             return;
         }
-        foreach (['ip_whitelist_enabled' => env('ADMIN_IP_WHITELIST_ENABLED', false), 'admin_login_captcha' => env('ADMIN_LOGIN_CAPTCHA', false)] as $key => $envDefault) {
+        foreach ([
+            'ip_whitelist_enabled' => env('ADMIN_IP_WHITELIST_ENABLED', false),
+            'admin_login_captcha' => env('ADMIN_LOGIN_CAPTCHA', false),
+            'admin_two_factor_enabled' => env('ADMIN_TWO_FACTOR_ENABLED', true),
+        ] as $key => $envDefault) {
             SecuritySetting::firstOrCreate(
                 ['key' => $key],
                 ['value' => filter_var($envDefault, FILTER_VALIDATE_BOOLEAN) ? '1' : '0', 'updated_at' => now()]
@@ -140,12 +146,12 @@ class SecurityDashboardController extends Controller
     }
 
     /**
-     * AJAX: Toggle a security setting (DB-backed: ip_whitelist_enabled, admin_login_captcha).
+     * AJAX: Toggle a security setting (DB-backed: ip_whitelist_enabled, admin_login_captcha, admin_two_factor_enabled).
      * SuperAdmin only.
      */
     public function toggleSetting(Request $request)
     {
-        $request->validate(['key' => 'required|string|in:ip_whitelist_enabled,admin_login_captcha', 'value' => 'required|boolean']);
+        $request->validate(['key' => 'required|string|in:ip_whitelist_enabled,admin_login_captcha,admin_two_factor_enabled', 'value' => 'required|boolean']);
         $key = $request->key;
         $newValue = $request->boolean('value') ? '1' : '0';
 
@@ -153,7 +159,7 @@ class SecurityDashboardController extends Controller
         SecuritySetting::set($key, $newValue);
         SecurityAuditLog::log($key, $old, $newValue);
 
-        if ($key === 'admin_login_captcha') {
+        if ($key === 'admin_login_captcha' || $key === 'admin_two_factor_enabled') {
             SecuritySetting::forgetCache($key);
             try {
                 Artisan::call('config:clear');
@@ -230,14 +236,19 @@ class SecurityDashboardController extends Controller
         if (config('admin.prefix') === 'admin') {
             $recs[] = ['level' => 'warning', 'msg' => __('Use custom ADMIN_PREFIX in .env for security.')];
         }
-        $mandatory = config('admin.two_factor_mandatory_roles', []);
-        $without2fa = Admin::whereIn('role', $mandatory)
-            ->where(function ($q) {
-                $q->whereNull('two_factor_confirmed_at')->orWhereNull('two_factor_secret');
-            })
-            ->count();
-        if ($without2fa > 0) {
-            $recs[] = ['level' => 'danger', 'msg' => __(':n Owner/SuperAdmin without 2FA.', ['n' => $without2fa])];
+        if (!config('admin.admin_two_factor_enabled', true)) {
+            $recs[] = ['level' => 'warning', 'msg' => __('Admin login two-factor is off. Enable it before production.')];
+        }
+        if (config('admin.admin_two_factor_enabled', true)) {
+            $mandatory = config('admin.two_factor_mandatory_roles', []);
+            $without2fa = Admin::whereIn('role', $mandatory)
+                ->where(function ($q) {
+                    $q->whereNull('two_factor_confirmed_at')->orWhereNull('two_factor_secret');
+                })
+                ->count();
+            if ($without2fa > 0) {
+                $recs[] = ['level' => 'danger', 'msg' => __(':n Owner/SuperAdmin without 2FA.', ['n' => $without2fa])];
+            }
         }
 
         if (empty($recs)) {

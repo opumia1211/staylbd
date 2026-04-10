@@ -82,23 +82,9 @@
 </div>
 
 @push('style')
-<style>
-.ps-page { font-size: 0.8125rem; }
-.ps-nav .nav-link { color: var(--bs-secondary); font-weight: 500; }
-.ps-nav .nav-link:hover { color: var(--bs-primary); }
-.ps-nav .nav-link.active { background: var(--bs-primary); color: #fff; border: none; }
-.ps-section { background: #f8f9fa; border-radius: 8px; padding: 0.6rem 0.9rem; }
-.ps-section__head { margin-bottom: 0.4rem; }
-.ps-section__title { font-weight: 600; font-size: 0.8rem; color: #333; }
-.ps-form__label { display: block; font-size: 0.7rem; color: #6c757d; margin-bottom: 0.15rem; }
-.ps-form .form-control-sm, .ps-form .form-select-sm { font-size: 0.8rem; padding: 0.25rem 0.45rem; height: auto; }
-.ps-section .payment-methods-block { background: none; padding: 0; }
-.ps-section .payment-methods-block .table { font-size: 0.8rem; }
-.ps-section .payment-methods-block .table td, .ps-section .payment-methods-block .table th { padding: 0.3rem 0.45rem; }
-.ps-section .payment-methods-block .table thead th { font-size: 0.7rem; font-weight: 600; color: #6c757d; }
-.ps-section .payment-methods-block .payment-icon-form .row { margin-bottom: 0; }
-.ps-section .payment-methods-block .form-control-sm { font-size: 0.8rem; padding: 0.25rem 0.45rem; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

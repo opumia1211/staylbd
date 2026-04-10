@@ -210,13 +210,7 @@
 @endpush
 
 @push('style')
-<style>
-.manual-create-hero .card-body { border-radius: 12px; }
-.manual-hero-icon { width: 56px; height: 56px; }
-.manual-create-card { border-radius: 12px; overflow: hidden; }
-.manual-section-title { font-size: 0.9rem; }
-.manual-currency-chips .btn { font-size: 0.8rem; }
-.manual-currency-chips .btn.active { border-color: var(--bs-primary); }
-.manual-range-card, .manual-charge-card { border-radius: 10px; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

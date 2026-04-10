@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Gateway\Paystack;
 
-use App\Constants\Status;
 use App\Models\Deposit;
+use App\Models\PaymentEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Gateway\PaymentController;
+use App\Services\PaymentIpnService;
 use Illuminate\Http\Request;
 
 class ProcessController extends Controller
@@ -40,6 +41,11 @@ class ProcessController extends Controller
         ]);
         $track = $request->reference;
         $deposit = Deposit::where('trx', $track)->orderBy('id', 'DESC')->first();
+        if (! PaymentIpnService::depositAwaitingPayment($deposit)) {
+            $notify[] = ['error', 'Invalid or already processed payment.'];
+            return to_route(gatewayRedirectUrl())->withNotify($notify);
+        }
+
         $paystackAcc = json_decode($deposit->gatewayCurrency()->gateway_parameter);
         $secret_key = $paystackAcc->secret_key;
 
@@ -67,7 +73,18 @@ class ProcessController extends Controller
                         $am = $result['data']['amount']/100;
                         $sam = round($deposit->final_amo, 2);
 
-                        if ($am == $sam && $result['data']['currency'] == $deposit->method_currency  && $deposit->status == Status::PAYMENT_INITIATE) {
+                        if (PaymentIpnService::amountsMatch($sam, $am)
+                            && PaymentIpnService::currencyMatches((string) $deposit->method_currency, (string) $result['data']['currency'])) {
+                            $idemKey = 'paystack_' . $track;
+                            if (PaymentIpnService::isReplay('Paystack', $idemKey)) {
+                                $notify[] = ['success', __('Payment already recorded.')];
+                                return to_route(gatewayRedirectUrl(true))->withNotify($notify);
+                            }
+                            PaymentEvent::log('Paystack', 'verify_success', [
+                                'idempotency_key' => $idemKey,
+                                'trx' => $deposit->trx,
+                                'deposit_id' => $deposit->id,
+                            ]);
                             PaymentController::userDataUpdate($deposit);
                             $notify[] = ['success', 'Payment captured successfully'];
                             return to_route(gatewayRedirectUrl(true))->withNotify($notify);

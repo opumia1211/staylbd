@@ -1378,7 +1378,7 @@ body.pro-lightbox-open {
     width: 100%;
     font-size: 0.7rem;
     color: #94a3b8 !important;
-    font-family: ui-monospace, monospace;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
 .pro-detail-similar-card-stock {
     display: inline-block;
@@ -2105,7 +2105,9 @@ body.pro-lightbox-open {
     .pro-detail-price-one-line .pro-detail-special-price { font-size: 1.1rem; }
     .pro-detail-cart-row { flex-wrap: wrap; gap: 0.35rem; }
     .pro-detail-sticky-cart .container { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .pro-detail-sticky-cart .btn { font-size: 0.85rem; padding: 0.4rem 0.6rem; }
+    .pro-detail-sticky-cart .btn--base,
+    .pro-detail-sticky-cart .btn-outline--base,
+    .pro-detail-sticky-cart .st-btn-secondary { font-size: 0.85rem; padding: 0.4rem 0.6rem; }
     .pro-detail-more-sections .container-fluid, .product-carousel-section .container-fluid { padding-left: 0.5rem; padding-right: 0.5rem; }
 }
 @media (min-width: 576px) and (max-width: 991.98px) {

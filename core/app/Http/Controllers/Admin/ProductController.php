@@ -21,6 +21,28 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    /** Product table columns cache for legacy/master DB compatibility. */
+    protected static ?array $productColumnsCache = null;
+
+    protected function productTableColumns(): array
+    {
+        if (self::$productColumnsCache !== null) {
+            return self::$productColumnsCache;
+        }
+        try {
+            self::$productColumnsCache = Schema::getColumnListing('products');
+        } catch (\Throwable $e) {
+            self::$productColumnsCache = [];
+        }
+
+        return self::$productColumnsCache;
+    }
+
+    protected function productHasColumn(string $column): bool
+    {
+        return in_array($column, $this->productTableColumns(), true);
+    }
+
     public function index(Request $request)
     {
         $pageTitle = request()->filled('low_stock') ? 'Low Stock Products' : 'Manage Product';
@@ -33,15 +55,17 @@ class ProductController extends Controller
     /** Columns needed for product list only – avoids loading description/gallery/features (scales to millions). */
     protected function productListColumns(): array
     {
-        $cols = [
+        $desired = [
             'id', 'name', 'slug', 'image', 'product_sku', 'category_id', 'brand_id', 'subcategory_id',
             'price', 'quantity', 'status', 'featured_product', 'hot_deals', 'today_deals', 'trending_now',
             'sale_count', 'created_at',
         ];
-        if (Schema::hasColumn('products', 'low_stock_alert')) {
-            $cols[] = 'low_stock_alert';
+        if ($this->productHasColumn('low_stock_alert')) {
+            $desired[] = 'low_stock_alert';
         }
-        return $cols;
+        $existing = $this->productTableColumns();
+
+        return array_values(array_intersect($desired, $existing));
     }
 
     public function todayDealProduct()
@@ -722,9 +746,12 @@ class ProductController extends Controller
             $message = __('Product added successfully.');
         }
 
-        $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
-        if (Product::where('slug', $slug)->where('id', '!=', $product->id ?? 0)->exists()) {
-            $slug = $slug . '-' . ($product->id ?? uniqid());
+        $slug = null;
+        if ($this->productHasColumn('slug')) {
+            $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
+            if (Product::where('slug', $slug)->where('id', '!=', $product->id ?? 0)->exists()) {
+                $slug = $slug . '-' . ($product->id ?? uniqid());
+            }
         }
 
         if ($request->hasFile('image')) {
@@ -770,7 +797,9 @@ class ProductController extends Controller
         }
 
         $product->name = $request->name;
-        $product->slug = $slug;
+        if ($this->productHasColumn('slug')) {
+            $product->slug = $slug;
+        }
         $product->brand_id = $request->brand_id;
         $product->category_id = $request->category_id;
         $product->subcategory_id = $request->subcategory_id;
@@ -948,7 +977,11 @@ class ProductController extends Controller
     public function reviewsIndex(Request $request)
     {
         $pageTitle = __('All Product Reviews');
-        $query     = Review::with(['user:id,name', 'product:id,name,slug']);
+        $reviewProductCols = ['id', 'name'];
+        if ($this->productHasColumn('slug')) {
+            $reviewProductCols[] = 'slug';
+        }
+        $query     = Review::with(['user:id,name', 'product:' . implode(',', $reviewProductCols)]);
         if ($request->filled('rating') && in_array((int) $request->rating, [1, 2, 3, 4, 5], true)) {
             $query->where('stars', (int) $request->rating);
         }
@@ -1192,7 +1225,7 @@ class ProductController extends Controller
         }
         // Remove video
         if (Schema::hasColumn('products', 'video') && $product->video) {
-            @unlink(public_path(getFilePath('productVideo') . '/' . $product->video));
+            fileManager()->removeFile(getFilePath('productVideo') . '/' . $product->video);
         }
         // Delete related records (variants, comparisons, reviews; OrderDetail kept for history)
         ProductVariant::where('product_id', $id)->delete();

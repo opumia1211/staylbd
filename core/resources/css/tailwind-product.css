@@ -1,0 +1,13 @@
+/*
+ * Full storefront CSS: shell + product grids, PDP, cart, filters.
+ */
+@import "./imports/storefront-vendor.css";
+@import "./imports/storefront-home-legacy.css";
+@import "./storefront-lucide.css";
+/* PDP/listing/cart legacy (~150KB+ minified) loads async via tailwind-storefront-deferred.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "./storefront-tailwind-overrides.css";

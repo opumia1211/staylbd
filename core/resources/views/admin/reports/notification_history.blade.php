@@ -222,11 +222,9 @@
 
 {{-- Detail Modal (Bootstrap 5 compatible) - z-index must be above backdrop so content is visible --}}
 @push('style')
-<style>
-    #notifyDetailModal { z-index: 10610 !important; }
-    #notifyDetailModal .modal-dialog { z-index: 10612 !important; position: relative; }
-    body.modal-open .modal-backdrop { z-index: 10600 !important; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 <div class="modal fade" id="notifyDetailModal" tabindex="-1" aria-labelledby="notifyDetailModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
@@ -253,9 +251,6 @@
 @endpush
 
 @if(request()->routeIs('admin.report.notification.history'))
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/datepicker.min.css') }}">
-@endpush
 @push('script-lib')
     <script src="{{ asset('assets/admin/js/vendor/datepicker.min.js') }}"></script>
     <script src="{{ asset('assets/admin/js/vendor/datepicker.en.js') }}"></script>

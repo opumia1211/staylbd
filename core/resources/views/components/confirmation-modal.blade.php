@@ -19,15 +19,9 @@
     </div>
 </div>
 @push('style')
-<style>
-    /* Modal সবসময় সামনে – অন্ধকার পর্দার উপরে কন্টেন্ট দেখা যাবে */
-    #confirmationModal { z-index: 10600 !important; }
-    #confirmationModal .modal-dialog { z-index: 10601 !important; position: relative; }
-    #confirmationModal .modal-content,
-    .confirmation-modal-content { background: #fff !important; color: #333 !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-    #confirmationModal .modal-body .question { color: #333 !important; }
-    body.modal-open .modal-backdrop { z-index: 10599 !important; opacity: 0.5 !important; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 @push('script')
 <script>

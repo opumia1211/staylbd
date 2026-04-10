@@ -167,19 +167,13 @@
 
 @if(isset($key) && $key == 'policy_pages')
 @push('style')
-<style>
-    .policy-element-form .form-group label { font-size: 0.875rem; }
-    .policy-element-form .form-control-sm { font-size: 0.875rem; }
-    .policy-plain-textarea { min-height: 220px; resize: vertical; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 @endif
 
 
-
-@push('style-lib')
-<link href="{{ asset('assets/admin/css/fontawesome-iconpicker.min.css') }}" rel="stylesheet">
-@endpush
 
 @push('script-lib')
     <script src="{{ asset('assets/admin/js/fontawesome-iconpicker.js') }}"></script>

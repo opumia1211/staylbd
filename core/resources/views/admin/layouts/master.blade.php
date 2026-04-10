@@ -3,9 +3,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $general->siteName($pageTitle ?? '') }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        indigo: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        },
+                        emerald: {
+                            50: '#ecfdf5',
+                            600: '#059669',
+                        },
+                        rose: {
+                            600: '#e11d48',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <script>
         window.adminSearchUrl = "{{ route('admin.search.index') }}";
     </script>
@@ -20,22 +45,58 @@
     @else
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/default.png') }}">
     @endif
-    <link rel="preconnect" href="https://rsms.me/" crossorigin>
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" crossorigin>
-    <link rel="stylesheet" href="{{ asset('assets/global/css/bootstrap.min.css') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/bootstrap-toggle.min.css') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ asset('assets/global/css/all.min.css') }}?v={{ $assetVersion }}">
+    @php
+        // Prefer resources source so version tracks source edits in local subdirectory setup.
+        $tailwindAdminPath = resource_path('css/tailwind-admin.css');
+        if (!is_file($tailwindAdminPath)) {
+            $tailwindAdminPath = public_path('css/tailwind-admin.css');
+        }
+        $tailwindAdminVer = is_file($tailwindAdminPath) ? (string) filemtime($tailwindAdminPath) : ($assetVersion ?? config('app.version'));
+    @endphp
+    @include('partials.inter-font-preload', ['assetVersion' => $assetVersion ?? config('app.asset_version') ?? config('app.version')])
+
+    {{-- ================================================================
+         ADMIN PANEL CSS — Individual asset() links (no @import chain)
+         Each file served directly by Apache with correct MIME types.
+         This fixes icon/font 404s in XAMPP subdirectory environments.
+         ================================================================ --}}
     <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}?v={{ $assetVersion }}">
-
-    @stack('style-lib')
-
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/bootstrap-toggle.min.css') }}?v={{ $assetVersion }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/select2.min.css') }}?v={{ $assetVersion }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/app.css') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ url('serve-css/tailwind-admin') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ asset('assets/templates/basic/css/logo-effects.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/dashboard-glass.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/admin-pro-ui.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/monokai.min.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/verification_code.css') }}?v={{ $assetVersion }}">
 
+    {{-- Dashboard Panel styles (source in resources/css — served via controller) --}}
+    @php
+        $dashPanelPath = resource_path('css/admin-dashboard-panel.css');
+        $dashPanelVer = is_file($dashPanelPath) ? (string) filemtime($dashPanelPath) : ($assetVersion ?? config('app.version'));
+    @endphp
+    <link rel="stylesheet" href="{{ url('serve-css/admin-panel') }}?v={{ $dashPanelVer }}">
+
+    {{-- Auth-page overrides (scoped: body.admin-auth-page only) --}}
+    <link rel="stylesheet" href="{{ url('serve-css/tailwind-admin') }}?v={{ $tailwindAdminVer }}">
+
+    @stack('style-lib')
     @stack('style')
+
+    <style>
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            z-index: 1040 !important;
+        }
+        .modal-backdrop.show {
+            opacity: 0.5 !important;
+        }
+        input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+            color: #334155 !important;
+        }
+    </style>
 </head>
+
+
 <body>
 {{-- Save sidebar scroll on nav link click; restore on load so menu does not roll to top --}}
 <script>

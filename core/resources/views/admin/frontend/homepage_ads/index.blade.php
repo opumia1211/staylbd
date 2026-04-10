@@ -1,25 +1,9 @@
 @extends('admin.layouts.app')
 @section('panel')
 @push('style')
-<style>
-  /* Make header row clearly visible on all admin themes */
-  .hp-ads-table thead th {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    color: #334155;
-    background: #f8fafc;
-    border-bottom: 1px solid rgba(0,0,0,.08) !important;
-    padding-top: 0.85rem !important;
-    padding-bottom: 0.85rem !important;
-    white-space: nowrap;
-  }
-  .hp-ads-table tbody td { padding-top: 0.45rem; padding-bottom: 0.45rem; font-size: 0.82rem; }
-  .hp-ads-active-wrap { display: inline-flex; align-items: center; gap: 0.6rem; justify-content: center; }
-  .hp-ads-active-text { font-size: 0.78rem; font-weight: 700; }
-  .hp-ads-active-text.on { color: #16a34a; }
-  .hp-ads-active-text.off { color: #64748b; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 <div class="card border-0 shadow-sm">

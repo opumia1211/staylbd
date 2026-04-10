@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ContactChannelIntegration;
 use App\Services\ContactChannelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class ContactChannelWebhookController extends Controller
@@ -27,6 +29,19 @@ class ContactChannelWebhookController extends Controller
             }
 
             return response('Invalid verify token', Response::HTTP_FORBIDDEN);
+        }
+
+        $bypassAllowed = (bool) config('contact_channels.whatsapp.bypass_signature', false)
+            && ! app()->environment('production');
+
+        if ($bypassAllowed) {
+            Log::channel('security')->warning('WhatsApp webhook signature verification bypassed (non-production only; WHATSAPP_WEBHOOK_BYPASS_SIGNATURE)');
+        } elseif (! $this->whatsappWebhookSignatureValid($request)) {
+            Log::channel('security')->warning('WhatsApp webhook rejected: invalid or missing signature', [
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json(['success' => false, 'message' => 'Invalid signature'], Response::HTTP_FORBIDDEN);
         }
 
         $entries = $request->input('entry', []);
@@ -140,5 +155,61 @@ class ContactChannelWebhookController extends Controller
         return ContactChannelIntegration::where('channel', 'whatsapp')
             ->where('settings->phone_number_id', $phoneNumberId)
             ->first();
+    }
+
+    /**
+     * Meta Cloud API: X-Hub-Signature-256 = "sha256=" + hex(HMAC-SHA256(raw_body, app_secret)).
+     *
+     * @see https://developers.facebook.com/docs/graph-api/webhooks/getting-started#verification-requests
+     */
+    protected function whatsappWebhookSignatureValid(Request $request): bool
+    {
+        $secrets = $this->whatsappAppSecrets();
+        if ($secrets->isEmpty()) {
+            if (app()->environment('production')) {
+                Log::channel('security')->error('WhatsApp webhook: no app secret configured (auth_meta.whatsapp_app_secret on active integrations)');
+
+                return false;
+            }
+
+            Log::channel('security')->warning('WhatsApp webhook: no app secret; accepting in non-production (configure whatsapp_app_secret for production)');
+
+            return true;
+        }
+
+        $header = (string) $request->header(config('contact_channels.whatsapp.signature_header', 'X-Hub-Signature-256'), '');
+        if (! str_starts_with($header, 'sha256=')) {
+            return false;
+        }
+
+        $providedHex = strtolower(substr($header, 7));
+        if ($providedHex === '' || strlen($providedHex) !== 64 || ! ctype_xdigit($providedHex)) {
+            return false;
+        }
+
+        $payload = $request->getContent();
+        foreach ($secrets as $secret) {
+            $expected = hash_hmac('sha256', $payload, $secret);
+            if (hash_equals(strtolower($expected), $providedHex)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Collection<int, non-empty-string>
+     */
+    protected function whatsappAppSecrets(): Collection
+    {
+        return ContactChannelIntegration::query()
+            ->where('channel', 'whatsapp')
+            ->where('is_active', true)
+            ->get()
+            ->map(fn (ContactChannelIntegration $i) => $i->getSecret('whatsapp_app_secret'))
+            ->filter(fn ($s) => is_string($s) && $s !== '')
+            ->unique()
+            ->values();
     }
 }

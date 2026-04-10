@@ -11,6 +11,12 @@ class ImageOptimizationService
     /** Default high quality (92) for clear, professional output – user-facing images. */
     public const QUALITY_HIGH = 92;
 
+    /** LQIP dimension: tiny 16px edge for blur effect. */
+    public const LQIP_SIZE = 16;
+
+    /** LQIP dimension: tiny 16px edge for blur effect. */
+    public const LQIP_SIZE = 16;
+
     /**
      * Convert and optimize image to WebP format (high quality, clear output).
      *
@@ -36,8 +42,9 @@ class ImageOptimizationService
             $width = $image->width();
             $height = $image->height();
 
-            if ($width > 2000 || $height > 2000) {
-                $image->resize(2000, 2000, function ($constraint) {
+            $maxEdge = (int) config('upload.max_optimize_edge', 2560);
+            if ($maxEdge > 0 && ($width > $maxEdge || $height > $maxEdge)) {
+                $image->resize($maxEdge, $maxEdge, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 });
@@ -135,6 +142,13 @@ class ImageOptimizationService
             }
 
             $image = Image::make($imagePath);
+            $maxEdge = (int) config('upload.max_optimize_edge', 2560);
+            if ($maxEdge > 0 && ($image->width() > $maxEdge || $image->height() > $maxEdge)) {
+                $image->resize($maxEdge, $maxEdge, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+            }
             $image = $this->sharpenImage($image, 1);
 
             $pathInfo = pathinfo($imagePath);
@@ -204,11 +218,98 @@ class ImageOptimizationService
         try {
             $q = min(100, max(1, $quality));
             $this->optimizeImage($fullPath, $q);
-            $this->convertToWebP($fullPath, $q);
+            $webpPath = $this->convertToWebP($fullPath, $q);
+            if ($webpPath && is_string($webpPath) && is_file($webpPath)) {
+                $maxBytes = (int) config('upload.max_product_webp_bytes', 153600);
+                if ($maxBytes > 0) {
+                    $this->clampWebpToMaxBytes($webpPath, $fullPath, $maxBytes);
+                }
+            }
             return true;
         } catch (\Throwable $e) {
             Log::warning('Image optimization skipped', ['path' => $fullPath, 'error' => $e->getMessage()]);
             return false;
         }
     }
+
+    /**
+     * Best-effort: keep WebP at or below $maxBytes by lowering quality, then scaling down.
+     *
+     * @param string $webpPath Absolute path to .webp file
+     * @param string $sourceRasterPath Original raster used for re-encode (jpg/png/webp)
+     */
+    public function clampWebpToMaxBytes(string $webpPath, string $sourceRasterPath, int $maxBytes): void
+    {
+        if ($maxBytes < 1024 || !is_file($webpPath) || !is_file($sourceRasterPath)) {
+            return;
+        }
+        if (filesize($webpPath) <= $maxBytes) {
+            return;
+        }
+        try {
+            $image = Image::make($sourceRasterPath);
+            $quality = 82;
+            $scale = 1.0;
+            for ($round = 0; $round < 24 && file_exists($webpPath) && filesize($webpPath) > $maxBytes; $round++) {
+                $work = clone $image;
+                if ($scale < 0.999) {
+                    $w = max(1, (int) round($work->width() * $scale));
+                    $h = max(1, (int) round($work->height() * $scale));
+                    $work->resize($w, $h, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                }
+                $work->encode('webp', min(100, max(40, $quality)))->save($webpPath);
+                if (filesize($webpPath) <= $maxBytes) {
+                    return;
+                }
+                $quality -= 7;
+                if ($quality < 48) {
+                    $quality = 82;
+                    $scale *= 0.88;
+                }
+                if ($scale < 0.35) {
+                    break;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('WebP size clamp failed', ['webp' => $webpPath, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Generate tiny Base64 blur placeholder (LQIP).
+     *
+     * @param string $imagePath Filesystem path to image
+     * @return string|null Base64 data URL
+     */
+    public function generateLQIP(string $imagePath): ?string
+    {
+        try {
+            if (!file_exists($imagePath) || !is_file($imagePath)) {
+                return $this->getNeutralDataUrl();
+            }
+
+            $img = Image::make($imagePath);
+            $img->resize(self::LQIP_SIZE, self::LQIP_SIZE, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+            $img->blur(1); // Subtle blur
+            
+            return (string) $img->encode('data-url', 30);
+        } catch (\Throwable $e) {
+            return $this->getNeutralDataUrl();
+        }
+    }
+
+    /**
+     * Placeholder data URL (transparent or neutral gray).
+     */
+    protected function getNeutralDataUrl(): string
+    {
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+    }
 }
+

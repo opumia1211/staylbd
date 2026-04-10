@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class ServeAssetController extends Controller
 {
-    private const ALLOWED_JS = ['fly-to-header', 'product-carousel', 'glass-header', 'auth'];
+    private const ALLOWED_JS = ['fly-to-header', 'product-carousel', 'glass-header', 'storefront-lucide', 'auth'];
 
     /** Template basic CSS files allowed to be served with text/css (fixes MIME type 'text/html' when asset() returns 404) */
     private const ALLOWED_CSS = [
@@ -209,11 +209,11 @@ class ServeAssetController extends Controller
     }
 
     /**
-     * Full storefront CSS: PostCSS/Tailwind build (legacy template CSS + @tailwind) — one request, correct MIME.
+     * Homepage-only storefront CSS (smaller — no PDP/listing-only legacy imports).
      */
-    public function tailwindStorefront(Request $request): Response|BinaryFileResponse
+    public function tailwindHomepage(Request $request): Response|BinaryFileResponse
     {
-        $path = public_path('css/tailwind-storefront.css');
+        $path = public_path('css/tailwind-homepage.css');
         if (!is_file($path) || !is_readable($path)) {
             abort(404);
         }
@@ -225,11 +225,11 @@ class ServeAssetController extends Controller
     }
 
     /**
-     * Admin panel Tailwind + Inter base (separate bundle from storefront).
+     * Full storefront CSS (PDP, listing, cart legacy + Tailwind).
      */
-    public function tailwindAdmin(Request $request): Response|BinaryFileResponse
+    public function tailwindProduct(Request $request): Response|BinaryFileResponse
     {
-        $path = public_path('css/tailwind-admin.css');
+        $path = public_path('css/tailwind-product.css');
         if (!is_file($path) || !is_readable($path)) {
             abort(404);
         }
@@ -238,6 +238,205 @@ class ServeAssetController extends Controller
             'Content-Type' => 'text/css; charset=UTF-8',
             'Cache-Control' => 'public, max-age=2592000',
         ]);
+    }
+
+    /**
+     * Legacy URL: same file as tailwind-product.css (build copies for compatibility).
+     */
+    public function tailwindStorefront(Request $request): Response|BinaryFileResponse
+    {
+        return $this->tailwindProduct($request);
+    }
+
+    /**
+     * Async-loaded storefront legacy CSS (see resources/css/tailwind-storefront-deferred.css).
+     */
+    public function tailwindStorefrontDeferred(Request $request): Response|BinaryFileResponse
+    {
+        return $this->serveCompiledStorefrontCss('tailwind-storefront-deferred.css');
+    }
+
+    public function tailwindStorefrontDeferredCart(Request $request): Response|BinaryFileResponse
+    {
+        return $this->serveCompiledStorefrontCss('tailwind-storefront-deferred-cart.css');
+    }
+
+    public function tailwindStorefrontDeferredAccount(Request $request): Response|BinaryFileResponse
+    {
+        return $this->serveCompiledStorefrontCss('tailwind-storefront-deferred-account.css');
+    }
+
+    public function tailwindStorefrontDeferredCompare(Request $request): Response|BinaryFileResponse
+    {
+        return $this->serveCompiledStorefrontCss('tailwind-storefront-deferred-compare.css');
+    }
+
+    public function tailwindStorefrontDeferredHome(Request $request): Response|BinaryFileResponse
+    {
+        return $this->serveCompiledStorefrontCss('tailwind-storefront-deferred-home.css');
+    }
+
+    private function serveCompiledStorefrontCss(string $filename): Response|BinaryFileResponse
+    {
+        $path = public_path('css/'.$filename);
+        if (!is_file($path) || !is_readable($path)) {
+            abort(404);
+        }
+
+        return response()->file($path, [
+            'Content-Type' => 'text/css; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=2592000',
+        ]);
+    }
+
+    /**
+     * Consolidated storefront Blade <style> rules (built from resources/css/critical-storefront.css).
+     * Loaded after @stack('style') so product-card and page rules keep correct cascade.
+     */
+    public function criticalStorefront(Request $request): Response|BinaryFileResponse
+    {
+        $path = public_path('css/critical-storefront.css');
+        if (!is_file($path) || !is_readable($path)) {
+            abort(404);
+        }
+
+        return response()->file($path, [
+            'Content-Type' => 'text/css; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=2592000',
+        ]);
+    }
+
+    /**
+     * Serve admin-dashboard-panel.css from resources/css with correct MIME type.
+     * This file is in resources/ not public/, so it needs to be served via controller.
+     */
+    public function adminPanel(Request $request): Response
+    {
+        $path = resource_path('css/admin-dashboard-panel.css');
+        if (!is_file($path) || !is_readable($path)) {
+            abort(404);
+        }
+
+        $css = file_get_contents($path);
+        $css = $this->minifyCss($css);
+
+        return response($css)
+            ->header('Content-Type', 'text/css; charset=UTF-8')
+            ->header('Cache-Control', 'public, max-age=2592000');
+    }
+
+    /**
+     * Admin panel CSS bundle (Tailwind + imported admin assets).
+     */
+    public function tailwindAdmin(Request $request): Response
+    {
+        // Prefer resources source file so @import rewriting always runs consistently.
+        // Fallback to public copy only if source file is unavailable.
+        $path = resource_path('css/tailwind-admin.css');
+        if (!is_file($path) || !is_readable($path)) {
+            $path = public_path('css/tailwind-admin.css');
+        }
+
+        if (!is_file($path) || !is_readable($path)) {
+            abort(404);
+        }
+
+        $contents = file_get_contents($path);
+        
+        // Resolve @imports recursively to combine all dashboard styles into one bundle
+        // This fixes relative-path and subfolder delivery issues.
+        $contents = $this->resolveImports($contents, dirname($path));
+
+        // Minify CSS for faster delivery
+        $minified = $this->minifyCss($contents);
+
+        return response($minified)
+            ->header('Content-Type', 'text/css; charset=UTF-8')
+            ->header('Cache-Control', 'public, max-age=2592000');
+    }
+
+    /**
+     * Recursively resolve and embed @import statements.
+     */
+    private function resolveImports(string $css, string $currentDir): string
+    {
+        return preg_replace_callback('/@import\s+[\'"](.+)[\'"];/', function ($matches) use ($currentDir) {
+            $importPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $matches[1]);
+            
+            // Handle relative paths (e.g., ../../public/...)
+            $fullPath = realpath($currentDir . DIRECTORY_SEPARATOR . $importPath);
+            
+            if ($fullPath && is_file($fullPath) && is_readable($fullPath)) {
+                $content = file_get_contents($fullPath);
+                // Rewrite URLs in the imported file to be absolute before embedding
+                $content = $this->rewriteUrls($content, dirname($fullPath));
+                // Recursively resolve imports in the imported file
+                return $this->resolveImports($content, dirname($fullPath));
+            }
+            
+            // If file not found, leave as is (browser will try to resolve)
+            return $matches[0];
+        }, $css);
+    }
+
+    /**
+     * Rewrite relative URLs in CSS to absolute paths based on the file location.
+     */
+    private function rewriteUrls(string $css, string $dir): string
+    {
+        // Normalize directory separator for replacement
+        $publicPath = str_replace('\\', '/', public_path());
+        $dir = str_replace('\\', '/', $dir);
+
+        // Match url(...) or url('...') or url("...")
+        return preg_replace_callback('/url\(\s*[\'"]?([^\)\'"]+)[\'"]?\s*\)/i', function ($matches) use ($dir, $publicPath) {
+            $path = $matches[1];
+            
+            // Skip absolute, data-uri, or protocol-relative URLs
+            if (str_starts_with($path, '/') || str_starts_with($path, 'data:') || str_starts_with($path, 'http') || str_starts_with($path, '#')) {
+                return $matches[0];
+            }
+            
+            // Resolve path relative to the CSS file's directory
+            $fullPathOnDisk = realpath(str_replace('/', DIRECTORY_SEPARATOR, $dir . '/' . $path));
+            
+            if ($fullPathOnDisk) {
+                // Normalize for URL conversion
+                $normalizedFullPath = str_replace('\\', '/', $fullPathOnDisk);
+                
+                // Convert disk path to public URL path
+                // Using case-insensitive replacement to be robust on Windows
+                $relativeToPublic = str_ireplace($publicPath, '', $normalizedFullPath);
+                
+                // Generate absolute URL. In subdirectory setup (e.g. /staylbd),
+                // ensure assets always resolve to /core/public even when ASSET_URL is missing.
+                $relativeAssetPath = ltrim($relativeToPublic, '/');
+                $assetRoot = rtrim((string) config('app.asset_url'), '/');
+                if ($assetRoot === '') {
+                    $assetRoot = rtrim((string) config('app.url'), '/') . '/core/public';
+                }
+                $url = $assetRoot . '/' . $relativeAssetPath;
+                return 'url("' . $url . '")';
+            }
+            
+            return $matches[0];
+        }, $css);
+    }
+
+    /**
+     * Simple CSS minifier - safer version that avoids breaking layouts.
+     */
+    private function minifyCss(string $css): string
+    {
+        // Remove comments
+        $css = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
+        // Remove tabs and excessive newlines, but keep single spaces for safety
+        $css = str_replace(["\t", "\r"], '', $css);
+        $css = preg_replace('/\n+/', "\n", $css);
+        // Trim each line
+        $lines = explode("\n", $css);
+        $cleanLines = array_map('trim', $lines);
+        return implode('', $cleanLines);
     }
 
     private function fontMime(string $name): string

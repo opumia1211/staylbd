@@ -1,0 +1,14 @@
+/* Storefront shell + home sections. Heavy main.css loads async (tailwind-storefront-deferred). */
+@import "../../../public/assets/templates/basic/css/custom.css";
+@import "../../../public/assets/templates/basic/css/glass-header.css";
+@import "../../../public/assets/templates/basic/css/logo-effects.css";
+@import "../../../public/assets/templates/basic/css/scrollbar.css";
+@import "../../../public/assets/templates/basic/css/contact-chat.css";
+@import "../../../public/assets/templates/basic/css/floating-actions.css";
+@import "../../../public/assets/templates/basic/css/product-carousel.css";
+@import "../../../public/assets/templates/basic/css/gdpr-cookie.css";
+@import "../../../public/assets/templates/basic/css/footer-glass.css";
+@import "../../../public/assets/templates/basic/css/products-section-pro.css";
+@import "../../../public/assets/templates/basic/css/auth-modal.css";
+@import "../../../public/assets/global/css/glass-product-card.css";
+@import "../../../public/assets/global/css/product-card-buttons.css";

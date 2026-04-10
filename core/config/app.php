@@ -67,6 +67,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Mix asset URL (compiled Tailwind / storefront bundles)
+    |--------------------------------------------------------------------------
+    |
+    | Laravel's mix() helper prefixes manifest paths with this value. If empty,
+    | the browser resolves /css/vendor.js relative to the page URL — broken when
+    | the site is served from htdocs/staylbd/index.php while static files live
+    | under staylbd/core/public. Set MIX_ASSET_URL or ASSET_URL, or rely on
+    | AppServiceProvider subdirectory detection for the staylbd layout.
+    |
+    */
+    'mix_url' => rtrim((string) (env('MIX_ASSET_URL') ?: env('ASSET_URL') ?: ''), '/'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Storefront compiled CSS delivery
+    |--------------------------------------------------------------------------
+    | By default CSS is loaded from public/css via asset() so ASSET_URL (CDN) applies.
+    | Set STOREFRONT_CSS_SERVE=true only if static CSS is incorrectly routed (MIME/subdir).
+    */
+    'storefront_css_via_serve_route' => filter_var(env('STOREFRONT_CSS_SERVE', false), FILTER_VALIDATE_BOOLEAN),
+
+    /*
+    |--------------------------------------------------------------------------
     | Asset Version (Cache Busting)
     |--------------------------------------------------------------------------
     | Set APP_VERSION in .env on deploy. When admin runs "Clear cache", the
@@ -74,6 +97,11 @@ return [
     | and old browser cache is dropped automatically. Cache takes precedence.
     */
     'version' => env('APP_VERSION', '1.0.0'),
+
+    /*
+    | Public JSON API (routes/api.php) — requests per minute per IP or authenticated user.
+    */
+    'api_rate_limit_per_minute' => env('API_RATE_LIMIT_PER_MINUTE', 120),
 
     /*
     |--------------------------------------------------------------------------
@@ -191,7 +219,7 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Modules\ModuleServiceProvider::class,

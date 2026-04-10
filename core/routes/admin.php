@@ -89,6 +89,7 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
     Route::controller('AdminController')->group(function () {
         Route::get('dashboard', 'dashboard')->name('dashboard');
         Route::get('dashboard/stats', 'dashboardStats')->name('dashboard.stats');
+        Route::get('business/insights', 'businessInsights')->name('business.insights');
         Route::get('profile', 'profile')->name('profile');
         Route::post('profile', 'profileUpdate')->name('profile.update');
         Route::get('password', 'password')->name('password');

@@ -630,99 +630,16 @@
 
 @if(isset($key) && $key == 'contact_us')
 @push('style')
-<style>
-    .contact-top-bar .card-body { min-height: auto; }
-    .contact-content-form .form-group { margin-bottom: 0.5rem; }
-    .contact-content-form .form-group label { font-size: 0.8rem; margin-bottom: 0.2rem; }
-    .contact-content-form .form-control { font-size: 0.875rem; padding: 0.35rem 0.5rem; }
-    .contact-content-form .input-group-text { font-size: 0.875rem; padding: 0.35rem 0.5rem; }
-    .contact-content-form .avatar-preview .profilePicPreview { min-height: 80px; }
-    .contact-content-form .avatar-edit label { padding: 0.35rem 0.6rem; font-size: 0.8rem; }
-    .contact-content-form small { font-size: 0.75rem; }
-    .contact-element-modal .modal-body .form-group { margin-bottom: 0.5rem; }
-    .contact-element-modal .modal-body label { font-size: 0.8rem; }
-    .contact-element-modal .modal-body .form-control,
-    .contact-element-modal .modal-body select.form-control,
-    .contact-element-modal .modal-body textarea.form-control { font-size: 0.875rem; padding: 0.35rem 0.5rem; }
-    .contact-element-modal .modal-body textarea { min-height: 70px; }
-    .contact-element-modal .input-group-text { font-size: 0.875rem; padding: 0.35rem 0.5rem; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 @endif
 
-@push('style-lib')
-<link href="{{ asset('assets/admin/css/fontawesome-iconpicker.min.css') }}" rel="stylesheet">
-@endpush
-
 @push('style')
-<style>
-    /* Fixed admin navbar uses z-index 9999; confirmation modal forces backdrop to 10599 — keep Add/Update dialogs above both */
-    #addModal.modal,
-    #updateBtn.modal {
-        z-index: 10610 !important;
-    }
-    #addModal .modal-dialog,
-    #updateBtn .modal-dialog {
-        z-index: 10611 !important;
-        position: relative;
-    }
-    #addModal .modal-content,
-    #updateBtn .modal-content {
-        position: relative;
-        z-index: 1;
-        pointer-events: auto;
-    }
-    /* Icon picker popover defaults to z-index: 9 — stays under modal/backdrop otherwise */
-    body.modal-open .iconpicker-popover.popover {
-        z-index: 10620 !important;
-    }
-    /* Social Icons: Add/Update modals — override global .profilePicPreview { height:310px } from app.css */
-    .social-icon-fe-modal .modal-dialog {
-        max-width: min(640px, calc(100vw - 1.5rem));
-        width: 100%;
-        margin: 1rem auto;
-    }
-    .social-icon-fe-modal .modal-content {
-        border-radius: 12px;
-        overflow: hidden;
-    }
-    .social-icon-fe-modal .modal-body {
-        overflow: visible;
-        max-height: none;
-    }
-    .social-icon-fe-modal .social-fe-social-upload .thumb .profilePicPreview {
-        width: 80px !important;
-        height: 80px !important;
-        min-width: 80px !important;
-        min-height: 80px !important;
-        max-width: 80px !important;
-        max-height: 80px !important;
-        display: block !important;
-        background-size: contain !important;
-        background-position: center !important;
-        box-sizing: border-box !important;
-    }
-    .social-icon-fe-modal .social-fe-social-upload .avatar-edit label.btn {
-        width: auto !important;
-        max-width: 100%;
-    }
-    .social-icon-fe-modal .social-fe-social-upload .avatar-edit label.bg--success {
-        width: auto !important;
-        display: inline-block !important;
-        line-height: 1.35 !important;
-        padding: 0.35rem 0.75rem !important;
-    }
-    .social-icon-pub-cell .form-check-input {
-        width: 2.35em;
-        min-height: 1.15em;
-        cursor: pointer;
-        margin-top: 0;
-    }
-    .social-icon-pub-cell label {
-        cursor: pointer;
-        user-select: none;
-    }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script-lib')

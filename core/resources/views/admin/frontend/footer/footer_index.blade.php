@@ -61,9 +61,8 @@
 </div>
 
 @push('style')
-<style>
-    .footer-section-card { transition: box-shadow 0.15s ease, background-color 0.15s ease; }
-    .footer-section-card:hover { background-color: var(--bs-primary-bg-subtle, #e7f1ff) !important; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.08); }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 @endsection

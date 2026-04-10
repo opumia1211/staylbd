@@ -143,11 +143,9 @@
 </div>
 
 @push('style')
-<style>
-.admin-login-control { max-width: 640px; }
-.admin-login-control .card-header { background: var(--bs-gray-100); border-bottom: 1px solid var(--bs-border-color); }
-.admin-login-control .login-switch-label { min-width: 2rem; display: inline-block; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

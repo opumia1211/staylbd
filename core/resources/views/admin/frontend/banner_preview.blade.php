@@ -5,14 +5,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@lang('Banner Preview')</title>
-    <link rel="stylesheet" href="{{ asset('assets/global/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
-    <style>
-        body { margin: 0; padding: 0; background: #f0f0f0; }
-        .banner-preview-wrap { max-width: 100%; margin: 0 auto; }
-    </style>
+    @php
+        $storefrontCssHref = storefront_compiled_stylesheet_url('tailwind-storefront');
+        $storefrontDeferredHref = storefront_compiled_stylesheet_url('tailwind-storefront-deferred');
+        $previewAv = is_file(public_path('css/tailwind-storefront.css')) ? (string) filemtime(public_path('css/tailwind-storefront.css')) : '1';
+    @endphp
+    @include('partials.inter-font-preload', ['assetVersion' => $previewAv])
+    <link rel="preload" href="{{ $storefrontCssHref }}" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ $storefrontCssHref }}" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ $storefrontDeferredHref }}" media="print" onload="this.media='all'" crossorigin="anonymous">
+    <noscript><link rel="stylesheet" href="{{ $storefrontDeferredHref }}" crossorigin="anonymous"></noscript>
+
 </head>
-<body>
+<body class="st-banner-preview">
     <div class="banner-preview-wrap">
         <section class="banner-section banner-section--fullscreen">
             <div class="banner-fullscreen-inner">

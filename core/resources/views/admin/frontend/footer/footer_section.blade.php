@@ -21,25 +21,9 @@
 </div>
 
 @push('style')
-<style>
-    .footer-section-form .form-group { margin-bottom: 0.5rem; }
-    .footer-section-form .form-label { font-size: 0.8rem; margin-bottom: 0.2rem; }
-    .footer-section-form .form-control, .footer-section-form .form-select { font-size: 0.875rem; padding: 0.35rem 0.5rem; }
-    .footer-section-form .form-control-sm { font-size: 0.875rem; }
-    .footer-section-form .btn:not(.btn-sm) { padding: 0.35rem 0.75rem; font-size: 0.875rem; }
-    .footer-section-form .table { font-size: 0.875rem; }
-    .footer-section-form .table thead th { font-size: 0.8rem; padding: 0.35rem 0.5rem; }
-    .footer-section-form .table td, .footer-section-form .table th { padding: 0.35rem 0.5rem; }
-    .footer-section-form .p-3.bg-light, .footer-section-form .border.rounded.bg-light { padding: 0.5rem !important; }
-    .footer-section-form .row.g-2 { margin-bottom: 0; }
-    .footer-section-form .row.g-3 { --bs-gutter-y: 0.5rem; }
-    .footer-section-form small.text-muted { font-size: 0.75rem; }
-    .footer-section-form h6 { font-size: 0.9rem; margin-bottom: 0.35rem; }
-    .footer-section-form .alert { padding: 0.5rem 0.75rem; font-size: 0.875rem; }
-    .footer-section-form .payment-methods-block .payment-icon-form .row { margin-bottom: 0; }
-    .footer-section-form .payment-methods-block .table td, .footer-section-form .payment-methods-block .table th { padding: 0.4rem 0.5rem; vertical-align: middle; }
-    .footer-section-form .payment-methods-block .table thead th { font-weight: 600; font-size: 0.75rem; text-transform: none; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

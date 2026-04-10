@@ -1156,27 +1156,9 @@
 
 @once
 @push('style')
-<style>
-.sidebar-submenu--home-layout > ul > .sidebar-menu-item .nav-link {
-    padding-top: 0.38rem !important;
-    padding-bottom: 0.38rem !important;
-    min-height: 0;
-    align-items: center;
-}
-.sidebar-submenu--home-layout .menu-title {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    line-height: 1.25;
-}
-.sidebar-submenu--home-layout .menu-icon {
-    font-size: 1.05rem;
-    width: 1.45rem;
-    min-width: 1.45rem;
-    text-align: center;
-    line-height: 1;
-    opacity: 0.92;
-}
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 @endonce
 

@@ -129,21 +129,9 @@
   Send Notification (All) - Flexible CSS. Override without breaking: set on .admin-notify-all:
   --notify-label-color, --notify-label-weight, --notify-input-radius, --notify-spacing
 --}}
-<style>
-.admin-notify-all { --notify-label-color: #212529; --notify-label-weight: 600; --notify-input-radius: 0.375rem; --notify-spacing: 0.75rem; }
-.admin-notify-all__header-icon { opacity: 0.85; }
-.admin-notify-all__label { color: var(--notify-label-color); font-weight: var(--notify-label-weight); font-size: 0.9375rem; margin-bottom: 0.35rem; }
-.admin-notify-all__input { border-radius: var(--notify-input-radius); }
-.admin-notify-all__textarea { border-radius: var(--notify-input-radius); min-height: 8rem; }
-.admin-notify-all__submit { min-height: 2.75rem; }
-.admin-notify-all__modal .modal-header { padding: var(--notify-spacing) 1rem; }
-.admin-notify-all__modal-warning { font-size: clamp(0.9rem, 2vw, 1rem); }
-.admin-notify-all__progress { height: 0.5rem; border-radius: var(--notify-input-radius); }
-.admin-notify-all .coolingIcon { margin: 0 auto; }
-@media (min-width: 768px) {
-    .admin-notify-all__submit { width: auto; }
-}
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

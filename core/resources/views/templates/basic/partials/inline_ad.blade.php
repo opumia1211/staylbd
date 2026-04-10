@@ -22,20 +22,8 @@
     @endforeach
 </div>
 @push('style')
-<style>
-.inline-ad-wrap { margin: 0; }
-.inline-ad-wrap--sidebar_right { margin-top: 1rem; }
-.inline-ad-wrap--sidebar_left { margin-top: 1rem; }
-.inline-ad-wrap--content_top, .inline-ad-wrap--content_bottom { margin: 0.75rem 0; }
-.inline-ad-box { width: 100%; max-width: min(var(--inline-w), 100%); height: var(--inline-h); max-height: min(var(--inline-h), 400px); background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; display: flex; align-items: center; justify-content: center; box-sizing: border-box; margin-bottom: 0.75rem; }
-.inline-ad-box:last-child { margin-bottom: 0; }
-.inline-ad-box--auto-height { height: auto; max-height: 400px; }
-.inline-ad-link { display: block; width: 100%; height: 100%; min-height: 0; }
-.inline-ad-img { max-width: 100% !important; max-height: 100% !important; width: auto !important; height: auto !important; object-fit: contain !important; display: block; }
-.inline-ad-placeholder { padding: 1rem; text-align: center; color: #666; font-size: 0.9rem; }
-@media (max-width: 991.98px) {
-    .inline-ad-wrap--sidebar_right .inline-ad-box { max-height: min(var(--inline-h), 280px); }
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 @endif

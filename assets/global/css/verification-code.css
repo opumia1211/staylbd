@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap');
+/* Inter via storefront/admin bundle (@fontsource); no extra network font */
 
 .form-control:focus {
     background: transparent;
@@ -52,7 +52,7 @@
     border: none;
     z-index: 1;
     padding-left: 25px;
-    font-family: 'Courier Prime', monospace;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     color: #504c4c !important;
 }
 

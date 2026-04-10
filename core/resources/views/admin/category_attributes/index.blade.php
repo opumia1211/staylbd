@@ -134,9 +134,7 @@ document.querySelectorAll('.category-attributes-form').forEach(function(form) {
 @endpush
 
 @push('style')
-<style>
-.category-attributes-panel .cursor-pointer { cursor: pointer; }
-.category-attributes-panel .table th { font-size: 0.8rem; }
-.category-attributes-panel .table td { vertical-align: middle; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

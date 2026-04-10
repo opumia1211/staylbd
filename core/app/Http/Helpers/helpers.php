@@ -26,6 +26,39 @@ function systemDetails()
     return $system;
 }
 
+/**
+ * URL for a compiled storefront stylesheet in public/css.
+ * Uses asset() so ASSET_URL (CDN) applies when set.
+ * Falls back to serve-css/* when config(app.storefront_css_via_serve_route) is true.
+ *
+ * @param  string  $name  tailwind-homepage|tailwind-product|tailwind-storefront|critical-storefront|tailwind-storefront-deferred|tailwind-storefront-deferred-{home|cart|account|compare}
+ */
+function storefront_compiled_stylesheet_url(string $name, ?string $version = null): string
+{
+    $path = 'css/' . $name . '.css';
+    $full = public_path($path);
+    $v = $version ?? ((is_file($full) ? (string) filemtime($full) : null) ?: (string) (config('app.asset_version') ?? config('app.version', '1')));
+
+    if (config('app.storefront_css_via_serve_route')) {
+        $route = match ($name) {
+            'tailwind-homepage' => 'serve-css/tailwind-homepage',
+            'tailwind-product' => 'serve-css/tailwind-product',
+            'tailwind-storefront' => 'serve-css/tailwind-storefront',
+            'critical-storefront' => 'serve-css/critical-storefront',
+            'tailwind-storefront-deferred' => 'serve-css/tailwind-storefront-deferred',
+            'tailwind-storefront-deferred-cart' => 'serve-css/tailwind-storefront-deferred-cart',
+            'tailwind-storefront-deferred-account' => 'serve-css/tailwind-storefront-deferred-account',
+            'tailwind-storefront-deferred-compare' => 'serve-css/tailwind-storefront-deferred-compare',
+            'tailwind-storefront-deferred-home' => 'serve-css/tailwind-storefront-deferred-home',
+            default => 'serve-css/tailwind-product',
+        };
+
+        return url($route) . '?v=' . rawurlencode($v);
+    }
+
+    return asset($path) . '?v=' . rawurlencode($v);
+}
+
 function slug($string)
 {
     return Illuminate\Support\Str::slug($string);
@@ -524,6 +557,77 @@ function getImageWebP($image, $size = null)
 
     return getImage($image, $size);
 }
+
+/**
+ * Return tiny Base64 data-URL for an image (LQIP). Best for style="background-image: url(...)".
+ * Uses caching to avoid repeated Intervention Image processing.
+ */
+function getImageLQIP($image)
+{
+    if (!is_string($image) || $image === '') {
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+    }
+
+    $cacheKey = 'lqip:' . md5($image);
+    return Cache::remember($cacheKey, 86400, function () use ($image) {
+        // Resolve absolute path
+        $imagePath = ltrim(str_replace('\\', '/', trim($image)), '/');
+        $fullPath = public_path($imagePath);
+        if (!file_exists($fullPath)) {
+            $projectRoot = dirname(base_path());
+            $fullPath = rtrim($projectRoot, '/\\') . '/' . $imagePath;
+        }
+
+    return app(\App\Services\ImageOptimizationService::class)->generateLQIP($fullPath);
+    });
+}
+
+/**
+ * Return srcset string for responsive images (WebP).
+ * Generates thumbnail, medium, and large versions if not present.
+ */
+function getImageSrcset($image, $pathKey)
+{
+    if (!is_string($image) || $image === '') {
+        return '';
+    }
+
+    $cacheKey = 'srcset:' . md5($image . $pathKey);
+    return Cache::remember($cacheKey, 86400, function () use ($image, $pathKey) {
+        $imagePath = getFilePath($pathKey) . '/' . $image;
+        $fullPath = public_path($imagePath);
+        if (!file_exists($fullPath)) {
+            $projectRoot = dirname(base_path());
+            $fullPath = rtrim($projectRoot, '/\\') . '/' . $imagePath;
+        }
+
+        if (!file_exists($fullPath)) {
+            return '';
+        }
+
+        $service = app(\App\Services\ImageOptimizationService::class);
+        $sizes = $service->createResponsiveSizes($fullPath);
+        
+        $srcset = [];
+        $publicBase = asset('/');
+        foreach ($sizes as $name => $path) {
+            $width = match($name) {
+                'thumbnail' => '150w',
+                'medium' => '500w',
+                'large' => '1000w',
+                default => '1000w'
+            };
+            // Convert absolute path back to relative URL
+            $rel = str_replace([public_path(), str_replace('\\', '/', public_path())], '', str_replace('\\', '/', $path));
+            $rel = ltrim($rel, '/');
+            $srcset[] = asset($rel) . ' ' . $width;
+        }
+        
+        return implode(', ', $srcset);
+    });
+}
+
+
 
 /** Return asset URL for official platform logo (Android, iOS, Windows, Mac, Desktop) if file exists; else null. Place files in public: assets/images/frontend/footer/platforms/android.png, ios.png, windows.png, mac.png, desktop.png */
 function getPlatformLogoUrl($platform)
@@ -1268,6 +1372,148 @@ function header_icon_svg(string $key, string $fallback): string
     return $v !== '' ? $v : $fallback;
 }
 
+/**
+ * Map a generic / FA-style icon name to a Lucide kebab icon id (for data-lucide + npm lucide).
+ */
+function lucide_icon_kebab(string $rawName): string
+{
+    $raw = str_replace(['fa ', 'fas ', 'far ', 'fab ', 'fa-'], '', trim($rawName));
+    $nameLower = strtolower($raw);
+
+    $iconAliases = [
+        'angle-double-up' => 'chevrons-up',
+        'angle-left' => 'chevron-left',
+        'angle-right' => 'chevron-right',
+        'angle-up' => 'chevron-up',
+        'angle-down' => 'chevron-down',
+        'times' => 'x',
+        'close' => 'x',
+        'th-large' => 'layout-grid',
+        'exchange-alt' => 'arrow-left-right',
+        'shipping-fast' => 'truck',
+        'sliders-h' => 'sliders-horizontal',
+        'filter' => 'funnel',
+        'sign-in-alt' => 'log-in',
+        'facebook-f' => 'facebook',
+        'whatsapp' => 'message-circle',
+        'print' => 'printer',
+        'exclamation-circle' => 'circle-alert',
+        'check-circle' => 'circle-check',
+        'check-double' => 'check-check',
+        'grid' => 'layout-grid',
+        'mobile-alt' => 'smartphone',
+        'map-marker-alt' => 'map-pin',
+        'map-marker' => 'map-pin',
+        'haykal' => 'sparkles',
+        'cart-plus' => 'circle-plus',
+        'list-alt' => 'list',
+        'money-bill-wave' => 'banknote',
+        'sign-out-alt' => 'log-out',
+        'user-tie' => 'user-round',
+        'circle' => 'circle',
+        'paper-plane' => 'send',
+        'android' => 'smartphone',
+        'microphone' => 'mic',
+        'scan' => 'scan-line',
+        'user-plus' => 'user-plus',
+        'user-minus' => 'user-minus',
+        'comments' => 'messages-square',
+        'language' => 'languages',
+        'twitter' => 'twitter',
+        'x-twitter' => 'twitter',
+        'bolt' => 'zap',
+        'key' => 'key-round',
+        'box' => 'package',
+    ];
+
+    if (isset($iconAliases[$nameLower])) {
+        return $iconAliases[$nameLower];
+    }
+
+    return match (true) {
+        in_array($nameLower, ['cart', 'cart_icon', 'shopping-cart', 'shopping_cart'], true)
+            || str_contains($nameLower, 'shopping-cart')
+            || str_contains($nameLower, 'add-to-cart') => 'shopping-cart',
+        $nameLower === 'wishlist_icon' || str_contains($nameLower, 'heart') => 'heart',
+        str_contains($nameLower, 'exchange') => 'arrow-left-right',
+        $nameLower === 'quick_view_icon' || $nameLower === 'eye' => 'eye',
+        $nameLower === 'buy_now_icon' || str_contains($nameLower, 'buy-now') => 'zap',
+        str_contains($nameLower, 'bag') => 'shopping-bag',
+        str_contains($nameLower, 'user') => 'user',
+        str_contains($nameLower, 'search') => 'search',
+        str_contains($nameLower, 'map') || str_contains($nameLower, 'marker') => 'map-pin',
+        str_contains($nameLower, 'phone') => 'phone',
+        str_contains($nameLower, 'mail') || str_contains($nameLower, 'envelope') => 'mail',
+        str_contains($nameLower, 'truck') => 'truck',
+        str_contains($nameLower, 'star') => 'star',
+        str_contains($nameLower, 'chevron-down') || str_contains($nameLower, 'angle-down') => 'chevron-down',
+        str_contains($nameLower, 'chevron-up') || str_contains($nameLower, 'angle-up') => 'chevron-up',
+        str_contains($nameLower, 'chevron-left') || str_contains($nameLower, 'angle-left') => 'chevron-left',
+        str_contains($nameLower, 'chevron-right') || str_contains($nameLower, 'angle-right') => 'chevron-right',
+        str_contains($nameLower, 'menu') || str_contains($nameLower, 'bars') => 'menu',
+        str_contains($nameLower, 'times') || str_contains($nameLower, 'close') => 'x',
+        default => str_replace('_', '-', $nameLower),
+    };
+}
+
+/**
+ * Lucide name for header / product chrome keys (admin iconKey + FA fallback).
+ */
+/**
+ * Neutral SVG data-URL for broken custom header / button images.
+ */
+function stayl_placeholder_icon_data_url(): string
+{
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-3.086-3.086a.5.5 0 0 0-.707 0L9 20"/></svg>';
+
+    return $cached = 'data:image/svg+xml,' . rawurlencode($svg);
+}
+
+function header_icon_lucide_name(string $iconKey, string $fallback = ''): string
+{
+    $key = strtolower(trim($iconKey));
+    $map = [
+        'wishlist_icon' => 'heart',
+        'compare_icon' => 'arrow-left-right',
+        'cart_icon' => 'shopping-cart',
+        'buy_now_icon' => 'zap',
+        'quick_view_icon' => 'eye',
+        'search_icon' => 'search',
+        'voice_search_icon' => 'mic',
+        'image_search_icon' => 'scan-line',
+        'products_icon' => 'package',
+        'contact_icon' => 'phone',
+        'track_order_icon' => 'truck',
+        'language_icon' => 'languages',
+        'notification_icon' => 'bell',
+        'orders_icon' => 'clipboard-list',
+        'login_icon' => 'log-in',
+        'register_icon' => 'user-plus',
+        'home_icon' => 'home',
+        'messages_icon' => 'messages-square',
+        'transactions_icon' => 'banknote',
+        'review_icon' => 'star',
+        'profile_icon' => 'user-round',
+        'change_password_icon' => 'key-round',
+        'logout_icon' => 'log-out',
+        'scroll_top_icon' => 'chevrons-up',
+        'category_icon' => 'layout-grid',
+        'categories_icon' => 'layout-grid',
+    ];
+
+    if (isset($map[$key])) {
+        return $map[$key];
+    }
+
+    $fb = trim($fallback);
+
+    return lucide_icon_kebab($fb !== '' ? $fb : $iconKey);
+}
+
 function header_icon_uploaded(string $key): ?string
 {
     $file = trim((string) (header_icon_values()[$key . '_image'] ?? ''));
@@ -1276,23 +1522,47 @@ function header_icon_uploaded(string $key): ?string
 }
 
 /**
+ * Shipped Lucide SVG defaults (repo files, no DB). Used when admin has not uploaded an image
+ * or after upload is removed — same professional look survives DB reset.
+ *
+ * @see public/assets/images/frontend/header_icons/bundled/{iconKey}.svg
+ */
+function header_icon_bundled_default_svg_path(string $iconKey): ?string
+{
+    $iconKey = trim($iconKey);
+    if ($iconKey === '' || ! preg_match('/^[a-z0-9_]+$/i', $iconKey)) {
+        return null;
+    }
+    $rel = 'assets/images/frontend/header_icons/bundled/' . $iconKey . '.svg';
+    $public = public_path($rel);
+    if (is_file($public) && is_readable($public)) {
+        return $public;
+    }
+    $legacy = rtrim(dirname(base_path()), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $rel);
+    if (is_file($legacy) && is_readable($legacy)) {
+        return $legacy;
+    }
+
+    return null;
+}
+
+/**
  * Inline SVG for uploaded header icons so Lucide currentColor follows parent text/icon color (img tags cannot).
  */
 function header_icon_inline_svg_html(string $iconKey, string $imgClass, int $w, int $h, string $alt = ''): ?string
 {
+    $path = null;
     $file = header_icon_uploaded($iconKey);
-    if ($file === null || $file === '') {
-        return null;
+    if ($file !== null && $file !== '' && preg_match('/\.svg$/i', $file)) {
+        $safe = basename($file);
+        if ($safe !== '' && ! str_contains($safe, '..')) {
+            $path = header_icon_storage_absolute_path($safe);
+        }
     }
-    if (!preg_match('/\.svg$/i', $file)) {
-        return null;
+    if ($path === null || ! is_file($path)) {
+        $path = header_icon_bundled_default_svg_path($iconKey);
     }
-    $safe = basename($file);
-    if ($safe === '' || str_contains($safe, '..')) {
-        return null;
-    }
-    $path = header_icon_storage_absolute_path($safe);
-    if ($path === null) {
+    if ($path === null || ! is_readable($path)) {
         return null;
     }
     $raw = @file_get_contents($path);
@@ -1316,7 +1586,8 @@ function header_icon_inline_svg_html(string $iconKey, string $imgClass, int $w, 
             $a11y = $alt !== ''
                 ? ' role="img" aria-label="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '"'
                 : ' aria-hidden="true"';
-            $cls = htmlspecialchars(trim($imgClass), ENT_QUOTES, 'UTF-8');
+            $cls = trim($imgClass . ' staylbd-inline-svg staylbd-icon-premium');
+            $cls = htmlspecialchars($cls, ENT_QUOTES, 'UTF-8');
 
             return '<svg class="' . $cls . '" width="' . (int) $w . '" height="' . (int) $h . '" focusable="false"' . $a11y . $inner . '>';
         },
@@ -2331,7 +2602,70 @@ function productPrice($product)
         $discountPrice = 0;
     }
 
+    $baseList = (float) ($product->price ?? 0);
+    if ($baseList > 0 && (float) $discountPrice > $baseList) {
+        $discountPrice = $baseList;
+    }
+
     return $discountPrice;
+}
+
+/**
+ * Storefront-safe pricing: never show a "sale" above list; strike price only when compare > effective.
+ * Uses selling price + optional original_price (admin "Original price") + discount/today_deals.
+ */
+function productDisplayPricing($product): array
+{
+    if ($product === null) {
+        return [
+            'effective' => 0.0,
+            'compare_at' => null,
+            'show_strike' => false,
+            'save_amount' => 0.0,
+            'save_percent' => 0,
+            'has_savings' => false,
+        ];
+    }
+
+    $basePrice = (float) ($product->price ?? 0);
+    $originalPrice = (float) ($product->original_price ?? 0);
+    $effective = (float) productPrice($product);
+
+    if ($basePrice <= 0 && $effective <= 0) {
+        return [
+            'effective' => 0.0,
+            'compare_at' => null,
+            'show_strike' => false,
+            'save_amount' => 0.0,
+            'save_percent' => 0,
+            'has_savings' => false,
+        ];
+    }
+
+    if ($basePrice > 0 && $effective > $basePrice) {
+        $effective = $basePrice;
+    }
+
+    $candidates = [];
+    if ($basePrice > $effective + 0.000001) {
+        $candidates[] = $basePrice;
+    }
+    if ($originalPrice > $effective + 0.000001) {
+        $candidates[] = $originalPrice;
+    }
+    $compareAt = empty($candidates) ? null : max($candidates);
+    $showStrike = $compareAt !== null && $compareAt > $effective + 0.000001;
+    $saveAmount = $showStrike ? max(0.0, $compareAt - $effective) : 0.0;
+    $savePercent = ($showStrike && $compareAt > 0) ? (int) round(($saveAmount / $compareAt) * 100) : 0;
+
+    return [
+        'effective' => $effective,
+        'compare_at' => $compareAt,
+        'show_strike' => $showStrike,
+        'save_amount' => $saveAmount,
+        'save_percent' => $savePercent,
+        'has_savings' => $showStrike && $saveAmount > 0.000001,
+    ];
 }
 
 function showDiscountPrice($price, $discount, $discount_type)
@@ -2355,7 +2689,7 @@ function showProductRatings($avgRate)
     $pathFull = 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z';
     $normalized = round($rate * 2) / 2;
     $label = 'Rating ' . number_format($rate, 1) . ' of 5';
-    $html = '<span class="product-card__stars-inline" role="img" aria-label="' . e($label) . '" data-rating="' . e(number_format($rate, 1)) . '">';
+    $html = '<span class="product-card__stars-inline stayl-rating-stars" role="img" aria-label="' . e($label) . '" data-rating="' . e(number_format($rate, 1)) . '">';
     for ($i = 1; $i <= 5; $i++) {
         if ($normalized >= $i) {
             $html .= '<svg class="product-card__star product-card__star--full" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="' . $pathFull . '"/></svg>';

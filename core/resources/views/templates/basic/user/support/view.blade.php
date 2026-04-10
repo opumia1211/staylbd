@@ -53,12 +53,7 @@
 <x-confirmation-modal class="frontend"/>
 @endsection
 @push('style')
-<style>
-.message-view-page .message-body { line-height: 1.45; color: #1a1a1a; }
-.message-view-page .message-block { transition: background .15s ease; }
-.message-view-page .message-block:hover { background: rgba(0,0,0,.02); }
-@media (max-width: 576px) {
-    .message-view-page .card-body { padding: 0.5rem !important; }
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush

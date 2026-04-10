@@ -185,30 +185,9 @@
 </div>
 
 @push('style')
-<style>
-.app-promotion-page { font-size: 0.875rem; }
-.ap-top-bar { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem 1rem; }
-.ap-top-bar__label { font-weight: 600; color: #334155; font-size: 0.875rem; }
-.ap-top-bar__select { width: auto; min-width: 100px; }
-.ap-main__title { font-weight: 600; color: #1e293b; font-size: 1rem; }
-.ap-main__subtitle { font-size: 0.8rem; line-height: 1.35; }
-.ap-form-card { border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-.ap-label { font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 0.25rem; }
-.ap-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.ap-chip { font-size: 0.7rem; padding: 0.2rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #475569; cursor: pointer; transition: all 0.15s; }
-.ap-chip:hover { border-color: var(--bs-primary); color: var(--bs-primary); background: rgba(var(--bs-primary-rgb), 0.06); }
-.ap-table-wrap { border-color: #e2e8f0 !important; }
-.ap-table { font-size: 0.8125rem; }
-.ap-table__th { font-size: 0.75rem; font-weight: 600; color: #64748b; padding: 0.6rem 0.75rem; background: #f8fafc; }
-.ap-table__th--img { width: 56px; }
-.ap-table__th--order { width: 48px; }
-.ap-table__th--action { width: 140px; }
-.ap-table td { padding: 0.5rem 0.75rem; }
-.ap-table__img { width: 40px; height: 40px; object-fit: contain; }
-.ap-link { font-size: 0.8rem; color: var(--bs-primary); text-decoration: none; max-width: 200px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ap-link:hover { text-decoration: underline; }
-.ap-empty-icon { font-size: 2rem; opacity: 0.5; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

@@ -193,11 +193,9 @@
 @endsection
 
 @push('style')
-<style>
-#customMessageModal.modal.show { display: block !important; z-index: 1060 !important; }
-#customMessageModal .modal-dialog { z-index: 1061; }
-body .modal-backdrop.show { z-index: 1050 !important; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

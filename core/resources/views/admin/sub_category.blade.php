@@ -181,12 +181,9 @@
 @endpush
 
 @push('style')
-<style>
-    #cuModal { z-index: 10600 !important; position: fixed !important; }
-    #cuModal .modal-dialog { z-index: 10602 !important; position: relative; }
-    body.modal-open .modal-backdrop { z-index: 10598 !important; }
-    #cuModal .modal-content { position: relative; z-index: 1; pointer-events: auto; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script-lib')

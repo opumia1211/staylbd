@@ -8,7 +8,7 @@ use App\Models\PaymentEvent;
 use App\Http\Controllers\Gateway\PaymentController;
 use App\Http\Controllers\Controller;
 use App\Lib\CurlRequest;
-use App\Services\PaymentEventLogger;
+use App\Services\PaymentIpnService;
 
 class ProcessController extends Controller
 {
@@ -69,14 +69,13 @@ class ProcessController extends Controller
         }
 
         $deposit = Deposit::where('trx', $custom)->orderBy('id', 'DESC')->first();
-        if ($deposit === null || $deposit->status != Status::PAYMENT_INITIATE) {
+        if (! PaymentIpnService::depositAwaitingPayment($deposit)) {
             return;
         }
 
         $txnId = $myPost['txn_id'] ?? $_POST['txn_id'] ?? null;
         $idempotencyKey = $txnId ? 'paypal_' . $txnId : 'paypal_custom_' . $custom;
-        if (PaymentEventLogger::isDuplicate('Paypal', $idempotencyKey)) {
-            PaymentEventLogger::logReplayAttempt('Paypal', $idempotencyKey);
+        if (PaymentIpnService::isReplay('Paypal', $idempotencyKey)) {
             return;
         }
 
@@ -84,7 +83,7 @@ class ProcessController extends Controller
         $deposit->save();
 
         $mcGross = $myPost['mc_gross'] ?? $_POST['mc_gross'] ?? null;
-        if (!$mcGross || (float) $mcGross != round($deposit->final_amo, 2)) {
+        if ($mcGross === null || $mcGross === '' || ! PaymentIpnService::amountsMatch(round((float) $deposit->final_amo, 2), (float) $mcGross)) {
             return;
         }
 

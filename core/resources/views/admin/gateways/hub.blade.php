@@ -103,5 +103,7 @@
 @endsection
 
 @push('style')
-<style>.gateway-hub-card{transition:transform .2s,box-shadow .2s}.gateway-hub-card:hover{transform:translateY(-4px);box-shadow:0 .5rem 1.5rem rgba(0,0,0,.12)!important}</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

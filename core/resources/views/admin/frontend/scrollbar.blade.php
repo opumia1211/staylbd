@@ -252,24 +252,9 @@
 @endsection
 
 @push('style')
-<style>
-    .scrollbar-table-shell { max-height: 70vh; overflow: auto; border: 1px solid #e2e8f0; border-radius: 10px; }
-    .scrollbar-admin-table thead th {
-        font-size: 0.76rem;
-        padding: 0.34rem 0.42rem;
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        background: #f8fafc;
-        border-bottom: 1px solid #dbe4ee;
-        white-space: nowrap;
-    }
-    .scrollbar-admin-table td { padding: 0.32rem 0.42rem; vertical-align: middle !important; font-size: 0.77rem; }
-    .scrollbar-admin-table .badge { font-size: 0.66rem; letter-spacing: .2px; }
-    .scrollbar-admin-table .btn.btn-sm { padding: 0.18rem 0.36rem; min-height: 24px; line-height: 1.05; }
-    .scrollbar-admin-table .scrollbar-list-row:nth-child(odd) { background: #fcfdff; }
-    .scrollbar-admin-table .scrollbar-list-row:hover { background: #f5f9ff; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

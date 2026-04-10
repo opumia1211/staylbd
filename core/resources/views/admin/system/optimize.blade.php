@@ -181,7 +181,7 @@
 @endsection
 
 @push('style')
-<style>
-.cache-item-card:hover { background: rgba(0,0,0,.02); }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

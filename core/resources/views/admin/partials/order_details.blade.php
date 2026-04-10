@@ -1,43 +1,6 @@
-<style>
-    .order-detail-card .order-detail-size-col { min-width: 120px; }
-    .order-detail-card .order-detail-qty-col { min-width: 64px; }
-    .order-detail-card .order-detail-qty-value { font-size: 1.05rem; }
 
-    /* Location & Shipment Tracking – flexible, professional (change variables to theme) */
-    .order-tracking-section {
-        --track-card-radius: 0.5rem;
-        --track-card-header-bg: transparent;
-        --track-timeline-icon-size: 2rem;
-        --track-timeline-icon-bg: var(--primary, #0d6efd);
-        --track-map-min-height: 240px;
-    }
-    .order-tracking-summary .order-tracking-card { transition: box-shadow 0.2s ease; }
-    .order-tracking-summary .order-tracking-card:hover { box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.08) !important; }
-    .order-tracking-card__icon { width: 2.25rem; height: 2.25rem; display: inline-flex; align-items: center; justify-content: center; font-size: 0.9375rem; }
-    .order-tracking-card__header { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
-    .order-tracking-address-text { line-height: 1.5; word-break: break-word; }
-    .order-tracking-map-wrap { min-height: var(--track-map-min-height); background: #f1f3f5; }
-    .order-tracking-map-iframe { border: 0; width: 100%; height: 100%; }
-    .order-tracking-map-placeholder { min-height: var(--track-map-min-height); background: #f8f9fa; border-radius: 0 0 var(--track-card-radius) var(--track-card-radius); }
-    .tracking-timeline-vertical { display: flex; flex-direction: column; gap: 0; }
-    .tracking-timeline-item {
-        display: flex; align-items: flex-start; gap: 0.75rem;
-        padding: 0.5rem 0; border-bottom: 1px solid rgba(0,0,0,0.06); flex-wrap: wrap;
-    }
-    .tracking-timeline-item:last-child { border-bottom: 0; }
-    .tracking-timeline-icon {
-        flex-shrink: 0; width: var(--track-timeline-icon-size); height: var(--track-timeline-icon-size);
-        border-radius: 50%; background: var(--track-timeline-icon-bg); color: #fff;
-        display: flex; align-items: center; justify-content: center; font-size: 1rem;
-    }
-    .tracking-timeline-body { min-width: 0; word-break: break-word; }
-    .tracking-timeline-actions { flex-shrink: 0; }
-    @media (max-width: 767.98px) {
-        .order-tracking-section { --track-map-min-height: 220px; }
-        .tracking-timeline-item { flex-direction: column; gap: 0.5rem; }
-        .tracking-timeline-icon { width: 2rem; height: 2rem; font-size: 0.9rem; }
-    }
-</style>
+{{-- inline style moved to critical-admin.css --}}
+
 <div class="card border-0 shadow-sm rounded-3 order-detail-card">
     <div class="card-header bg-transparent border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
         <h6 class="card-title mb-0 fw-semibold"><i class="las la-receipt me-1"></i>@lang('Order detail of') {{ $order->order_no }}</h6>

@@ -363,29 +363,9 @@
 @endsection
 
 @push('style')
-<link rel="stylesheet" href="{{ asset('assets/templates/basic/css/logo-effects.css') }}">
-<style>
-.form-switch { display: flex; align-items: center; }
-.logo-preview-box { cursor: pointer; transition: all 0.3s; position: relative; }
-.logo-preview-box:hover { opacity: 0.95; }
-.logo-preview-box .logo-remove-btn {
-    cursor: pointer !important;
-    z-index: 9999 !important;
-    pointer-events: auto !important;
-    min-width: 32px;
-    min-height: 32px;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-}
-.logo-preview-box .logo-remove-btn:hover {
-    background: #c82333 !important;
-    transform: scale(1.15);
-}
-.logo-placeholder-content small { font-size: 10px; line-height: 1.5; }
-#effectPreview { min-height: 100px; }
-#effectPreview img { transition: all 0.3s ease; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap');
+/* Local/system monospace stack only (no external font request). */
 
 .login-area{
     width: 480px;
@@ -44,7 +44,7 @@
     border: none;
     z-index: 1;
     padding-left: 25px;
-    font-family: 'Courier Prime', monospace;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     color: #fff !important;
     border-color: transparent !important;
 }

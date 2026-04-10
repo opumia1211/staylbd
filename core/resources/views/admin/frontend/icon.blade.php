@@ -341,60 +341,9 @@
 @endsection
 
 @push('style')
-<link rel="stylesheet" href="{{ asset('assets/templates/basic/css/logo-effects.css') }}">
-<style>
-/* Logo & Favicon page – flexible, maintainable */
-.admin-icon-page .form-switch { display: flex; align-items: center; }
-.admin-icon-page .logo-preview-box {
-    min-height: 150px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.admin-icon-page .logo-preview-box:hover { opacity: 0.95; }
-.admin-icon-page .logo-preview-box .logo-remove-btn {
-    position: absolute;
-    top: 0.35rem;
-    right: 0.35rem;
-    cursor: pointer !important;
-    z-index: 9999 !important;
-    pointer-events: auto !important;
-    min-width: 32px;
-    min-height: 32px;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-}
-.admin-icon-page .logo-preview-box .logo-remove-btn:hover {
-    filter: brightness(1.1);
-    transform: scale(1.08);
-}
-.admin-icon-page .logo-placeholder-content small { font-size: 0.7rem; line-height: 1.5; }
-.admin-icon-page #effectPreview { min-height: 100px; }
-.admin-icon-page #effectPreview img { transition: all 0.3s ease; }
-.admin-icon-page .logo-effects-disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-.admin-icon-page .logo-preview-box--light { background: #f8f9fa; }
-.admin-icon-page .logo-preview-box--dark { background: #1a1a2e; }
-.admin-icon-page .logo-preview-box--favicon { background: #f0f7ff; }
-.admin-icon-page .logo-preview-img {
-    max-height: 100px;
-    max-width: 100%;
-    pointer-events: none;
-}
-.admin-icon-page .logo-preview-img--favicon { max-width: 100px; }
-.admin-icon-page .card-header.bg-dark-card { background: #1a1a2e; }
-.admin-icon-page .card-body.bg-dark-card { background: #2d2d44; }
-@media (max-width: 576px) {
-    .admin-icon-page .logo-preview-box { min-height: 120px; }
-}
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

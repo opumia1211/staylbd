@@ -171,36 +171,9 @@
         </div>
     </div>
     @push('style')
-        <style>
-            .hp-form-pro__banner {
-                background: linear-gradient(135deg, #334155 0%, #475569 50%, #1e293b 100%);
-            }
+        
+{{-- inline style moved to critical-admin.css --}}
 
-            .hp-form-pro__icon {
-                width: 56px;
-                height: 56px;
-                background: rgba(255, 255, 255, .15);
-            }
-
-            .hp-form-pro__step {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 28px;
-                height: 28px;
-                border-radius: 8px;
-                background: var(--primary, #6366f1);
-                color: #fff;
-                font-size: 0.8rem;
-                font-weight: 800;
-            }
-
-            .hp-form-pro .btn-check:checked+.btn-outline-secondary {
-                background: var(--primary, #6366f1);
-                border-color: var(--primary, #6366f1);
-                color: #fff;
-            }
-        </style>
     @endpush
     @push('script')
         <script>

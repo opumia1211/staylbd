@@ -138,9 +138,6 @@
 @push('script-lib')
     <script src="{{ asset('assets/admin/js/spectrum.js') }}"></script>
 @endpush
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/spectrum.css') }}">
-@endpush
 @push('script')
     <script>
         (function($) {

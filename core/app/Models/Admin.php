@@ -34,6 +34,9 @@ class Admin extends Authenticatable
 
     public function mustHaveTwoFactor(): bool
     {
+        if (!config('admin.admin_two_factor_enabled', true)) {
+            return false;
+        }
         if (config('admin.zero_trust_mode', false)) {
             return true;
         }

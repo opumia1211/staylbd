@@ -74,34 +74,9 @@
 @endsection
 
 @push('style')
-<style>
-.system-config-card { border-radius: 0.5rem; overflow: hidden; }
-.system-config-header {
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-    border: none;
-}
-.system-config-header .system-config-title,
-.system-config-header .system-config-desc,
-.system-config-header .header-bn { color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-.system-config-header .system-config-title { font-weight: 700; font-size: 1.25rem; }
-.system-config-header .system-config-desc { opacity: 1; font-size: 0.9rem; }
-.system-config-header .header-bn { font-weight: 500; opacity: 0.95; }
-.config-block { background: #fff; border: 1px solid #e9ecef; border-radius: 0.5rem; overflow: hidden; }
-.config-block-title { margin: 0; padding: 0.75rem 1rem; background: #f8f9fa; border-bottom: 1px solid #e9ecef; font-weight: 600; color: #212529; }
-.config-list { padding: 0; }
-.config-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1rem; border-bottom: 1px solid #f0f0f0; }
-.config-item:last-child { border-bottom: none; }
-.config-item:hover { background: #fafafa; }
-.config-item .config-info { flex: 1 1 280px; }
-.config-item .config-info .config-title { font-weight: 600; color: #212529; }
-.config-item .config-info .config-desc { font-size: 0.8125rem; color: #6c757d; margin-top: 0.25rem; }
-.config-item .config-control { flex-shrink: 0; display: flex; align-items: center; gap: 0.75rem; }
-.switch-wrap { display: inline-flex; align-items: center; gap: 0.5rem; }
-.switch-wrap input[type="checkbox"] { width: 3.5rem; height: 1.85rem; cursor: pointer; accent-color: #198754; flex-shrink: 0; }
-.switch-status { min-width: 110px; text-align: center; font-weight: 700; font-size: 0.875rem; padding: 0.4rem 0.65rem; border-radius: 0.375rem; }
-.switch-status.status-on { background: #198754; color: #fff; }
-.switch-status.status-off { background: #6c757d; color: #fff; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

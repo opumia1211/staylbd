@@ -116,12 +116,9 @@
 @endsection
 
 @push('style')
-<style>
-.card.border-success .card-header { background: rgba(25, 135, 84, 0.1) !important; }
-.template-preview-actions { opacity: 0; transition: opacity 0.2s; }
-.template-preview-wrapper:hover .template-preview-actions { opacity: 1; }
-@media (hover: none) { .template-preview-actions { opacity: 1; } }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

@@ -49,30 +49,9 @@
 </div>
 
 @push('style')
-<style>
-.reg-fields-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px 12px;
-}
-@media (max-width: 991px) { .reg-fields-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 576px) { .reg-fields-grid { grid-template-columns: repeat(2, 1fr); } }
-.reg-field-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    padding: 8px 10px;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    background: #fff;
-    cursor: pointer;
-    min-height: 36px;
-}
-.reg-field-item:hover { background: #f8f9fa; }
-.reg-field-item .form-check-input { flex-shrink: 0; width: 18px; height: 18px; margin: 0; }
-.reg-field-item .reg-field-label { font-size: 0.85rem; line-height: 1.2; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

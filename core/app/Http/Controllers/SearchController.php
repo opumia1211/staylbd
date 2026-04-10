@@ -14,6 +14,7 @@ use App\Services\UniversalSearchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class SearchController extends Controller
@@ -72,6 +73,39 @@ class SearchController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
+    }
+
+    /**
+     * Popular search terms (last 30 days, universal text search) for header discovery UI.
+     * Cached with event invalidation when new universal searches are logged.
+     */
+    public function trendingKeywords()
+    {
+        $keywords = Cache::remember('search.trending.keywords.v1', 600, function () {
+            if (!Schema::hasTable('user_search_logs')) {
+                return [];
+            }
+
+            return SearchLog::query()
+                ->where('created_at', '>=', now()->subDays(30))
+                ->where('source', 'universal')
+                ->whereRaw('CHAR_LENGTH(TRIM(query)) >= 2')
+                ->selectRaw('`query`, COUNT(*) as cnt')
+                ->groupBy('query')
+                ->orderByDesc('cnt')
+                ->limit(12)
+                ->pluck('query')
+                ->map(fn ($q) => trim((string) $q))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+        });
+
+        return response()->json([
+            'success' => true,
+            'keywords' => $keywords,
+        ]);
     }
 
     /**

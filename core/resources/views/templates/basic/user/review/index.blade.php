@@ -77,21 +77,9 @@
 @endsection
 
 @push('style')
-<style>
-.review-page .dashboard-compact-table tbody .dashboard-compact-row { border-bottom: 1px solid #e5e7eb; }
-.review-page .dashboard-compact-table tbody .dashboard-compact-row:last-child { border-bottom-width: 0; }
-.review-page.review-view-compact .dashboard-compact-name { font-size: 0.875rem; white-space: normal; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; }
-/* View, Buy Now, Wishlist, Add Review – কার্ট/উইশলিস্টের মতো একই স্টাইল */
-.review-page .product-list-row__btn--view { background: #0d6efd !important; color: #fff !important; border-color: #0d6efd !important; }
-.review-page .product-list-row__btn--view:hover { background: #0b5ed7 !important; color: #fff !important; }
-.review-page .product-list-row__btn--buy { background: #198754 !important; color: #fff !important; border-color: #198754 !important; }
-.review-page .product-list-row__btn--buy:hover { background: #157347 !important; color: #fff !important; }
-.review-page .product-list-row__btn--wishlist { background: #fff !important; color: #dc3545 !important; border: 1px solid #dc3545 !important; }
-.review-page .product-list-row__btn--wishlist:hover,
-.review-page .product-list-row__btn--wishlist.added { background: #dc3545 !important; color: #fff !important; border-color: #dc3545 !important; }
-.review-page .product-list-row__btn--review.btn--base { background: var(--base, #198754) !important; color: #fff !important; border-color: var(--base) !important; }
-.review-page .product-list-row__action-btns .btn { min-width: 36px; min-height: 36px; padding: 0.35rem !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 6px; }
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 @push('script')
 <script>

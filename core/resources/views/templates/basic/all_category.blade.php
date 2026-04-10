@@ -7,28 +7,9 @@
 
 {{-- পেজ-স্কোপড: টেইলউইন্ড বান্ডল ক্যাশে পুরনো হলেও ডেস্কটপে মোবাইল হাব লুকাবে, রেল সারি নয় --}}
 @push('style')
-<style>
-@media (min-width: 992px) {
-    #catMobileHub { display: none !important; }
-    .all-categories-section .all-categories-desktop-only { display: block !important; }
-}
-@media (max-width: 991.98px) {
-    .all-categories-section .all-categories-desktop-only { display: none !important; }
-}
-#catMobileHub .cat-mobile-hub__rail {
-    display: flex !important;
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-    align-items: stretch !important;
-}
-#catMobileHub .cat-mobile-hub__cat {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @section('content')

@@ -14,13 +14,7 @@
     </div>
 @endsection
 @push('style')
-<style>
-  td{
 
-    font-size: 22px !important;
-  }
-  .table td {
-      white-space: nowrap;
-  }
-</style>
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

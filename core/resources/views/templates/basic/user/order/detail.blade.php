@@ -227,24 +227,7 @@
     </div>
 @endsection
 @push('style')
-    <style>
-        .total-wrapper {
-            max-width: 300px;
-            margin-left: auto;
-            margin-top: 15px;
-            font-size: 14px;
-            margin-right: 20px;
-        }
+    
+{{-- inline style moved to critical-storefront.css --}}
 
-        @media (max-width:575px) {
-            .total-wrapper {
-                margin-right: 0;
-            }
-        }
-
-        .total-wrapper>div {
-            padding: 6px 0;
-            border-bottom: 1px dashed #ddd;
-        }
-    </style>
 @endpush

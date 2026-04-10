@@ -107,53 +107,7 @@
 @endsection
 
 @push('style')
-<style>
-:root {
-    --order-hero-py: 0.5rem;
-    --order-avatar-size: 48px;
-    --order-card-radius: 0.5rem;
-    --order-card-body-py: 0.75rem;
-    --order-card-body-px: 1rem;
-    --order-list-row-py: 0.4rem;
-}
-.order-detail-hero .order-detail-back-btn { font-weight: 500; }
-.order-detail-hero .order-detail-category-badge { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
-.order-detail-hero__sep { font-size: 0.875rem; }
-.order-detail-avatar { width: var(--order-avatar-size); height: var(--order-avatar-size); object-fit: cover; }
-.order-detail-customer-card .card-body { padding: var(--order-card-body-py) var(--order-card-body-px); }
-.order-detail-card .card-header { flex-wrap: wrap; padding: var(--order-card-body-py) var(--order-card-body-px); }
-.order-detail-card .card-body { padding: var(--order-card-body-py) var(--order-card-body-px); }
-.order-delivery-address-block { font-size: 0.9375rem; line-height: 1.5; color: #023047; }
-.order-address-line { margin-bottom: 0.2rem; }
-.order-address-line:last-child { margin-bottom: 0; }
-.order-detail-card .list-group-item { padding: var(--order-list-row-py) 0; border-width: 0 0 1px; }
-.order-detail-card .list-group-flush .list-group-item:last-child { border-bottom: 0 !important; }
-.table-align-middle td, .table-align-middle th { vertical-align: middle !important; }
-.order-detail-card .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.order-detail-card .table { margin-bottom: 0; min-width: 560px; font-size: 0.9375rem; }
-.order-detail-card .table td, .order-detail-card .table th { padding: 0.5rem 0.75rem; }
-@media (max-width: 767.98px) {
-    .table-align-middle .d-inline-flex { width: 48px !important; height: 48px !important; }
-    .table-align-middle img[style*="56px"] { width: 48px !important; height: 48px !important; max-width: 48px !important; }
-    .order-detail-card .table { min-width: 480px; }
-}
-@media (max-width: 575.98px) {
-    .order-detail-hero .order-detail-status-actions { width: 100%; }
-}
-/* Order tracking section – flexible, future-proof */
-.order-tracking-section .card { transition: box-shadow 0.2s ease; }
-.order-tracking-section .card:hover { box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.08) !important; }
-.tracking-timeline-vertical { display: flex; flex-direction: column; gap: 0; }
-.tracking-timeline-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(0,0,0,0.06); flex-wrap: wrap; }
-.tracking-timeline-item:last-child { border-bottom: 0; }
-.tracking-timeline-icon { flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%; background: var(--primary, #219ebc); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; }
-.tracking-timeline-body { min-width: 0; word-break: break-word; }
-.tracking-timeline-actions { flex-shrink: 0; }
-@media (max-width: 575.98px) {
-    .tracking-timeline-item { flex-direction: column; gap: 0.35rem; }
-}
-.order-address-edit-form .order-address-edit-label { color: #212529; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem; }
-.order-address-edit-form .form-control { font-size: 0.875rem; }
-.order-address-edit-form .bg-light { background-color: #f8f9fa !important; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush

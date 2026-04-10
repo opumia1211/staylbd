@@ -1,0 +1,236 @@
+/**
+ * Homepage banner module (#home-banner-section). Aspect ratio via inline CSS vars on section:
+ * --hb-w, --hb-h (set in home_banner.blade.php).
+ */
+#home-banner-section {
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 1mm !important;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    position: relative;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+#home-banner-section .banner-fullscreen-inner {
+    width: 100%;
+    max-width: var(--stayl-content-max, min(1920px, 100%));
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    box-sizing: border-box;
+}
+
+#home-banner-section .banner-slider {
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px -12px rgba(15, 23, 42, 0.25);
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: var(--hb-w, 2560) / var(--hb-h, 900);
+}
+
+#home-banner-section .banner-slider svg,
+#home-banner-section .banner-slider i,
+#home-banner-section .banner-slider .ui-icon {
+    max-width: 44px !important;
+    max-height: 44px !important;
+    object-fit: contain !important;
+}
+
+#home-banner-section .banner-slider .banner-slide-inner {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.55s ease;
+    pointer-events: none;
+}
+
+#home-banner-section .banner-slider .banner-slide-inner.banner-slide-active {
+    opacity: 1;
+    z-index: 1;
+    pointer-events: auto;
+}
+
+#home-banner-section .banner-slider .banner-slide-inner .banner-slide-link,
+#home-banner-section .banner-slider .banner-slide-inner img,
+#home-banner-section .banner-slider .banner-slide-inner picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+#home-banner-section .banner-slider .banner-slide-inner .banner-slide-link {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #e8eaed;
+}
+
+#home-banner-section .banner-slider .banner-slide-inner .banner-slide-link.is-banner-media-error {
+    background: linear-gradient(135deg, #334155 0%, #0f172a 45%, #1e293b 100%);
+}
+
+#home-banner-section .banner-slider .banner-slide-inner .banner-slide-link picture.banner-slide-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    display: block;
+    z-index: 1;
+}
+
+#home-banner-section .banner-slider .banner-slide-inner .banner-slide-link picture.banner-slide-media img {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none;
+    max-height: none !important;
+    display: block;
+    object-fit: cover !important;
+    object-position: center center !important;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+#home-banner-section .banner-slider .banner-slide-inner .banner-slide-link img.banner-slide-media {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    display: block;
+    object-fit: cover !important;
+    object-position: center center !important;
+    z-index: 1;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+#home-banner-section .banner-slider .banner-slide-inner img.banner-img-fullscreen {
+    max-height: none !important;
+    min-height: 0;
+}
+
+#home-banner-section .banner-slider-dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 6px;
+    text-align: center;
+    z-index: 12;
+    display: block !important;
+    pointer-events: auto;
+}
+
+#home-banner-section .banner-slider-dots .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease;
+}
+
+#home-banner-section .banner-slider-dots .dot:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: scale(1.15);
+}
+
+#home-banner-section .banner-slider-dots .dot.active {
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Product carousels: mandatory horizontal snap (homepage rows act as independent sliders) */
+.product-line-flex-row.product-line-flex-row--snap-mand {
+    scroll-snap-type: x mandatory;
+}
+
+/* Hero overlay: subtle fade/slide-in (respect reduced motion) */
+@keyframes stayl-hero-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    #home-banner-section .hero-overlay-motion .banner-badge {
+        animation: stayl-hero-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    #home-banner-section .hero-overlay-motion .banner-title {
+        animation: stayl-hero-fade-up 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+    }
+
+    #home-banner-section .hero-overlay-motion .banner-subtitle {
+        animation: stayl-hero-fade-up 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    }
+
+    #home-banner-section .hero-overlay-motion .banner-desc {
+        animation: stayl-hero-fade-up 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+    }
+
+    #home-banner-section .hero-overlay-motion .banner-cta {
+        animation: stayl-hero-fade-up 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+    }
+}
+
+.hero-flash-sale-bar--ended {
+    opacity: 0.85;
+    filter: grayscale(0.2);
+}
+
+/* Desktop: product strips become a responsive grid; mobile keeps horizontal snap scroll */
+@media (min-width: 1024px) {
+    .product-carousel-section .product-carousel-wrap {
+        overflow: visible;
+    }
+
+    .product-line-flex-row.home-product-strip {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        overflow-x: visible !important;
+        scroll-snap-type: none !important;
+        padding-bottom: 0 !important;
+        width: 100%;
+    }
+
+    .product-line-flex-row.home-product-strip > .product-card-col {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: none !important;
+        scroll-snap-align: none !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    .product-line-flex-row.home-product-strip {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}

@@ -3,212 +3,172 @@
 @section('panel')
 <div class="support-ticket-panel">
     {{-- Status tabs: All | Pending | Closed | Answered --}}
-    <div class="ticket-status-tabs mb-4">
-        <nav class="ticket-tabs-nav">
-            <a href="{{ route('admin.ticket.index') }}" class="ticket-tab {{ request()->routeIs('admin.ticket.index') && !request()->routeIs('admin.ticket.pending') && !request()->routeIs('admin.ticket.closed') && !request()->routeIs('admin.ticket.answered') ? 'active' : '' }}">
-                <i class="las la-inbox"></i>
+    {{-- Status tabs: All | Pending | Closed | Answered --}}
+    <div class="mb-8">
+        <nav class="flex flex-wrap items-center gap-2.5 bg-slate-100/80 p-1.5 rounded-[22px] border border-slate-100 w-fit">
+            <a href="{{ route('admin.ticket.index') }}" class="px-5 py-2.5 rounded-[18px] text-[13px] font-bold transition-all duration-300 {{ request()->routeIs('admin.ticket.index') && !request()->routeIs('admin.ticket.pending') && !request()->routeIs('admin.ticket.closed') && !request()->routeIs('admin.ticket.answered') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:bg-white hover:text-indigo-600' }}">
+                <i class="las la-inbox text-lg"></i>
                 <span>@lang('All Ticket')</span>
             </a>
-            <a href="{{ route('admin.ticket.pending') }}" class="ticket-tab {{ request()->routeIs('admin.ticket.pending') ? 'active' : '' }}">
-                <i class="las la-clock"></i>
-                <span>@lang('Pending Ticket')</span>
+            <a href="{{ route('admin.ticket.pending') }}" class="px-5 py-2.5 rounded-[18px] text-[13px] font-bold transition-all duration-300 flex items-center gap-2 {{ request()->routeIs('admin.ticket.pending') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:bg-white hover:text-indigo-600' }}">
+                <i class="las la-clock text-lg"></i>
+                <span>@lang('Pending')</span>
                 @if(isset($pendingTicketCount) && $pendingTicketCount > 0)
-                    <span class="ticket-tab-badge">{{ $pendingTicketCount }}</span>
+                    <span class="bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-md">{{ $pendingTicketCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.ticket.closed') }}" class="ticket-tab {{ request()->routeIs('admin.ticket.closed') ? 'active' : '' }}">
-                <i class="las la-times-circle"></i>
-                <span>@lang('Closed Ticket')</span>
+            <a href="{{ route('admin.ticket.answered') }}" class="px-5 py-2.5 rounded-[18px] text-[13px] font-bold transition-all duration-300 flex items-center gap-2 {{ request()->routeIs('admin.ticket.answered') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:bg-white hover:text-indigo-600' }}">
+                <i class="las la-check-circle text-lg"></i>
+                <span>@lang('Answered')</span>
             </a>
-            <a href="{{ route('admin.ticket.answered') }}" class="ticket-tab {{ request()->routeIs('admin.ticket.answered') ? 'active' : '' }}">
-                <i class="las la-check-circle"></i>
-                <span>@lang('Answered Ticket')</span>
+            <a href="{{ route('admin.ticket.closed') }}" class="px-5 py-2.5 rounded-[18px] text-[13px] font-bold transition-all duration-300 flex items-center gap-2 {{ request()->routeIs('admin.ticket.closed') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:bg-white hover:text-indigo-600' }}">
+                <i class="las la-times-circle text-lg"></i>
+                <span>@lang('Closed')</span>
             </a>
         </nav>
     </div>
 
-    {{-- Stats: compact single row --}}
-    <div class="ticket-stats row g-3 mb-4">
-        <div class="col-sm-6 col-xl-3">
-            <div class="ticket-stat-card">
-                <div class="ticket-stat-icon ticket-stat-icon--primary"><i class="las la-users"></i></div>
-                <div class="ticket-stat-body">
-                    <span class="ticket-stat-label">@lang('Conversations')</span>
-                    <span class="ticket-stat-value">{{ $totalConversations ?? $items->total() }}</span>
-                </div>
+    {{-- Stats: compact grid --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-2xl">
+                <i class="las la-users"></i>
+            </div>
+            <div>
+                <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">@lang('Conversations')</span>
+                <span class="text-xl font-bold text-slate-800">{{ $totalConversations ?? $items->total() }}</span>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="ticket-stat-card">
-                <div class="ticket-stat-icon ticket-stat-icon--success"><i class="las la-comments"></i></div>
-                <div class="ticket-stat-body">
-                    <span class="ticket-stat-label">@lang('Total Messages')</span>
-                    <span class="ticket-stat-value">{{ $totalMessages ?? 0 }}</span>
-                </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl">
+                <i class="las la-comments"></i>
+            </div>
+            <div>
+                <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">@lang('Total Messages')</span>
+                <span class="text-xl font-bold text-slate-800">{{ $totalMessages ?? 0 }}</span>
             </div>
         </div>
     </div>
 
-    {{-- Info: one line, collapsible --}}
-    <div class="ticket-info-bar mb-4">
-        <details class="ticket-info-details">
-            <summary class="ticket-info-summary">
-                <i class="las la-info-circle"></i>
-                <span>@lang('Support Ticket')</span>
-                <small class="text-muted">— @lang('Live Chat, Inquiry, Order Support, WhatsApp, Telegram, Email')</small>
-            </summary>
-            <p class="ticket-info-text mb-0 small text-muted">@lang('Admin panel: messages older than 60 days are automatically deleted. User chat: only last 30 days are visible.')</p>
-        </details>
-    </div>
-
-    {{-- Filters: one card, channel + subject --}}
-    <div class="ticket-filters-card card b-radius--10 mb-4">
-        <div class="card-body py-3">
-            <div class="row g-3 align-items-center">
+    {{-- Filters & Options --}}
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-6">
+            <div class="flex flex-wrap items-center gap-6">
                 @if(isset($hasChannelColumn) && $hasChannelColumn)
-                <div class="col-12 col-md-6">
-                    <label class="form-label small text-muted mb-1 d-block">@lang('Channel')</label>
-                    <div class="ticket-filter-pills d-flex flex-wrap gap-1">
-                        <a href="{{ request()->fullUrlWithQuery(['channel' => null, 'subject' => request('subject')]) }}" class="ticket-pill {{ !request('channel') ? 'active' : '' }}">@lang('All')</a>
-                        <a href="{{ request()->fullUrlWithQuery(['channel' => 'web', 'subject' => request('subject')]) }}" class="ticket-pill {{ request('channel') == 'web' ? 'active' : '' }}"><i class="las la-globe"></i> Web</a>
-                        <a href="{{ request()->fullUrlWithQuery(['channel' => 'telegram', 'subject' => request('subject')]) }}" class="ticket-pill {{ request('channel') == 'telegram' ? 'active' : '' }}"><i class="fab fa-telegram"></i></a>
-                        <a href="{{ request()->fullUrlWithQuery(['channel' => 'whatsapp', 'subject' => request('subject')]) }}" class="ticket-pill {{ request('channel') == 'whatsapp' ? 'active' : '' }}"><i class="fab fa-whatsapp"></i></a>
-                        <a href="{{ request()->fullUrlWithQuery(['channel' => 'email', 'subject' => request('subject')]) }}" class="ticket-pill {{ request('channel') == 'email' ? 'active' : '' }}"><i class="las la-envelope"></i></a>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-3 px-1">@lang('Channel')</label>
+                    <div class="flex items-center gap-1.5 p-1 bg-slate-50 rounded-xl border border-slate-100">
+                        <a href="{{ request()->fullUrlWithQuery(['channel' => null]) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ !request('channel') ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">@lang('All')</a>
+                        <a href="{{ request()->fullUrlWithQuery(['channel' => 'web']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('channel') == 'web' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">Web</a>
+                        <a href="{{ request()->fullUrlWithQuery(['channel' => 'telegram']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('channel') == 'telegram' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}"><i class="fab fa-telegram text-base"></i></a>
+                        <a href="{{ request()->fullUrlWithQuery(['channel' => 'whatsapp']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('channel') == 'whatsapp' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}"><i class="fab fa-whatsapp text-base"></i></a>
                     </div>
                 </div>
                 @endif
-                <div class="{{ (isset($hasChannelColumn) && $hasChannelColumn) ? 'col-12 col-md-6' : 'col-12' }}">
-                    <label class="form-label small text-muted mb-1 d-block">@lang('Subject')</label>
-                    @php $sub = request('subject'); @endphp
-                    <div class="ticket-filter-pills d-flex flex-wrap gap-1">
-                        <a href="{{ request()->fullUrlWithQuery(['subject' => null, 'channel' => request('channel')]) }}" class="ticket-pill {{ !$sub ? 'active' : '' }}">@lang('All')</a>
-                        <a href="{{ request()->fullUrlWithQuery(['subject' => 'Live Chat Message', 'channel' => request('channel')]) }}" class="ticket-pill {{ $sub === 'Live Chat Message' ? 'active' : '' }}">@lang('Live Chat')</a>
-                        <a href="{{ request()->fullUrlWithQuery(['subject' => 'General Inquiry', 'channel' => request('channel')]) }}" class="ticket-pill {{ $sub === 'General Inquiry' ? 'active' : '' }}">@lang('Inquiry')</a>
-                        <a href="{{ request()->fullUrlWithQuery(['subject' => 'Report a Problem', 'channel' => request('channel')]) }}" class="ticket-pill {{ $sub === 'Report a Problem' ? 'active' : '' }}">@lang('Report')</a>
-                        <a href="{{ request()->fullUrlWithQuery(['subject' => 'Order Support', 'channel' => request('channel')]) }}" class="ticket-pill {{ $sub === 'Order Support' ? 'active' : '' }}">@lang('Order')</a>
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-3 px-1">@lang('Quick Bulk Delete')</label>
+                    <form action="{{ route('admin.ticket.bulk-delete-messages-global') }}" method="post" class="flex items-center gap-2">
+                        @csrf
+                        <select name="delete_last" class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                            <option value="">@lang('Last 20')</option>
+                            <option value="50">@lang('Last 50')</option>
+                            <option value="100">@lang('Last 100')</option>
+                        </select>
+                        <button type="submit" class="p-2 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 hover:bg-rose-600 hover:text-white transition-all">
+                            <i class="las la-trash-alt text-lg"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
+            
+            <form action="{{ route('admin.ticket.bulk-delete-conversations') }}" method="post" id="bulkConvForm" class="flex items-center gap-2">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition-all shadow-sm shadow-rose-100">
+                    <i class="las la-trash-alt text-base"></i> @lang('Delete Selected')
+                </button>
+            </form>
         </div>
     </div>
 
-    {{-- Bulk actions: compact bar --}}
-    <div class="ticket-bulk-bar card b-radius--10 mb-4">
-        <div class="card-body py-2 px-3">
-            <div class="d-flex flex-wrap align-items-center gap-3">
-                <span class="small fw-semibold text-muted">@lang('Bulk actions'):</span>
-                <form action="{{ route('admin.ticket.bulk-delete-messages-global') }}" method="post" class="d-flex align-items-center gap-2" onsubmit="return confirm('{{ __('Delete last N messages from entire system? This cannot be undone.') }}'.replace('N', document.getElementById('globalDeleteLast').value));">
-                    @csrf
-                    <select name="delete_last" id="globalDeleteLast" class="form-select form-select-sm ticket-bulk-select" required>
-                        <option value="">@lang('Delete last…')</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                        <option value="200">200</option>
-                        <option value="300">300</option>
-                        <option value="400">400</option>
-                        <option value="500">500</option>
-                        <option value="1000">1000</option>
-                    </select>
-                    <span class="small text-muted">@lang('messages')</span>
-                    <button type="submit" class="btn btn-sm btn--danger"><i class="las la-trash"></i></button>
-                </form>
-                <span class="text-muted small">|</span>
-                <form action="{{ route('admin.ticket.bulk-delete-conversations') }}" method="post" id="bulkConvForm" class="d-flex align-items-center gap-2">
-                    @csrf
-                    <button type="button" class="btn btn-sm btn--outline-secondary" id="selectAllConvs">@lang('Select all')</button>
-                    <button type="submit" class="btn btn-sm btn--danger" onclick="return confirm('{{ __('Delete selected conversations and all their messages? This cannot be undone.') }}');">
-                        <i class="las la-trash"></i> @lang('Delete selected')
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    {{-- Table --}}
-    <div class="card b-radius--10 ticket-table-card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table--light ticket-table">
-                    <thead>
-                        <tr>
-                            <th class="ticket-th-check"><input type="checkbox" class="form-check-input" id="selectAllConvsCheck" title="@lang('Select all')"></th>
-                            @if(isset($hasChannelColumn) && $hasChannelColumn)<th class="ticket-th-channel">@lang('Channel')</th>@endif
-                            <th>@lang('User / Contact')</th>
-                            <th>@lang('Subjects')</th>
-                            <th>@lang('Status')</th>
-                            <th>@lang('Priority')</th>
-                            <th>@lang('Last Reply')</th>
-                            <th class="ticket-th-action">@lang('Action')</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+    {{-- Main Table Area --}}
+    <div class="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider w-12 text-center">
+                            <input type="checkbox" class="form-check-input rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20" id="selectAllConvsCheck">
+                        </th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">@lang('Customer info')</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">@lang('Preview / Topics')</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">@lang('Status & Activity')</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">@lang('Action')</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
                         @forelse($items as $item)
-                        <tr class="ticket-row">
-                            <td class="ticket-td-check">
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                            <td class="px-6 py-4 text-center">
                                 @if(!$item->is_guest && $item->user_id)
-                                    <input type="checkbox" class="form-check-input conv-cb" name="user_ids[]" value="{{ $item->user_id }}" form="bulkConvForm">
+                                    <input type="checkbox" class="form-check-input conv-cb rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20" name="user_ids[]" value="{{ $item->user_id }}" form="bulkConvForm">
                                 @else
-                                    <span class="text-muted">—</span>
+                                    <span class="text-slate-200">—</span>
                                 @endif
                             </td>
-                            @if(isset($hasChannelColumn) && $hasChannelColumn)
-                            <td class="ticket-td-channel">
-                                @php $ch = $item->channel ?? 'web'; @endphp
-                                @if($ch == 'web')<span class="badge badge--info" title="@lang('Web')"><i class="las la-globe"></i></span>
-                                @elseif($ch == 'telegram')<span class="badge badge--primary"><i class="fab fa-telegram"></i></span>
-                                @elseif($ch == 'whatsapp')<span class="badge badge--success"><i class="fab fa-whatsapp"></i></span>
-                                @elseif($ch == 'email')<span class="badge badge--warning"><i class="las la-envelope"></i></span>
-                                @else<span class="badge badge--dark"><i class="las la-link"></i></span>
-                                @endif
-                            </td>
-                            @endif
-                            <td>
-                                <div class="ticket-user">
-                                    <span class="fw-semibold">{{ $item->name }}</span>
-                                    @if($item->email)<br><small class="text-muted">{{ $item->email }}</small>@endif
-                                    @if($item->user_id)<br><a href="{{ route('admin.users.detail', $item->user_id) }}" class="small">@lang('View user')</a>@endif
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center font-bold text-sm">
+                                        {{ substr($item->name, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-slate-700 leading-tight">{{ $item->name }}</div>
+                                        <div class="text-[11px] text-slate-400 mt-0.5">{{ $item->email }}</div>
+                                        @if($item->user_id)
+                                            <a href="{{ route('admin.users.detail', $item->user_id) }}" class="inline-flex items-center text-[10px] font-bold text-indigo-500 hover:text-indigo-700 mt-1 uppercase tracking-tighter">@lang('View Profile')</a>
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
-                            <td>
-                                <div class="ticket-subjects">
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap gap-1.5 max-w-[280px]">
                                     @foreach(array_slice($item->subjects ?? [], 0, 3) as $s)
-                                        <span class="badge badge--secondary me-1 mb-1">{{ strLimit($s, 16) }}</span>
+                                        <span class="inline-block px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] font-bold border border-slate-200/50">{{ $s }}</span>
                                     @endforeach
                                     @if(count($item->subjects ?? []) > 3)
-                                        <span class="badge badge--dark">+{{ count($item->subjects) - 3 }}</span>
+                                        <span class="inline-block px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 text-[10px] font-black">+{{ count($item->subjects) - 3 }}</span>
                                     @endif
                                 </div>
+                                <div class="text-[11px] text-slate-400 mt-2 italic line-clamp-1">
+                                    {{ strLimit($item->last_message ?? '', 45) }}
+                                </div>
                             </td>
-                            <td>@php echo $item->status_badge ?? $item->statusBadge ?? ''; @endphp</td>
-                            <td>
-                                @if(isset($item->priority))
-                                    @if($item->priority == Status::PRIORITY_LOW)<span class="badge badge--dark">@lang('Low')</span>
-                                    @elseif($item->priority == Status::PRIORITY_MEDIUM)<span class="badge badge--warning">@lang('Medium')</span>
-                                    @elseif($item->priority == Status::PRIORITY_HIGH)<span class="badge badge--danger">@lang('High')</span>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex flex-col items-center gap-1.5">
+                                    @php echo $item->status_badge ?? $item->statusBadge; @endphp
+                                    <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">{{ diffForHumans($item->last_reply) }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    @if(!$item->is_guest && $item->user_id)
+                                        <a href="{{ route('admin.ticket.view.user', $item->user_id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[11px] font-bold hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-100" title="@lang('Open Chat')">
+                                            <i class="las la-comments text-base"></i> @lang('Reply')
+                                        </a>
+                                    @else
+                                        <a href="{{ route('admin.ticket.view', $item->primary_ticket_id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-white rounded-lg text-[11px] font-bold hover:bg-black transition-all" title="@lang('View Details')">
+                                            <i class="las la-desktop text-base"></i> @lang('Details')
+                                        </a>
                                     @endif
-                                @else
-                                    <span class="badge badge--warning">@lang('Medium')</span>
-                                @endif
-                            </td>
-                            <td><span class="text-muted small">{{ diffForHumans($item->last_reply) }}</span></td>
-                            <td class="ticket-td-action">
-                                @if(!$item->is_guest && $item->user_id)
-                                    <a href="{{ route('admin.ticket.view.user', $item->user_id) }}" class="btn btn-sm btn--primary" title="@lang('Open')">
-                                        <i class="las la-comments"></i> @lang('Open')
-                                    </a>
-                                @else
-                                    <a href="{{ route('admin.ticket.view', $item->primary_ticket_id) }}" class="btn btn-sm btn--primary">
-                                        <i class="las la-desktop"></i> @lang('Details')
-                                    </a>
-                                @endif
+                                </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td class="text-center text-muted py-5" colspan="{{ (isset($hasChannelColumn) && $hasChannelColumn) ? 8 : 7 }}">
-                                <i class="las la-inbox font-size--36px opacity-50 d-block mb-2"></i>
-                                {{ __($emptyMessage ?? 'No conversations found') }}
+                            <td class="px-6 py-12 text-center text-slate-400 font-medium" colspan="5">
+                                <div class="flex flex-col items-center gap-3 opacity-60">
+                                    <i class="las la-inbox text-5xl"></i>
+                                    <span>{{ __($emptyMessage ?? 'No conversations tracked.') }}</span>
+                                </div>
                             </td>
                         </tr>
                         @endforelse
@@ -226,41 +186,9 @@
 @endsection
 
 @push('style')
-<style>
-.support-ticket-panel { --ticket-radius: 10px; --ticket-space: 1rem; }
-.ticket-status-tabs { margin-bottom: var(--ticket-space); }
-.ticket-tabs-nav { display: flex; flex-wrap: wrap; gap: 6px; }
-.ticket-tab { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: #5a6c7d; text-decoration: none; background: rgba(0,0,0,0.04); transition: background .15s, color .15s; }
-.ticket-tab:hover { background: rgba(0,0,0,0.08); color: #1e3a5f; }
-.ticket-tab.active { background: var(--base); color: #fff; }
-.ticket-tab-badge { background: #dc3545; color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: 4px; }
-.ticket-stats .ticket-stat-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--ticket-radius); background: #fff; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-.ticket-stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-.ticket-stat-icon--primary { background: rgba(79, 196, 247, 0.18); color: var(--base, #0d6efd); }
-.ticket-stat-icon--success { background: rgba(40, 199, 111, 0.15); color: #28c76f; }
-.ticket-stat-body { display: flex; flex-direction: column; gap: 2px; }
-.ticket-stat-label { font-size: 0.75rem; color: #6c757d; }
-.ticket-stat-value { font-size: 1.25rem; font-weight: 600; color: #1e3a5f; }
-.ticket-info-bar { font-size: 0.875rem; }
-.ticket-info-details { border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; padding: 8px 12px; background: rgba(13, 110, 253, 0.06); }
-.ticket-info-summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.ticket-info-summary::-webkit-details-marker { display: none; }
-.ticket-info-text { padding-top: 6px; }
-.ticket-filters-card .ticket-filter-pills { display: flex; flex-wrap: wrap; gap: 6px; }
-.ticket-pill { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; color: #5a6c7d; background: rgba(0,0,0,0.05); transition: all .15s; }
-.ticket-pill:hover { background: rgba(0,0,0,0.1); color: #1e3a5f; }
-.ticket-pill.active { background: var(--base); color: #fff; }
-.ticket-bulk-bar .ticket-bulk-select { width: 120px; }
-.ticket-table-card .ticket-table { margin-bottom: 0; }
-.ticket-table thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: #6c757d; font-weight: 600; padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
-.ticket-table tbody td { padding: 14px; vertical-align: middle; border-bottom: 1px solid rgba(0,0,0,0.05); }
-.ticket-row:hover { background: rgba(0,0,0,0.02); }
-.ticket-th-check, .ticket-td-check { width: 42px; text-align: center; }
-.ticket-th-channel, .ticket-td-channel { width: 90px; }
-.ticket-th-action, .ticket-td-action { white-space: nowrap; }
-.ticket-user { line-height: 1.4; }
-.ticket-subjects { line-height: 1.5; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

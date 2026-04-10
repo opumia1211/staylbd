@@ -6,16 +6,26 @@ use App\Http\Controllers\Api\AutopayIncomingController;
 use App\Http\Controllers\ServeAssetController;
 
 // Serve template JS/CSS with correct MIME (fixes 404/MIME when static assets hit Laravel)
-Route::get('serve-js/{name}', [ServeAssetController::class, 'js'])->name('serve.js')->where('name', 'fly-to-header|product-carousel|glass-header|auth');
+Route::get('serve-js/{name}', [ServeAssetController::class, 'js'])->name('serve.js')->where('name', 'fly-to-header|product-carousel|glass-header|storefront-lucide|auth');
 Route::get('serve-css/global/{name}', [ServeAssetController::class, 'cssGlobal'])->name('serve.css.global');
 Route::get('serve-css/img/{name}', [ServeAssetController::class, 'imageTemplate'])->name('serve.css.img');
 Route::get('serve-css/images/{name}', [ServeAssetController::class, 'cssBundleImages'])->name('serve.css.bundle-images');
-Route::get('serve-css/webfonts/{name}', [ServeAssetController::class, 'webfonts'])->name('serve.css.webfonts');
-Route::get('serve-css/fonts/{name}', [ServeAssetController::class, 'fonts'])->name('serve.css.fonts');
+Route::get('serve-css/webfonts/{name}', [ServeAssetController::class, 'webfonts'])->name('serve.css.webfonts')->where('name', '.*');
+Route::get('serve-css/fonts/{name}', [ServeAssetController::class, 'fonts'])->name('serve.css.fonts')->where('name', '.*');
 Route::get('serve-css/tailwind-utilities', [ServeAssetController::class, 'tailwindUtilities'])->name('serve.css.tailwind.utilities');
+Route::get('serve-css/tailwind-homepage', [ServeAssetController::class, 'tailwindHomepage'])->name('serve.css.tailwind.homepage');
+Route::get('serve-css/tailwind-product', [ServeAssetController::class, 'tailwindProduct'])->name('serve.css.tailwind.product');
 Route::get('serve-css/tailwind-storefront', [ServeAssetController::class, 'tailwindStorefront'])->name('serve.css.tailwind.storefront');
+Route::get('serve-css/tailwind-storefront-deferred', [ServeAssetController::class, 'tailwindStorefrontDeferred'])->name('serve.css.tailwind.storefront.deferred');
+Route::get('serve-css/tailwind-storefront-deferred-cart', [ServeAssetController::class, 'tailwindStorefrontDeferredCart'])->name('serve.css.tailwind.storefront.deferred.cart');
+Route::get('serve-css/tailwind-storefront-deferred-account', [ServeAssetController::class, 'tailwindStorefrontDeferredAccount'])->name('serve.css.tailwind.storefront.deferred.account');
+Route::get('serve-css/tailwind-storefront-deferred-compare', [ServeAssetController::class, 'tailwindStorefrontDeferredCompare'])->name('serve.css.tailwind.storefront.deferred.compare');
+Route::get('serve-css/tailwind-storefront-deferred-home', [ServeAssetController::class, 'tailwindStorefrontDeferredHome'])->name('serve.css.tailwind.storefront.deferred.home');
+Route::get('serve-css/critical-storefront', [ServeAssetController::class, 'criticalStorefront'])->name('serve.css.critical.storefront');
 Route::get('serve-css/tailwind-admin', [ServeAssetController::class, 'tailwindAdmin'])->name('serve.css.tailwind.admin');
+Route::get('serve-css/admin-panel', [ServeAssetController::class, 'adminPanel'])->name('serve.css.admin.panel');
 Route::get('serve-css/{name}', [ServeAssetController::class, 'css'])->name('serve.css');
+
 
 // Autopay: app/SMS message bridge (Android etc. send payment confirmation here)
 Route::post('api/autopay/incoming-message', [AutopayIncomingController::class, 'incomingMessage'])->name('api.autopay.incoming')->middleware('throttle:60,1');
@@ -47,6 +57,11 @@ Route::post('ticket/reply/{ticket}', [\App\Http\Controllers\TicketController::cl
 Route::post('ticket/close/{ticket}', [\App\Http\Controllers\TicketController::class, 'closeTicket'])->name('ticket.close');
 Route::get('ticket/download/{ticket}', [\App\Http\Controllers\TicketController::class, 'ticketDownload'])->name('ticket.download');
 Route::get('ticket/', function () { return redirect('/message', 301); });
+
+Route::get('realtime/product/{id}', [\App\Http\Controllers\Storefront\RealtimePollController::class, 'product'])
+    ->name('storefront.realtime.product')
+    ->whereNumber('id')
+    ->middleware('throttle:90,1');
 
 Route::controller('SiteController')->group(function () {
     // Home/root – GET + HEAD explicitly so "GET method not supported" never appears (even with route cache)
@@ -169,6 +184,7 @@ Route::controller('ProductComparisonController')->prefix('compare')->name('compa
 
 // Universal Search Routes (GET for live suggestions; POST for form fallback)
 Route::controller('SearchController')->prefix('search')->name('search.')->group(function () {
+    Route::get('trending-keywords', 'trendingKeywords')->name('trending');
     Route::match(['get', 'post'], 'universal', 'universalSearch')->name('universal');
     Route::post('voice', 'voiceSearch')->name('voice');
     Route::post('image', 'imageSearch')->name('image');

@@ -1,181 +1,179 @@
 @extends('admin.layouts.app')
 
 @section('panel')
-<div class="support-reply-panel">
-    <div class="row">
-        <div class="col-lg-12">
-            {{-- Subject tabs (view by user only) --}}
-            @if(!empty($byUser) && isset($ticket->user_id))
-                @php
-                    $subjects = ['Live Chat Message', 'General Inquiry', 'Report a Problem', 'Order Support'];
-                    $currentSubject = $subjectFilter ?? null;
-                @endphp
-                <div class="reply-subject-bar mb-3">
-                    <span class="reply-subject-label">@lang('Subject'):</span>
-                    <div class="reply-subject-pills">
-                        <a href="{{ route('admin.ticket.view.user', $ticket->user_id) }}" class="reply-pill {{ !$currentSubject ? 'active' : '' }}">@lang('All')</a>
-                        @foreach($subjects as $sub)
-                            <a href="{{ route('admin.ticket.view.user', $ticket->user_id) }}?subject={{ urlencode($sub) }}" class="reply-pill {{ $currentSubject === $sub ? 'active' : '' }}">{{ __($sub) }}</a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+<div class="space-y-6">
+    {{-- Subject Filters --}}
+    @if(!empty($byUser) && isset($ticket->user_id))
+        @php
+            $subjects = ['Live Chat Message', 'General Inquiry', 'Report a Problem', 'Order Support'];
+            $currentSubject = $subjectFilter ?? null;
+        @endphp
+        <div class="flex flex-wrap items-center gap-2.5">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-1">@lang('Topics'):</span>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('admin.ticket.view.user', $ticket->user_id) }}" class="px-4 py-1.5 rounded-full text-[11px] font-bold transition-all duration-300 {{ !$currentSubject ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-slate-500 border border-slate-200 hover:border-indigo-400 hover:text-indigo-600' }}">@lang('All')</a>
+                @foreach($subjects as $sub)
+                    <a href="{{ route('admin.ticket.view.user', $ticket->user_id) }}?subject={{ urlencode($sub) }}" class="px-4 py-1.5 rounded-full text-[11px] font-bold transition-all duration-300 {{ $currentSubject === $sub ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-slate-500 border border-slate-200 hover:border-indigo-400 hover:text-indigo-600' }}">{{ __($sub) }}</a>
+                @endforeach
+            </div>
+        </div>
+    @endif
 
-            {{-- Header: compact one row --}}
-            <div class="reply-header-card card b-radius--10 mb-3">
-                <div class="card-body py-2 px-3">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                        <div class="d-flex flex-wrap align-items-center gap-2">
-                            @if(isset($hasChannelColumn) && $hasChannelColumn)
-                                @php $ch = $ticket->channel ?? 'web'; @endphp
-                                @if($ch == 'web')<span class="badge badge--info" title="@lang('Web')"><i class="las la-globe"></i></span>
-                                @elseif($ch == 'telegram')<span class="badge badge--primary"><i class="fab fa-telegram"></i></span>
-                                @elseif($ch == 'whatsapp')<span class="badge badge--success"><i class="fab fa-whatsapp"></i></span>
-                                @elseif($ch == 'email')<span class="badge badge--warning"><i class="las la-envelope"></i></span>
-                                @else<span class="badge badge--dark"><i class="las la-link"></i></span>
-                                @endif
-                            @endif
-                            @php echo $ticket->statusBadge; @endphp
-                            @if(!empty($byUser))
-                                <span class="fw-semibold">@lang('Conversation')</span>
-                                <span class="text-muted small">— {{ $ticket->user->fullname ?? $ticket->user->username ?? $ticket->name }}@if($ticket->user_id) <a href="{{ route('admin.users.detail', $ticket->user_id) }}" class="text--base">&#64;{{ $ticket->user->username ?? '' }}</a>@endif</span>
-                            @else
-                                <span class="fw-semibold">#{{ $ticket->ticket }}</span>
-                                <span class="text-muted small">{{ $ticket->subject }} — {{ $ticket->name }}@if($ticket->user_id) <a href="{{ route('admin.users.detail', $ticket->user_id) }}" class="text--base">&#64;{{ $ticket->user->username ?? '' }}</a>@endif</span>
-                            @endif
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            @if($ticket->status != Status::TICKET_CLOSE)
-                                <button class="btn btn--danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#DelModal"><i class="las la-times-circle"></i> @lang('Close')</button>
-                            @endif
-                            <a href="{{ route('admin.ticket.index') }}" class="btn btn--outline-secondary btn-sm"><i class="las la-arrow-left"></i> @lang('Back')</a>
-                        </div>
-                    </div>
+    {{-- Chat Header --}}
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl">
+                <i class="las la-envelope-open"></i>
+            </div>
+            <div>
+                <h6 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    @if(!empty($byUser))
+                        @lang('Conversation with') {{ $ticket->user->fullname ?? $ticket->name }}
+                    @else
+                        #{{ $ticket->ticket }} — {{ $ticket->subject }}
+                    @endif
+                    @php echo $ticket->statusBadge; @endphp
+                </h6>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[11px] text-slate-400 font-medium">@lang('Customer'):</span>
+                    <span class="text-[11px] font-bold text-indigo-500 hover:underline">
+                        {{ $ticket->name }} @if($ticket->user_id)<a href="{{ route('admin.users.detail', $ticket->user_id) }}">(@lang('View Profile'))</a>@endif
+                    </span>
                 </div>
             </div>
+        </div>
+        <div class="flex items-center gap-2">
+            @if($ticket->status != Status::TICKET_CLOSE)
+                <button class="btn inline-flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold hover:bg-rose-600 hover:text-white transition-all shadow-sm shadow-rose-50" type="button" data-bs-toggle="modal" data-bs-target="#DelModal">
+                    <i class="las la-times-circle text-base"></i> @lang('Close Ticket')
+                </button>
+            @endif
+            <a href="{{ route('admin.ticket.index') }}" class="btn inline-flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200 transition-all border border-slate-200">
+                <i class="las la-arrow-left text-base"></i> @lang('Back')
+            </a>
+        </div>
+    </div>
 
-            {{-- Chat thread + Reply area --}}
-            <div class="card b-radius--10 admin-chat-card">
-                <div class="admin-chat-thread" id="adminChatThread">
-                    <div class="admin-chat-messages" id="adminChatMessages">
-                        @php
-                            $tz = config('app.timezone', 'UTC');
-                            $lastDate = '';
-                        @endphp
-                        @forelse($messages as $message)
-                            @php
-                                $dt = $message->created_at->timezone($tz);
-                                $dateLabel = $dt->isToday() ? __('Today') : ($dt->isYesterday() ? __('Yesterday') : $dt->format('d/m/Y'));
-                            @endphp
-                            @if($dateLabel !== $lastDate)
-                                @php $lastDate = $dateLabel; @endphp
-                                <div class="admin-chat-date-divider">
-                                    <span>{{ $dateLabel }}</span>
-                                </div>
-                            @endif
-                            <div class="admin-chat-msg {{ $message->admin_id ? 'admin-chat-msg--admin' : 'admin-chat-msg--user' }}" data-msg-id="{{ $message->id }}">
-                                <div class="admin-chat-msg-head d-flex align-items-center justify-content-between flex-wrap gap-1">
-                                    <span class="admin-chat-msg-name">{{ $message->admin_id ? ($message->admin->name ?? 'Staff') : ($message->ticket->name ?? $ticket->name) }}</span>
-                                    <span class="admin-chat-msg-time" title="{{ $dt->format('Y-m-d H:i:s') }}">{{ $dt->format('d M Y, g:i A') }}</span>
-                                </div>
-                                <div class="admin-chat-msg-text">{{ nl2br(e($message->message)) }}</div>
+    {{-- Chat Thread Body --}}
+    <div class="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden flex flex-col h-[700px]">
+        <div class="flex-1 overflow-y-auto p-8 space-y-8" id="adminChatThread">
+            <div id="adminChatMessages" class="space-y-8">
+                @php
+                    $tz = config('app.timezone', 'UTC');
+                    $lastDate = '';
+                @endphp
+                @forelse($messages as $message)
+                    @php
+                        $dt = $message->created_at->timezone($tz);
+                        $dateLabel = $dt->isToday() ? __('Today') : ($dt->isYesterday() ? __('Yesterday') : $dt->format('d M Y'));
+                    @endphp
+                    @if($dateLabel !== $lastDate)
+                        @php $lastDate = $dateLabel; @endphp
+                        <div class="flex justify-center">
+                            <span class="bg-slate-100 text-slate-400 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-slate-200/50">{{ $dateLabel }}</span>
+                        </div>
+                    @endif
+
+                    <div class="flex group {{ $message->admin_id ? 'justify-end' : 'justify-start' }}" data-msg-id="{{ $message->id }}">
+                        <div class="flex flex-col max-w-[80%] {{ $message->admin_id ? 'items-end' : 'items-start' }}">
+                            {{-- Bubble Meta --}}
+                            <div class="flex items-center gap-2 mb-1.5 px-2">
+                                <span class="text-[11px] font-bold text-slate-400">{{ $message->admin_id ? ($message->admin->name ?? 'Staff') : ($message->ticket->name ?? $ticket->name) }}</span>
+                                <span class="text-[10px] text-slate-300">{{ $dt->format('g:i A') }}</span>
+                            </div>
+                            
+                            {{-- Message Content --}}
+                            <div class="relative p-4 rounded-2xl text-[13px] leading-relaxed shadow-sm {{ $message->admin_id ? 'bg-indigo-600 text-white rounded-tr-none shadow-indigo-100' : 'bg-slate-50 text-slate-700 rounded-tl-none border border-slate-100' }}">
+                                {!! nl2br(e($message->message)) !!}
+
                                 @if($message->attachments->count() > 0)
-                                    <div class="admin-chat-msg-att mt-2 d-flex flex-wrap align-items-center gap-2">
-                                        @foreach($message->attachments as $k => $att)
+                                    <div class="mt-4 grid grid-cols-2 gap-2">
+                                        @foreach($message->attachments as $att)
                                             @php
                                                 $attExt = strtolower(pathinfo($att->attachment ?? '', PATHINFO_EXTENSION));
                                                 $isImage = in_array($attExt, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
                                                 $imgUrl = $isImage ? route('admin.ticket.download', encrypt($att->id)) . '?inline=1' : null;
                                             @endphp
                                             @if($isImage && $imgUrl)
-                                                <a href="{{ $imgUrl }}" target="_blank" class="admin-chat-att-thumb" title="@lang('View full size')">
-                                                    <img src="{{ $imgUrl }}" alt="@lang('Photo') {{ $k + 1 }}" loading="lazy">
+                                                <a href="{{ $imgUrl }}" target="_blank" class="block rounded-lg overflow-hidden border border-black/10 hover:opacity-90 transition-opacity">
+                                                    <img src="{{ $imgUrl }}" class="w-full h-24 object-cover" alt="Attachment">
+                                                </a>
+                                            @else
+                                                <a href="{{ route('admin.ticket.download', encrypt($att->id)) }}" class="flex items-center gap-2 p-2 rounded-lg bg-black/5 hover:bg-black/10 transition-colors text-[10px] truncate max-w-full">
+                                                    <i class="las la-paperclip text-sm"></i> File {{ $loop->iteration }}
                                                 </a>
                                             @endif
-                                            <a href="{{ route('admin.ticket.download', encrypt($att->id)) }}{{ $isImage ? '?inline=1' : '' }}" target="_blank" class="btn btn-sm btn--outline-primary me-1 mb-1" title="{{ $isImage ? __('View image') : __('Download') }}">
-                                                <i class="las {{ $isImage ? 'la-image' : 'la-paperclip' }}"></i> @lang('Attachment') {{ $k + 1 }}
-                                            </a>
                                         @endforeach
                                     </div>
                                 @endif
-                                <div class="admin-chat-msg-actions mt-1 d-flex align-items-center gap-2">
-                                    <label class="mb-0 small d-flex align-items-center gap-1">
-                                        <input type="checkbox" class="admin-msg-bulk-cb form-check-input" name="message_ids[]" value="{{ $message->id }}">
-                                        <span>@lang('Select')</span>
-                                    </label>
-                                    <button type="button" class="btn btn-sm btn--danger confirmationBtn" data-question="@lang('Are you sure to delete this message?')" data-action="{{ route('admin.ticket.delete', $message->id) }}">
-                                        <i class="las la-trash"></i> @lang('Delete')
-                                    </button>
-                                </div>
                             </div>
-                        @empty
-                            <div class="text-center text-muted py-5">
-                                <i class="las la-comment-slash font-size--48px opacity-50"></i>
-                                <p class="mt-2 mb-0">@lang('No messages yet.')</p>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
 
-                {{-- Bulk delete: Select messages + Delete last 50/100/200/300/400/500 --}}
-                @if($messages->count() > 0)
-                    <div class="admin-chat-bulk-bar px-3 py-2 border-top">
-                        @if(!empty($byUser))
-                            <p class="small text-muted mb-2">@lang('All messages from this user are shown above. Replies go to the same conversation.')</p>
-                        @endif
-                        <form action="{{ route('admin.ticket.bulk-delete') }}" method="post" class="admin-bulk-form d-flex flex-wrap align-items-center gap-3" id="adminBulkDeleteForm">
-                            @csrf
-                            @if(!empty($byUser) && $ticket->user_id)
-                                <input type="hidden" name="user_id" value="{{ $ticket->user_id }}">
-                            @else
-                                <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
-                            @endif
-                            <label class="mb-0 small d-flex align-items-center gap-1">
-                                <input type="checkbox" class="form-check-input" id="adminSelectAllMsgs"> @lang('Select all')
-                            </label>
-                            <button type="submit" class="btn btn-sm btn--danger" name="action" value="selected" id="adminBulkDeleteSelected"><i class="las la-trash"></i> @lang('Delete selected')</button>
-                            <span class="text-muted small">|</span>
-                            <label class="mb-0 small">@lang('Delete last'):</label>
-                            <select name="delete_last" class="form-select form-select-sm admin-bulk-select">
-                                <option value="">—</option>
+                            {{-- Msg Actions (Show on group hover) --}}
+                            <div class="flex items-center gap-3 mt-2 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <label class="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-400 hover:text-indigo-500">
+                                    <input type="checkbox" class="admin-msg-bulk-cb rounded w-3 h-3 border-slate-300 text-indigo-600 focus:ring-0" name="message_ids[]" value="{{ $message->id }}">
+                                    @lang('Select')
+                                </label>
+                                <button type="button" class="btn text-[10px] font-bold text-rose-400 hover:text-rose-600 inline-flex items-center gap-1 confirmationBtn" data-question="@lang('Delete this message?')" data-action="{{ route('admin.ticket.delete', $message->id) }}">
+                                    <i class="las la-trash text-sm"></i> @lang('Delete')
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="flex flex-col items-center justify-center h-full opacity-30 gap-3">
+                        <i class="las la-comments text-7xl"></i>
+                        <p class="font-bold text-slate-400">@lang('No messages exchanged yet.')</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Bulk Bar & Reply Box --}}
+        <div class="bg-slate-50/80 border-t border-slate-100 p-6">
+            @if($messages->count() > 0)
+                <div class="flex flex-wrap items-center gap-6 mb-6">
+                    <form action="{{ route('admin.ticket.bulk-delete') }}" method="post" class="flex flex-wrap items-center gap-4" id="adminBulkDeleteForm">
+                        @csrf
+                        <input type="hidden" name="{{ !empty($byUser) ? 'user_id' : 'ticket_id' }}" value="{{ !empty($byUser) ? $ticket->user_id : $ticket->id }}">
+                        <label class="flex items-center gap-2 text-xs font-bold text-slate-500 cursor-pointer">
+                            <input type="checkbox" class="rounded border-slate-300 text-indigo-600 focus:ring-0" id="adminSelectAllMsgs"> @lang('Select All')
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <select name="delete_last" class="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] font-bold text-slate-600 outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                <option value="">@lang('Delete Last...')</option>
                                 <option value="20">20</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
-                                <option value="200">200</option>
-                                <option value="300">300</option>
-                                <option value="400">400</option>
-                                <option value="500">500</option>
-                                <option value="1000">1000</option>
                             </select>
-                            <button type="submit" class="btn btn-sm btn--danger" name="action" value="last"><i class="las la-trash"></i></button>
-                        </form>
-                    </div>
-                @endif
+                            <button type="submit" name="action" value="last" class="btn p-2 bg-rose-50 text-rose-600 rounded-lg border border-rose-100 hover:bg-rose-600 hover:text-white transition-all"><i class="las la-trash text-lg"></i></button>
+                        </div>
+                        <button type="submit" name="action" value="selected" class="btn px-4 py-2 bg-rose-600 text-white rounded-xl text-[11px] font-bold hover:bg-rose-700 transition-all shadow-sm shadow-rose-100">@lang('Delete Selected')</button>
+                    </form>
+                </div>
+            @endif
 
-                @if($ticket->status != Status::TICKET_CLOSE)
-                    <div class="admin-chat-reply-bar">
-                        <form action="{{ route('admin.ticket.reply', $ticket->id) }}" method="post" enctype="multipart/form-data" class="admin-chat-reply-form" id="adminChatReplyForm">
-                            @csrf
-                            <div class="admin-chat-reply-inner">
-                                <div class="admin-chat-reply-input-wrap">
-                                    <textarea name="message" id="adminReplyMessage" class="form-control" rows="2" placeholder="@lang('Type your reply...')" required></textarea>
-                                    <div class="admin-chat-reply-actions">
-                                        <label class="btn btn-sm btn--outline-secondary mb-0 me-2 cursor-pointer">
-                                            <i class="las la-paperclip"></i> @lang('Attach')
-                                            <input type="file" name="attachments[]" class="d-none" id="adminReplyAttach" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple>
-                                        </label>
-                                        <button type="submit" class="btn btn--primary btn-sm" name="replayTicket" value="1">
-                                            <i class="las la-paper-plane"></i> @lang('Send')
-                                        </button>
-                                    </div>
-                                </div>
-                                <div id="adminReplyFileList" class="small text-muted mt-1"></div>
-                                <p class="small text-muted mb-0 mt-1">@lang('Allowed'): jpg, jpeg, png, pdf, doc, docx. @lang('Max 5 files.')</p>
+            @if($ticket->status != Status::TICKET_CLOSE)
+                <form action="{{ route('admin.ticket.reply', $ticket->id) }}" method="post" enctype="multipart/form-data" id="adminChatReplyForm">
+                    @csrf
+                    <div class="flex flex-col gap-3">
+                        <div class="relative group">
+                            <textarea name="message" id="adminReplyMessage" rows="3" class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all resize-none shadow-sm" placeholder="@lang('Write your response here...')"></textarea>
+                            <div class="absolute bottom-3 right-3 flex items-center gap-2">
+                                <label class="btn flex items-center gap-2 px-3 py-1.5 bg-slate-50 text-slate-500 rounded-lg text-xs font-bold border border-slate-200 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer transition-all">
+                                    <i class="las la-paperclip text-base"></i> @lang('Attach')
+                                    <input type="file" name="attachments[]" class="hidden" id="adminReplyAttach" multiple>
+                                </label>
+                                <button type="submit" class="btn flex items-center gap-2 px-6 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                                    <i class="las la-paper-plane text-base"></i> @lang('Send Message')
+                                </button>
                             </div>
-                        </form>
+                        </div>
+                        <div id="adminReplyFileList" class="flex flex-wrap gap-2 px-1"></div>
+                        <p class="text-[10px] text-slate-400 px-1"><i class="las la-info-circle"></i> @lang('Supported formats: JPG, PNG, PDF, DOCX (Max 5 files).')</p>
                     </div>
-                @endif
-            </div>
+                </form>
+            @endif
         </div>
     </div>
 </div>
@@ -209,41 +207,9 @@
 @endpush
 
 @push('style')
-<style>
-.support-reply-panel { --reply-radius: 10px; }
-.reply-subject-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--reply-radius); background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06); }
-.reply-subject-label { font-size: 0.8rem; font-weight: 600; color: #6c757d; }
-.reply-subject-pills { display: flex; flex-wrap: wrap; gap: 6px; }
-.reply-pill { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; color: #5a6c7d; background: #fff; border: 1px solid rgba(0,0,0,0.08); transition: all .15s; }
-.reply-pill:hover { background: rgba(0,0,0,0.05); color: #1e3a5f; }
-.reply-pill.active { background: var(--base); color: #fff; border-color: var(--base); }
-.reply-header-card .card-body { padding: 10px 14px; }
-.admin-bulk-form .admin-bulk-select { width: 90px; }
-.admin-chat-bulk-bar { background: rgba(0,0,0,0.02); }
-.admin-chat-card { display: flex; flex-direction: column; min-height: 400px; max-height: 65vh; overflow: hidden; border-radius: var(--reply-radius); }
-.admin-chat-thread { flex: 1; overflow-y: auto; padding: 14px; background: #f5f5f0; }
-.admin-chat-messages { display: flex; flex-direction: column; gap: 10px; }
-.admin-chat-date-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0 8px; }
-.admin-chat-date-divider::before, .admin-chat-date-divider::after { content: ''; flex: 1; height: 1px; background: rgba(0,0,0,0.1); }
-.admin-chat-date-divider span { font-size: 0.7rem; color: #6c757d; padding: 3px 10px; border-radius: 6px; background: rgba(0,0,0,0.06); }
-.admin-chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-.admin-chat-msg--user { background: #fff; margin-right: auto; border-top-left-radius: 4px; border: 1px solid rgba(0,0,0,0.06); }
-.admin-chat-msg--admin { background: #e8f5e9; margin-left: auto; border-top-right-radius: 4px; border: 1px solid rgba(0,0,0,0.05); }
-.admin-chat-msg-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.admin-chat-msg-name { font-weight: 600; font-size: 0.8rem; color: #1e3a5f; }
-.admin-chat-msg-time { font-size: 0.7rem; color: #6c757d; }
-.admin-chat-msg-text { font-size: 0.9rem; color: #212529; word-break: break-word; white-space: pre-wrap; line-height: 1.45; }
-.admin-chat-msg-actions { opacity: 0.9; }
-.admin-chat-msg--sending { opacity: 0.85; }
-.admin-chat-reply-bar { flex-shrink: 0; padding: 12px 14px; background: #fff; border-top: 1px solid rgba(0,0,0,0.08); }
-.admin-chat-reply-inner { max-width: 100%; }
-.admin-chat-reply-input-wrap { display: flex; flex-direction: column; gap: 8px; }
-.admin-chat-reply-input-wrap textarea { resize: none; min-height: 56px; max-height: 120px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); }
-.admin-chat-reply-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-.admin-chat-att-thumb { display: inline-block; width: 56px; height: 56px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,0,0,0.08); flex-shrink: 0; }
-.admin-chat-att-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.cursor-pointer { cursor: pointer; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

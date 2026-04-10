@@ -33,15 +33,7 @@
             </div>
         @endif
     @endforeach
-    <style>
-    .custom-site-msg { padding: 10px 16px; background: var(--base-color, #0d9488); color: #fff; text-align: center; font-size: 14px; }
-    .custom-site-msg--top { position: sticky; top: 0; z-index: 9999; }
-    .custom-site-msg--bottom { position: relative; margin-top: auto; }
-    .custom-site-msg__item { margin: 0; }
-    .custom-site-msg__text { margin-right: 6px; }
-    .custom-site-msg__link { color: #fff; text-decoration: underline; font-weight: 600; }
-    .custom-site-msg__link:hover { color: rgba(255,255,255,0.9); }
-    .custom-site-msg--banner { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 99998; max-width: 90%; width: 420px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 20px; }
-    .custom-site-msg__item--banner { padding: 0; }
-    </style>
+    
+{{-- inline style moved to critical-storefront.css --}}
+
 @endif

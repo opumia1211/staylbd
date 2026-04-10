@@ -10,7 +10,8 @@
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'header_above'])
     @include($activeTemplate . 'partials.header')
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'header_below'])
-    <main style="margin-top: 0;">
+    {{-- storefront-main: offset for fixed glass header + 3px air before first section (e.g. banner) --}}
+    <main class="storefront-main" style="margin-top: 0;">
         @include($activeTemplate . 'partials.inline_public_ads')
         @include($activeTemplate . 'partials.scrollbar', ['position' => 'content_top'])
         @if($__contentTopTimers->isNotEmpty())
@@ -40,6 +41,15 @@
     @include($activeTemplate . 'partials.global_positioned_ads')
     @include($activeTemplate . 'partials.footer')
 
+    {{-- Floating WhatsApp Integration --}}
+    @if($general->whatsapp_number)
+    <a href="https://wa.me/{{ $general->whatsapp_number }}?text=Hi, I need assistance with my order." 
+       target="_blank" 
+       class="fixed bottom-24 right-6 z-[9990] bg-[#25d366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
+        <i class="lab la-whatsapp fs-1"></i>
+    </a>
+    @endif
+
     @include($activeTemplate . 'partials.contact_panel')
     @if($__popupAds->isNotEmpty())
     @include($activeTemplate . 'partials.popup_ad', ['popupAds' => $__popupAds])
@@ -63,20 +73,9 @@
 @endsection
 
 @push('style')
-<style>
-    /* Phase-A lightweight modal controller styles (no layout shift). */
-    .modal#quickView { display: none; background: rgba(2, 6, 23, 0.55); }
-    .modal#quickView.is-open { display: block; }
-    .modal#quickView .modal-dialog {
-        transform: translateY(12px) scale(.98);
-        opacity: 0;
-        transition: transform .2s ease, opacity .2s ease;
-    }
-    .modal#quickView.is-open .modal-dialog {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @if (!$general->maintenance_mode)
@@ -826,6 +825,7 @@
                         }).then(function(r) { return r.text(); })
                           .then(function(html) {
                               qvModalBody.innerHTML = html || '';
+                              if (typeof window.refreshStaylLucide === 'function') window.refreshStaylLucide(qvModalBody);
                               if (window.StaylModal && typeof window.StaylModal.show === 'function') {
                                   window.StaylModal.show('quickView');
                               } else {
@@ -1234,6 +1234,20 @@
                 }
             })();
         </script>
+        {{-- Optional template scripts: include only when files exist (prevents 404 noise in console). --}}
+        @php
+            $templateJsBase = 'assets/templates/' . activeTemplateName() . '/js/';
+            $businessJsRel = $templateJsBase . 'storefront-business.js';
+            $legalJsRel = $templateJsBase . 'legal.js';
+        @endphp
+        @if(is_file(public_path($businessJsRel)))
+            <script src="{{ asset($businessJsRel) }}" defer></script>
+        @endif
+        @if(is_file(public_path($legalJsRel)))
+            <script src="{{ asset($legalJsRel) }}" defer></script>
+        @endif
+        @include('partials.marketing_analytics')
     @endpush
 @endif
+
 

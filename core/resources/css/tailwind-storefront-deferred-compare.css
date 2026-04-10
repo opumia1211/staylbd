@@ -1,0 +1,6 @@
+/*
+ * Compare + wishlist legacy CSS — load async on compare / wishlist pages.
+ */
+@import "../../public/assets/templates/basic/css/compare.css";
+@import "../../public/assets/templates/basic/css/wishlist-responsive.css";
+@import "../../public/assets/templates/basic/css/wishlist-buttons.css";

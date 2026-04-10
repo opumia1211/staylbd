@@ -38,7 +38,7 @@ class ReAuthController extends Controller
         }
 
         $code = trim((string) $request->input('code'));
-        if ($admin->hasTwoFactorEnabled()) {
+        if ($admin->hasTwoFactorEnabled() && config('admin.admin_two_factor_enabled', true)) {
             if ($code === '') {
                 $notify[] = ['error', __('2FA code is required.')];
                 return back()->withNotify($notify);

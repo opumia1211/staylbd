@@ -3,15 +3,13 @@ Easy Installer by ViserLab
 Laravel Software Setup Module By viserlab.com
 */
 
-@import url(https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap);
-            
 html {
     font-size: 18px;
 }
 body {
     color: #ddd;
     line-height: 26px;
-    font-family: "Courier Prime", sans-serif;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     background: #050d3d;
     display: flex;
     flex-direction: column;

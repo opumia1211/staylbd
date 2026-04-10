@@ -9,20 +9,19 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $pageTitle ?? __('Login') }} - {{ gs('site_name') ?? config('app.name') }}</title>
     @include('partials.seo')
-    {{-- Same as public app: Inter blocking + storefront preload — faster, no FOUT inside iframe --}}
-    <link rel="preconnect" href="https://rsms.me/" crossorigin>
-    <link rel="preload" href="https://rsms.me/inter/inter.css" as="style" crossorigin>
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" crossorigin>
-    <style>
-        body, html {
-            background: transparent !important;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Hide scrollbars within the iframe if not needed */
-            font-family: Inter, system-ui, sans-serif;
-        }
-    </style>
-    <link rel="stylesheet" href="{{ url('serve-css/tailwind-storefront') }}?v={{ $assetVersion }}" crossorigin="anonymous">
+    @php
+        $storefrontCssHref = storefront_compiled_stylesheet_url('tailwind-storefront');
+        $storefrontDeferredHref = storefront_compiled_stylesheet_url('tailwind-storefront-deferred');
+    @endphp
+    @include('partials.inter-font-preload', ['assetVersion' => $assetVersion])
+    
+{{-- inline style moved to critical-storefront.css --}}
+
+    <link rel="preload" href="{{ $storefrontCssHref }}" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ $storefrontCssHref }}" crossorigin="anonymous">
+    <link rel="preload" href="{{ $storefrontDeferredHref }}" as="style" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ $storefrontDeferredHref }}" media="print" onload="this.media='all'" crossorigin="anonymous">
+    <noscript><link rel="stylesheet" href="{{ $storefrontDeferredHref }}" crossorigin="anonymous"></noscript>
 </head>
 <body class="floating-auth-page">
     <script>try{if(window.self!==window.top){document.documentElement.classList.add('st-auth-iframe');document.body.classList.add('st-auth-iframe');}}catch(e){}</script>

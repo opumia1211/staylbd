@@ -363,22 +363,11 @@
 @endpush
 
 @push('style')
-<style>
-.search-analytics-panel .card { min-width: 0; }
-.search-analytics-panel .table th { white-space: nowrap; }
-.search-analytics-panel .text-break { word-break: break-word; overflow-wrap: break-word; max-width: 100%; }
-.search-analytics-panel .search-query-text { flex: 1; min-width: 0; }
-.search-analytics-panel .copy-query-btn { flex-shrink: 0; }
-@media (max-width: 767px) {
-    .search-analytics-panel .table-responsive { font-size: 0.875rem; }
-    .search-analytics-panel .btn-sm { padding: 0.25rem 0.5rem; }
-}
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/datepicker.min.css') }}">
-@endpush
 @push('script-lib')
     <script src="{{ asset('assets/admin/js/vendor/datepicker.min.js') }}"></script>
     <script src="{{ asset('assets/admin/js/vendor/datepicker.en.js') }}"></script>

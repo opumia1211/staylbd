@@ -1,15 +1,213 @@
-/* Admin: Inter + Tailwind utilities (no preflight). Loaded after app.css so body font applies. */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@charset "UTF-8";
+/**
+ * Staylbd Admin Panel – Master CSS Bundle
+ * Served via ServeAssetController which embeds @imports and rewrites font/image URLs.
+ * DO NOT remove @imports – they are resolved at runtime by ServeAssetController::tailwindAdmin().
+ * Last rebuilt: 2026-04-10
+ */
 
-@layer base {
-    body,
-    button,
-    input,
-    select,
-    textarea,
-    .form-control {
-        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-    }
+/* ====================================================================
+   1. ICON & FONT LIBRARIES
+   ==================================================================== */
+@import '../../public/assets/global/css/bootstrap.min.css';
+@import '../../public/assets/global/css/all.min.css';
+@import '../../public/assets/global/css/line-awesome.min.css';
+
+/* ====================================================================
+   2. ADMIN FRAMEWORK – Bootstrap + Admin Base Theme
+   ==================================================================== */
+@import '../../public/assets/admin/css/vendor/bootstrap-toggle.min.css';
+@import '../../public/assets/admin/css/vendor/select2.min.css';
+@import '../../public/assets/admin/css/app.css';
+
+/* ====================================================================
+   3. ADMIN DASHBOARD PREMIUM GLASS DESIGN
+   ==================================================================== */
+@import '../../public/assets/admin/css/dashboard-glass.css';
+@import 'admin-dashboard-panel.css';
+
+/* ====================================================================
+   4. ADDITIONAL ADMIN COMPONENTS
+   ==================================================================== */
+@import '../../public/assets/admin/css/professional-login.css';
+@import '../../public/assets/admin/css/monokai.min.css';
+@import '../../public/assets/admin/css/verification_code.css';
+
+/* ====================================================================
+   5. AUTH PAGE OVERRIDES (Scoped – only on body.admin-auth-page)
+   These override framework defaults only on the login/reset pages.
+   ==================================================================== */
+
+:root {
+    --admin-primary: #0e9f90;
+    --admin-primary-hover: #0c8a7d;
+}
+
+/* Force white clean background on auth pages ONLY */
+body.admin-auth-page {
+    background: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+body.admin-auth-page .login-main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+body.admin-auth-page .admin-login-shell {
+    width: 100%;
+    max-width: 420px;
+}
+
+body.admin-auth-page .login-wrapper {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,.05), 0 8px 10px -6px rgba(0,0,0,.05) !important;
+    overflow: hidden;
+    width: 100%;
+}
+
+body.admin-auth-page .login-wrapper__body {
+    padding: 32px;
+}
+
+body.admin-auth-page .login-wrapper__top {
+    text-align: center;
+    padding: 32px 32px 0;
+}
+
+/* Input Styling on Auth Pages */
+body.admin-auth-page .form-control {
+    width: 100% !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 12px 16px !important;
+    font-size: 15px !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    transition: all .2s ease;
+}
+body.admin-auth-page .form-control:focus {
+    outline: none !important;
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 4px rgba(14,159,144,.1) !important;
+}
+
+/* Password Toggle */
+body.admin-auth-page .password-input-wrap {
+    position: relative;
+    display: block;
+}
+body.admin-auth-page .password-toggle-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+    padding: 4px;
+}
+
+/* Captcha */
+body.admin-auth-page .captcha-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+body.admin-auth-page .captcha-img-wrap {
+    flex: 0 0 132px;
+    height: 52px;
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+}
+body.admin-auth-page .captcha-code-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 2px;
+}
+body.admin-auth-page .captcha-refresh-btn {
+    flex: 0 0 42px;
+    height: 42px;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+body.admin-auth-page .captcha-input {
+    flex: 1;
+}
+
+/* Button */
+body.admin-auth-page .btn-primary {
+    background: var(--admin-primary) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    height: 52px !important;
+    font-weight: 700 !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all .2s ease !important;
+}
+
+/* Form options row */
+body.admin-auth-page .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+body.admin-auth-page .forgot-link {
+    font-size: .875rem;
+    color: var(--admin-primary);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+/* Kill pseudo-element overlays on auth page */
+body.admin-auth-page .login-wrapper::before,
+body.admin-auth-page .login-wrapper::after,
+body.admin-auth-page .login-main::before,
+body.admin-auth-page .login-main::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Admin dropdown stacking safety */
+.dropdown-menu {
+    z-index: 9999 !important;
+}
+
+.navbar,
+.navbar-wrapper {
+    z-index: 1000;
 }

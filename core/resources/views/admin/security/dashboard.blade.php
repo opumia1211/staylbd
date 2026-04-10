@@ -134,6 +134,16 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td class="text-muted">@lang('Login 2FA')</td>
+                                    <td>
+                                        <div class="form-check form-switch mb-0 security-toggle d-inline-block" data-key="admin_two_factor_enabled">
+                                            <input class="form-check-input" type="checkbox" {{ ($security_config['admin_two_factor'] ?? true) ? 'checked' : '' }}>
+                                            <label class="form-check-label small">{{ ($security_config['admin_two_factor'] ?? true) ? __('On') : __('Off') }}</label>
+                                        </div>
+                                        <div class="small text-muted mt-1">@lang('When off, password-only login (no OTP / setup). For development; enable for production.')</div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                         <div class="px-3 py-2 bg-light small text-muted border-top">

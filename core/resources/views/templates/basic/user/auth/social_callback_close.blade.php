@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>@lang('Login')</title>
+    <link rel="stylesheet" href="{{ storefront_compiled_stylesheet_url('critical-storefront') }}" crossorigin="anonymous">
     <script>
         (function(){
             var redirectUrl = {!! json_encode($redirectUrl ?? '') !!};
@@ -17,9 +18,9 @@
             setTimeout(function(){ window.location = redirectUrl && redirectUrl.length ? redirectUrl : '/'; }, 800);
         })();
     </script>
-    <style>html,body{background:#fff;margin:0}</style>
+
 </head>
-<body></body>
+<body class="st-social-callback"></body>
 </html>
 
 

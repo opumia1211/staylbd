@@ -1,4 +1,7 @@
 @extends($activeTemplate . 'layouts.frontend')
+@push('body_attrs')
+data-product-id="{{ $product->id }}"
+@endpush
 @php
     // PDP scripts rely on jQuery + Bootstrap Modal (tabs, AJAX actions, image lightbox).
     // Keep these enabled on this page to avoid non-responsive buttons/features.
@@ -9,158 +12,17 @@
 @php
     $shareUrl = $productUrl ?? product_detail_url($product);
 @endphp
-@push('head-meta')
-    <style id="pdp-critical-cart">
-        /* এক লাইন, হরিজন্টাল স্ক্রলবার নয় — ফ্লেক্স শ্রিঙ্ক + কমপ্যাক্ট; ক্লিপ/ভাসমান product-details.css */
-        .pro-detail-page .pdp-cart-action-row{display:flex;flex-wrap:nowrap;align-items:center;gap:clamp(2px,.75vw,6px);width:100%;min-width:0;overflow:visible;padding:0;background:transparent;box-shadow:none;border-radius:0;position:relative;z-index:2}
-        .pro-detail-page .pdp-cart-action-row .action-buttons.pdp-actions-scroll{display:flex;flex-wrap:nowrap;flex:1 1 0%;min-width:0;min-height:0;width:0;max-width:100%;gap:clamp(2px,.5vw,5px);align-items:center;overflow-x:hidden;overflow-y:visible;scrollbar-width:none;padding:0;background:transparent;box-shadow:none}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .btn{box-sizing:border-box;flex:1 1 0%;min-width:0;height:clamp(28px,5.8vw,34px);display:flex;align-items:center;justify-content:center;gap:2px;font-size:clamp(7.5px,1.5vw,10.5px);font-weight:600;border-radius:clamp(6px,1vw,9px);padding:0 clamp(3px,.9vw,9px);overflow:visible;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 1px 2px rgba(15,23,42,.07),0 1px 3px rgba(15,23,42,.05);position:relative;z-index:2}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .btn>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .cart-btn{flex:1.22 1 0%;background:linear-gradient(155deg,rgba(16,185,129,.88),rgba(5,150,105,.92));color:#fff;border:1px solid rgba(255,255,255,.55);font-weight:700}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .cart-btn.in-cart{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .compare-btn{background:#fff;color:#0f172a;border:1px solid rgba(148,163,184,.65)}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .compare-btn.in-compare{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn{background:linear-gradient(155deg,rgba(16,185,129,.85),rgba(4,120,87,.9));color:#fff;border:1px solid rgba(255,255,255,.52);text-decoration:none}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn.added,.pro-detail-page .pdp-cart-action-row .action-buttons .wishlist-btn.active{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .chat-btn{background:#fff;color:#0f172a;border:1px solid rgba(148,163,184,.62);text-decoration:none}
-        .pro-detail-page .pdp-cart-action-row .action-buttons .chat-btn.pdp-chat-active{background:linear-gradient(155deg,rgba(239,68,68,.92),rgba(185,28,28,.95));border-color:rgba(255,255,255,.5);color:#fff}
-    </style>
-@endpush
-
 @push('style')
     <link rel="preconnect" href="{{ url('/') }}" crossorigin>
     <link rel="preload" href="{{ $product->imageShowWebP() }}" as="image" fetchpriority="high">
-    <style>
-        /* Flexible product-detail: variables so layout won’t break when tuned later */
-        .pro-detail-page {
-            --pro-detail-container-sm: 1140px;
-            --pro-detail-container-xl: 1320px;
-            --pro-detail-break-lg: 992px;
-            --pro-detail-break-xl: 1400px;
-        }
-        .pro-detail-size-wrap .pro-detail-size-btn--custom .size-text,
-        .pro-detail-size-btns .pro-detail-size-btn--custom .size-text {
-            font-size: 0.6rem !important;
-            line-height: 1.1 !important;
-            font-weight: 600;
-        }
-        .pro-detail-page .container {
-            max-width: var(--pro-detail-container-sm);
-        }
-        @media (min-width: 1400px) {
-            .pro-detail-page .container {
-                max-width: var(--pro-detail-container-xl);
-            }
-        }
-        .pro-detail-gallery-col, .pro-detail-info-col { min-width: 0; }
-        .pro-detail-size-btns { flex-wrap: wrap; gap: clamp(4px, 1vw, 8px); }
-        .pro-detail-size-btn {
-            width: clamp(36px, 10vw, 42px);
-            height: clamp(36px, 10vw, 42px);
-            min-width: clamp(36px, 10vw, 42px);
-        }
-        #product-detail-tabs {
-            content-visibility: auto;
-            contain-intrinsic-size: auto 400px;
-        }
-        .pro-detail-related-section,
-        .pro-detail-more-sections .pro-section {
-            content-visibility: auto;
-            contain-intrinsic-size: auto 300px;
-        }
-        .pro-detail-more-sections .pro-section__title { font-size: 1.1rem; }
-        /* Bottom product list: force real responsive grid so one card never takes full row */
-        .pro-detail-bottom-grid {
-            display: grid !important;
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            gap: 10px !important;
-            width: 100% !important;
-            align-items: stretch;
-        }
-        .pro-detail-bottom-grid > .product-card-col {
-            width: auto !important;
-            max-width: none !important;
-            min-width: 0 !important;
-            flex: 0 0 auto !important;
-        }
-        .pro-detail-bottom-grid .product-card {
-            height: 100%;
-        }
-        @media (min-width: 768px) {
-            .pro-detail-bottom-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-                gap: 12px !important;
-            }
-        }
-        @media (min-width: 992px) {
-            .pro-detail-bottom-grid {
-                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-            }
-        }
-        @media (min-width: 1200px) {
-            .pro-detail-bottom-grid {
-                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-            }
-        }
-        @media (min-width: 1400px) {
-            .pro-detail-bottom-grid {
-                grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-            }
-        }
-        /* Critical: no horizontal overflow on any device */
-        .pro-detail-page { overflow-x: hidden; width: 100%; }
-        .pro-detail-page .container { max-width: 100%; box-sizing: border-box; }
-        .pro-detail-gallery-col, .pro-detail-info-col { min-width: 0; max-width: 100%; }
-        @media (max-width: 575.98px) {
-            .pro-detail-page .container { padding-left: 0.5rem; padding-right: 0.5rem; }
-            /* cart-action-row: layout from product-details.css @ 768px */
-        }
-        /* Quantity input: wider so number is clearly visible */
-        .pdp-cart-action-row .qty-box input.productQuantity {
-            min-width: 44px;
-            width: 3rem;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        /* Mobile: প্রোডাক্ট ছবি নেভ বাটন দুপাশে – Prev বামে, Thumbs মাঝে স্ক্রল, Next ডানে */
-        @media (max-width: 575.98px) {
-            .pro-detail-thumbs-col {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                gap: 8px;
-            }
-            .pro-detail-thumb-prev { order: 0; flex-shrink: 0; }
-            .pro-detail-thumbs-vertical { order: 1; flex: 1; min-width: 0; -webkit-overflow-scrolling: touch; }
-            .pro-detail-thumb-next { order: 2; flex-shrink: 0; }
-        }
-        /* Mobile/Tablet: Similar Products সাইডবার লুকানো – শুধু Related Products; ক্রম ঠিক */
-        @media (max-width: 991.98px) {
-            .pro-detail-page .container {
-                display: flex;
-                flex-direction: column;
-            }
-            .pro-detail-page .container > .row.g-4 {
-                display: contents;
-            }
-            .pro-detail-page .container > .row.g-4 > .pro-detail-gallery-col { order: 0; }
-            .pro-detail-page .container > .row.g-4 > .pro-detail-info-col { order: 1; }
-            .pro-detail-page .container > #product-detail-tabs { order: 2; }
-            .pro-detail-page .container > .row.g-4 > .col-lg-3.order-lg-3 {
-                display: none !important; /* Similar Products: মোবাইল/ট্যাবে দেখাব না, শুধু Related Products */
-            }
-            .pro-detail-page .container > .pro-detail-more-sections { order: 3; }
-        }
-    </style>
 @endpush
 
 @section('content')
     @php
         $reviewsTotalSeo = $reviewsTotal ?? 0;
         $avgRateSeo = $product->avg_rate ?? 0;
-        $detailPrice = $detailPrice ?? productPrice($product);
+        $detailPricing = productDisplayPricing($product);
+        $detailPrice = $detailPrice ?? $detailPricing['effective'];
         $productUrl = $productUrl ?? product_detail_url($product);
         $productImages = $productImages ?? [];
         if (empty($productImages)) {
@@ -229,9 +91,11 @@
 
     @php
         $features = $product->features ?? [];
-        $detailSave = $product->price - $detailPrice;
-        $detailPercent = $product->price > 0 ? round(($detailSave / $product->price) * 100) : 0;
-        $hasDiscount = $product->price > 0 && $detailPrice < $product->price;
+        $detailCompareAt = $detailPricing['compare_at'];
+        $detailShowStrike = $detailPricing['show_strike'];
+        $detailSave = $detailPricing['save_amount'];
+        $detailPercent = $detailPricing['save_percent'];
+        $hasDiscount = $detailPricing['has_savings'];
         $galleryImages = array_merge([$product->image], $product->gallery ?? []);
         $totalGallery = count($product->gallery ?? []) + 1;
     @endphp
@@ -333,8 +197,8 @@
 
                         <div class="pro-detail-price-block pro-detail-price-one-line">
                             <span class="pro-detail-special-price product-price">{{ $general->cur_sym }}{{ showAmount($detailPrice) }}</span>
-                            @if ($hasDiscount)
-                                <span class="pro-detail-regular-price">{{ $general->cur_sym }}{{ showAmount($product->price) }}</span>
+                            @if ($hasDiscount && $detailShowStrike && $detailCompareAt !== null)
+                                <span class="pro-detail-regular-price">{{ $general->cur_sym }}{{ showAmount($detailCompareAt) }}</span>
                                 <span class="badge bg-success pro-detail-discount-badge">{{ $detailPercent }}% @lang('OFF')</span>
                                 <span class="pro-detail-save-extra">{{ $general->cur_sym }}{{ showAmount($detailSave) }} @lang('saved')</span>
                             @endif
@@ -463,7 +327,7 @@
                                 </div>
                                 <div class="action-buttons pdp-actions-scroll" aria-label="{{ __('Product actions') }}">
                                     <button type="button"
-                                            class="btn cart-btn add-to-cart"
+                                            class="cart-btn add-to-cart"
                                             data-product_id="{{ $product->id }}"
                                             id="addToCartBtn"
                                             title="{{ __('Add to cart — click again when red to remove') }}">
@@ -471,14 +335,14 @@
                                         <span>@lang('Add To Cart')</span>
                                     </button>
                                     <button type="button"
-                                            class="btn compare-btn btn-compare add-to-compare"
+                                            class="compare-btn btn-compare add-to-compare"
                                             data-product_id="{{ $product->id }}"
                                             title="{{ __('In compare list — click again to remove') }}">
                                         @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'sync-alt', 'width' => 20, 'height' => 20, 'alt' => ''])
                                         <span>@lang('Compare')</span>
                                     </button>
                                     <a href="javascript:void(0)"
-                                       class="btn wishlist-btn add-wishlist {{ in_array($product->id, $wishListProductIds ?? []) ? 'added' : '' }}"
+                                       class="wishlist-btn add-wishlist {{ in_array($product->id, $wishListProductIds ?? []) ? 'added' : '' }}"
                                        data-product_id="{{ $product->id }}"
                                        role="button"
                                        title="{{ __('Wishlist — click again when red to remove') }}">
@@ -496,11 +360,8 @@
                                 </div>
                             </div>
                             <div class="pro-detail-buy-now-wrap mb-2">
-                                @if($detailMaxQty > 0)
-                                <a class="cmn--btn buy-now w-100 justify-content-center" href="#0" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
-                                @else
-                                <span class="cmn--btn w-100 justify-content-center disabled" style="cursor:not-allowed; opacity:0.7;">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
-                                @endif
+                                <a class="cmn--btn buy-now w-100 justify-content-center {{ $detailMaxQty <= 0 ? 'd-none' : '' }}" id="pdpBuyNowLink" href="#0" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
+                                <span class="cmn--btn w-100 cursor-not-allowed justify-content-center opacity-70 disabled {{ $detailMaxQty > 0 ? 'd-none' : '' }}" id="pdpBuyNowOos" role="status">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
                             </div>
                             @guest
                             <div class="pro-detail-quick-order-wrap mb-2">
@@ -550,16 +411,16 @@
                             <div class="pro-detail-share">
                                 <span>@lang('Share'):</span>
                                 <ul class="social-icons">
-                                    <li><a href="https://wa.me/?text={{ urlencode(__($product->name) . ' ' . $shareUrl) }}" target="_blank" rel="noopener" style="background:#25D366" title="WhatsApp">@include($activeTemplate . 'partials.icon', ['name' => 'whatsapp'])</a></li>
-                                    <li><a href="mailto:?subject={{ urlencode(__($product->name)) }}&body={{ urlencode($shareUrl) }}" style="background:#ea4335" title="@lang('Email')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'mail_icon', 'fallback' => 'envelope', 'width' => 18, 'height' => 18, 'alt' => ''])</a></li>
-                                    <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}" target="_blank" rel="noopener" style="background:#1877f2" title="@lang('Facebook')">@include($activeTemplate . 'partials.icon', ['name' => 'facebook-f'])</a></li>
-                                    <li><a href="https://twitter.com/intent/tweet?text={{ urlencode(__($product->name)) }}&url={{ urlencode($shareUrl) }}" target="_blank" rel="noopener" style="background:#000" title="@lang('Twitter')">@include($activeTemplate . 'partials.icon', ['name' => 'twitter'])</a></li>
-                                    <li><a href="javascript:window.print()" style="background:#6c757d" title="@lang('Print')">@include($activeTemplate . 'partials.icon', ['name' => 'print'])</a></li>
-                                    <li><a href="javascript:void(0)" class="copy-link-btn" data-url="{{ $shareUrl }}" style="background:#0d6efd" title="@lang('Copy Link')">@include($activeTemplate . 'partials.icon', ['name' => 'link'])</a></li>
+                                    <li><a class="bg-[#25D366]" href="https://wa.me/?text={{ urlencode(__($product->name) . ' ' . $shareUrl) }}" target="_blank" rel="noopener" title="WhatsApp">@include($activeTemplate . 'partials.icon', ['name' => 'whatsapp'])</a></li>
+                                    <li><a class="bg-[#ea4335]" href="mailto:?subject={{ urlencode(__($product->name)) }}&body={{ urlencode($shareUrl) }}" title="@lang('Email')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'mail_icon', 'fallback' => 'envelope', 'width' => 18, 'height' => 18, 'alt' => ''])</a></li>
+                                    <li><a class="bg-[#1877f2]" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}" target="_blank" rel="noopener" title="@lang('Facebook')">@include($activeTemplate . 'partials.icon', ['name' => 'facebook-f'])</a></li>
+                                    <li><a class="bg-black" href="https://twitter.com/intent/tweet?text={{ urlencode(__($product->name)) }}&url={{ urlencode($shareUrl) }}" target="_blank" rel="noopener" title="@lang('Twitter')">@include($activeTemplate . 'partials.icon', ['name' => 'twitter'])</a></li>
+                                    <li><a class="bg-[#6c757d]" href="javascript:window.print()" title="@lang('Print')">@include($activeTemplate . 'partials.icon', ['name' => 'print'])</a></li>
+                                    <li><a class="copy-link-btn bg-[#0d6efd]" href="javascript:void(0)" data-url="{{ $shareUrl }}" title="@lang('Copy Link')">@include($activeTemplate . 'partials.icon', ['name' => 'link'])</a></li>
                                 </ul>
                             </div>
-                            <div class="d-grid gap-2 mt-2">
-                                <a href="{{ route('contact.live') }}?open_contact=1" class="btn btn-outline-secondary js-contact-panel-open" role="button" data-contact-live-url="{{ route('contact.live') }}?open_contact=1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'messages_icon', 'fallback' => 'comments', 'class' => 'me-1', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Chat with us')</a>
+                            <div class="mt-2 grid gap-2">
+                                <a href="{{ route('contact.live') }}?open_contact=1" class="st-btn-outline js-contact-panel-open w-full" role="button" data-contact-live-url="{{ route('contact.live') }}?open_contact=1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'messages_icon', 'fallback' => 'comments', 'class' => 'me-1', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Chat with us')</a>
                             </div>
                         </div>
                     </div>
@@ -746,7 +607,7 @@
                                             </form>
                                         </div>
                                     @else
-                                        <p class="review-form-edited-note">@lang('You have already reviewed this product.') <button type="button" class="btn btn-sm btn-outline-primary" id="btnEditReview">@lang('Edit')</button></p>
+                                        <p class="review-form-edited-note">@lang('You have already reviewed this product.') <button type="button" class="st-btn-outline-primary st-btn-sm" id="btnEditReview">@lang('Edit')</button></p>
                                     @endif
                                 @endguest
                             </div>
@@ -857,12 +718,9 @@
                 <div class="pro-detail-sticky-cart-price">
                     <span class="cur_sym">{{ $general->cur_sym }}</span><span class="sticky-price-amount">{{ showAmount($detailPrice) }}</span>
                 </div>
-                @if($detailMaxQtySticky > 0)
-                <button type="button" class="btn btn--base flex-grow-1 add-to-cart" data-product_id="{{ $product->id }}" id="addToCartStickyBtn">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Add To Cart')</button>
-                <a href="#0" class="btn btn-outline--base buy-now" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
-                @else
-                <span class="btn btn-secondary disabled flex-grow-1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
-                @endif
+                <button type="button" class="btn--base add-to-cart inline-flex flex-1 items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" data-product_id="{{ $product->id }}" id="addToCartStickyBtn">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Add To Cart')</button>
+                <a href="#0" class="btn-outline--base buy-now inline-flex items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" id="pdpStickyBuyNowLink" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
+                <span class="st-btn-secondary flex-1 cursor-not-allowed opacity-70 pointer-events-none select-none {{ $detailMaxQtySticky > 0 ? 'd-none' : '' }}" id="pdpStickyOos">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
             </div>
         </div>
     </section>
@@ -964,6 +822,19 @@
             }
             (function($) {
                 "use strict";
+
+                var pdpProductId = {{ $product->id }};
+                var pdpDisplayStock = @json(isset($general->display_stock) && (int) $general->display_stock === \App\Constants\Status::ENABLE);
+                var pdpLowStockMax = {{ (int) config('product_upload.low_stock_max', 20) }};
+                var pdpRtStrings = {
+                    off: @json(__('OFF')),
+                    saved: @json(__('saved')),
+                    outOfStock: @json(__('Out Of Stock')),
+                    inStock: @json(__('In Stock')),
+                    lowStock: @json(__('Low Stock')),
+                    available: @json(__('available')),
+                    onlyLeft: @json(__('Only :count left!')),
+                };
 
                 // Move product lightbox to body so it escapes main's stacking context (main has z-index:0 on mobile/tablet in glass-header.css).
                 // Otherwise the modal stays under the backdrop and no buttons work on touch devices.
@@ -1153,6 +1024,191 @@
                     $('.pro-detail-special-price.product-price').html(curSym + formatted);
                     $('.sticky-price-amount').text(formatted);
                 }
+
+                function formatPdpAmountClient(n) {
+                    var x = parseFloat(n);
+                    if (isNaN(x)) x = 0;
+                    return x.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }
+
+                function patchVariantDom(variants) {
+                    var sel = document.getElementById('productVariantId');
+                    if (!sel || !variants || !variants.length) return;
+                    var map = {};
+                    var peak = 0;
+                    for (var i = 0; i < variants.length; i++) {
+                        map[variants[i].id] = variants[i];
+                        if (variants[i].quantity > peak) {
+                            peak = variants[i].quantity;
+                        }
+                    }
+                    $(sel).find('option[value]').each(function() {
+                        var id = parseInt($(this).attr('value'), 10);
+                        if (!id || !map[id]) return;
+                        var v = map[id];
+                        $(this).attr('data-qty', v.quantity);
+                        $(this).attr('data-price', v.final_price);
+                        this.disabled = v.quantity < 1;
+                    });
+                    document.querySelectorAll('.pro-detail-size-btn[data-variant-id]').forEach(function(btn) {
+                        var vid = parseInt(btn.getAttribute('data-variant-id'), 10);
+                        var v = map[vid];
+                        if (!v) return;
+                        btn.setAttribute('data-qty', v.quantity);
+                        if (v.quantity < 1) {
+                            btn.setAttribute('disabled', 'disabled');
+                        } else {
+                            btn.removeAttribute('disabled');
+                        }
+                    });
+                    if (sel.value) {
+                        maxQty = Math.max(0, getMaxQty());
+                    } else {
+                        maxQty = Math.max(0, peak);
+                    }
+                }
+
+                function applyPdpRealtimePayload(payload) {
+                    if (!payload || !payload.product || parseInt(payload.product.id, 10) !== pdpProductId) {
+                        return;
+                    }
+                    var action = payload.action || 'updated';
+                    var p = payload.product;
+                    var d = payload.display || {};
+                    var variants = payload.variants || [];
+
+                    if (action === 'deleted') {
+                        p.stock_qty = 0;
+                        p.max_order_qty = 0;
+                        p.quantity = 0;
+                    }
+
+                    if (d.cur_sym) {
+                        curSym = d.cur_sym;
+                    }
+                    if (typeof d.effective === 'number') {
+                        basePrice = d.effective;
+                    }
+
+                    if (variants.length) {
+                        patchVariantDom(variants);
+                    } else {
+                        maxQty = Math.max(0, parseInt(p.max_order_qty, 10) || 0);
+                    }
+
+                    var stockQty = parseInt(p.stock_qty, 10) || 0;
+                    var inStock = stockQty > 0 && action !== 'deleted';
+
+                    var effFmt = d.effective_formatted || formatPdpAmountClient(d.effective);
+                    $('.pro-detail-special-price.product-price').html(curSym + effFmt);
+                    $('.sticky-price-amount').text(effFmt);
+
+                    var $reg = $('.pro-detail-regular-price');
+                    var $badge = $('.pro-detail-discount-badge');
+                    var $saveX = $('.pro-detail-save-extra');
+                    if ($reg.length && d.has_savings && d.compare_formatted) {
+                        $reg.text(curSym + d.compare_formatted).removeClass('d-none').show();
+                        if ($badge.length) {
+                            $badge.text(d.save_percent + '% ' + pdpRtStrings.off).removeClass('d-none').show();
+                        }
+                        if ($saveX.length && d.save_amount_formatted) {
+                            $saveX.text(curSym + d.save_amount_formatted + ' ' + pdpRtStrings.saved).removeClass('d-none').show();
+                        }
+                    } else {
+                        if ($reg.length) {
+                            $reg.hide();
+                        }
+                        if ($badge.length) {
+                            $badge.hide();
+                        }
+                        if ($saveX.length) {
+                            $saveX.hide();
+                        }
+                    }
+
+                    var selV = document.getElementById('productVariantId');
+                    if (selV && selV.value) {
+                        $(selV).trigger('change');
+                    } else {
+                        updateDisplayedPrice(basePrice);
+                    }
+
+                    if (pdpDisplayStock) {
+                        var $av = $('.pro-detail-availability-text');
+                        $av.removeClass('pro-detail-availability-text--in pro-detail-availability-text--low pro-detail-availability-text--out');
+                        if (!inStock) {
+                            $av.addClass('pro-detail-availability-text--out');
+                            $av.html(pdpRtStrings.outOfStock);
+                        } else {
+                            var tier = stockQty > pdpLowStockMax ? 'in' : 'low';
+                            $av.addClass('pro-detail-availability-text--' + tier);
+                            var label = tier === 'in' ? pdpRtStrings.inStock : pdpRtStrings.lowStock;
+                            var lineQty;
+                            if (variants.length && selV && selV.value) {
+                                var optSel = $(selV).find('option:selected');
+                                lineQty = optSel.data('qty') !== undefined ? parseInt(optSel.data('qty'), 10) : stockQty;
+                            } else if (variants.length) {
+                                lineQty = stockQty;
+                            } else {
+                                lineQty = parseInt(p.quantity, 10) || 0;
+                            }
+                            var html = label + ' (<span class="amount" id="productStockDisplay">' + lineQty + '</span> ' + pdpRtStrings.available + ')';
+                            if (tier === 'low' && lineQty > 0) {
+                                var onlyMsg = String(pdpRtStrings.onlyLeft).replace(':count', String(lineQty));
+                                html += ' <span class="text-danger ms-1 fw-semibold">' + onlyMsg + '</span>';
+                            }
+                            $av.html(html);
+                        }
+                    }
+
+                    var canPurchase = inStock && (parseInt(p.max_order_qty, 10) || 0) > 0;
+                    if (variants.length && selV && selV.value) {
+                        var qSel = parseInt($(selV).find('option:selected').data('qty'), 10);
+                        canPurchase = inStock && !isNaN(qSel) && qSel > 0;
+                    }
+
+                    $('#addToCartBtn').prop('disabled', !canPurchase);
+                    if (canPurchase) {
+                        $('#addToCartBtn').removeClass('opacity-70 pointer-events-none');
+                    } else {
+                        $('#addToCartBtn').addClass('opacity-70 pointer-events-none');
+                    }
+
+                    if (canPurchase) {
+                        $('#pdpBuyNowLink').removeClass('d-none');
+                        $('#pdpBuyNowOos').addClass('d-none');
+                        $('#addToCartStickyBtn').removeClass('d-none');
+                        $('#pdpStickyBuyNowLink').removeClass('d-none');
+                        $('#pdpStickyOos').addClass('d-none');
+                    } else {
+                        $('#pdpBuyNowLink').addClass('d-none');
+                        $('#pdpBuyNowOos').removeClass('d-none');
+                        $('#addToCartStickyBtn').addClass('d-none');
+                        $('#pdpStickyBuyNowLink').addClass('d-none');
+                        $('#pdpStickyOos').removeClass('d-none');
+                    }
+
+                    var qtyInp = $('.single-add-cart-area .productQuantity');
+                    if (qtyInp.length) {
+                        var limit = getMaxQty();
+                        var qv = parseInt(qtyInp.val(), 10) || 1;
+                        qtyInp.attr('max', limit > 0 ? limit : 1);
+                        if (limit > 0) {
+                            qtyInp.val(Math.min(Math.max(1, qv), limit));
+                        } else {
+                            qtyInp.val(1);
+                        }
+                    }
+                }
+
+                window.addEventListener('staylbd:product-updated', function(ev) {
+                    try {
+                        applyPdpRealtimePayload(ev && ev.detail ? ev.detail : null);
+                    } catch (err) {
+                        console.error('staylbd PDP realtime update failed', err);
+                    }
+                });
+
                 $('#productVariantId').on('change', function() {
                     var opt = $(this).find('option:selected');
                     var qty = opt.data('qty');

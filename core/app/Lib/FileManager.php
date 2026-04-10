@@ -289,6 +289,7 @@ class FileManager
             } else {
                 $this->moveToTrash($absPath);
             }
+            $this->removeRasterSidecars($absPath, $hardDelete);
         }
         if ($this->thumb) {
             $thumbPath = dirname($absPath) . DIRECTORY_SEPARATOR . 'thumb_' . basename($absPath);
@@ -298,6 +299,38 @@ class FileManager
                 } else {
                     $this->moveToTrash($thumbPath);
                 }
+            }
+        }
+    }
+
+    /**
+     * Remove thumb_* and parallel .webp (and common responsive WebP suffixes) next to a deleted raster.
+     */
+    protected function removeRasterSidecars(string $absPath, bool $hardDelete): void
+    {
+        $dir = dirname($absPath);
+        $base = basename($absPath);
+        $stem = pathinfo($base, PATHINFO_FILENAME);
+        $ext = strtolower((string) pathinfo($base, PATHINFO_EXTENSION));
+        $raster = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        if (!in_array($ext, $raster, true)) {
+            return;
+        }
+        $extra = [
+            $dir . DIRECTORY_SEPARATOR . 'thumb_' . $base,
+            $dir . DIRECTORY_SEPARATOR . $stem . '.webp',
+        ];
+        foreach (['thumbnail', 'medium', 'large'] as $suffix) {
+            $extra[] = $dir . DIRECTORY_SEPARATOR . $stem . '_' . $suffix . '.webp';
+        }
+        foreach ($extra as $p) {
+            if ($p === '' || !file_exists($p) || !is_file($p)) {
+                continue;
+            }
+            if ($hardDelete) {
+                @unlink($p);
+            } else {
+                $this->moveToTrash($p);
             }
         }
     }

@@ -161,18 +161,9 @@
 @endsection
 
 @push('style')
-<style>
-    .CodeMirror { border-top: 1px solid #eee; border-bottom: 1px solid #eee; line-height: 1.3; height: 500px; }
-    .CodeMirror-linenumbers { padding: 0 8px; }
-    .custom-css p, .custom-css li, .custom-css span { color: inherit; }
-    .cm-s-monokai span.cm-tag { margin-left: 15px; }
-    .CodeMirror-fullscreen { z-index: 9999 !important; height: 100vh !important; }
-</style>
-@endpush
 
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/codemirror.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/monokai.min.css') }}">
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script-lib')

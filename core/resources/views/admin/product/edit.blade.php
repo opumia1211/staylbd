@@ -1,17 +1,9 @@
 @extends('admin.layouts.app')
 
 @push('style')
-<style>
-    /* Product edit: lightweight layout, flexible grid, no break on small screens */
-    .product-edit-page .card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
-    .product-edit-page .card-body .row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-    .product-edit-page .form-group { flex: 1 1 180px; min-width: 0; max-width: 100%; }
-    .product-edit-page .input-group { flex-wrap: nowrap; min-width: 0; }
-    .product-edit-page .input-group .form-control { min-width: 0; }
-    .product-edit-page .addedFeature .service-data { flex: 1 1 100%; }
-    .product-edit-page .image-uploader-wrapper { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-    .product-edit-page .profile-uploader, .product-edit-page .gallery-uploader { min-width: 0; }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @section('panel')
@@ -353,10 +345,6 @@
 
 @push('script-lib')
     <script src="{{ asset('assets/admin/js/image-uploader.min.js') }}"></script>
-@endpush
-
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/image-uploader.min.css') }}">
 @endpush
 
 {{-- Single category→subcategories map (no heavy data on each option) --}}

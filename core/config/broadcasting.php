@@ -30,19 +30,32 @@ return [
 
     'connections' => [
 
-        'pusher' => [
-            'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
-            'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
-                'useTLS' => true,
-            ],
-            'client_options' => [
-                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
-            ],
-        ],
+        'pusher' => (static function () {
+            $scheme = env('PUSHER_SCHEME', 'https');
+            $useTls = $scheme === 'https';
+            $options = [
+                'cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
+                'useTLS' => $useTls,
+                'encrypted' => $useTls,
+            ];
+            $customHost = env('PUSHER_HOST');
+            if (! empty($customHost)) {
+                $options['host'] = $customHost;
+                $options['port'] = (int) env('PUSHER_PORT', $useTls ? 443 : 80);
+                $options['scheme'] = $scheme;
+            }
+
+            return [
+                'driver' => 'pusher',
+                'key' => env('PUSHER_APP_KEY'),
+                'secret' => env('PUSHER_APP_SECRET'),
+                'app_id' => env('PUSHER_APP_ID'),
+                'options' => $options,
+                'client_options' => [
+                    // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+                ],
+            ];
+        })(),
 
         'ably' => [
             'driver' => 'ably',

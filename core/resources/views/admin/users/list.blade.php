@@ -468,35 +468,8 @@
   Admin Users List - Flexible CSS. To adjust without breaking layout, override these variables on .admin-users-card or body:
   --admin-users-radius, --admin-users-icon-size, --admin-users-th-color, --admin-users-avatar-size, --primary-rgb
 --}}
-<style>
-/* Admin Users List - scoped to avoid breaking other pages */
-.admin-users-card { border-radius: var(--admin-users-radius, 0.5rem); }
-.admin-users-stats { gap: 0; }
-.admin-users-stats__icon-wrap {
-    width: var(--admin-users-icon-size, 2.5rem);
-    height: var(--admin-users-icon-size, 2.5rem);
-    border-radius: var(--admin-users-radius, 0.5rem);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.admin-users-stats__icon-wrap--primary { background: rgba(var(--primary-rgb, 33, 158, 188), 0.1); color: var(--primary, #219ebc); }
-.admin-users-stats__icon-wrap--warning { background: rgba(255, 193, 7, 0.15); color: #b38600; }
-.admin-users-stats__icon-wrap--info { background: rgba(23, 162, 184, 0.15); color: #0d6e7a; }
-.admin-users-filter-select { width: auto; min-width: 8rem; }
-.admin-users-filter-date { width: 100%; max-width: 12.5rem; }
 
-.users-list-table { width: 100%; }
-.users-list-table th { font-weight: 600; color: var(--admin-users-th-color, #374151); }
-.users-list-table td { vertical-align: middle !important; }
-.user-list-avatar { width: var(--admin-users-avatar-size, 2.5rem); height: var(--admin-users-avatar-size, 2.5rem); object-fit: cover; }
-.user-list-avatar--initials { font-size: clamp(0.65rem, 2vw, 0.75rem); min-width: var(--admin-users-avatar-size, 2.5rem); min-height: var(--admin-users-avatar-size, 2.5rem); }
-.ban-reason-cell { max-width: 12rem; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+{{-- inline style moved to critical-admin.css --}}
 
-@media (max-width: 767.98px) {
-    .users-list-table .btn-group .btn { padding: 0.2rem 0.35rem; }
-    .admin-users-filter-date { max-width: 100%; }
-}
-</style>
 @endpush
 

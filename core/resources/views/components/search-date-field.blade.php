@@ -7,7 +7,3 @@
     <script src="{{ asset('assets/admin/js/vendor/datepicker.min.js') }}"></script>
     <script src="{{ asset('assets/admin/js/vendor/datepicker.en.js') }}"></script>
 @endpush
-
-@push('style-lib')
-    <link rel="stylesheet" href="{{asset('assets/admin/css/vendor/datepicker.min.css')}}">
-@endpush

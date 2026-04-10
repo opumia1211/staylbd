@@ -36,99 +36,9 @@
 @endpush
 @endif
 @push('style')
-<style>
-/* Below-fold — NOT .pro-section--tight (breaks product row scrollWidth / auto-scroll) */
-.latest-products-section, .new-arrivals-section, .trending-now-section, .power-zone-section {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 280px;
-}
 
-/* Home Category – কার্ডের মাঝে gap সর্বোচ্চ 1mm */
-.home-category-section { margin-top: 0 !important; padding: 0 0 10px; background: #fff; border-bottom: 1px solid rgba(0,0,0,.06); min-width: 0; width: 100%; box-sizing: border-box; }
-/* টাইটেল প্রোডাক্ট সেকশন হেডার লাইনের মতো — কার্ড সারি একই কন্টেন্ট উইথ (কোনো অতিরিক্ত পাশের বর্ডার/গাটার নয়) */
-.home-category-section__title { font-size: 1.05rem; font-weight: 600; letter-spacing: 0.01em; color: #374151; margin: 0 0 8px; padding: 0; width: 100%; box-sizing: border-box; }
-/* Hard clip: nothing draws past padded content area (fixes mobile right-edge bleed) */
-.home-category-section__viewport {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    overflow-x: hidden;
-    overflow-y: visible;
-    position: relative;
-    box-sizing: border-box;
-}
-.home-category-section__grid {
-    display: flex;
-    gap: 1mm;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    padding-bottom: 4px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    touch-action: pan-x pan-y;
-    scroll-behavior: smooth;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-.home-category-section__grid::-webkit-scrollbar { width: 0; height: 0; display: none; }
-.home-category-section__grid + .home-category-section__grid { margin-top: 10px; }
-/* ফ্রেম = ছোট স্কয়ার কার্ড, স্ক্রলযোগ্য রোতে অনেকগুলো ক্যাটাগরি দেখানোর জন্য */
-.home-category-section__card { flex: 0 0 auto; width: 148px; max-width: 148px; aspect-ratio: 1; display: block; padding: 0; background: #f5f5f5; border: 1px solid rgba(0,0,0,.12); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); text-decoration: none; color: #1f2937; transition: transform .2s, box-shadow .2s; box-sizing: border-box; overflow: hidden; position: relative; scroll-snap-align: start; }
-.home-category-section__card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.1); }
-/* ফ্রেমের ভেতরে ছবি পুরো জায়গা – সম্পূর্ণ বক্স ছবি */
-.home-category-section__card-media { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; overflow: hidden; line-height: 0; font-size: 0; }
-.home-category-section__card-media img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; min-width: 100%; min-height: 100%; object-fit: cover; object-position: center; display: block; }
-.home-category-section__card-icon { position: absolute; inset: 0; font-size: 1.75rem; color: #6b7280; display: flex; align-items: center; justify-content: center; }
-.home-category-section__card:hover .home-category-section__card-icon { color: var(--base, #6366f1); }
-/* ক্যাটাগরি নাম ফ্রেমের নিচে ওভারলে – ছবির ওপর */
-.home-category-section__card-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 6px 6px; background: linear-gradient(to top, rgba(0,0,0,.7), transparent); color: #fff; font-size: 0.7rem; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 0 2px rgba(0,0,0,.8); z-index: 1; }
+{{-- inline style moved to critical-storefront.css --}}
 
-/* Inner shell: keeps scroll track width = viewport shell (no horizontal page grow) */
-.home-category-section .pass-scroll {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    overflow-x: hidden;
-    box-sizing: border-box;
-}
-.pass-scroll__track { max-width: 100%; min-width: 0; box-sizing: border-box; }
-
-/* Product line flex row — hidden scrollbar, smooth programmatic scroll */
-.product-line-flex-row {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 1mm;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    touch-action: pan-x pan-y;
-    scroll-snap-type: x proximity;
-    padding-bottom: 6px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-.product-line-flex-row::-webkit-scrollbar { width: 0; height: 0; display: none; }
-.product-line-flex-row > .product-card-col {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    width: calc((100% - 1mm) / 2);
-}
-@media (min-width: 768px) { .product-line-flex-row > div.product-card-col { width: calc((100% - 3mm) / 4); } }
-@media (min-width: 1024px) { .product-line-flex-row > div.product-card-col { width: calc((100% - 4mm) / 5); } }
-@media (min-width: 1280px) { .product-line-flex-row > div.product-card-col { width: calc((100% - 5mm) / 6); } }
-</style>
 @endpush
 @section('content')
     @php
@@ -142,7 +52,9 @@
     @endphp
 
     {{-- ব্যানার সেকশন (Banner মডিউল) – সবসময় হেডারের নিচে --}}
-    @include('modules.Banner::home_banner', $bannerModuleData)
+    @include('modules.Banner::home_banner', array_merge($bannerModuleData, [
+        'flashSaleEndsAt' => config('stayl.flash_sale_ends_at'),
+    ]))
     {{-- Banner নিচে ticker/scrollbar restore --}}
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_above', 'options' => ['page' => 'home']])
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_below', 'options' => ['page' => 'home']])
@@ -178,20 +90,21 @@
                 'sectionTitle' => $hpLabel,
             ])
         @elseif($hpId === 'quick_deals')
-            @if(isset($todayDealProducts) && $todayDealProducts->isNotEmpty())
-                @include($activeTemplate . 'partials.product_carousel_section', [
-                    'products' => $todayDealProducts,
-                    'general' => $general,
-                    'sectionTitle' => '<svg style="width: 1.15em; height: 1.15em; vertical-align: -0.15em; margin-right: 0.35em; color: #eab308;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>' . e($hpLabel),
-                    'sectionId' => 'home-quick-deals',
-                    'sectionClass' => 'pro-section pro-section--tight',
-                    'sectionKey' => 'today_deals',
-                    'carouselIntervalSec' => $hpInterval,
-                    'carouselSpeedMs' => $hpSpeedMs,
-                    'priorityFirst' => true,
-                    'forceScrollbars' => false,
-                ])
-            @endif
+            @include($activeTemplate . 'partials.product_carousel_section', [
+                'products' => $todayDealProducts ?? collect(),
+                'general' => $general,
+                'activeTemplate' => $activeTemplate,
+                'sectionTitle' => '<svg class="inline-block h-6 w-6 shrink-0 text-amber-500 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="ml-2">' . e($hpLabel) . '</span>',
+                'sectionLink' => route('product.hot.deal'),
+                'sectionLinkText' => __('View All'),
+                'sectionId' => 'home-quick-deals',
+                'sectionClass' => 'pro-section pro-section--tight',
+                'sectionKey' => 'today_deals',
+                'carouselIntervalSec' => $hpInterval,
+                'carouselSpeedMs' => $hpSpeedMs,
+                'priorityFirst' => true,
+                'forceScrollbars' => false,
+            ])
         @elseif($hpId === 'power_zone')
             @if(($homeSectionData['settings']->power_zone_enabled ?? 1))
                 @include($activeTemplate . 'partials.power_zone', ['todayDealProducts' => $todayDealProducts ?? collect()])
@@ -214,14 +127,16 @@
                                 <div class="banner-below-card__body">
                                     <div class="product-max-xl-slider">
                                         @forelse ($todayDealProducts ?? [] as $product)
-                                            @php $price = productPrice($product); @endphp
+                                            @php $dealP = productDisplayPricing($product); $price = $dealP['effective']; @endphp
                                             <a href="{{ product_detail_url($product) }}" class="deal__item">
                                                 <div class="deal__item-img">
                                                     <img src="{{ getImageWebP(getFilePath('product') . '/' . $product->image, getFileSize('product')) }}" loading="lazy" decoding="async" alt="{{ __($product->name) }}" width="150" height="150">
                                                 </div>
                                                 <div class="deal__item-cont">
                                                     <h6 class="price text--base">{{ $general->cur_sym }}{{ showAmount($price) }}</h6>
-                                                    <del class="old-price">{{ $general->cur_sym }}{{ showAmount($product->price) }}</del>
+                                                    @if($dealP['show_strike'] && $dealP['compare_at'] !== null)
+                                                        <del class="old-price">{{ $general->cur_sym }}{{ showAmount($dealP['compare_at']) }}</del>
+                                                    @endif
                                                 </div>
                                             </a>
                                         @empty
@@ -375,7 +290,7 @@
     var section = document.getElementById(sectionId);
     if (!section || !section.dataset.sectionKey) return;
     var btn = section.querySelector(".home-load-more-btn");
-    var wrap = section.querySelector(".product-carousel-track-inner");
+    var wrap = section.querySelector(".product-line-flex-row");
     var sentinel = section.querySelector("[data-load-more-sentinel]");
     if (!btn || !wrap || !sentinel || btn.disabled) return;
     var sectionKey = section.dataset.sectionKey;
@@ -390,6 +305,7 @@
         if (data.html && data.html.length > 0) {
           wrap.insertAdjacentHTML("beforeend", data.html);
           section.dataset.loadMoreOffset = offset + (data.count || 0);
+          if (typeof window.refreshStaylLucide === "function") window.refreshStaylLucide(wrap);
         }
         if (!data.count || data.count < 8) {
           sentinel.style.display = "none";
@@ -427,7 +343,6 @@
   // Category + product rows: every data-interval-sec, smooth-scroll one card width (right→left); at end smooth back to start; no visible scrollbar
   function initHomeHorizontalAutoScroll() {
     var rows = [
-      { sel: ".home-category-section__grid[data-auto-scroll=\"1\"]", card: ".home-category-section__card" },
       { sel: ".product-line-flex-row[data-auto-scroll=\"1\"]", card: ".product-card-col" }
     ];
 
@@ -520,7 +435,7 @@
   window.addEventListener("resize", function() {
     window.clearTimeout(_staylResizeT);
     _staylResizeT = window.setTimeout(function() {
-      document.querySelectorAll(".home-category-section__grid[data-auto-scroll=\"1\"], .product-line-flex-row[data-auto-scroll=\"1\"]").forEach(function(el) {
+      document.querySelectorAll(".product-line-flex-row[data-auto-scroll=\"1\"]").forEach(function(el) {
         if (el._staylScrollTimer) {
           clearInterval(el._staylScrollTimer);
           el._staylScrollTimer = null;

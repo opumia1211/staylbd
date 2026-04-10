@@ -9,11 +9,12 @@ class VerifyCsrfToken extends Middleware
     /**
      * The URIs that should be excluded from CSRF verification.
      *
+     * Payment IPN and external webhooks use Route::withoutMiddleware(VerifyCsrfToken::class).
+     * Admin routes must send a valid session CSRF token (forms include @csrf).
+     *
      * @var array<int, string>
      */
     protected $except = [
-        'ipn*',
-        '*setting/logo-icon',
-        '*frontend/scrollbar/save'
+        //
     ];
 }

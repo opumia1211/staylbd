@@ -1,8 +1,5 @@
 @extends('admin.layouts.master')
 @section('content')
-@push('style')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/professional-login.css') }}">
-@endpush
 @php
     $adminLoginLogo = getLogo('logo_dark') ?: getLogo('logo');
     $adminSiteName = $general->site_name ?? gs('site_name');

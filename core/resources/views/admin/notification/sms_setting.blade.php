@@ -273,11 +273,9 @@
     <button type="button" data-bs-target="#testSMSModal" data-bs-toggle="modal" class="btn btn-outline--primary btn-sm"> <i class="las la-paper-plane"></i> @lang('Send Test SMS')</button>
 @endpush
 @push('style')
-<style>
-    .method-select{
-        padding: 2px 7px;
-    }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 @push('script')
     <script>

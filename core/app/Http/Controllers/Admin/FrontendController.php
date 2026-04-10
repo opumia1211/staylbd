@@ -1226,7 +1226,7 @@ class FrontendController extends Controller
             'transactions' => ['label' => __('Transactions'), 'default' => 'money-bill-wave', 'field' => 'transactions_icon', 'group' => 'account'],
             'messages' => ['label' => __('Messages'), 'default' => 'comments', 'field' => 'messages_icon', 'group' => 'account'],
             'mail' => ['label' => __('Email / envelope'), 'default' => 'envelope', 'field' => 'mail_icon', 'group' => 'nav'],
-            'review' => ['label' => __('Review products'), 'default' => 'haykal', 'field' => 'review_icon', 'group' => 'account'],
+            'review' => ['label' => __('Review products'), 'default' => 'star', 'field' => 'review_icon', 'group' => 'account'],
             'profile' => ['label' => __('Profile'), 'default' => 'user-tie', 'field' => 'profile_icon', 'group' => 'account'],
             'change_password' => ['label' => __('Change password'), 'default' => 'key', 'field' => 'change_password_icon', 'group' => 'account'],
             'logout' => ['label' => __('Logout'), 'default' => 'sign-out-alt', 'field' => 'logout_icon', 'group' => 'account'],

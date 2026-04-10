@@ -1,4 +1,9 @@
 @extends($activeTemplate . 'layouts.frontend')
+
+@push('head-meta')
+    @include('partials.storefront_deferred_bundle', ['bundle' => 'tailwind-storefront-deferred-compare'])
+@endpush
+
 @section('content')
     @include($activeTemplate . 'partials.wishlist_page_content')
 @endsection

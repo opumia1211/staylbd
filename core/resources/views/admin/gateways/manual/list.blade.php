@@ -177,18 +177,9 @@
 @endpush
 
 @push('style')
-<style>
-.manual-gateway-page { padding-bottom: 1rem; }
-.manual-stat-card { border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s; }
-.manual-stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; }
-.manual-stat-icon { width: 48px; height: 48px; flex-shrink: 0; }
-.manual-gateway-card { border-radius: 12px; overflow: hidden; }
-.manual-gateway-table thead th { padding: 0.75rem 1rem; font-size: 0.75rem; }
-.manual-gateway-table tbody td { padding: 0.75rem 1rem; vertical-align: middle; }
-.manual-gateway-row:hover { background-color: rgba(0,0,0,0.02); }
-.manual-empty-state { max-width: 320px; margin: 0 auto; }
-.manual-empty-icon { font-size: 4rem; opacity: 0.2; color: var(--bs-primary); }
-</style>
+
+{{-- inline style moved to critical-admin.css --}}
+
 @endpush
 
 @push('script')

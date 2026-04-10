@@ -71,11 +71,9 @@
 @endsection
 
 @push('style')
-    <style>
-        .input-group-text:focus {
-            box-shadow: none !important;
-        }
-    </style>
+    
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush
 
 @push('script')

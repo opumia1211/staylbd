@@ -52,16 +52,7 @@
 </div>
 @endsection
 @push('style')
-<style>
-.message-list-page .message-item { transition: background .15s ease; }
-.message-list-page .message-item:hover { background: rgba(0,0,0,.03); }
-.message-list-page .message-token { font-size: 0.85rem; }
-.message-list-page .message-subject { font-size: 0.9rem; }
-.message-list-page .message-preview { font-size: 0.8rem; line-height: 1.35; }
-.message-list-page .message-date { font-size: 0.75rem; }
-@media (max-width: 576px) {
-    .message-list-page .message-item { padding: 0.5rem !important; }
-    .message-list-page .message-preview { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-}
-</style>
+
+{{-- inline style moved to critical-storefront.css --}}
+
 @endpush

@@ -91,11 +91,8 @@
     @endforeach
 
     @push('style')
-    <style>
-        .glb-pos-ad { position: fixed; max-width: min(100vw, var(--stayl-content-max, 1920px)); box-sizing: border-box; }
-        .glb-pos-ad__img { display: block; width: 100%; height: auto; max-width: 100%; border: 0; border-radius: 0; box-shadow: none; }
-        .glb-pos-ad__iframe { width: 100%; min-height: 120px; border: 0; }
-        @media (max-width: 575px) { .glb-pos-ad { width: 100vw !important; max-width: 100vw !important; } }
-    </style>
+    
+{{-- inline style moved to critical-storefront.css --}}
+
     @endpush
 @endif

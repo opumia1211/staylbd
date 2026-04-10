@@ -395,3 +395,45 @@ main > .scrollbar-section--content_top:first-of-type {
 @media (min-width: 768px) {
     .scrollbar-hide-desktop { display: none !important; }
 }
+
+/* Admin WYSIWYG preview (scrollbar_preview.blade.php — loads serve-css/scrollbar only) */
+body.st-scrollbar-admin-preview {
+    margin: 0;
+    padding: 10px;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef4fa 100%);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+.st-scrollbar-admin-preview .preview-shell {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 10px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-segment--text {
+    text-shadow: none;
+    color: inherit;
+    font-weight: 500;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-wrapper {
+    min-height: 42px !important;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-track {
+    display: flex;
+    align-items: center;
+    min-height: 100%;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-content {
+    line-height: 1.4;
+}
+.st-scrollbar-admin-preview .preview-shell .scrollbar-wrapper[data-position="custom"] {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
