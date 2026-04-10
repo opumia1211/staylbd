@@ -14,9 +14,6 @@ class ImageOptimizationService
     /** LQIP dimension: tiny 16px edge for blur effect. */
     public const LQIP_SIZE = 16;
 
-    /** LQIP dimension: tiny 16px edge for blur effect. */
-    public const LQIP_SIZE = 16;
-
     /**
      * Convert and optimize image to WebP format (high quality, clear output).
      *

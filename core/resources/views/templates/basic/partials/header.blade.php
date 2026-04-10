@@ -23,8 +23,8 @@
 
 <style>
     :root {
-        --stayl-h1: 120px;
-        --stayl-h2: 100px;
+        --stayl-h1: 90px;
+        --stayl-h2: 65px;
         --stayl-yellow: #ffbb38;
         --stayl-active-blue: #2eb4e7;
         --stayl-bg-light: #f1f3f5;
@@ -258,7 +258,8 @@
         z-index: 10000;
         padding: 15px 0;
     }
-    .stayl-cat-dropdown.active {
+    /* Dropdown Hover State */
+    #staylCatContainer:hover .stayl-cat-dropdown {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
@@ -285,6 +286,45 @@
         padding-left: 35px;
     }
 
+    /* Pages Dropdown CSS */
+    .stayl-pages-item {
+        position: relative;
+    }
+    .stayl-pages-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 250px;
+        background: #fff;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        border-radius: 16px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(15px);
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 10000;
+        padding: 15px 0;
+        border: 1px solid #f1f1f1;
+    }
+    .stayl-pages-item:hover .stayl-pages-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .stayl-pages-dropdown a {
+        display: block;
+        padding: 12px 25px;
+        font-size: 15px;
+        font-weight: 800;
+        color: #111 !important;
+        text-decoration: none !important;
+        transition: 0.2s;
+    }
+    .stayl-pages-dropdown a:hover {
+        background: #f8f9fa;
+        color: var(--stayl-active-blue) !important;
+        padding-left: 30px;
+    }
 
     /* Premium Glass Sidebar CSS (Framework Independent) */
     .stayl-sb-header {
@@ -551,12 +591,12 @@
                 <ul class="stayl-nav-ul">
                     <li><a href="{{ route('home') }}">@lang('Homepage')</a></li>
                     <li><a href="{{ route('products') }}">@lang('Shop Products')</a></li>
-                    <li class="relative group">
-                        <a href="#">@lang('Pages') <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></a>
-                        <div class="absolute top-full left-0 w-64 bg-white shadow-2xl rounded-2xl py-6 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-3 group-hover:translate-y-0 transition-all duration-300">
-                             <a href="{{ route('category.all') }}" class="block px-8 py-3.5 text-sm font-bold text-slate-700 hover:text-blue-500 no-underline">@lang('All Categories')</a>
-                             <a href="{{ route('track.order') }}" class="block px-8 py-3.5 text-sm font-bold text-slate-700 hover:text-blue-500 no-underline">@lang('Track Order')</a>
-                             <a href="{{ route('contact') }}" class="block px-8 py-3.5 text-sm font-bold text-slate-700 hover:text-blue-500 no-underline">@lang('Customer Support')</a>
+                    <li class="stayl-pages-item">
+                        <a href="#" style="display:flex; align-items:center; gap:8px;">@lang('Pages') <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></a>
+                        <div class="stayl-pages-dropdown">
+                             <a href="{{ route('category.all') }}">@lang('All Categories')</a>
+                             <a href="{{ route('track.order') }}">@lang('Track Order')</a>
+                             <a href="{{ route('contact') }}">@lang('Customer Support')</a>
                         </div>
                     </li>
                     <li><a href="#">@lang('About Us')</a></li>
@@ -669,26 +709,6 @@
 
             if (closeBtn) closeBtn.addEventListener('click', closeAction);
             if (overlay) overlay.addEventListener('click', closeAction);
-
-            // Categories Click Toggle
-            const catBtn = document.getElementById('staylCatBtn');
-            const catDropdown = document.getElementById('staylCatDropdown');
-            const catContainer = document.getElementById('staylCatContainer');
-
-            if (catBtn && catDropdown) {
-                catBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    catDropdown.classList.toggle('active');
-                });
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (catContainer && !catContainer.contains(e.target)) {
-                        catDropdown.classList.remove('active');
-                    }
-                });
-            }
         }
 
         // Initialize

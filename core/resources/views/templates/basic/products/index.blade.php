@@ -1,8 +1,6 @@
 @extends($activeTemplate . 'layouts.frontend')
 @php
-    $disableLegacyBootstrapBundle = true;
-    $disableLegacyJquery = true;
-    $disableLegacyJqueryUi = true;
+    // Legacy flags removed to restore Bootstrap layout engine for grid compatibility
 @endphp
 @section('content')
     <section class="products-section products-section--compact products-page-with-pro-filter pb-60 wow fadeInUp" data-wow-duration="0.35s" data-wow-delay="0.05s">
