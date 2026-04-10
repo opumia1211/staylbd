@@ -10,16 +10,16 @@
         }
     }
     $banners = $banners ?? collect();
-    $settings = $settings ?? ['slide_interval_seconds' => 5, 'autoplay' => 1, 'banner_width' => 2560, 'banner_height' => 900];
+    $settings = $settings ?? ['slide_interval_seconds' => 5, 'autoplay' => 1, 'banner_width' => 2560, 'banner_height' => 600];
     $slideIntervalSeconds = (int)($settings['slide_interval_seconds'] ?? 5);
     $bannerAutoplay = (int)($settings['autoplay'] ?? 1);
     $bannerWidth = (int)($settings['banner_width'] ?? 2560);
-    $bannerHeight = (int)($settings['banner_height'] ?? 900);
+    $bannerHeight = (int)($settings['banner_height'] ?? 600);
     if ($bannerWidth < 100) {
         $bannerWidth = 2560;
     }
     if ($bannerHeight < 50) {
-        $bannerHeight = 900;
+        $bannerHeight = 600;
     }
     $bannerSizesAttr = '(max-width: 640px) 100vw, (max-width: 1024px) 100vw, min(1920px, 100vw)';
     $bannerImgOnError = "this.onerror=null;var l=this.closest('.banner-slide-link');if(l){l.classList.add('is-banner-media-error');}this.style.visibility='hidden';";

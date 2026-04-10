@@ -2,7 +2,7 @@
     "banner": {
         "builder": true,
         "no_selection": true,
-        "name": "Banner Section",
+        "name": "Hero Banner Section",
         "content": {
             "slide_interval_seconds": "number",
             "autoplay": "number",
@@ -12,7 +12,35 @@
         "element": {
             "images": {
                 "image": {
-                    "size": "1920x400"
+                    "size": "1920x600"
+                }
+            },
+            "url": "text",
+            "modal": true
+        }
+    },
+    "middle_banner": {
+        "builder": true,
+        "no_selection": false,
+        "name": "Mid-Page Banner",
+        "element": {
+            "images": {
+                "image": {
+                    "size": "1440x300"
+                }
+            },
+            "url": "text",
+            "modal": true
+        }
+    },
+    "bottom_banner": {
+        "builder": true,
+        "no_selection": false,
+        "name": "Bottom-Page Banner",
+        "element": {
+            "images": {
+                "image": {
+                    "size": "1440x250"
                 }
             },
             "url": "text",

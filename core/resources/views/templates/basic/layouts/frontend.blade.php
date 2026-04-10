@@ -11,7 +11,7 @@
     @include($activeTemplate . 'partials.header')
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'header_below'])
     {{-- storefront-main: offset for fixed glass header + 3px air before first section (e.g. banner) --}}
-    <main class="storefront-main" style="margin-top: 0;">
+    <main class="storefront-main" style="margin-top: 155px !important;">
         @include($activeTemplate . 'partials.inline_public_ads')
         @include($activeTemplate . 'partials.scrollbar', ['position' => 'content_top'])
         @if($__contentTopTimers->isNotEmpty())

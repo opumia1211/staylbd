@@ -36,7 +36,7 @@
     box-shadow: 0 10px 40px -12px rgba(15, 23, 42, 0.25);
     height: auto !important;
     min-height: 0 !important;
-    aspect-ratio: var(--hb-w, 2560) / var(--hb-h, 900);
+    aspect-ratio: var(--hb-w, 2560) / var(--hb-h, 600);
 }
 
 #home-banner-section .banner-slider svg,

@@ -51,10 +51,12 @@
         $homeRowScrollIntervalSec = max(2, min(30, (int) $categoryScrollIntervalSec));
     @endphp
 
-    {{-- ব্যানার সেকশন (Banner মডিউল) – সবসময় হেডারের নিচে --}}
-    @include('modules.Banner::home_banner', array_merge($bannerModuleData, [
-        'flashSaleEndsAt' => config('stayl.flash_sale_ends_at'),
-    ]))
+    {{-- ব্যানার সেকশন (Banner মডিউল) – সবসময় হেডারের নিচে --}}
+    <div style="margin-top: 10px;">
+        @include('modules.Banner::home_banner', array_merge($bannerModuleData, [
+            'flashSaleEndsAt' => config('stayl.flash_sale_ends_at'),
+        ]))
+    </div>
     {{-- Banner নিচে ticker/scrollbar restore --}}
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_above', 'options' => ['page' => 'home']])
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_below', 'options' => ['page' => 'home']])
@@ -65,6 +67,8 @@
         $adSlotsById = $adSlotsById ?? [];
         $hpLayout = \App\Services\HomepageLayoutService::getOrderedSections();
         $renderedHomeSlots = [];
+        $midBanners = \App\Models\Frontend::where('data_keys', 'middle_banner.element')->get();
+        $bottomBanners = \App\Models\Frontend::where('data_keys', 'bottom_banner.element')->get();
     @endphp
     @foreach($hpLayout as $hpSlot)
         @continue(empty($hpSlot['enabled']))
@@ -84,6 +88,34 @@
 
         @if($hpId === 'scrollbar')
             {{-- Kept for backward-compatible layout slot; banner scrollbars are rendered above unconditionally --}}
+        @elseif($hpId === 'middle_banner')
+            @if($midBanners->isNotEmpty())
+            <div class="main-container py-4">
+                <div class="row">
+                    @foreach($midBanners as $mb)
+                        <div class="col-12 mb-4 px-2">
+                            <a href="{{ $mb->data_values->url ?? '#' }}" class="block overflow-hidden rounded-2xl shadow-sm border border-slate-100 hover:scale-[1.005] transition-transform duration-300">
+                                <img src="{{ getImage('assets/images/frontend/middle_banner/' . $mb->data_values->image, '1440x300') }}" alt="Banner" class="w-full h-auto">
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+        @elseif($hpId === 'bottom_banner')
+            @if($bottomBanners->isNotEmpty())
+            <div class="main-container py-4">
+                <div class="row">
+                    @foreach($bottomBanners as $bb)
+                        <div class="col-12 mb-4 px-2">
+                            <a href="{{ $bb->data_values->url ?? '#' }}" class="block overflow-hidden rounded-2xl shadow-sm border border-slate-100 hover:scale-[1.005] transition-transform duration-300">
+                                <img src="{{ getImage('assets/images/frontend/bottom_banner/' . $bb->data_values->image, '1440x250') }}" alt="Banner" class="w-full h-auto">
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
         @elseif($hpId === 'home_category')
             @include($activeTemplate . 'partials.home_category_section', [
                 'categoryScrollIntervalSec' => $hpInterval ?? $categoryScrollIntervalSec,

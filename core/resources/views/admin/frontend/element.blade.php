@@ -20,45 +20,61 @@
                                         $imgCount = collect($content)->count();
                                     @endphp
                                     @foreach($content as $imgKey => $image)
-                                            <div class="col-md-4">
+                                            <div class="col-md-{{ $imgCount > 1 ? '6' : '12' }} mb-4">
                                                 <input type="hidden" name="has_image[]" value="1">
-                                                <div class="form-group">
-                                                    <label>{{ __(keyToTitle($imgKey)) }}</label>
-                                                    <div class="image-upload">
-                                                        <div class="thumb">
-                                                            <div class="avatar-preview">
-                                                                <div class="profilePicPreview" style="background-image: url({{getImage('assets/images/frontend/' . $key .'/'. @$data->data_values->$imgKey,@$section->element->images->$imgKey->size) }})">
-                                                                    <button type="button" class="remove-image"><i class="fa fa-times"></i></button>
+                                                <div class="card border-0 shadow-sm">
+                                                    <div class="card-header bg-white border-bottom-0 pt-3">
+                                                        <h5 class="card-title mb-0" style="font-size: 0.9rem; font-weight: 700; color: #344767;">
+                                                            @if($key == 'banner')
+                                                                <i class="fa fa-image text--primary mr-2"></i> @lang('Hero Banner Image')
+                                                            @elseif($key == 'middle_banner')
+                                                                <i class="fa fa-image text--success mr-2"></i> @lang('Middle Page Banner')
+                                                            @elseif($key == 'bottom_banner')
+                                                                <i class="fa fa-image text--warning mr-2"></i> @lang('Bottom Page Banner')
+                                                            @else
+                                                                {{ __(keyToTitle($imgKey)) }}
+                                                            @endif
+                                                        </h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="image-upload px-0">
+                                                            <div class="thumb">
+                                                                <div class="avatar-preview">
+                                                                    <div class="profilePicPreview" style="border-radius: 12px; border: 2px dashed #e9ecef; background-image: url({{getImage('assets/images/frontend/' . $key .'/'. @$data->data_values->$imgKey,@$section->element->images->$imgKey->size) }})">
+                                                                        <button type="button" class="remove-image bg--danger" style="border-radius: 50%;"><i class="fa fa-times"></i></button>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="avatar-edit">
-                                                                @if($key == 'banner')
-                                                                    <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg, .webp, .mp4">
-                                                                    <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="bg--primary">{{ __(keyToTitle($imgKey)) }}</label>
-                                                                    <small class="mt-2">@lang('Supported files'): <b>WEBP (Primary), JPG, PNG, MP4</b>.
-                                                                        @if(@$section->element->images->$imgKey->size)
-                                                                            | @lang('Recommended size'): <b>{{@$section->element->images->$imgKey->size}}</b> @lang('px').
-                                                                        @endif
-                                                                    </small>
-                                                                @elseif($key == 'social_icon')
-                                                                    <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png,.jpg,.jpeg,.webp,.svg">
-                                                                    <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="bg--primary">{{ __(keyToTitle($imgKey)) }}</label>
-                                                                    <small class="mt-2">@lang('Supported files'): <b>JPEG, PNG, WebP, SVG</b>.
-                                                                        @if(@$section->element->images->$imgKey->size)
-                                                                            | @lang('Suggested'): <b>{{@$section->element->images->$imgKey->size}}</b> @lang('px').
-                                                                        @endif
-                                                                    </small>
-                                                                @else
-                                                                    <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg">
-                                                                    <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="bg--primary">{{ __(keyToTitle($imgKey)) }}</label>
-                                                                    <small class="mt-2  ">@lang('Supported files'): <b>@lang('jpeg'), @lang('jpg'), @lang('png')</b>.
-                                                                        @if(@$section->element->images->$imgKey->size)
-                                                                            | @lang('Will be resized to'):
-                                                                            <b>{{@$section->element->images->$imgKey->size}}</b>
-                                                                            @lang('px').
-                                                                        @endif
-                                                                    </small>
-                                                                @endif
+                                                                <div class="avatar-edit mt-3">
+                                                                    @php $isBanner = in_array($key, ['banner', 'middle_banner', 'bottom_banner']); @endphp
+                                                                    @if($isBanner)
+                                                                        <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg, .webp, .mp4">
+                                                                        <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="btn btn--primary w-100 py-2" style="border-radius: 8px; font-weight: 600;">
+                                                                            <i class="fa fa-cloud-upload-alt mr-1"></i> @lang('Upload Image')
+                                                                        </label>
+                                                                        <div class="mt-2 text-muted" style="font-size: 0.75rem;">
+                                                                            <p class="mb-1"><i class="fa fa-info-circle mr-1"></i> @lang('Supported'): <b>WEBP, JPG, PNG, MP4</b></p>
+                                                                            @if(@$section->element->images->$imgKey->size)
+                                                                                <p class="mb-0"><i class="fa fa-expand mr-1"></i> @lang('Pro Size'): <span class="badge badge-soft--info">{{@$section->element->images->$imgKey->size}}px</span></p>
+                                                                            @endif
+                                                                        </div>
+                                                                    @elseif($key == 'social_icon')
+                                                                        <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png,.jpg,.jpeg,.webp,.svg">
+                                                                        <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="btn btn--primary w-100 py-2" style="border-radius: 8px;">{{ __($imgKey) }}</label>
+                                                                        <small class="mt-2 text-muted">@lang('Supported'): <b>JPEG, PNG, WebP, SVG</b>.
+                                                                            @if(@$section->element->images->$imgKey->size)
+                                                                                | @lang('Suggested'): <b>{{@$section->element->images->$imgKey->size}}</b> @lang('px').
+                                                                            @endif
+                                                                        </small>
+                                                                    @else
+                                                                        <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg">
+                                                                        <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="btn btn--primary w-100 py-2">{{ __(keyToTitle($imgKey)) }}</label>
+                                                                        <small class="mt-2 text-muted">@lang('Supported'): <b>jpeg, jpg, png</b>.
+                                                                            @if(@$section->element->images->$imgKey->size)
+                                                                                | @lang('Size'): <b>{{@$section->element->images->$imgKey->size}}</b> @lang('px').
+                                                                            @endif
+                                                                        </small>
+                                                                    @endif
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>

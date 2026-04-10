@@ -1,4 +1,3 @@
-{{-- Restored baseline-safe header structure --}}
 @php
     $customButtonsAll = \App\Models\Frontend::where('data_keys', 'custom_buttons.element')->orderBy('id', 'asc')->get();
     $customHeaderButtons = $customButtonsAll->filter(function ($row) {
@@ -8,11 +7,7 @@
         $dv = (array) ($row->data_values ?? []);
         return (int) ($dv['display_order'] ?? 0);
     })->values();
-    $headerButtonsByPosition = [
-        'left' => $customHeaderButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'left')),
-        'nav' => $customHeaderButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'nav')),
-        'right' => $customHeaderButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'right')),
-    ];
+
     if (!isset($__staylHeaderCategories)) {
         $__staylHeaderCategories = \Illuminate\Support\Facades\Cache::remember(
             'storefront.header_nav_categories_v1',
@@ -25,316 +20,390 @@
         );
     }
 @endphp
-{{-- Typography: Inter subset + icons in compiled storefront CSS (see tailwind-storefront.css) --}}
-<header class="glass-header font-sans antialiased fixed top-0 left-0 right-0 z-[99999] w-full supports-[backdrop-filter]:backdrop-blur-md">
-    <div class="glass-header__shell">
-        <div class="glass-header__max flex items-center w-full min-h-[52px]">
-        <div class="glass-header-wrapper flex items-center justify-between flex-nowrap w-full gap-4 min-h-[52px]">
-            <!-- Left: Logo + Hamburger -->
-            <div class="glass-header-left flex items-center gap-[15px] shrink-0">
-                <button class="glass-menu-toggle d-lg-none" type="button" id="glassMenuToggle" aria-label="@lang('Toggle Menu')">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+
+<style>
+    :root {
+        --stayl-h1: 120px;
+        --stayl-h2: 100px;
+        --stayl-yellow: #ffbb38;
+        --stayl-active-blue: #2eb4e7;
+        --stayl-bg-light: #f1f3f5;
+        --stayl-icon-gray: #f8f9fa;
+    }
+    .stayl-fixed-master {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100000;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.06);
+        font-family: 'Outfit', sans-serif !important;
+        background: #fff;
+    }
+    .stayl-top-bar {
+        height: var(--stayl-h1);
+        background: #ffffff;
+        border-bottom: 1px solid #f1f1f1;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    .stayl-yellow-bar {
+        height: var(--stayl-h2);
+        background: var(--stayl-yellow);
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    .stayl-wrap {
+        max-width: 1650px;
+        margin: 0 auto;
+        padding: 0 40px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    /* Professional Search UI */
+    .stayl-search-pill {
+        flex: 1;
+        max-width: 850px;
+        margin: 0 40px;
+        display: flex;
+        align-items: center;
+        background: #f8f9fa;
+        border: 2px solid #f1f1f1;
+        border-radius: 999px;
+        height: 64px;
+        padding: 4px;
+        padding-right: 6px;
+        transition: 0.3s;
+    }
+    .stayl-search-pill:focus-within {
+        background: #ffffff;
+        border-color: var(--stayl-active-blue);
+        box-shadow: 0 10px 25px rgba(46, 180, 231, 0.12);
+    }
+    .stayl-search-input {
+        flex: 1;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        padding: 0 35px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        color: #111 !important;
+        width: 100%;
+    }
+    .stayl-search-actions-inner {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-right: 10px;
+    }
+    .stayl-search-icon-btn {
+        width: 52px;
+        height: 52px;
+        background: var(--stayl-active-blue);
+        color: white !important;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 4px 12px rgba(46, 180, 231, 0.35);
+    }
+    .stayl-search-icon-btn:hover {
+        background: #1e97c9;
+        transform: scale(1.04);
+    }
+
+    /* 3D/Professional Icons Alignment */
+    .stayl-action-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .stayl-icon-item {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: var(--stayl-icon-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        text-decoration: none !important;
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        color: #111;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
+    }
+    .stayl-icon-item svg {
+        stroke-width: 1.8;
+        width: 24px;
+        height: 24px;
+    }
+    .stayl-icon-item:hover {
+        background: #ffffff;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+    }
+    .stayl-icon-item:hover svg {
+        color: var(--stayl-active-blue);
+    }
+    .stayl-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #ff4d4d;
+        color: #fff !important;
+        font-size: 11px;
+        font-weight: 800;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(255, 77, 77, 0.3);
+    }
+
+    /* Yellow Bar Navigation */
+    .stayl-cat-btn {
+        background: transparent !important;
+        height: var(--stayl-h2);
+        padding: 0 45px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: #000;
+        font-weight: 800;
+        font-size: 17px;
+        cursor: pointer;
+        border: none;
+        transition: 0.3s;
+    }
+    .stayl-cat-btn:hover {
+        background: rgba(0,0,0,0.03) !important;
+    }
+    .stayl-nav-ul {
+        display: flex;
+        align-items: center;
+        gap: 45px;
+        margin-left: 50px;
+        list-style: none;
+        padding: 0;
+        margin-bottom: 0;
+    }
+    .stayl-nav-ul li a {
+        color: #000 !important;
+        font-weight: 800;
+        font-size: 16px;
+        text-decoration: none !important;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .stayl-nav-ul li a:hover {
+        color: #fff !important;
+        transform: translateY(-2px);
+    }
+    .stayl-seller-btn {
+        background: #111;
+        color: #fff !important;
+        padding: 16px 36px;
+        border-radius: 14px;
+        font-weight: 900;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none !important;
+        transition: 0.3s;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+    .stayl-seller-btn:hover {
+        background: #000;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+    }
+</style>
+
+<header class="stayl-fixed-master">
+    {{-- Row 1: The Main Action Bar --}}
+    <div class="stayl-top-bar">
+        <div class="stayl-wrap">
+            {{-- Logo & Mobile --}}
+            <div class="flex items-center gap-8">
+                <button class="d-lg-none stayl-sidebar-toggle" style="background:none; border:none; color:#111; cursor:pointer;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
-                <div class="glass-logo {{ getLogoEffectClasses() }}">
-                    <a href="{{ route('home') }}" title="@lang('Home')" class="rounded-lg transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
-                        @php $headerLogo = getLogo('logo'); @endphp
-                        @if($headerLogo)
-                            <img src="{{ $headerLogo }}" alt="{{ gs('site_name') }}" class="site-logo-img" width="{{ getLogoMaxWidth() }}" height="{{ getLogoMaxHeight() }}" fetchpriority="high" loading="eager" decoding="async" style="max-width: {{ getLogoMaxWidth() }}px; max-height: {{ getLogoMaxHeight() }}px; {{ getLogoStyle() }}">
+                <div class="flex items-center gap-4">
+                    <div class="stayl-sidebar-toggle cursor-pointer" style="cursor: pointer;">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </div>
+                    <a href="{{ route('home') }}">
+                        @php $logo = getLogo('logo'); @endphp
+                        @if($logo)
+                            <img src="{{ $logo }}" alt="Staylbd" style="max-height: 75px; width: auto;">
                         @else
-                            <span class="logo-text">{{ gs('site_name') }}</span>
+                            <span style="font-size: 34px; font-weight: 900; color: #111; letter-spacing: -2px;">{{ strtoupper(gs('site_name')) }}</span>
                         @endif
                     </a>
                 </div>
-
-                {{-- Desktop category menu (native &lt;details&gt; — keyboard + click-outside friendly) --}}
-                @if($__staylHeaderCategories->isNotEmpty())
-                <details class="group/cat relative hidden shrink-0 lg:block">
-                    <summary class="flex cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200/70 bg-white/30 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur-sm transition hover:bg-white/55 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 marker:hidden [&::-webkit-details-marker]:hidden">
-                        @include($activeTemplate . 'partials.icon', ['name' => 'th-large', 'class' => 'h-4 w-4 text-emerald-600'])
-                        @lang('Categories')
-                        <svg class="h-4 w-4 text-slate-500 transition group-open/cat:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-                    </summary>
-                    <div class="absolute left-0 top-[calc(100%+8px)] z-[100220] hidden max-h-[min(28rem,72vh)] w-[min(20rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-slate-200/90 bg-white py-2 shadow-xl ring-1 ring-slate-900/5 group-open/cat:block" role="menu">
-                        @foreach($__staylHeaderCategories as $hc)
-                            <div class="border-b border-slate-100 px-2 pb-1 last:border-b-0">
-                                <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 transition hover:bg-emerald-50 focus:outline-none focus-visible:bg-emerald-50" role="menuitem">{{ __($hc->name) }}</a>
-                                @if($hc->subcategories && $hc->subcategories->isNotEmpty())
-                                    <ul class="pb-1 pl-1">
-                                        @foreach($hc->subcategories->take(10) as $sub)
-                                            <li>
-                                                <a href="{{ route('subcategory.products', [slug($sub->name), $sub->id]) }}" class="block rounded-md px-3 py-1.5 text-xs text-slate-600 transition hover:bg-slate-50 hover:text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40" role="menuitem">{{ __($sub->name) }}</a>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @endif
-                            </div>
-                        @endforeach
-                        <div class="px-2 pt-1">
-                            <a href="{{ route('category.all') }}" class="block rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 py-2.5 text-center text-xs font-bold text-white shadow-sm transition hover:from-emerald-500 hover:to-teal-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">@lang('View All Categories')</a>
-                        </div>
-                    </div>
-                </details>
-                @endif
-
-                @foreach($headerButtonsByPosition['left'] as $btn)
-                    @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
-                    <a href="{{ $href }}" class="glass-nav-btn glass-custom-btn" title="{{ $b['button_text'] ?? 'Button' }}">
-                        @if(!empty($b['icon_image']))
-                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="staylbd-icon" width="22" height="22" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
-                        @else
-                            @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle')])
-                        @endif
-                    </a>
-                @endforeach
             </div>
 
-            <!-- Center: search pill (mic + search inside) + camera beside (same as other header round icons) -->
-            <div class="glass-header-center glass-search-zone flex flex-[1_1_0%] min-w-0 max-w-[800px] mx-auto items-center self-center justify-center gap-2">
-                <form action="{{ route('products') }}" method="GET" class="glass-search-form flex flex-1 min-w-0 flex-col justify-center" id="universalSearchForm" role="search" data-search-url="{{ url('/search/universal') }}" data-trending-url="{{ route('search.trending') }}" data-image-search-url="{{ url('/search/image') }}">
-                    <div class="glass-search-wrapper glass-search-wrapper--card flex w-full min-w-0 flex-nowrap items-center rounded-xl transition-shadow focus-within:ring-2 focus-within:ring-emerald-500/35">
-                        <input type="search"
-                               class="glass-search-input font-sans min-w-0"
-                               id="universalSearchInput"
-                               name="search"
-                               placeholder="@lang('Search products, brands, and more')"
-                               value="{{ request()->search ?? null }}"
-                               autocomplete="off"
-                               spellcheck="false"
-                               enterkeyhint="search"
-                               data-search-url="{{ url('/search/universal') }}"
-                               data-placeholder-listening="@lang('Listening… speak now')"
-                               aria-label="@lang('Search products, brands, and more')"
-                               onfocus="this.style.outline='none';this.style.boxShadow='none';this.style.border='none';"
-                               onblur="this.style.outline='none';this.style.boxShadow='none';this.style.border='none';"
-                               style="border:none !important;outline:none !important;box-shadow:none !important;-webkit-box-shadow:none !important;-moz-box-shadow:none !important;background:transparent !important;-webkit-appearance:none !important;appearance:none !important;">
-                        <div class="glass-search-trailing shrink-0 flex items-center flex-nowrap" role="group" aria-label="@lang('Search actions')">
-                        <button type="button" class="glass-search-icon glass-search-voice shrink-0" id="voiceSearchBtn" title="@lang('Voice Search')" aria-label="@lang('Voice Search')">
-                            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'voice_search_icon', 'fallback' => 'microphone', 'svgClass' => 'icon-bold', 'width' => 20, 'height' => 20, 'alt' => ''])
-                        </button>
-                        <button type="submit" class="glass-search-icon glass-search-submit shrink-0" title="@lang('Search')" aria-label="@lang('Search')">
-                            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'search_icon', 'fallback' => 'search', 'svgClass' => 'icon-bold', 'width' => 20, 'height' => 20, 'alt' => '', 'loading' => 'eager'])
-                        </button>
+            {{-- Search Pill & External Lens --}}
+            <div class="flex flex-1 items-center justify-center gap-2"> {{-- Tight gap for unified look --}}
+                <form action="{{ route('products') }}" method="GET" class="stayl-search-pill" style="margin: 0 !important; flex: 1; max-width: 800px;">
+                    <input type="text" name="search" class="stayl-search-input" placeholder="@lang('Search products, brands, and more')..." value="{{ request()->search ?? null }}" autocomplete="off">
+                    <div class="stayl-search-actions-inner" style="gap: 12px; margin-right: 8px;">
+                        {{-- Voice Search --}}
+                        <div style="cursor:pointer; color:#555;" id="voiceSearchBtn" title="Voice Search">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
                         </div>
+                        {{-- Search Submit --}}
+                        <button type="submit" class="stayl-search-icon-btn" style="width: 48px; height: 48px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </button>
                     </div>
-                    <input type="file" id="imageSearchInput" accept="image/*" hidden tabindex="-1" aria-hidden="true">
-                    <!-- Search Results Dropdown -->
-                    <div class="glass-search-results" id="searchResults"></div>
                 </form>
-                <button type="button" class="glass-icon-btn glass-header-camera-btn shrink-0" id="cameraSearchBtn" title="@lang('Search by image')" aria-label="@lang('Search by image')" style="width:44px;height:44px;min-width:44px;min-height:44px;max-width:44px;max-height:44px;border-radius:9999px;aspect-ratio:1/1;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;padding:0;">
-                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'image_search_icon', 'fallback' => 'scan', 'width' => 22, 'height' => 22, 'alt' => ''])
-                </button>
+                {{-- Professional Lens Icon (Outside but Right Next to Search) --}}
+                <div id="cameraSearchBtn" title="Camera Search" style="width: 58px; height: 58px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid #f1f1f1; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: 0.3s; flex-shrink: 0;" onmouseover="this.style.boxShadow='0 8px 25px rgba(0,0,0,0.12)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';" onclick="alert('Camera Search feature');">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                        <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                        <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                        <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
+                    </svg>
+                </div>
             </div>
-            
-            <!-- Navigation: icon-only links -->
-            <nav class="glass-header-nav hidden items-center gap-[10px] shrink-0 whitespace-nowrap" aria-label="@lang('Quick links')">
-                <a href="{{ route('products') }}" class="glass-nav-btn {{ menuActive('products') }}" title="@lang('Products')" aria-label="@lang('Products')">
-                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'products_icon', 'fallback' => 'box', 'alt' => __('Products')])
-                </a>
-                <a href="{{ route('contact') }}" class="glass-nav-btn {{ request()->routeIs('contact') ? 'active' : '' }}" title="@lang('Contact')" aria-label="@lang('Contact')">
-                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'contact_icon', 'fallback' => 'phone', 'alt' => __('Contact')])
-                </a>
-                <a href="{{ route('track.order') }}" class="glass-nav-btn {{ menuActive('track-order') }}" title="@lang('Track Order')" aria-label="@lang('Track Order')">
-                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'alt' => __('Track Order')])
-                </a>
-                @foreach($headerButtonsByPosition['nav'] as $btn)
-                    @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
-                    <a href="{{ $href }}" class="glass-nav-btn glass-custom-btn" title="{{ $b['button_text'] ?? 'Button' }}">
-                        @if(!empty($b['icon_image']))
-                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="staylbd-icon" width="22" height="22" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
-                        @else
-                            @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle')])
-                        @endif
-                    </a>
-                @endforeach
-            </nav>
 
-            <!-- Right: All Features in One Line - serial order preserved even if CSS fails -->
-            <div class="glass-header-right flex items-center gap-2 flex-nowrap shrink-0">
-                @foreach($headerButtonsByPosition['right'] as $btn)
-                    @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
-                    <a href="{{ $href }}" class="glass-icon-btn glass-custom-btn" title="{{ $b['button_text'] ?? 'Button' }}">
-                        @if(!empty($b['icon_image']))
-                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" class="staylbd-icon" width="22" height="22" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
-                        @else
-                            @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle')])
-                        @endif
-                    </a>
-                @endforeach
-                <!-- Language selector -->
-                @if($general->multi_language)
-                    @php
-                        $language = App\Models\Language::all();
-                        $sessionLang = strtolower((string) session('lang', 'en'));
-                        $lookupLang = $sessionLang === 'hi' ? 'hn' : $sessionLang;
-                        $currentLang = $language->firstWhere('code', $sessionLang) ?? $language->firstWhere('code', $lookupLang);
-                    @endphp
-                    <div class="dropdown glass-dropdown-wrapper glass-lang-dropdown-wrap inline-flex shrink-0">
-                        <button type="button" class="glass-icon-btn glass-lang-btn js-lang-dropdown-toggle" aria-expanded="false" title="{{ __($currentLang->name ?? 'EN') }}" aria-label="@lang('Language')">
-                            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'language_icon', 'fallback' => 'language', 'alt' => __('Language')])
-                            <span class="glass-badge-text d-none">{{ __($currentLang->name ?? 'EN') }}</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end glass-dropdown glass-lang-dropdown-menu">
-                            @foreach ($language as $item)
-                                <li>
-                                    <a class="dropdown-item js-lang-switch" href="{{ route('lang', $item->code) }}" data-no-ajax data-lang-code="{{ $item->code }}">
-                                        {{ __($item->name) }}
+            {{-- Action Icons (Premium SVG Set) --}}
+            <div class="stayl-action-row">
+                <a href="#" class="stayl-icon-item" title="Orders">
+                    {{-- Lucide: shopping-bag --}}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                </a>
+                <a href="{{ route('contact') }}" class="stayl-icon-item" title="Contact">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </a>
+                <a href="{{ route('track.order') }}" class="stayl-icon-item" title="Track Order">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                </a>
+                <a href="#" class="stayl-icon-item" title="Language">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </a>
+                <a href="{{ route('user.wishlist') }}" class="stayl-icon-item" title="Wishlist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    <span class="stayl-badge show-wishlist-count">0</span>
+                </a>
+                <a href="#" class="stayl-icon-item" title="Compare">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m16 4 4 4-4 4"></path><path d="M20 8H4"></path><path d="m8 20-4-4 4-4"></path><path d="M4 16h16"></path></svg>
+                    <span class="stayl-badge">0</span>
+                </a>
+                <a href="{{ route('user.cart') }}" class="stayl-icon-item" title="Cart">
+                    {{-- Lucide: shopping-cart --}}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                    <span class="stayl-badge show-cart-count">0</span>
+                </a>
+                <a href="{{ route('user.home') }}" class="stayl-icon-item" style="background:#111; color:#fff !important;" title="Account">
+                    {{-- Lucide: user-round --}}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{-- Row 2: Secondary Nav Bar --}}
+    <div class="stayl-yellow-bar">
+        <div class="stayl-wrap">
+            <nav class="flex items-center h-full">
+                <div class="h-full relative group">
+                    <button class="stayl-cat-btn stayl-sidebar-toggle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        @lang('ALL CATEGORIES')
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg>
+                    </button>
+                    @if($__staylHeaderCategories->isNotEmpty())
+                    <div class="absolute top-full left-0 w-80 bg-white shadow-2xl rounded-b-3xl opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-3 group-hover:translate-y-0 transition-all duration-300 z-[100] border-t-8 border-black">
+                        <ul class="py-6">
+                            @foreach($__staylHeaderCategories->take(12) as $hc)
+                                <li class="px-2">
+                                    <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="flex items-center justify-between px-8 py-3.5 text-[16px] font-bold text-slate-800 hover:bg-slate-50 hover:text-blue-500 transition-colors no-underline rounded-xl">
+                                        {{ __($hc->name) }}
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m9 18 6-6-6-6"></path></svg>
                                     </a>
                                 </li>
                             @endforeach
                         </ul>
                     </div>
-                @endif
+                    @endif
+                </div>
 
-                <!-- Notifications -->
-                @auth
-                    <a href="{{ route('user.notifications') }}" class="glass-icon-btn glass-notification-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Notifications')">
-                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'alt' => __('Notifications')])
-                        @if(($userNotificationCount ?? 0) > 0)
-                            <span class="glass-badge show-notification-count">{{ $userNotificationCount }}</span>
-                        @else
-                            <span class="glass-badge show-notification-count d-none">0</span>
-                        @endif
-                    </a>
-                @else
-                    <a href="{{ route('user.login') }}" class="glass-icon-btn glass-notification-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Notifications')" aria-label="@lang('Sign in to view notifications')">
-                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'alt' => __('Notifications')])
-                    </a>
-                @endauth
+                <ul class="stayl-nav-ul">
+                    <li><a href="{{ route('home') }}">@lang('Homepage')</a></li>
+                    <li><a href="{{ route('products') }}">@lang('Shop Products')</a></li>
+                    <li class="relative group">
+                        <a href="#">@lang('Pages') <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></a>
+                        <div class="absolute top-full left-0 w-64 bg-white shadow-2xl rounded-2xl py-6 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-3 group-hover:translate-y-0 transition-all duration-300">
+                             <a href="{{ route('category.all') }}" class="block px-8 py-3.5 text-sm font-bold text-slate-700 hover:text-blue-500 no-underline">@lang('All Categories')</a>
+                             <a href="{{ route('track.order') }}" class="block px-8 py-3.5 text-sm font-bold text-slate-700 hover:text-blue-500 no-underline">@lang('Track Order')</a>
+                             <a href="{{ route('contact') }}" class="block px-8 py-3.5 text-sm font-bold text-slate-700 hover:text-blue-500 no-underline">@lang('Customer Support')</a>
+                        </div>
+                    </li>
+                    <li><a href="#">@lang('About Us')</a></li>
+                    <li><a href="#">@lang('Latest Blog')</a></li>
+                    <li><a href="{{ route('contact') }}">@lang('Contact Us')</a></li>
+                </ul>
+            </nav>
 
-                <!-- Wishlist – same URL for guest and logged-in -->
-                <a href="{{ route('user.wishlist') }}" id="header-wishlist" class="glass-icon-btn glass-wishlist-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Wishlist')" @auth data-dashboard-link="1" @endauth>
-                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'alt' => __('Wishlist')])
-                    <span class="glass-badge show-wishlist-count">0</span>
-                </a>
-
-                <!-- Compare (secondary — available in mobile menu) -->
-                <a href="{{ route('user.compare') }}" id="header-compare" class="glass-icon-btn glass-compare-btn hidden transition-transform duration-200 hover:scale-105 2xl:inline-flex" title="@lang('Compare')" @auth data-dashboard-link="1" @endauth>
-                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'alt' => __('Compare')])
-                    <span class="glass-badge show-compare-count">0</span>
-                </a>
-
-                <!-- Cart – same URL for guest and logged-in -->
-                <a href="{{ route('user.cart') }}" id="header-cart" class="glass-icon-btn glass-cart-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Cart')" @auth data-dashboard-link="1" @endauth>
-                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'alt' => __('Cart')])
-                    <span class="glass-badge show-cart-count">0</span>
-                </a>
-
-                <!-- Orders (secondary — in account menu / mobile) -->
-                @auth
-                    <a href="{{ route('user.order.index') }}" class="glass-icon-btn glass-orders-btn hidden transition-transform duration-200 hover:scale-105 2xl:inline-flex" title="@lang('My Orders')">
-                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'list-alt', 'alt' => __('My Orders')])
-                    </a>
-                @endauth
-
-                <!-- User Profile - অ্যাভাটারে ক্লিক করলে ড্যাশবোর্ডে যাবে (ক্লিক নিশ্চিত) -->
-                @auth
-                    @php
-                        $avatarLetter = mb_strtoupper(mb_substr(trim(auth()->user()->fullname ?? auth()->user()->username ?? 'U'), 0, 1));
-                    @endphp
-                    <a href="{{ route('user.home') }}" class="glass-profile-btn glass-profile-btn--logged d-flex align-items-center justify-content-center w-10 h-10 min-w-10 min-h-10 max-w-10 max-h-10 p-0 mx-[2px] rounded-full overflow-hidden box-border cursor-pointer shrink-0 no-underline transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" style="width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;max-height:40px;padding:0;margin:0 2px;border-radius:50%;overflow:hidden;box-sizing:border-box;cursor:pointer;flex-shrink:0;text-decoration:none;" aria-label="@lang('Dashboard')" title="@lang('Dashboard')">
-                        @if(auth()->user()->image)
-                            <span class="block w-10 h-10 min-w-10 min-h-10 max-w-10 max-h-10 rounded-full overflow-hidden shrink-0 pointer-events-none" style="display:block;width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;max-height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;pointer-events:none;"><img src="{{ getImage(getFilePath('userProfile') . '/' . auth()->user()->image, getFileSize('userProfile')) }}" alt="{{ auth()->user()->username }}" class="w-full h-full object-cover block pointer-events-none" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;"></span>
-                        @else
-                            <span class="glass-profile-btn__circle flex items-center justify-center w-10 h-10 min-w-10 min-h-10 max-w-10 max-h-10 rounded-full overflow-hidden shrink-0 box-border bg-[#0aa473] text-white text-base font-bold uppercase pointer-events-none" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;min-width:40px;min-height:40px;max-width:40px;max-height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;box-sizing:border-box;background:#0aa473;color:#fff;font-size:16px;font-weight:700;text-transform:uppercase;pointer-events:none;">{{ $avatarLetter }}</span>
-                        @endif
-                    </a>
-                @else
-                    <a href="{{ route('user.login') }}" class="glass-icon-btn glass-login-btn transition-transform duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="@lang('Login')" role="button">
-                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'login_icon', 'fallback' => 'user', 'alt' => __('Login')])
-                    </a>
-                @endauth
-            </div>
-        </div>
+            <a href="{{ route('seller.apply') }}" class="stayl-seller-btn">
+                @lang('BECOME A SELLER')
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--stayl-yellow);"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
         </div>
     </div>
 </header>
 
-<!-- Mobile Menu - Slides from left, above header, all devices -->
 <div class="glass-mobile-menu" id="glassSidebar">
     <div class="glass-mobile-menu-overlay glass-sidebar-overlay"></div>
-    <div class="glass-mobile-menu-content font-sans antialiased">
-        <div class="glass-mobile-menu-header">
-            <div class="glass-mobile-menu-header__brand">
-                <a href="{{ route('home') }}" class="glass-mobile-menu-logo" aria-label="@lang('Home')">
-                    @php $mobileMenuLogo = getLogo('logo'); @endphp
-                    @if($mobileMenuLogo)
-                        <img src="{{ $mobileMenuLogo }}" alt="{{ gs('site_name') }}" class="glass-mobile-menu-logo__img" width="112" height="28" loading="eager" decoding="async">
-                    @else
-                        <span class="glass-mobile-menu-logo__text">{{ gs('site_name') }}</span>
-                    @endif
-                </a>
-                <span class="glass-mobile-menu-title">@lang('Menu')</span>
+    <div class="glass-mobile-menu-content">
+        <div class="p-10 flex items-center justify-between border-b">
+            <span class="h3 fw-bold mb-0">@lang('MENU')</span>
+            <button id="glassSidebarClose" style="background:none; border:none;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        </div>
+        <div class="p-10">
+            <div class="flex flex-col gap-10">
+                <a href="{{ route('home') }}" class="no-underline text-dark h4 fw-bold">@lang('Home')</a>
+                <a href="{{ route('products') }}" class="no-underline text-dark h4 fw-bold">@lang('Shop')</a>
+                <hr>
+                <a href="{{ route('user.login') }}" class="btn btn-dark btn-lg w-100 rounded-pill">@lang('Login Account')</a>
             </div>
-            <button type="button" class="glass-mobile-menu-close" id="glassSidebarClose" aria-label="@lang('Close Menu')">
-                <svg class="glass-mobile-menu-close__icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-            </button>
         </div>
-        <div class="glass-mobile-search font-sans">
-            <form action="{{ route('products') }}" method="GET" class="glass-mobile-search-form">
-                <div class="glass-mobile-search-inner">
-                    <input type="text" name="search" class="glass-mobile-search-input" placeholder="@lang('Search here')" value="{{ request()->search ?? null }}" autocomplete="off">
-                    <button type="submit" class="glass-mobile-search-submit" aria-label="@lang('Search')">
-                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'search_icon', 'fallback' => 'search', 'width' => 20, 'height' => 20, 'alt' => ''])
-                    </button>
-                </div>
-            </form>
-        </div>
-        <nav class="glass-mobile-nav">
-            <a href="{{ route('home') }}" class="{{ menuActive('home') }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'home_icon', 'fallback' => 'home', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Home')</a>
-            <a href="{{ route('products') }}" class="{{ menuActive('products') }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'products_icon', 'fallback' => 'box', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Products')</a>
-            <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'contact_icon', 'fallback' => 'phone', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Contact')</a>
-            <a href="{{ route('track.order') }}" class="{{ menuActive('track-order') }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Track Order')</a>
-            @guest
-                <a href="{{ route('user.login') }}" role="button">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'login_icon', 'fallback' => 'sign-in-alt', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Login')</a>
-                <a href="{{ route('user.register') }}" role="button">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'register_icon', 'fallback' => 'user-plus', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Register')</a>
-            @endguest
-        </nav>
-
-        {{-- Logged-in user: show Dashboard, Orders, Cart, Profile, Logout etc. in hamburger menu (mobile/tablet) --}}
-        @auth
-        <div class="glass-mobile-user-section">
-            <div class="glass-mobile-user-menu-title">@lang('My Account')</div>
-            <nav class="glass-mobile-nav glass-mobile-user-nav">
-                <a href="{{ route('user.home') }}" class="{{ menuActive('user.home') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'home_icon', 'fallback' => 'home', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Dashboard')</a>
-                <a href="{{ route('user.track.order') }}" class="{{ menuActive('user.track.order') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Track Order')</a>
-                <a href="{{ route('user.notifications') }}" class="{{ menuActive('user.notifications') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Notifications')</a>
-                <a href="{{ route('user.order.index') }}" class="{{ menuActive('user.order.index') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'shopping-bag', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('My Orders')</a>
-                <a href="{{ route('user.transactions') }}" class="{{ menuActive('user.transactions') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'transactions_icon', 'fallback' => 'money-bill-wave', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Transactions History')</a>
-                <a href="{{ route('message.index') }}" class="{{ menuActive('message*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'messages_icon', 'fallback' => 'comments', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('My Messages')</a>
-                <a href="{{ route('user.cart') }}" class="{{ menuActive('user.cart') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Cart')</a>
-                <a href="{{ route('user.wishlist') }}" class="{{ menuActive('user.wishlist') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'wishlist_icon', 'fallback' => 'heart', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Wishlist')</a>
-                <a href="{{ route('user.compare') }}" class="{{ menuActive('user.compare') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Compare')</a>
-                <a href="{{ route('user.review.index') }}" class="{{ menuActive('user.review*') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'review_icon', 'fallback' => 'star', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Review Products')</a>
-                <a href="{{ route('user.profile.setting') }}" class="{{ menuActive('user.profile.setting') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'profile_icon', 'fallback' => 'user-tie', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Profile')</a>
-                <a href="{{ route('user.change.password') }}" class="{{ menuActive('user.change.password') }}" data-dashboard-link="1">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'change_password_icon', 'fallback' => 'key', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Change Password')</a>
-                <form method="POST" action="{{ route('user.logout') }}" class="glass-mobile-logout-form">
-                    @csrf
-                    <button type="submit" class="glass-mobile-logout-btn" aria-label="@lang('Logout')">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'logout_icon', 'fallback' => 'sign-out-alt', 'width' => 20, 'height' => 20, 'alt' => ''])@lang('Logout')</button>
-                </form>
-            </nav>
-        </div>
-        @endauth
-
-        @if($__staylHeaderCategories->isNotEmpty())
-        <div class="border-t border-slate-200/60 px-3 py-3">
-            <div class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">@lang('Categories')</div>
-            <div class="-mx-1 flex max-h-48 flex-wrap gap-2 overflow-y-auto">
-                @foreach($__staylHeaderCategories->take(16) as $mc)
-                    <a href="{{ route('category.products', [slug($mc->name), $mc->id]) }}" class="inline-flex max-w-full items-center rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
-                        <span class="truncate">{{ __($mc->name) }}</span>
-                    </a>
-                @endforeach
-            </div>
-            <a href="{{ route('category.all') }}" class="mt-3 block rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 py-2.5 text-center text-xs font-bold text-white shadow-sm">@lang('View All Categories')</a>
-        </div>
-        @endif
     </div>
 </div>
-<!-- Old header completely hidden - replaced by glass header -->
-@push('style')
+<script>
+    $(document).ready(function() {
+        // Universal Sidebar Toggle
+        $('.stayl-sidebar-toggle').on('click', function(e) {
+            e.preventDefault();
+            $('#glassSidebar').addClass('active');
+        });
 
-{{-- inline style moved to critical-storefront.css --}}
-
-@endpush
+        $('#glassSidebarClose, .glass-sidebar-overlay').on('click', function() {
+            $('#glassSidebar').removeClass('active');
+        });
+    });
+</script>

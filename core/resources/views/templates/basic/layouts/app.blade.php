@@ -90,10 +90,14 @@
 
     <link rel="stylesheet" href="{{ storefront_compiled_stylesheet_url('critical-storefront') }}" crossorigin="anonymous">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+
     @include('partials.tracking_scripts')
 </head>
 
-<body class="overflow-hidden font-sans antialiased" @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default') data-theme="{{ $uiSettings->theme_template }}" @endif @stack('body_attrs')>
+<body class="antialiased" style="font-family: 'Outfit', sans-serif; padding-top: 220px !important;" @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default') data-theme="{{ $uiSettings->theme_template }}" @endif @stack('body_attrs')>
     <!-- Preloader removed for instant page loads -->
     @yield('app')
     @include($activeTemplate . 'partials.mobile_bottom_nav')
