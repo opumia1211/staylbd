@@ -29,6 +29,9 @@ class BannerService
     /** Base path: project root assets (staylbd/assets) so URL http://localhost/staylbd/assets/... is served correctly. */
     public const UPLOAD_BASE = 'assets/images/frontend/banner';
 
+    /** Row split promo images (large slider + small card) — same root assets pattern as hero banners. */
+    public const ROW_SPLIT_RELATIVE = 'assets/images/frontend/row_split_banner';
+
     /** Subfolders: desktop = main, mobile = optional separate, thumb = preview */
     public const DESKTOP_DIR = 'desktop';
     public const MOBILE_DIR = 'mobile';
@@ -82,6 +85,34 @@ class BannerService
             @mkdir($path, 0755, true);
         }
         return $path;
+    }
+
+    /** Physical directory for homepage row split banner uploads (project root assets). */
+    public static function rowSplitUploadPath(): string
+    {
+        $path = base_path('../' . self::ROW_SPLIT_RELATIVE);
+        if (!is_dir($path)) {
+            @mkdir($path, 0755, true);
+        }
+
+        return $path;
+    }
+
+    /**
+     * Public URL for row split image (served via row-split-banner route — works with subdirectory installs).
+     */
+    public static function rowSplitImageUrl(string $filename): string
+    {
+        $filename = basename($filename);
+        if ($filename === '') {
+            return '';
+        }
+        $routeUrl = route('row.split.image', ['filename' => $filename]);
+        if (request()->getBasePath() !== '' && strpos($routeUrl, request()->getBasePath()) === false) {
+            return rtrim(request()->getSchemeAndHttpHost() . request()->getBasePath(), '/') . '/row-split-banner/' . $filename;
+        }
+
+        return $routeUrl;
     }
 
     /** Relative path for asset URL (e.g. assets/images/frontend/banner/desktop/) */

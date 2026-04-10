@@ -25,8 +25,8 @@
                             <p class="hp-pro__head-lead mb-0">@lang('Order homepage blocks and optional product carousels.')</p>
                             <ul class="hp-pro__head-steps list-unstyled mb-0 mt-2">
                                 <li><span class="hp-pro__step-n">1</span> @lang('Reorder · show/hide')</li>
-                                <li><span class="hp-pro__step-n">2</span> @lang('Add rows (category or IDs)')</li>
-                                <li><span class="hp-pro__step-n">3</span> @lang('Save to publish')</li>
+                                <li><span class="hp-pro__step-n">2</span> @lang('Add / edit rows — optional split banners (large + small) per row in the edit form')</li>
+                                <li><span class="hp-pro__step-n">3</span> @lang('Save layout to publish')</li>
                             </ul>
                         </div>
                     </div>

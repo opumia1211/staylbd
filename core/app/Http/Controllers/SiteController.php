@@ -2173,4 +2173,27 @@ class SiteController extends Controller
         }
         abort(404);
     }
+
+    /**
+     * Serve row split promo images from project root assets or Laravel public (same reliability as hero banners).
+     */
+    public function serveRowSplitBanner(string $filename)
+    {
+        $filename = basename($filename);
+        if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $filename)) {
+            abort(404);
+        }
+        $rel = \App\Services\BannerService::ROW_SPLIT_RELATIVE;
+        $paths = [
+            base_path('../' . $rel . '/' . $filename),
+            public_path($rel . '/' . $filename),
+        ];
+        foreach ($paths as $path) {
+            if (is_file($path) && is_readable($path)) {
+                $mime = mime_content_type($path) ?: 'image/jpeg';
+                return response()->file($path, ['Content-Type' => $mime]);
+            }
+        }
+        abort(404);
+    }
 }

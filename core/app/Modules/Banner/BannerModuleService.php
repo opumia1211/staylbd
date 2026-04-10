@@ -114,12 +114,12 @@ class BannerModuleService
             $autoplay = 1;
         }
         $width = (int)($dv['banner_width'] ?? 2560);
-        $height = (int)($dv['banner_height'] ?? 400);
+        $height = (int)($dv['banner_height'] ?? 600);
         if ($width < 100) {
             $width = 2560;
         }
         if ($height < 50) {
-            $height = 400;
+            $height = 600;
         }
         return [
             'slide_interval_seconds' => $slideInterval,

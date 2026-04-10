@@ -189,11 +189,14 @@
         font-weight: 800;
         font-size: 17px;
         cursor: pointer;
-        border: none;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
         transition: 0.3s;
     }
     .stayl-cat-btn:hover {
-        background: rgba(0,0,0,0.03) !important;
+        background: transparent !important;
+        color: #fff !important;
     }
     .stayl-nav-ul {
         display: flex;
@@ -237,30 +240,218 @@
         transform: translateY(-3px);
         box-shadow: 0 12px 25px rgba(0,0,0,0.25);
     }
+
+    /* Categories Dropdown CSS */
+    .stayl-cat-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 300px;
+        background: #fff;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        border-radius: 0 0 20px 20px;
+        border-top: 4px solid #111;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(15px);
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 10000;
+        padding: 15px 0;
+    }
+    .stayl-cat-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .stayl-cat-dropdown ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .stayl-cat-dropdown li a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 30px;
+        font-size: 15px;
+        font-weight: 800;
+        color: #111 !important;
+        text-decoration: none !important;
+        transition: 0.2s;
+    }
+    .stayl-cat-dropdown li a:hover {
+        background: #f8f9fa;
+        color: var(--stayl-active-blue) !important;
+        padding-left: 35px;
+    }
+
+
+    /* Premium Glass Sidebar CSS (Framework Independent) */
+    .stayl-sb-header {
+        padding: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f1f1f1;
+        background: #f8f9fa;
+    }
+    .stayl-sb-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .stayl-sb-icon-box {
+        background: #111;
+        color: #fff;
+        padding: 10px;
+        border-radius: 12px;
+        display: flex;
+    }
+    .stayl-sb-title {
+        font-size: 22px;
+        font-weight: 900;
+        color: #111;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+    .stayl-sb-close {
+        background: #fff;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .stayl-sb-close:hover {
+        background: #f1f1f1;
+        transform: rotate(90deg);
+    }
+    .stayl-sb-body {
+        padding: 25px;
+        overflow-y: auto;
+        max-height: calc(100vh - 100px);
+    }
+    .stayl-sb-item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 15px 25px;
+        border-radius: 18px;
+        text-decoration: none !important;
+        color: #111;
+        margin-bottom: 15px;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #f8f9fa;
+        border: 1px solid transparent;
+    }
+    .stayl-sb-item:hover {
+        background: #ffffff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        border-color: #f1f1f1;
+        transform: translateY(-3px);
+        color: var(--stayl-active-blue);
+    }
+    .stayl-sb-item-icon {
+        width: 50px;
+        height: 50px;
+        background: #ffffff;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        transition: 0.3s;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .stayl-sb-item:hover .stayl-sb-item-icon {
+        background: var(--stayl-active-blue);
+        color: #ffffff;
+    }
+    .stayl-sb-item-text {
+        font-size: 18px;
+        font-weight: 800;
+        margin: 0;
+    }
+    .stayl-sb-divider-text {
+        font-size: 12px;
+        font-weight: 900;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 30px 10px 15px;
+        border-bottom: 1px solid #f1f1f1;
+        padding-bottom: 10px;
+    }
+    .stayl-sb-action-box {
+        margin-top: 35px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 24px;
+        border: 1px solid #f1f1f1;
+    }
+    .stayl-btn-dark {
+        background: #111;
+        color: #fff !important;
+        width: 100%;
+        padding: 18px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        text-decoration: none !important;
+        font-weight: 800;
+        font-size: 16px;
+        transition: 0.3s;
+    }
+    .stayl-btn-dark:hover {
+        background: var(--stayl-active-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(46, 180, 231, 0.3);
+    }
+    .stayl-btn-outline {
+        background: #fff;
+        color: #111 !important;
+        width: 100%;
+        padding: 18px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        text-decoration: none !important;
+        font-weight: 800;
+        font-size: 16px;
+        border: 2px solid #f1f1f1;
+        margin-top: 15px;
+        transition: 0.3s;
+    }
+    .stayl-btn-outline:hover {
+        background: #f8f9fa;
+        border-color: #ddd;
+    }
 </style>
 
 <header class="stayl-fixed-master">
     {{-- Row 1: The Main Action Bar --}}
     <div class="stayl-top-bar">
         <div class="stayl-wrap">
-            {{-- Logo & Mobile --}}
-            <div class="flex items-center gap-8">
-                <button class="d-lg-none stayl-sidebar-toggle" style="background:none; border:none; color:#111; cursor:pointer;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-                <div class="flex items-center gap-4">
-                    <div class="stayl-sidebar-toggle cursor-pointer" style="cursor: pointer;">
-                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                    </div>
-                    <a href="{{ route('home') }}">
-                        @php $logo = getLogo('logo'); @endphp
-                        @if($logo)
-                            <img src="{{ $logo }}" alt="Staylbd" style="max-height: 75px; width: auto;">
-                        @else
-                            <span style="font-size: 34px; font-weight: 900; color: #111; letter-spacing: -2px;">{{ strtoupper(gs('site_name')) }}</span>
-                        @endif
-                    </a>
-                </div>
+            {{-- Logo --}}
+            <div class="d-flex align-items-center">
+                <a href="{{ route('home') }}">
+                    @php $logo = getLogo('logo'); @endphp
+                    @if($logo)
+                        <img src="{{ $logo }}" alt="Staylbd" style="max-height: 75px; width: auto;">
+                    @else
+                        <span style="font-size: 34px; font-weight: 900; color: #111; letter-spacing: -2px;">{{ strtoupper(gs('site_name')) }}</span>
+                    @endif
+                </a>
             </div>
 
             {{-- Search Pill & External Lens --}}
@@ -329,19 +520,24 @@
     {{-- Row 2: Secondary Nav Bar --}}
     <div class="stayl-yellow-bar">
         <div class="stayl-wrap">
-            <nav class="flex items-center h-full">
-                <div class="h-full relative group">
-                    <button class="stayl-cat-btn stayl-sidebar-toggle">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            <nav class="d-flex align-items-center h-100" style="gap: 50px;"> {{-- Fixed huge gap --}}
+                {{-- Separate Hamburger Button --}}
+                <div class="stayl-sidebar-trigger cursor-pointer flex items-center justify-center" style="width: 42px; height: 42px; transition: 0.3s; color: #000;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" title="Open Menu">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </div>
+
+                {{-- All Categories Button (Separate) --}}
+                <div class="h-100 position-relative" id="staylCatContainer">
+                    <button class="stayl-cat-btn" id="staylCatBtn" style="padding: 0; gap: 10px;">
                         @lang('ALL CATEGORIES')
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg>
                     </button>
                     @if($__staylHeaderCategories->isNotEmpty())
-                    <div class="absolute top-full left-0 w-80 bg-white shadow-2xl rounded-b-3xl opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-3 group-hover:translate-y-0 transition-all duration-300 z-[100] border-t-8 border-black">
-                        <ul class="py-6">
+                    <div class="stayl-cat-dropdown" id="staylCatDropdown">
+                        <ul>
                             @foreach($__staylHeaderCategories->take(12) as $hc)
-                                <li class="px-2">
-                                    <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="flex items-center justify-between px-8 py-3.5 text-[16px] font-bold text-slate-800 hover:bg-slate-50 hover:text-blue-500 transition-colors no-underline rounded-xl">
+                                <li>
+                                    <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}">
                                         {{ __($hc->name) }}
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m9 18 6-6-6-6"></path></svg>
                                     </a>
@@ -377,33 +573,129 @@
     </div>
 </header>
 
-<div class="glass-mobile-menu" id="glassSidebar">
-    <div class="glass-mobile-menu-overlay glass-sidebar-overlay"></div>
-    <div class="glass-mobile-menu-content">
-        <div class="p-10 flex items-center justify-between border-b">
-            <span class="h3 fw-bold mb-0">@lang('MENU')</span>
-            <button id="glassSidebarClose" style="background:none; border:none;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-        </div>
-        <div class="p-10">
-            <div class="flex flex-col gap-10">
-                <a href="{{ route('home') }}" class="no-underline text-dark h4 fw-bold">@lang('Home')</a>
-                <a href="{{ route('products') }}" class="no-underline text-dark h4 fw-bold">@lang('Shop')</a>
-                <hr>
-                <a href="{{ route('user.login') }}" class="btn btn-dark btn-lg w-100 rounded-pill">@lang('Login Account')</a>
+<div class="glass-mobile-menu" id="glassSidebar" style="font-family: 'Outfit', sans-serif;">
+    <div class="glass-mobile-menu-overlay glass-sidebar-overlay" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);"></div>
+    <div class="glass-mobile-menu-content" style="background: #ffffff; width: 420px; box-shadow: 20px 0 60px rgba(0,0,0,0.15);">
+        
+        {{-- Custom CSS Header --}}
+        <div class="stayl-sb-header">
+            <div class="stayl-sb-title-wrap">
+                <div class="stayl-sb-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </div>
+                <h3 class="stayl-sb-title">@lang('NAVIGATION')</h3>
             </div>
+            <button id="glassSidebarClose" class="stayl-sb-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        
+        <div class="stayl-sb-body">
+            
+            <a href="{{ route('home') }}" class="stayl-sb-item">
+                <div class="stayl-sb-item-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </div>
+                <h5 class="stayl-sb-item-text">@lang('Home Page')</h5>
+            </a>
+            
+            <a href="{{ route('products') }}" class="stayl-sb-item">
+                <div class="stayl-sb-item-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h1.49l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                </div>
+                <h5 class="stayl-sb-item-text">@lang('Shop Products')</h5>
+            </a>
+
+            <div class="stayl-sb-divider-text">@lang('Support & Orders')</div>
+            
+            <a href="{{ route('track.order') }}" class="stayl-sb-item">
+                <div class="stayl-sb-item-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                </div>
+                <h5 class="stayl-sb-item-text">@lang('Track My Order')</h5>
+            </a>
+
+            <a href="{{ route('contact') }}" class="stayl-sb-item">
+                <div class="stayl-sb-item-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </div>
+                <h5 class="stayl-sb-item-text">@lang('Customer Support')</h5>
+            </a>
+
+            {{-- Action Area --}}
+            <div class="stayl-sb-action-box">
+                @guest
+                <a href="{{ route('user.login') }}" class="stayl-btn-dark">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg>
+                    @lang('LOGIN TO ACCOUNT')
+                </a>
+                <a href="{{ route('user.register') }}" class="stayl-btn-outline">
+                    @lang('CREATE NEW ACCOUNT')
+                </a>
+                @else
+                <a href="{{ route('user.home') }}" class="stayl-btn-dark" style="background: var(--stayl-active-blue);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    @lang('VIEW DASHBOARD')
+                </a>
+                @endguest
+            </div>
+            
         </div>
     </div>
 </div>
 <script>
-    $(document).ready(function() {
-        // Universal Sidebar Toggle
-        $('.stayl-sidebar-toggle').on('click', function(e) {
-            e.preventDefault();
-            $('#glassSidebar').addClass('active');
-        });
+    (function() {
+        // Vanilla JS Toggle to avoid dependency issues
+        function setupStaylSidebar() {
+            const triggers = document.querySelectorAll('.stayl-sidebar-trigger');
+            const sidebar = document.getElementById('glassSidebar');
+            const closeBtn = document.getElementById('glassSidebarClose');
+            const overlay = document.querySelector('.glass-sidebar-overlay');
 
-        $('#glassSidebarClose, .glass-sidebar-overlay').on('click', function() {
-            $('#glassSidebar').removeClass('active');
-        });
-    });
+            if (!sidebar) return;
+
+            triggers.forEach(trigger => {
+                trigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sidebar.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // Prevent scroll
+                });
+            });
+
+            const closeAction = function() {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+
+            if (closeBtn) closeBtn.addEventListener('click', closeAction);
+            if (overlay) overlay.addEventListener('click', closeAction);
+
+            // Categories Click Toggle
+            const catBtn = document.getElementById('staylCatBtn');
+            const catDropdown = document.getElementById('staylCatDropdown');
+            const catContainer = document.getElementById('staylCatContainer');
+
+            if (catBtn && catDropdown) {
+                catBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    catDropdown.classList.toggle('active');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (catContainer && !catContainer.contains(e.target)) {
+                        catDropdown.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupStaylSidebar);
+        } else {
+            setupStaylSidebar();
+        }
+    })();
 </script>

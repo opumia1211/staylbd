@@ -736,6 +736,7 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
                 return app('App\Http\Controllers\Admin\FrontendController')->bannerDuplicate((int) $id); })->name('sections.banner.duplicate');
             Route::get('banner/preview/{id}', function ($id) {
                 return app('App\Http\Controllers\Admin\FrontendController')->bannerPreview((int) $id); })->name('sections.banner.preview');
+            Route::post('banner/row-promo/{id}/visibility', [\App\Http\Controllers\Admin\HomepageCustomRowController::class, 'toggleSplitVisibility'])->whereNumber('id')->name('sections.banner.rowPromoVisibility');
             Route::get('contact', function () {
                 return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('contact'); })->name('sections.contact');
             Route::get('footer', [\App\Http\Controllers\Admin\FooterBuilderController::class, 'index'])->name('sections.footer');

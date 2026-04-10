@@ -23,7 +23,27 @@
     $speedMs = isset($carouselSpeedMs) && $carouselSpeedMs !== null && $carouselSpeedMs !== ''
         ? max(300, min(2000, (int) $carouselSpeedMs))
         : null;
+    $splitRaw = $r->split_banner_json ?? null;
+    if (is_string($splitRaw)) {
+        $splitRaw = json_decode($splitRaw, true);
+    }
+    $splitCfg = is_array($splitRaw) ? $splitRaw : [];
+    $hasLarge = is_array($splitCfg)
+        && !empty($splitCfg['large'])
+        && is_array($splitCfg['large'])
+        && count($splitCfg['large']) > 0;
+    $hasSmall = is_array($splitCfg)
+        && isset($splitCfg['small']['image'])
+        && $splitCfg['small']['image'] !== '';
+    $splitPublic = !array_key_exists('is_public', $splitCfg)
+        || $splitCfg['is_public'] === true
+        || $splitCfg['is_public'] === 1
+        || $splitCfg['is_public'] === '1';
+    $showRowSplit = is_array($splitCfg) && !empty($splitCfg['enabled']) && ($hasLarge || $hasSmall) && $splitPublic;
 @endphp
+@if($showRowSplit)
+    @include($activeTemplate . 'partials.row_split_promo', ['rowModel' => $r])
+@endif
 @include($activeTemplate . 'partials.product_carousel_section', [
     'products' => $products,
     'sectionKey' => $sectionKey,

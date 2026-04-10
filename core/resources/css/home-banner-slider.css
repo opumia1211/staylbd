@@ -19,7 +19,7 @@
 
 #home-banner-section .banner-fullscreen-inner {
     width: 100%;
-    max-width: var(--stayl-content-max, min(1920px, 100%));
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
     position: relative;

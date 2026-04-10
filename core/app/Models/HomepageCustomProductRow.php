@@ -21,6 +21,7 @@ class HomepageCustomProductRow extends Model
         'interval_seconds',
         'view_all_url',
         'view_all_label',
+        'split_banner_json',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class HomepageCustomProductRow extends Model
         'sort_order' => 'integer',
         'product_limit' => 'integer',
         'interval_seconds' => 'integer',
+        'split_banner_json' => 'array',
     ];
 
     public function category(): BelongsTo

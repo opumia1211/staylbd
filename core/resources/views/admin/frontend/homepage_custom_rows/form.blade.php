@@ -10,6 +10,35 @@
         } else {
             $activeOn = $row->exists ? (bool) $row->is_active : true;
         }
+        $split = $row->split_banner_json ?? [];
+        if (!is_array($split)) {
+            $split = [];
+        }
+        if (old('split_banner_interval') !== null) {
+            $splitEnabled = old('split_banner_enabled') === '1' || old('split_banner_enabled') === true || old('split_banner_enabled') === 1;
+            $splitInterval = old('split_banner_interval', 5);
+        } else {
+            $splitEnabled = !empty($split['enabled']);
+            $splitInterval = $split['interval'] ?? 5;
+        }
+        $splitLarge = isset($split['large']) && is_array($split['large']) ? $split['large'] : [];
+        $splitSmall = isset($split['small']) && is_array($split['small']) ? $split['small'] : [];
+        if (old('split_banner_is_public') !== null) {
+            $splitIsPublic = old('split_banner_is_public') === '1' || old('split_banner_is_public') === true || old('split_banner_is_public') === 1;
+        } else {
+            $splitIsPublic = !isset($split['is_public']) || $split['is_public'] === true || $split['is_public'] === 1 || $split['is_public'] === '1';
+        }
+        $splitCdTitle = old('split_banner_countdown_title', $split['countdown_title'] ?? '');
+        $splitCdEnd = old('split_banner_countdown_end');
+        if ($splitCdEnd === null && !empty($split['countdown_ends_at'] ?? null)) {
+            try {
+                $splitCdEnd = \Carbon\Carbon::parse($split['countdown_ends_at'])->format('Y-m-d\TH:i');
+            } catch (\Throwable $e) {
+                $splitCdEnd = '';
+            }
+        } elseif ($splitCdEnd === null) {
+            $splitCdEnd = '';
+        }
     @endphp
     <div class="row justify-content-center hp-form-pro">
         <div class="col-lg-11 col-xl-9">
@@ -44,7 +73,7 @@
                         </div>
                     </div>
 
-                    <form method="post" action="{{ $action }}">
+                    <form method="post" action="{{ $action }}" enctype="multipart/form-data">
                         @csrf
                         <div class="hp-form-pro__section mb-4 pb-4 border-bottom">
                             <div class="d-flex align-items-center gap-2 mb-3">
@@ -125,7 +154,7 @@
                             </div>
                         </div>
 
-                        <div class="hp-form-pro__section mb-0">
+                        <div class="hp-form-pro__section mb-4 pb-4 border-bottom">
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <span class="hp-form-pro__step">3</span>
                                 <h6 class="mb-0 fw-bold">@lang('Display & link')</h6>
@@ -153,6 +182,107 @@
                                     <input type="text" name="view_all_label" class="form-control"
                                         value="{{ old('view_all_label', $row->view_all_label) }}"
                                         placeholder="@lang('View all')">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hp-form-pro__section mb-0">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="hp-form-pro__step">4</span>
+                                <h6 class="mb-0 fw-bold">@lang('Split promo banners (this line only)')</h6>
+                            </div>
+                            <p class="small text-muted mb-3">@lang('Above the product strip for this line. Empty slots show size hints; after upload hints hide.')</p>
+                            <input type="hidden" name="split_banner_enabled" value="0">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="split_banner_enabled" value="1"
+                                    id="split_banner_enabled" @if($splitEnabled) checked @endif>
+                                <label class="form-check-label fw-medium" for="split_banner_enabled">@lang('Enable split banners on this product line')</label>
+                            </div>
+                            <input type="hidden" name="split_banner_is_public" value="0">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" name="split_banner_is_public" value="1"
+                                    id="split_banner_is_public" @if($splitIsPublic) checked @endif>
+                                <label class="form-check-label fw-medium" for="split_banner_is_public">@lang('Show on public storefront')</label>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label small">@lang('Slide interval (sec)')</label>
+                                    <input type="number" name="split_banner_interval" class="form-control form-control-sm"
+                                        value="{{ (int) $splitInterval }}" min="2" max="30">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">@lang('Offer countdown end')</label>
+                                    <input type="datetime-local" name="split_banner_countdown_end" class="form-control form-control-sm"
+                                        value="{{ $splitCdEnd }}">
+                                    <small class="text-muted">@lang('Optional. Uses same live countdown as site offer timers.')</small>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small">@lang('Countdown title')</label>
+                                    <input type="text" name="split_banner_countdown_title" class="form-control form-control-sm"
+                                        value="{{ $splitCdTitle }}" placeholder="{{ __('Offer ends in') }}" maxlength="120">
+                                </div>
+                            </div>
+                            <h6 class="small fw-bold text-uppercase text-muted mb-2">@lang('Large banner (slider, left)') — @lang('up to 5 slides')</h6>
+                            <div class="row g-3 mb-4">
+                                @for($s = 0; $s < 5; $s++)
+                                    @php
+                                        $slot = $splitLarge[$s] ?? [];
+                                        $slotImg = $slot['image'] ?? '';
+                                    @endphp
+                                    <div class="col-md-6 col-lg-4 border rounded-3 p-3 bg-light">
+                                        <div class="small fw-semibold mb-2">@lang('Slide') {{ $s + 1 }}</div>
+                                        @if(!$slotImg)
+                                            <div class="small text-muted border border-dashed rounded p-2 mb-2 bg-white">
+                                                <strong>@lang('Large art')</strong>: <code>1200–1600 × 600–800</code> @lang('px landscape') · JPG/PNG/WebP · 5MB
+                                            </div>
+                                        @endif
+                                        @if($slotImg)
+                                            <div class="mb-2">
+                                                <img src="{{ \App\Services\BannerService::rowSplitImageUrl($slotImg) }}" alt="" class="img-fluid rounded border" style="max-height:100px;">
+                                                <input type="hidden" name="split_banner_large_{{ $s }}_keep" value="{{ $slotImg }}">
+                                            </div>
+                                        @endif
+                                        <input type="file" name="split_banner_large_{{ $s }}_image" class="form-control form-control-sm mb-2" accept="image/jpeg,image/png,image/webp">
+                                        <input type="text" name="split_banner_large_{{ $s }}_kicker" class="form-control form-control-sm mb-1" placeholder="@lang('Kicker (e.g. New Arrivals)')" value="{{ old('split_banner_large_'.$s.'_kicker', $slot['kicker'] ?? '') }}">
+                                        <input type="text" name="split_banner_large_{{ $s }}_heading" class="form-control form-control-sm mb-1" placeholder="@lang('Heading')" value="{{ old('split_banner_large_'.$s.'_heading', $slot['heading'] ?? '') }}">
+                                        <div class="row g-1">
+                                            <div class="col-6">
+                                                <input type="text" name="split_banner_large_{{ $s }}_btn" class="form-control form-control-sm" placeholder="@lang('Button')" value="{{ old('split_banner_large_'.$s.'_btn', $slot['btn'] ?? '') }}">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="text" name="split_banner_large_{{ $s }}_url" class="form-control form-control-sm" placeholder="URL" value="{{ old('split_banner_large_'.$s.'_url', $slot['url'] ?? '') }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endfor
+                            </div>
+                            <h6 class="small fw-bold text-uppercase text-muted mb-2">@lang('Small banner (right)')</h6>
+                            <div class="row g-3 mb-0">
+                                <div class="col-lg-4">
+                                    @if(empty($splitSmall['image']))
+                                        <div class="small text-muted border border-dashed rounded p-2 mb-2 bg-light">
+                                            <strong>@lang('Small card')</strong>: <code>~800 × 900</code> @lang('px portrait') · JPG/PNG/WebP · 5MB
+                                        </div>
+                                    @endif
+                                    @if(!empty($splitSmall['image']))
+                                        <div class="mb-2">
+                                            <img src="{{ \App\Services\BannerService::rowSplitImageUrl($splitSmall['image']) }}" alt="" class="img-fluid rounded border" style="max-height:120px;">
+                                            <input type="hidden" name="split_banner_small_keep" value="{{ $splitSmall['image'] }}">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="split_banner_small_image" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp">
+                                </div>
+                                <div class="col-lg-8">
+                                    <input type="text" name="split_banner_small_badge" class="form-control form-control-sm mb-2" placeholder="@lang('Badge (e.g. Summer Offer)')" value="{{ old('split_banner_small_badge', $splitSmall['badge'] ?? '') }}">
+                                    <input type="text" name="split_banner_small_heading" class="form-control form-control-sm mb-2" placeholder="@lang('Heading')" value="{{ old('split_banner_small_heading', $splitSmall['heading'] ?? '') }}">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <input type="text" name="split_banner_small_btn" class="form-control form-control-sm" placeholder="@lang('Button')" value="{{ old('split_banner_small_btn', $splitSmall['btn'] ?? '') }}">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" name="split_banner_small_url" class="form-control form-control-sm" placeholder="URL" value="{{ old('split_banner_small_url', $splitSmall['url'] ?? '') }}">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -10,23 +10,31 @@
         $slideInterval = 5;
         $autoplay = 1;
         $bannerWidth = 2560;
-        $bannerHeight = 400;
+        $bannerHeight = 600;
         if ($bannerSliderSettings && isset($bannerSliderSettings->data_values)) {
             $dv = $bannerSliderSettings->data_values;
             $slideInterval = (int)($dv->slide_interval_seconds ?? 5);
             $autoplay = (int)($dv->autoplay ?? 1);
             $bannerWidth = (int)($dv->banner_width ?? 2560);
-            $bannerHeight = (int)($dv->banner_height ?? 400);
+            $bannerHeight = (int)($dv->banner_height ?? 600);
         }
         if ($bannerWidth < 100) $bannerWidth = 2560;
-        if ($bannerHeight < 50) $bannerHeight = 400;
+        if ($bannerHeight < 50) $bannerHeight = 600;
         if ($slideInterval < 1 || $slideInterval > 60) $slideInterval = 5;
     @endphp
 
     @php $bannerStats = $bannerStats ?? ['impressions' => 0, 'clicks' => 0, 'ctr' => 0]; @endphp
-    <div class="row">
-        <!-- Compact: Analytics + Guidelines in one bar -->
-        <div class="col-12 mb-3">
+    <div class="row g-3">
+        <div class="col-12">
+            <p class="small text-muted mb-0">
+                <strong>@lang('Hero')</strong> — @lang('full-width slider below.') 
+                <strong>@lang('Row promos')</strong> — @lang('large + small pair per line; position = drag in') <a href="{{ route('admin.frontend.sections.homepageCustomRows') }}">@lang('Homepage layout')</a>.
+                @lang('Site-wide offer bars:') <a href="{{ route('admin.offer-timers.index') }}">@lang('Offer timers')</a>.
+            </p>
+        </div>
+
+        <!-- Analytics strip -->
+        <div class="col-12">
             <div class="card border-0 shadow-sm banner-top-bar">
                 <div class="card-body py-2 px-3">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -44,22 +52,20 @@
                                 <strong>{{ $bannerStats['ctr'] }}%</strong>
                             </div>
                         </div>
-                        <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
-                            <span><i class="las la-file-image text--primary"></i> JPG, PNG, WEBP, MP4</span>
-                            <span><i class="las la-compress-arrows-alt"></i> 5MB max</span>
-                            <span><i class="las la-desktop"></i> 2560×400 (@lang('Recommended'))</span>
-                            <span><i class="las la-mobile-alt"></i> @lang('Use same ratio (6.4:1)')</span>
-                        </div>
+                        <div class="small text-muted">@lang('Hero banner analytics')</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Compact: Slider Settings single row – পাবলিক পেজে কত সেকেন্ড পর পর ব্যানার স্লাইড হবে -->
-        <div class="col-12 mb-3">
+        <!-- Slider dimensions + timing (hero) -->
+        <div class="col-12 mb-1">
             <div class="card border-0 shadow-sm">
-                <div class="card-body py-2 px-3">
-                    <p class="small text-muted mb-2">@lang('These settings control the public homepage banner slider. Save and refresh the public page to see changes.')</p>
+                <div class="card-header bg-white border-bottom py-2 px-3">
+                    <span class="fw-bold small text-uppercase text-muted">@lang('Hero slider')</span>
+                    <span class="text-muted small ms-2">@lang('Default aspect 2560×600.')</span>
+                </div>
+                <div class="card-body py-3 px-3">
                     <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" class="banner-slider-form">
                         @csrf
                         <input type="hidden" name="type" value="content">
@@ -93,11 +99,81 @@
             </div>
         </div>
 
+        <!-- Split row promos — which line = layout order -->
+        @php $homepageProductRows = $homepageProductRows ?? collect(); @endphp
+        <div class="col-12 mb-3">
+            <div class="card border-0 shadow-sm border-start border-4 border-warning">
+                <div class="card-header bg-white border-0 py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <span class="fw-bold">@lang('Row promos (large + small)')</span>
+                    <a href="{{ route('admin.frontend.sections.homepageCustomRows') }}" class="btn btn-outline-secondary btn-sm shrink-0"><i class="las la-stream"></i> @lang('Layout order')</a>
+                </div>
+                <div class="card-body py-3 px-3">
+                    <p class="small text-muted mb-3">@lang('Layout ID must be enabled in layout. Use Public / Private to hide a promo from the storefront in one click.')</p>
+                    @if($homepageProductRows->isEmpty())
+                        <p class="small text-muted mb-0">@lang('No custom product rows yet. Create one, then edit it to add split banners.')</p>
+                    @else
+                        <div class="table-responsive mb-0">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead><tr><th>@lang('Layout ID')</th><th>@lang('Title')</th><th>@lang('Promo')</th><th>@lang('Storefront')</th><th class="text-end">@lang('Actions')</th></tr></thead>
+                                <tbody>
+                                    @foreach($homepageProductRows as $hpRow)
+                                        @php
+                                            $sjRaw = $hpRow->split_banner_json ?? null;
+                                            $sj = is_array($sjRaw) ? $sjRaw : (is_string($sjRaw) ? (json_decode($sjRaw, true) ?: []) : []);
+                                            $on = !empty($sj['enabled']) && (!empty($sj['large']) || !empty($sj['small']['image']));
+                                            $isPub = !array_key_exists('is_public', $sj) || $sj['is_public'] === true || $sj['is_public'] === 1 || $sj['is_public'] === '1';
+                                        @endphp
+                                        <tr>
+                                            <td class="text-muted"><code>custom_row_{{ $hpRow->id }}</code></td>
+                                            <td>{{ $hpRow->title }} @if(!$hpRow->is_active)<span class="badge bg-secondary">@lang('Row off')</span>@endif</td>
+                                            <td>
+                                                @if($on)
+                                                    <span class="badge bg-success">@lang('Ready')</span>
+                                                @else
+                                                    <span class="badge bg-light text-dark">@lang('Empty')</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if(!$on)
+                                                    <span class="text-muted small">—</span>
+                                                @elseif($isPub)
+                                                    <span class="badge bg-primary">@lang('Public')</span>
+                                                @else
+                                                    <span class="badge bg-dark">@lang('Private')</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end text-nowrap">
+                                                @if($on)
+                                                    <form action="{{ route('admin.frontend.sections.banner.rowPromoVisibility', $hpRow->id) }}" method="POST" class="d-inline me-1">
+                                                        @csrf
+                                                        <input type="hidden" name="is_public" value="{{ $isPub ? '0' : '1' }}">
+                                                        <button type="submit" class="btn btn-sm {{ $isPub ? 'btn-outline-secondary' : 'btn--success' }}" title="@lang('Toggle public')">
+                                                            {{ $isPub ? __('Private') : __('Public') }}
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                <a href="{{ route('admin.frontend.sections.homepageCustomRows.edit', $hpRow->id) }}" class="btn btn-sm btn-outline--primary">
+                                                    @lang('Edit / upload')
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <!-- Banner Upload Grid -->
         <div class="col-12 mb-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-transparent border-0 py-2 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h6 class="mb-0 fw-600">@lang('Banner Management') <span class="text-muted fw-normal small">({{ $totalBanners }}/30)</span></h6>
+                    <div>
+                        <h6 class="mb-0 fw-600">@lang('Hero slides') <span class="text-muted fw-normal small">({{ $totalBanners }}/30)</span></h6>
+                        <p class="small text-muted mb-0 mt-1">@lang('Specs appear inside empty slots below.')</p>
+                    </div>
                     <div class="d-flex align-items-center gap-2">
                         <form action="{{ route('admin.frontend.sections.banner') }}" method="GET" class="d-inline">
                             <input type="hidden" name="edit" value="{{ request()->get('edit') }}">
@@ -247,10 +323,9 @@
                                                 <div class="upload-icon"><i class="las la-cloud-upload-alt"></i></div>
                                                 <strong class="upload-title">@lang('Banner') {{ $displayOrder }}</strong>
                                                 <div class="upload-specs">
-                                                    <span><strong>@lang('Desktop'):</strong> 2560 × 400 px</span>
-                                                    <span><strong>@lang('Mobile'):</strong> 1080 × 900 px</span>
-                                                    <span><strong>@lang('Format'):</strong> JPG, JPEG, PNG, WEBP, MP4</span>
-                                                    <span class="text-muted">@lang('Max'): 5MB · @lang('Thumbnail auto-generated')</span>
+                                                    <span><strong>@lang('Recommended'):</strong> 2560 × 600 px</span>
+                                                    <span><strong>@lang('Format'):</strong> JPG, PNG, WEBP, MP4</span>
+                                                    <span class="text-muted">@lang('Max') 5MB · @lang('Thumbnail auto-generated')</span>
                                                 </div>
                                                 <div class="upload-input-wrapper">
                                                     <input type="file" class="banner-file-input" name="image_input[image]"
@@ -267,11 +342,20 @@
                         @endforeach
                     </div>
                     @if($totalBanners < 30)
-                    <div class="mt-3 pt-2 border-top text-center">
+                    <div class="mt-3 pt-2 border-top d-flex flex-wrap align-items-center justify-content-center gap-2">
                         <form action="{{ route('admin.frontend.sections.banner.addNew') }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn btn--primary btn-sm"><i class="las la-plus"></i> @lang('Add New Banner')</button>
+                            <button type="submit" class="btn btn--primary btn-sm"><i class="las la-plus"></i> @lang('Add hero slide')</button>
                         </form>
+                        <a href="{{ route('admin.frontend.sections.homepageCustomRows.create') }}" class="btn btn-warning btn-sm text-dark fw-semibold">
+                            <i class="las la-plus"></i> @lang('Add row promo (large + small)')
+                        </a>
+                    </div>
+                    @else
+                    <div class="mt-3 pt-2 border-top text-center">
+                        <a href="{{ route('admin.frontend.sections.homepageCustomRows.create') }}" class="btn btn-warning btn-sm text-dark fw-semibold">
+                            <i class="las la-plus"></i> @lang('Add row promo (large + small)')
+                        </a>
                     </div>
                     @endif
                     @endif
@@ -315,7 +399,7 @@
                                         <div class="flex-grow-1">
                                             <label class="form-label small mb-1">@lang('Banner Image')</label>
                                             <input type="file" class="profilePicUpload form-control form-control-sm" name="image_input[image]" id="profilePicUploadEdit" accept=".png, .jpg, .jpeg, .webp">
-                                            <small class="text-muted">JPG, PNG, WEBP · 5MB · 2560×400 (@lang('recommended'))</small>
+                                            <small class="text-muted">JPG, PNG, WEBP · 5MB · 2560×600 (@lang('recommended'))</small>
                                         </div>
                                     </div>
                                 </div>

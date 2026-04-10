@@ -136,6 +136,7 @@ Route::controller('SiteController')->group(function () {
     Route::post('banner/analytics', 'recordBannerAnalytics')->name('banner.analytics');
     // Serve banner image from project root or public (works regardless of server static path)
     Route::get('banner-image/{filename}', 'serveBannerImage')->name('banner.image')->where('filename', '[a-zA-Z0-9_.-]+');
+    Route::get('row-split-banner/{filename}', 'serveRowSplitBanner')->name('row.split.image')->where('filename', '[a-zA-Z0-9_.-]+');
 });
 
 Route::prefix('webhooks/contact')->group(function () {

@@ -546,7 +546,7 @@ class FrontendController extends Controller
                 $inputContentValue['banner_width'] = 2560;
             }
             if (empty($inputContentValue['banner_height']) || (int) ($inputContentValue['banner_height'] ?? 0) < 50) {
-                $inputContentValue['banner_height'] = 900;
+                $inputContentValue['banner_height'] = 600;
             }
         }
 
@@ -1541,7 +1541,7 @@ class FrontendController extends Controller
                 'slide_interval_seconds' => 5,
                 'autoplay' => 1,
                 'banner_width' => 2560,
-                'banner_height' => 900,
+                'banner_height' => 600,
             ];
             $bannerContent->save();
         } else {
@@ -1560,7 +1560,7 @@ class FrontendController extends Controller
                 $updated = true;
             }
             if (empty($vals['banner_height']) || (int) ($vals['banner_height'] ?? 0) < 50) {
-                $vals['banner_height'] = 900;
+                $vals['banner_height'] = 600;
                 $updated = true;
             }
             if ($updated) {
@@ -1615,7 +1615,12 @@ class FrontendController extends Controller
                 // table may not exist yet
             }
         }
-        return view('admin.frontend.banner_element', compact('section', 'key', 'pageTitle', 'data', 'bannerElements', 'bannerStats'));
+        $homepageProductRows = \App\Models\HomepageCustomProductRow::query()
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get(['id', 'title', 'is_active', 'split_banner_json']);
+
+        return view('admin.frontend.banner_element', compact('section', 'key', 'pageTitle', 'data', 'bannerElements', 'bannerStats', 'homepageProductRows'));
     }
 
     /**
@@ -2387,11 +2392,11 @@ class FrontendController extends Controller
         }
         $settings = Frontend::where('data_keys', 'banner.content')->orderBy('id', 'desc')->first();
         $bannerWidth = $settings ? (int) (@$settings->data_values->banner_width ?? 2560) : 2560;
-        $bannerHeight = $settings ? (int) (@$settings->data_values->banner_height ?? 900) : 900;
+        $bannerHeight = $settings ? (int) (@$settings->data_values->banner_height ?? 600) : 600;
         if ($bannerWidth < 100)
             $bannerWidth = 2560;
         if ($bannerHeight < 50)
-            $bannerHeight = 900;
+            $bannerHeight = 600;
         $slideIntervalSeconds = $settings ? (int) (@$settings->data_values->slide_interval_seconds ?? 5) : 5;
         return view('admin.frontend.banner_preview', [
             'bannerElement' => $banner,
