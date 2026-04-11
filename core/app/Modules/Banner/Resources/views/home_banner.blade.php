@@ -10,7 +10,7 @@
         }
     }
     $banners = $banners ?? collect();
-    $settings = $settings ?? ['slide_interval_seconds' => 5, 'autoplay' => 1, 'banner_width' => 2560, 'banner_height' => 600];
+    $settings = $settings ?? ['slide_interval_seconds' => 5, 'autoplay' => 1, 'banner_width' => 2560, 'banner_height' => 800];
     $slideIntervalSeconds = (int)($settings['slide_interval_seconds'] ?? 5);
     $bannerAutoplay = (int)($settings['autoplay'] ?? 1);
     $bannerWidth = (int)($settings['banner_width'] ?? 2560);

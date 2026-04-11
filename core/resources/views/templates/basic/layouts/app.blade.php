@@ -97,7 +97,7 @@
     @include('partials.tracking_scripts')
 </head>
 
-<body class="antialiased" style="font-family: 'Outfit', sans-serif; padding-top: 220px !important;" @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default') data-theme="{{ $uiSettings->theme_template }}" @endif @stack('body_attrs')>
+<body class="antialiased" style="font-family: 'Outfit', sans-serif; padding-top: 155px !important;" @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default') data-theme="{{ $uiSettings->theme_template }}" @endif @stack('body_attrs')>
     <!-- Preloader removed for instant page loads -->
     @yield('app')
     @include($activeTemplate . 'partials.mobile_bottom_nav')

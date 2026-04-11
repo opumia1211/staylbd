@@ -52,7 +52,7 @@
     @endphp
 
     {{-- ব্যানার সেকশন (Banner মডিউল) – সবসময় হেডারের নিচে --}}
-    <div style="margin-top: 10px;">
+    <div style="margin-top: 2px;">
         @include('modules.Banner::home_banner', array_merge($bannerModuleData, [
             'flashSaleEndsAt' => config('stayl.flash_sale_ends_at'),
         ]))
