@@ -20,8 +20,10 @@ class HeaderControlController extends Controller
 
     public function saveDraft(Request $request): RedirectResponse
     {
-        $config = $this->validatedConfig($request);
-        HeaderControlService::saveDraft($config);
+        $draft = HeaderControlService::getDraftConfig();
+        $incomingMenuBar = $this->validatedMenuBar($request);
+        $draft['menu_bar'] = $incomingMenuBar;
+        HeaderControlService::saveDraft($draft);
 
         return back()->with('success', 'Header draft saved successfully');
     }
@@ -40,41 +42,46 @@ class HeaderControlController extends Controller
         ]);
     }
 
-    private function validatedConfig(Request $request): array
+    private function validatedMenuBar(Request $request): array
     {
         $validated = $request->validate([
-            'appearance.top_bg' => ['required', 'string', 'max:20'],
-            'appearance.main_bg' => ['required', 'string', 'max:20'],
-            'appearance.menu_bg' => ['required', 'string', 'max:20'],
-            'appearance.top_height' => ['required', 'integer', 'min:30', 'max:80'],
-            'appearance.main_height' => ['required', 'integer', 'min:40', 'max:100'],
-            'appearance.menu_height' => ['required', 'integer', 'min:30', 'max:80'],
-
-            'top_bar.enabled' => ['nullable', 'boolean'],
-            'top_bar.show_language' => ['nullable', 'boolean'],
-            'top_bar.show_currency' => ['nullable', 'boolean'],
-            'top_bar.show_apps' => ['nullable', 'boolean'],
-            'top_bar.language_mode' => ['required', 'in:code,name'],
-            'top_bar.currency_mode' => ['required', 'in:code,name'],
-            'top_bar.support_label' => ['required', 'string', 'max:60'],
-            'top_bar.support_phone' => ['nullable', 'string', 'max:60'],
-            'top_bar.show_seller_button' => ['nullable', 'boolean'],
-            'top_bar.seller_text' => ['required', 'string', 'max:60'],
-            'top_bar.seller_url' => ['required', 'string', 'max:255'],
-
-            'main_bar.enabled' => ['nullable', 'boolean'],
-            'main_bar.logo_max_height' => ['required', 'integer', 'min:28', 'max:90'],
-            'main_bar.icon_size' => ['required', 'integer', 'min:28', 'max:72'],
-            'main_bar.show_language_icon' => ['nullable', 'boolean'],
-
             'menu_bar.enabled' => ['nullable', 'boolean'],
+            'menu_bar.show_sidebar_trigger' => ['nullable', 'boolean'],
+            'menu_bar.show_category_button' => ['nullable', 'boolean'],
+            'menu_bar.category_button_label' => ['required', 'string', 'max:60'],
             'menu_bar.show_seller_button' => ['nullable', 'boolean'],
+            'menu_bar.seller_text' => ['required', 'string', 'max:60'],
+            'menu_bar.seller_url' => ['required', 'string', 'max:255'],
         ]);
 
-        $validated['top_bar']['custom_buttons'] = $this->parseButtons($request->input('top_bar.custom_buttons', []));
+        $validated['menu_bar']['category_items'] = $this->parseSimpleItems($request->input('menu_bar.category_items_text'));
+        $validated['menu_bar']['nav_links'] = $this->parseButtons($request->input('menu_bar.nav_links', []));
         $validated['menu_bar']['custom_buttons'] = $this->parseButtons($request->input('menu_bar.custom_buttons', []));
+        $validated['menu_bar'] = $this->applyGlobalDisplayOrder($validated['menu_bar'] ?? []);
 
-        return $validated;
+        return $validated['menu_bar'] ?? [];
+    }
+
+    private function parseSimpleItems($raw): array
+    {
+        $out = [];
+        $raw = is_string($raw) ? $raw : '';
+        $lines = preg_split('/\r\n|\r|\n/', trim($raw)) ?: [];
+        foreach ($lines as $line) {
+            $line = trim((string) $line);
+            if ($line === '') {
+                continue;
+            }
+            [$label, $url] = array_pad(explode('|', $line, 2), 2, '#');
+            $label = trim((string) $label);
+            $url = trim((string) $url) ?: '#';
+            if ($label === '') {
+                continue;
+            }
+            $out[] = ['label' => $label, 'url' => $url];
+        }
+
+        return array_slice($out, 0, 30);
     }
 
     private function parseButtons($rawButtons): array
@@ -83,7 +90,7 @@ class HeaderControlController extends Controller
             return [];
         }
         $buttons = [];
-        foreach ($rawButtons as $btn) {
+        foreach (array_values($rawButtons) as $position => $btn) {
             if (!is_array($btn)) {
                 continue;
             }
@@ -99,33 +106,119 @@ class HeaderControlController extends Controller
                 'label' => $label,
                 'url' => trim((string) ($btn['url'] ?? '#')) ?: '#',
                 'type' => $type,
+                'is_active' => (int) (!empty($btn['is_active'] ?? 0)),
+                'display_order' => $position + 1,
+                'dropdown_style' => in_array((string) ($btn['dropdown_style'] ?? 'dropdown'), ['dropdown', 'mega'], true)
+                    ? (string) ($btn['dropdown_style'] ?? 'dropdown')
+                    : 'dropdown',
                 'items' => [],
             ];
 
             $itemsText = trim((string) ($btn['items_text'] ?? ''));
             if ($type === 'dropdown' && $itemsText !== '') {
-                $lines = preg_split('/\r\n|\r|\n/', $itemsText) ?: [];
-                foreach ($lines as $line) {
-                    $line = trim((string) $line);
-                    if ($line === '') {
-                        continue;
-                    }
-                    [$itemLabel, $itemUrl] = array_pad(explode('|', $line, 2), 2, '#');
-                    $itemLabel = trim($itemLabel);
-                    $itemUrl = trim($itemUrl) ?: '#';
-                    if ($itemLabel === '') {
-                        continue;
-                    }
-                    $button['items'][] = [
-                        'label' => $itemLabel,
-                        'url' => $itemUrl,
-                    ];
-                }
+                $button['items'] = $this->parseNestedDropdownItems($itemsText);
             }
             $buttons[] = $button;
         }
 
         return $buttons;
+    }
+
+    private function parseNestedDropdownItems(string $itemsText): array
+    {
+        $root = [];
+        $refs = [];
+        $lines = preg_split('/\r\n|\r|\n/', $itemsText) ?: [];
+
+        foreach ($lines as $line) {
+            $line = trim((string) $line);
+            if ($line === '') {
+                continue;
+            }
+
+            [$token, $itemUrl] = array_pad(explode('|', $line, 2), 2, '#');
+            $token = trim((string) $token);
+            $itemUrl = trim((string) $itemUrl) ?: '#';
+            if ($token === '') {
+                continue;
+            }
+            if (preg_match('/^\/+\s+/', $token)) {
+                continue;
+            }
+
+            $slashDepth = 0;
+            if (preg_match('/^(\/+)(.+)$/', $token, $m)) {
+                $slashDepth = strlen($m[1]);
+                $token = trim((string) $m[2]);
+            }
+            if ($token === '') {
+                continue;
+            }
+
+            $depth = max(1, $slashDepth);
+            $node = [
+                'label' => $token,
+                'url' => $itemUrl,
+                'children' => [],
+            ];
+
+            if ($depth === 1 || empty($refs)) {
+                $root[] = $node;
+                $lastIdx = array_key_last($root);
+                $refs = [1 => &$root[$lastIdx]];
+                continue;
+            }
+
+            $parentDepth = $depth - 1;
+            while ($parentDepth > 0 && !isset($refs[$parentDepth])) {
+                $parentDepth--;
+            }
+
+            if ($parentDepth <= 0 || !isset($refs[$parentDepth])) {
+                $root[] = $node;
+                $lastIdx = array_key_last($root);
+                $refs = [1 => &$root[$lastIdx]];
+                continue;
+            }
+
+            $parent = &$refs[$parentDepth];
+            if (!isset($parent['children']) || !is_array($parent['children'])) {
+                $parent['children'] = [];
+            }
+            $parent['children'][] = $node;
+            $childIdx = array_key_last($parent['children']);
+
+            foreach (array_keys($refs) as $existingDepth) {
+                if ((int) $existingDepth > $parentDepth + 1) {
+                    unset($refs[$existingDepth]);
+                }
+            }
+            $refs[$parentDepth + 1] = &$parent['children'][$childIdx];
+        }
+
+        return array_slice($root, 0, 40);
+    }
+
+    private function applyGlobalDisplayOrder(array $menuBar): array
+    {
+        $nav = is_array($menuBar['nav_links'] ?? null) ? array_values($menuBar['nav_links']) : [];
+        $custom = is_array($menuBar['custom_buttons'] ?? null) ? array_values($menuBar['custom_buttons']) : [];
+        $seq = 1;
+        foreach ($nav as &$item) {
+            if (is_array($item)) {
+                $item['display_order'] = $seq++;
+            }
+        }
+        unset($item);
+        foreach ($custom as &$item) {
+            if (is_array($item)) {
+                $item['display_order'] = $seq++;
+            }
+        }
+        unset($item);
+        $menuBar['nav_links'] = $nav;
+        $menuBar['custom_buttons'] = $custom;
+        return $menuBar;
     }
 }
 

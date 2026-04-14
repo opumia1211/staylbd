@@ -1235,6 +1235,11 @@ class FrontendController extends Controller
             'policy_order' => ['label' => __('Product page: order procedure link'), 'default' => 'list-alt', 'field' => 'policy_order_icon', 'group' => 'product'],
             'section_brand' => ['label' => __('Section title: brand / tag'), 'default' => 'tag', 'field' => 'section_brand_icon', 'group' => 'product'],
             'scroll_top' => ['label' => __('Scroll to top button'), 'default' => 'angle-double-up', 'field' => 'scroll_top_icon', 'group' => 'nav'],
+            'all_categories_page' => ['label' => __('All categories page'), 'default' => 'th-large', 'field' => 'all_categories_page_icon', 'group' => 'nav'],
+            'all_brands_page' => ['label' => __('All brands page'), 'default' => 'tags', 'field' => 'all_brands_page_icon', 'group' => 'nav'],
+            'blog_page' => ['label' => __('Blog page'), 'default' => 'newspaper', 'field' => 'blog_page_icon', 'group' => 'nav'],
+            'guest_order_page' => ['label' => __('Guest order page'), 'default' => 'clipboard-list', 'field' => 'guest_order_page_icon', 'group' => 'nav'],
+            'checkout_page' => ['label' => __('Checkout page'), 'default' => 'credit-card', 'field' => 'checkout_page_icon', 'group' => 'nav'],
         ];
     }
 

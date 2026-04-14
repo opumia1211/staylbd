@@ -73,8 +73,14 @@ Route::controller('SiteController')->group(function () {
     Route::get('digital/file/download/{id}/{fileName}', 'download')->name('download');
 
     Route::get('/contact', 'contact')->name('contact')->middleware('auth');
+    Route::get('/user/contact', function () {
+        return redirect()->route('message.index');
+    })->name('user.contact')->middleware('auth');
     Route::get('/contactlive', 'contactLive')->name('contact.live');
     Route::post('/contact', 'contactSubmit')->middleware('auth');
+    Route::post('/user/contact', function () {
+        return redirect()->route('message.index');
+    })->name('user.contact.submit')->middleware('auth');
     Route::post('/contact/panel', 'contactPanelSubmit')->name('contact.panel.submit')->middleware('throttle:10,1');
     Route::get('/contact/chat-messages', 'getChatMessages')->name('contact.chat.messages')->middleware('auth');
     Route::get('/contact/chat-unread-count', 'getChatUnreadCount')->name('contact.chat.unread')->middleware('auth');
@@ -130,6 +136,9 @@ Route::controller('SiteController')->group(function () {
 
     //Track Order
     Route::get('track/order', 'trackOrder')->name('track.order');
+    Route::get('user/ordertrack', function () {
+        return redirect()->route('user.track.order');
+    })->name('user.ordertrack')->middleware('auth');
     Route::post('get-track/order', 'getTrackOrder')->name('get.track.order');
 
     // Banner analytics (impression/click tracking)

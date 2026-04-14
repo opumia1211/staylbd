@@ -97,9 +97,9 @@
         </div>
 
         <div class="mt-2 flex items-center justify-center gap-2">
-            <span class="text-[16px] font-bold leading-none" style="color: var(--product-price-color, #0e9f90);">{{ $general->cur_sym }}{{ showAmount($price) }}</span>
+            <span class="staylbd-rt-price text-[16px] font-bold leading-none" style="color: var(--product-price-color, #0e9f90);">{{ $general->cur_sym }}{{ showAmount($price) }}</span>
             @if($hasDiscount)
-                <span class="text-[12px] text-slate-400 line-through leading-none">{{ $general->cur_sym }}{{ showAmount($product->price) }}</span>
+                <span class="staylbd-rt-price-compare text-[12px] text-slate-400 line-through leading-none">{{ $general->cur_sym }}{{ showAmount($product->price) }}</span>
             @endif
         </div>
 

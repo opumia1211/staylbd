@@ -7,7 +7,7 @@
 @section('app')
     @include($activeTemplate . 'partials.header')
     <div class="dashboard-section pt-30 pb-30 bg-white" id="user-dashboard-root" data-user-dashboard="1">
-        <div class="container-fluid dashboard-two-panels-container">
+        <div class="dashboard-two-panels-container dashboard-responsive-shell">
             <div class="row g-0 align-items-stretch dashboard-row-equal-no-gap">
                 <div class="col-xxl-3 col-lg-3 dashboard-aside-col">
                     @include($activeTemplate . 'partials.dashboard_aside')
@@ -43,6 +43,47 @@
     {{-- Quick Order modal for guest (cart and any dashboard page showing Quick Order button) --}}
     @include($activeTemplate . 'partials.guest_checkout_modal')
     @endguest
+
+    <style>
+        #user-dashboard-root {
+            overflow-x: hidden;
+        }
+        #user-dashboard-root .dashboard-responsive-shell {
+            width: 100%;
+            max-width: 1920px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: clamp(10px, 1.8vw, 28px);
+            padding-right: clamp(10px, 1.8vw, 28px);
+        }
+        #user-dashboard-root .dashboard-row-equal-no-gap {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        #user-dashboard-root .dashboard-aside-col,
+        #user-dashboard-root .dashboard-content-col {
+            min-width: 0;
+        }
+        #user-dashboard-root .dashboard-wrapper,
+        #user-dashboard-root #dashboard-ajax-content {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        #user-dashboard-root .dashboard-wrapper .table-responsive {
+            overflow-x: auto;
+        }
+        #user-dashboard-root img,
+        #user-dashboard-root svg,
+        #user-dashboard-root video {
+            max-width: 100%;
+        }
+        @media (max-width: 991.98px) {
+            #user-dashboard-root .dashboard-responsive-shell {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+    </style>
 @endsection
 
 @push('script')
@@ -247,6 +288,7 @@
             if (a.target === '_blank' || a.getAttribute('data-no-ajax')) return false;
             var href = a.getAttribute('href');
             if (!href || href === '#' || href.indexOf('javascript') === 0) return false;
+            if (a.getAttribute('data-dashboard-nav') === '1') return true;
             if (a.getAttribute('data-dashboard-link') === '1') return true;
             try {
                 var path = normPath(a.pathname || (a.href ? new URL(a.href).pathname : ''));
@@ -342,6 +384,13 @@
         root.addEventListener('click', function(e) {
             var a = e.target.closest('a');
             if (!a || !isDashboardLink(a)) return;
+            e.preventDefault();
+            loadPage(a.href);
+        }, true);
+        document.addEventListener('click', function(e) {
+            var a = e.target.closest('a[data-dashboard-nav="1"]');
+            if (!a || !root || !contentEl) return;
+            if (a.target === '_blank' || a.hasAttribute('download')) return;
             e.preventDefault();
             loadPage(a.href);
         }, true);

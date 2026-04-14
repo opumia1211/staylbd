@@ -17,6 +17,13 @@
     $top = (array) ($config['top_bar'] ?? []);
     $main = (array) ($config['main_bar'] ?? []);
     $menu = (array) ($config['menu_bar'] ?? []);
+    $menuButtons = array_merge(
+        is_array($menu['nav_links'] ?? null) ? $menu['nav_links'] : [],
+        is_array($menu['custom_buttons'] ?? null) ? $menu['custom_buttons'] : []
+    );
+    usort($menuButtons, static function (array $x, array $y): int {
+        return (int) ($x['display_order'] ?? 0) <=> (int) ($y['display_order'] ?? 0);
+    });
 @endphp
 <div class="bar" style="height: {{ (int)($a['top_height'] ?? 38) }}px; background: {{ $a['top_bg'] ?? '#0f172a' }}; color: #fff;">
     <span class="muted">{{ $top['support_label'] ?? '24/7 Support' }} {{ $top['support_phone'] ?? '' }}</span>
@@ -31,8 +38,10 @@
 </div>
 <div class="bar" style="height: {{ (int)($a['menu_height'] ?? 38) }}px; background: {{ $a['menu_bg'] ?? '#c7eafe' }}; color: #0f172a;">
     <span class="muted">Menu Links</span>
-    @foreach((array) ($menu['custom_buttons'] ?? []) as $btn)
-        <span class="pill">{{ $btn['label'] ?? 'Link' }}</span>
+    @foreach($menuButtons as $btn)
+        @if((int)($btn['is_active'] ?? 1) === 1)
+            <span class="pill">{{ $btn['label'] ?? 'Link' }} #{{ (int) ($btn['display_order'] ?? 0) }}</span>
+        @endif
     @endforeach
 </div>
 </body>

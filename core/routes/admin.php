@@ -775,6 +775,9 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             Route::post('quickorder', [\App\Http\Controllers\Admin\QuickOrderController::class, 'save'])->name('quickorder.save');
             Route::get('service', function () {
                 return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('service'); })->name('sections.service');
+            Route::get('headericon', function () {
+                return redirect()->route('admin.frontend.sections.headericons', [], 301);
+            })->name('sections.headericon');
             Route::get('headericons', [FrontendController::class, 'headerIcons'])->name('sections.headericons');
             Route::get('header', [HeaderControlController::class, 'index'])->name('sections.header.index');
             Route::post('header/draft', [HeaderControlController::class, 'saveDraft'])->name('sections.header.saveDraft');

@@ -108,7 +108,25 @@ class HeaderControlService
             ],
             'menu_bar' => [
                 'enabled' => true,
+                'show_sidebar_trigger' => true,
+                'show_category_button' => true,
+                'category_button_label' => 'ALL CATEGORIES',
+                'category_items' => [],
                 'show_seller_button' => false,
+                'seller_text' => 'BECOME A SELLER',
+                'seller_url' => '/seller/apply',
+                'nav_links' => [
+                    ['label' => 'Homepage', 'url' => '/', 'type' => 'link', 'display_order' => 1, 'dropdown_style' => 'dropdown', 'items' => []],
+                    ['label' => 'Shop Products', 'url' => '/products', 'type' => 'link', 'display_order' => 2, 'dropdown_style' => 'dropdown', 'items' => []],
+                    ['label' => 'Pages', 'url' => '#', 'type' => 'dropdown', 'items' => [
+                        ['label' => 'All Categories', 'url' => '/categories'],
+                        ['label' => 'Track Order', 'url' => '/track-order'],
+                        ['label' => 'Customer Support', 'url' => '/contact'],
+                    ], 'display_order' => 3, 'dropdown_style' => 'dropdown'],
+                    ['label' => 'About Us', 'url' => '#', 'type' => 'link', 'display_order' => 4, 'dropdown_style' => 'dropdown', 'items' => []],
+                    ['label' => 'Latest Blog', 'url' => '#', 'type' => 'link', 'display_order' => 5, 'dropdown_style' => 'dropdown', 'items' => []],
+                    ['label' => 'Contact Us', 'url' => '/contact', 'type' => 'link', 'display_order' => 6, 'dropdown_style' => 'dropdown', 'items' => []],
+                ],
                 'custom_buttons' => $legacyButtons['menu'],
             ],
         ]);
@@ -125,7 +143,19 @@ class HeaderControlService
         $merged['main_bar']['logo_max_height'] = max(28, min(90, (int) $merged['main_bar']['logo_max_height']));
         $merged['main_bar']['icon_size'] = max(28, min(72, (int) $merged['main_bar']['icon_size']));
         $merged['top_bar']['custom_buttons'] = self::normalizeButtons($merged['top_bar']['custom_buttons'] ?? []);
+        $merged['menu_bar']['category_items'] = self::normalizeSimpleItems($merged['menu_bar']['category_items'] ?? []);
+        $merged['menu_bar']['nav_links'] = self::normalizeButtons($merged['menu_bar']['nav_links'] ?? []);
         $merged['menu_bar']['custom_buttons'] = self::normalizeButtons($merged['menu_bar']['custom_buttons'] ?? []);
+        $menuInput = is_array($config['menu_bar'] ?? null) ? $config['menu_bar'] : [];
+        if (array_key_exists('nav_links', $menuInput) && is_array($menuInput['nav_links']) && empty($menuInput['nav_links'])) {
+            $merged['menu_bar']['nav_links'] = [];
+        }
+        if (array_key_exists('custom_buttons', $menuInput) && is_array($menuInput['custom_buttons']) && empty($menuInput['custom_buttons'])) {
+            $merged['menu_bar']['custom_buttons'] = [];
+        }
+        if (array_key_exists('category_items', $menuInput) && is_array($menuInput['category_items']) && empty($menuInput['category_items'])) {
+            $merged['menu_bar']['category_items'] = [];
+        }
 
         return $merged;
     }
@@ -150,30 +180,76 @@ class HeaderControlService
             }
             $items = [];
             if ($type === 'dropdown' && is_array($button['items'] ?? null)) {
-                foreach ($button['items'] as $item) {
-                    if (!is_array($item)) {
-                        continue;
-                    }
-                    $itemLabel = trim((string) ($item['label'] ?? ''));
-                    $itemUrl = trim((string) ($item['url'] ?? ''));
-                    if ($itemLabel === '') {
-                        continue;
-                    }
-                    $items[] = [
-                        'label' => mb_substr($itemLabel, 0, 60),
-                        'url' => $itemUrl !== '' ? mb_substr($itemUrl, 0, 255) : '#',
-                    ];
-                }
+                $items = self::normalizeDropdownItems($button['items'], 1);
             }
             $out[] = [
                 'label' => mb_substr($label, 0, 60),
                 'url' => mb_substr((string) ($button['url'] ?? '#'), 0, 255),
                 'type' => $type,
+                'is_active' => (int) (!empty($button['is_active'] ?? 1)),
+                'display_order' => max(0, (int) ($button['display_order'] ?? 0)),
+                'dropdown_style' => in_array((string) ($button['dropdown_style'] ?? 'dropdown'), ['dropdown', 'mega'], true)
+                    ? (string) ($button['dropdown_style'] ?? 'dropdown')
+                    : 'dropdown',
                 'items' => $items,
             ];
         }
 
+        usort($out, static function (array $a, array $b): int {
+            return (int) ($a['display_order'] ?? 0) <=> (int) ($b['display_order'] ?? 0);
+        });
+
         return array_slice($out, 0, 20);
+    }
+
+    private static function normalizeDropdownItems(array $items, int $depth = 1): array
+    {
+        if ($depth > 4) {
+            return [];
+        }
+        $out = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $itemLabel = trim((string) ($item['label'] ?? ''));
+            $itemUrl = trim((string) ($item['url'] ?? ''));
+            if ($itemLabel === '') {
+                continue;
+            }
+            $children = is_array($item['children'] ?? null) ? $item['children'] : [];
+            $out[] = [
+                'label' => mb_substr($itemLabel, 0, 60),
+                'url' => $itemUrl !== '' ? mb_substr($itemUrl, 0, 255) : '#',
+                'children' => self::normalizeDropdownItems($children, $depth + 1),
+            ];
+        }
+
+        return array_slice($out, 0, 40);
+    }
+
+    private static function normalizeSimpleItems($items): array
+    {
+        if (!is_array($items)) {
+            return [];
+        }
+        $out = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $label = trim((string) ($item['label'] ?? ''));
+            $url = trim((string) ($item['url'] ?? ''));
+            if ($label === '') {
+                continue;
+            }
+            $out[] = [
+                'label' => mb_substr($label, 0, 60),
+                'url' => $url !== '' ? mb_substr($url, 0, 255) : '#',
+            ];
+        }
+
+        return array_slice($out, 0, 30);
     }
 
     private static function seedFromLegacyDefaults(): array
@@ -209,8 +285,73 @@ class HeaderControlService
             ],
             'menu_bar' => [
                 'enabled' => true,
+                'show_sidebar_trigger' => true,
+                'show_category_button' => true,
+                'category_button_label' => 'ALL CATEGORIES',
+                'category_items' => [],
                 'show_seller_button' => false,
+                'seller_text' => 'BECOME A SELLER',
+                'seller_url' => '/seller/apply',
+                'nav_links' => self::defaultMenuNavLinks(),
                 'custom_buttons' => [],
+            ],
+        ];
+    }
+
+    private static function defaultMenuNavLinks(): array
+    {
+        return [
+            [
+                'label' => 'Homepage',
+                'url' => '/',
+                'type' => 'link',
+                'display_order' => 1,
+                'dropdown_style' => 'dropdown',
+                'items' => [],
+            ],
+            [
+                'label' => 'Shop Products',
+                'url' => '/products',
+                'type' => 'link',
+                'display_order' => 2,
+                'dropdown_style' => 'dropdown',
+                'items' => [],
+            ],
+            [
+                'label' => 'Pages',
+                'url' => '#',
+                'type' => 'dropdown',
+                'display_order' => 3,
+                'dropdown_style' => 'dropdown',
+                'items' => [
+                    ['label' => 'All Categories', 'url' => '/categories'],
+                    ['label' => 'Track Order', 'url' => '/track-order'],
+                    ['label' => 'Customer Support', 'url' => '/contact'],
+                ],
+            ],
+            [
+                'label' => 'About Us',
+                'url' => '#',
+                'type' => 'link',
+                'display_order' => 4,
+                'dropdown_style' => 'dropdown',
+                'items' => [],
+            ],
+            [
+                'label' => 'Latest Blog',
+                'url' => '#',
+                'type' => 'link',
+                'display_order' => 5,
+                'dropdown_style' => 'dropdown',
+                'items' => [],
+            ],
+            [
+                'label' => 'Contact Us',
+                'url' => '/contact',
+                'type' => 'link',
+                'display_order' => 6,
+                'dropdown_style' => 'dropdown',
+                'items' => [],
             ],
         ];
     }
@@ -259,6 +400,7 @@ class HeaderControlService
                 'label' => mb_substr($label, 0, 60),
                 'url' => mb_substr($url, 0, 255),
                 'type' => 'link',
+                'is_active' => 1,
                 'items' => [],
             ];
             $position = (string) ($dv['position'] ?? 'right');

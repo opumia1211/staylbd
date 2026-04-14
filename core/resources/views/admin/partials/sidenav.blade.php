@@ -1016,6 +1016,12 @@
                                     <span class="menu-title">@lang('Header Control')</span>
                                 </a>
                             </li>
+                            <li class="sidebar-menu-item {{ menuActive('admin.frontend.sections.headericons') }} {{ menuActive('admin.frontend.sections.headericon') }}">
+                                <a href="{{ route('admin.frontend.sections.headericons') }}" class="nav-link">
+                                    <i class="menu-icon las la-icons"></i>
+                                    <span class="menu-title">@lang('Header Icons Upload')</span>
+                                </a>
+                            </li>
                             <li class="sidebar-menu-item {{ menuActive('admin.frontend.sections.homepage') }}">
                                 <a href="{{ route('admin.frontend.sections.homepage') }}" class="nav-link">
                                     <i class="menu-icon las la-th-large"></i>

@@ -50,6 +50,11 @@
             </div>
         </div>
     </div>
+    <div class="col-12">
+        <div class="alert alert-primary mb-0 py-2 px-3">
+            <strong>@lang('Category'):</strong> @lang('Frontend Manager') → @lang('Manage Section') → @lang('Header Icons Upload')
+        </div>
+    </div>
 </div>
 
 <form action="{{ route('admin.frontend.sections.content.headericons') }}" method="POST" enctype="multipart/form-data" id="headerIconsForm">
