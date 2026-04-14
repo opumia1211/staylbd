@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FrontendController;
+use App\Http\Controllers\Admin\HeaderControlController;
 
 Route::namespace('Auth')->group(function () {
             Route::controller('LoginController')->group(function () {
@@ -775,6 +776,10 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             Route::get('service', function () {
                 return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('service'); })->name('sections.service');
             Route::get('headericons', [FrontendController::class, 'headerIcons'])->name('sections.headericons');
+            Route::get('header', [HeaderControlController::class, 'index'])->name('sections.header.index');
+            Route::post('header/draft', [HeaderControlController::class, 'saveDraft'])->name('sections.header.saveDraft');
+            Route::post('header/publish', [HeaderControlController::class, 'publish'])->name('sections.header.publish');
+            Route::get('header/preview', [HeaderControlController::class, 'preview'])->name('sections.header.preview');
             Route::post('headericons/buttons', [FrontendController::class, 'headerButtonStore'])->name('sections.headericons.buttons.store');
             Route::post('headericons/buttons/{id}/delete', [FrontendController::class, 'headerButtonDelete'])->whereNumber('id')->name('sections.headericons.buttons.delete');
             Route::get('social_icon', function () {
@@ -850,7 +855,7 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             Route::get('frontend-sections/scrollbar', function () {
                 return redirect()->route('admin.frontend.sections.scrollbar', [], 301); });
             Route::get('frontend-sections/header_icons', function () {
-                return redirect()->route('admin.frontend.sections.headericons', [], 301); });
+                return redirect()->route('admin.frontend.sections.header.index', [], 301); });
 
             // Generic route for other sections (backward compatibility)
             Route::get('frontend-sections/{key}', 'frontendSections')->name('sections');

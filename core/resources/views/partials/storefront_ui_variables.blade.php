@@ -182,6 +182,16 @@
             color: #ffffff !important;
         }
 </style>
+@php
+    $headerControlLive = \App\Services\HeaderControlService::getLiveConfig();
+    $headerControlAppearance = (array) ($headerControlLive['appearance'] ?? []);
+    $headerTopBg = (string) ($headerControlAppearance['top_bg'] ?? '#0f172a');
+    $headerMainBg = (string) ($headerControlAppearance['main_bg'] ?? '#f8fafc');
+    $headerMenuBg = (string) ($headerControlAppearance['menu_bg'] ?? '#c7eafe');
+    $headerTopHeight = (int) ($headerControlAppearance['top_height'] ?? 38);
+    $headerMainHeight = (int) ($headerControlAppearance['main_height'] ?? 56);
+    $headerMenuHeight = (int) ($headerControlAppearance['menu_height'] ?? 38);
+@endphp
 <style id="stayl-storefront-live-glass-overrides">
     :root{
         --stayl-color-header-top:var(--header-top-bg, #0f172a);
@@ -209,40 +219,40 @@
         box-shadow: 0 18px 36px rgba(15,23,42,.12) !important;
     }
     .stayl-announcement-bar{
-        background: rgba(199, 234, 254, 0.82) !important;
+        background: {{ $headerTopBg }} !important;
         backdrop-filter: blur(14px) saturate(130%) !important;
         -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
-        min-height: 38px !important;
-        height: 38px !important;
+        min-height: {{ $headerTopHeight }}px !important;
+        height: {{ $headerTopHeight }}px !important;
         border-bottom: 1px solid rgba(226, 232, 240, 0.22) !important;
-        color: #0f172a !important;
+        color: #f8fafc !important;
         position: relative !important;
         z-index: 100500 !important;
     }
     .stayl-top-bar{
-        background: rgba(255, 255, 255, 0.74) !important;
+        background: {{ $headerMainBg }} !important;
         backdrop-filter: blur(14px) saturate(130%) !important;
         -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
-        min-height: 56px !important;
-        height: 56px !important;
+        min-height: {{ $headerMainHeight }}px !important;
+        height: {{ $headerMainHeight }}px !important;
         border-bottom: 1px solid rgba(226, 232, 240, 0.22) !important;
         color: #0f172a !important;
         position: relative !important;
         z-index: 100400 !important;
     }
     .stayl-yellow-bar{
-        background: rgba(13, 110, 122, 0.86) !important;
-        backdrop-filter: blur(14px) saturate(130%) !important;
-        -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
-        min-height: 38px !important;
-        height: 38px !important;
+        background: color-mix(in srgb, {{ $headerMenuBg }} 94%, #ffffff 6%) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        min-height: {{ $headerMenuHeight }}px !important;
+        height: {{ $headerMenuHeight }}px !important;
         border-bottom: 1px solid rgba(226, 232, 240, 0.22) !important;
-        color: #f8fafc !important;
+        color: #0f172a !important;
         position: relative !important;
         z-index: 100300 !important;
     }
     .stayl-announcement-bar .stayl-wrap{
-        min-height: 38px !important;
+        min-height: {{ $headerTopHeight }}px !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
     }
@@ -265,13 +275,49 @@
         border: none !important;
         border-radius: 0 !important;
         box-shadow: none !important;
-        color: #0f172a !important;
+        color: #f8fafc !important;
     }
     .stayl-icon-item{
-        width: 42px !important;
-        height: 42px !important;
+        width: 48px !important;
+        height: 48px !important;
         border-radius: 0 !important;
         background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .stayl-fixed-master.is-scrolled-down .stayl-announcement-bar,
+    .stayl-fixed-master.is-scrolled-down .stayl-yellow-bar{
+        min-height: 0 !important;
+        height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        border: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .stayl-fixed-master.is-scrolled-down .stayl-announcement-bar .stayl-wrap,
+    .stayl-fixed-master.is-scrolled-down .stayl-yellow-bar .stayl-wrap{
+        min-height: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+    .stayl-search-pill{
+        background: rgba(255, 255, 255, 0.96) !important;
+        border: 1px solid rgba(71, 85, 105, 0.25) !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+    }
+    .stayl-search-pill:focus-within{
+        background: #ffffff !important;
+        border-color: rgba(14, 116, 144, 0.65) !important;
+        box-shadow: none !important;
+    }
+    .stayl-search-input,
+    .stayl-search-input:focus,
+    .stayl-search-input:focus-visible{
+        outline: none !important;
         border: none !important;
         box-shadow: none !important;
     }

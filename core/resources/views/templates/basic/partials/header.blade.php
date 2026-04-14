@@ -45,9 +45,30 @@
     $contactContent = $footerData['contact'] ?? null;
 
     $headerLanguages = $general->multi_language ? \App\Models\Language::query()->orderBy('name')->get() : collect();
+    $headerControl = \App\Services\HeaderControlService::getLiveConfig();
+    $headerAppearance = (array) ($headerControl['appearance'] ?? []);
+    $headerTopCfg = (array) ($headerControl['top_bar'] ?? []);
+    $headerMainCfg = (array) ($headerControl['main_bar'] ?? []);
+    $headerMenuCfg = (array) ($headerControl['menu_bar'] ?? []);
+    $topCustomButtons = is_array($headerTopCfg['custom_buttons'] ?? null) ? $headerTopCfg['custom_buttons'] : [];
+    $menuCustomButtons = is_array($headerMenuCfg['custom_buttons'] ?? null) ? $headerMenuCfg['custom_buttons'] : [];
+
+    $currentLangCode = (string) (session('lang') ?: optional($headerLanguages->first())->code ?: 'EN');
+    $currentLangRow = $headerLanguages->firstWhere('code', $currentLangCode);
+    $currentLangName = trim((string) (optional($currentLangRow)->name ?: $currentLangCode));
+    $languageButtonLabel = (($headerTopCfg['language_mode'] ?? 'code') === 'name') ? $currentLangName : strtoupper($currentLangCode);
+    $currencyButtonLabel = (($headerTopCfg['currency_mode'] ?? 'code') === 'name')
+        ? (string) ($general->cur_text ?? 'BDT')
+        : strtoupper((string) ($general->cur_text ?? 'BDT'));
     // Keep header hotline in sync with Footer > Company Info fields.
     $headerContactPhone = trim((string) (optional($companyInfo)->data_values->contact_phone ?? ''));
     $headerContactEmail = trim((string) (optional($companyInfo)->data_values->contact_email ?? ''));
+    if (trim((string) ($headerTopCfg['support_phone'] ?? '')) !== '') {
+        $headerContactPhone = trim((string) $headerTopCfg['support_phone']);
+    }
+    if ($headerContactPhone === '') {
+        $headerContactPhone = '888-777-999';
+    }
     $appPromoEnabled = !empty(optional($appPromotion)->data_values->enabled);
     $headerAppItems = $appPromoEnabled
         ? $appPromotionItems->filter(function ($it) {
@@ -65,9 +86,9 @@
 
 <style>
     :root {
-        --stayl-h0: 38px;
-        --stayl-h1: 56px;
-        --stayl-h2: 38px;
+        --stayl-h0: {{ (int) ($headerAppearance['top_height'] ?? 38) }}px;
+        --stayl-h1: {{ (int) ($headerAppearance['main_height'] ?? 56) }}px;
+        --stayl-h2: {{ (int) ($headerAppearance['menu_height'] ?? 38) }}px;
         --stayl-yellow: var(--stayl-color-header-menu, #0e9f90);
         --stayl-active-blue: var(--header-accent-color, #2eb4e7);
         --stayl-bg-light: #f1f3f5;
@@ -77,14 +98,15 @@
         --stayl-header-button-bg: var(--product-button-color, #111111);
         --stayl-header-accent: var(--product-buy-now-color, var(--stayl-active-blue));
         --stayl-header-badge-bg: var(--product-discount-badge, #ff4d4d);
-        --stayl-header-top-glass-bg: rgba(199, 234, 254, 0.82);
-        --stayl-header-main-glass-bg: rgba(255, 255, 255, 0.74);
-        --stayl-header-menu-glass-bg: rgba(13, 110, 122, 0.86);
+        --stayl-header-top-glass-bg: {{ $headerAppearance['top_bg'] ?? '#0f172a' }};
+        --stayl-header-main-glass-bg: {{ $headerAppearance['main_bg'] ?? '#f8fafc' }};
+        --stayl-header-menu-glass-bg: {{ $headerAppearance['menu_bg'] ?? '#c7eafe' }};
         --stayl-header-glass-border: rgba(226, 232, 240, 0.22);
         --stayl-header-glass-text: #f8fafc;
-        --stayl-header-top-text: #0f172a;
+        --stayl-header-top-text: #f8fafc;
         --stayl-header-main-text: #0f172a;
-        --stayl-header-menu-text: #f8fafc;
+        --stayl-header-menu-text: #0f172a;
+        --stayl-main-icon-size: {{ (int) ($headerMainCfg['icon_size'] ?? 48) }}px;
     }
     .stayl-fixed-master {
         position: fixed;
@@ -111,19 +133,24 @@
         -webkit-backdrop-filter: blur(14px) saturate(130%);
         position: relative;
         z-index: 100400;
+        transition: transform 1.3s cubic-bezier(.23,1,.32,1), box-shadow 1s ease;
+        will-change: transform;
     }
     .stayl-yellow-bar {
         height: var(--stayl-h2);
-        background: var(--stayl-header-menu-glass-bg);
+        background: color-mix(in srgb, var(--stayl-header-menu-glass-bg) 94%, #ffffff 6%);
         display: flex;
         align-items: center;
         width: 100%;
         border-bottom: 1px solid var(--stayl-header-glass-border);
         color: var(--stayl-header-menu-text);
-        backdrop-filter: blur(14px) saturate(130%);
-        -webkit-backdrop-filter: blur(14px) saturate(130%);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
         position: relative;
         z-index: 100300;
+        transition: max-height 1.3s cubic-bezier(.23,1,.32,1), opacity 1.15s ease, transform 1.3s cubic-bezier(.23,1,.32,1), border-color 1.1s ease;
+        max-height: var(--stayl-h2);
+        will-change: max-height, transform, opacity;
     }
     .stayl-wrap {
         max-width: var(--stayl-content-max, min(1320px, calc(100vw - 2 * var(--stayl-pad-x, 16px))));
@@ -151,6 +178,36 @@
         -webkit-backdrop-filter: blur(14px) saturate(130%);
         position: relative;
         z-index: 100500;
+        transition: max-height 1.3s cubic-bezier(.23,1,.32,1), opacity 1.15s ease, transform 1.3s cubic-bezier(.23,1,.32,1), border-color 1.1s ease;
+        max-height: var(--stayl-h0);
+        will-change: max-height, transform, opacity;
+    }
+    .stayl-fixed-master.is-scrolled-down .stayl-announcement-bar,
+    .stayl-fixed-master.is-scrolled-down .stayl-yellow-bar {
+        max-height: 0 !important;
+        min-height: 0 !important;
+        height: 0 !important;
+        opacity: 0;
+        transform: translateY(-12px);
+        border-bottom-color: transparent !important;
+        pointer-events: none;
+        overflow: hidden;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin: 0 !important;
+    }
+    .stayl-fixed-master.is-scrolled-down .stayl-announcement-bar .stayl-wrap,
+    .stayl-fixed-master.is-scrolled-down .stayl-yellow-bar .stayl-wrap {
+        min-height: 0 !important;
+        height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        overflow: hidden !important;
+    }
+    .stayl-fixed-master.is-scrolled-down .stayl-top-bar {
+        box-shadow: 0 6px 20px rgba(15, 23, 42, .10);
+        transform: translateY(-4px);
+        transition: transform 1.3s cubic-bezier(.23,1,.32,1), box-shadow 1s ease;
     }
     .stayl-announcement-bar .stayl-wrap {
         gap: 16px;
@@ -161,7 +218,7 @@
         padding-bottom: 0;
     }
     .stayl-announcement-link {
-        color: #0f172a !important;
+        color: #f8fafc !important;
         text-decoration: none !important;
         opacity: 0.92;
         transition: opacity 0.2s;
@@ -172,6 +229,8 @@
     }
     .stayl-topbar-menu {
         position: relative;
+        padding-bottom: 8px;
+        margin-bottom: -8px;
     }
     .stayl-topbar-menu__btn {
         background: transparent;
@@ -189,9 +248,25 @@
         min-height: 32px;
         box-shadow: none;
     }
+    .stayl-support-inline {
+        gap: 8px;
+        white-space: nowrap;
+    }
+    .stayl-support-icon3d {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at 30% 30%, #ffffff, #dbeafe 35%, #93c5fd 100%);
+        color: #0f172a;
+        border: 1px solid rgba(15, 23, 42, .15);
+        box-shadow: 0 2px 7px rgba(15, 23, 42, .22);
+    }
     .stayl-topbar-menu__panel {
         position: absolute;
-        top: calc(100% + 8px);
+        top: 100%;
         bottom: auto;
         right: 0;
         min-width: 220px;
@@ -203,7 +278,7 @@
         padding: 8px;
         opacity: 0;
         visibility: hidden;
-        transform: translateY(8px);
+        transform: translateY(6px);
         transition: all 0.2s ease;
         z-index: 100900;
     }
@@ -283,8 +358,8 @@
         margin: 0 12px;
         display: flex;
         align-items: center;
-        background: transparent;
-        border: 1px solid rgba(226, 232, 240, 0.35);
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(71, 85, 105, 0.25);
         border-radius: 8px;
         height: 42px;
         padding: 0 8px;
@@ -292,8 +367,8 @@
         transition: 0.3s;
     }
     .stayl-search-pill:focus-within {
-        background: rgba(255, 255, 255, 0.07);
-        border-color: rgba(226, 232, 240, 0.65);
+        background: #ffffff;
+        border-color: rgba(14, 116, 144, 0.65);
         box-shadow: none;
     }
     .stayl-search-input {
@@ -306,6 +381,15 @@
         font-weight: 500 !important;
         color: #0f172a !important;
         width: 100%;
+        box-shadow: none !important;
+    }
+    .stayl-search-input:focus,
+    .stayl-search-input:focus-visible,
+    .stayl-search-pill input:focus,
+    .stayl-search-pill input:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
     }
     .stayl-search-input::placeholder {
         color: rgba(71, 85, 105, 0.82) !important;
@@ -339,12 +423,12 @@
     .stayl-action-row {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         flex-shrink: 0;
     }
     .stayl-icon-item {
-        width: 42px;
-        height: 42px;
+        width: var(--stayl-main-icon-size);
+        height: var(--stayl-main-icon-size);
         border-radius: 0;
         background: transparent;
         display: flex;
@@ -360,8 +444,8 @@
     }
     .stayl-icon-item svg {
         stroke-width: 1.8;
-        width: 23px;
-        height: 23px;
+        width: 25px;
+        height: 25px;
     }
     .stayl-icon-item:hover {
         background: transparent;
@@ -398,7 +482,7 @@
         display: flex;
         align-items: center;
         gap: 15px;
-        color: var(--stayl-header-glass-text);
+        color: #0f172a;
         font-weight: 800;
         font-size: 14px;
         cursor: pointer;
@@ -422,7 +506,7 @@
         white-space: nowrap;
     }
     .stayl-nav-ul li a {
-        color: var(--stayl-header-menu-text) !important;
+        color: #0f172a !important;
         font-weight: 700;
         font-size: 13px;
         text-decoration: none !important;
@@ -436,8 +520,8 @@
         transform: translateY(-2px);
     }
     .stayl-seller-btn {
-        background: rgba(14, 159, 144, 0.95);
-        color: #fff !important;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 58%, #334155 100%);
+        color: #ffffff !important;
         padding: 8px 14px;
         border-radius: 8px;
         font-weight: 800;
@@ -449,10 +533,51 @@
         transition: 0.3s;
         box-shadow: none;
     }
+    .stayl-seller-btn--top {
+        background: linear-gradient(135deg, #111827 0%, #1f2937 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        box-shadow: none !important;
+        min-height: 32px !important;
+        height: 32px !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+        padding: 0 12px !important;
+        position: relative;
+        overflow: hidden;
+        align-self: center !important;
+        transform: none !important;
+    }
+    .stayl-seller-btn--top svg {
+        color: #f8fafc !important;
+    }
+    .stayl-seller-btn--top::before,
+    .stayl-seller-btn--top::after {
+        content: none !important;
+        display: none !important;
+    }
+    .stayl-announcement-bar .stayl-wrap > .d-flex.align-items-center.gap-3:last-child {
+        align-self: center;
+    }
     .stayl-seller-btn:hover {
         filter: brightness(0.95);
         transform: none;
         box-shadow: none;
+    }
+    .stayl-top-bar .stayl-icon-item:last-child {
+        background: #0f172a;
+        color: #f8fafc !important;
+        border-radius: 8px;
+        border: 1px solid rgba(15, 23, 42, 0.85);
+    }
+    .stayl-account-icon,
+    .stayl-account-icon svg {
+        color: #0f172a !important;
+        stroke: #0f172a !important;
+    }
+    .stayl-account-icon {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
     }
     .stayl-top-bar .stayl-wrap,
     .stayl-yellow-bar .stayl-wrap {
@@ -711,30 +836,24 @@
 </style>
 
 <header class="stayl-fixed-master">
-    @if(!empty($headerBarVisible['header_bar_top_notice']))
+    @if(!empty($headerBarVisible['header_bar_top_notice']) && !empty($headerTopCfg['enabled']))
     <div class="stayl-announcement-bar" style="order: {{ $headerBarOrderIndex['header_bar_top_notice'] ?? 1 }};">
         <div class="stayl-wrap">
             <div class="d-flex align-items-center gap-3">
                 <span>@lang('Need help?') <a href="{{ route('contact') }}" class="stayl-announcement-link">@lang('Contact support')</a></span>
                 <span class="d-none d-md-inline">|</span>
                 <span>{{ __($headerCodNoticeText) }}</span>
-                @if($headerContactPhone !== '')
-                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $headerContactPhone) }}" class="stayl-hotline-chip ms-1">
-                        <span class="stayl-hotline-chip__label">@lang('Hotline')</span>
-                        <span>{{ __($headerContactPhone) }}</span>
-                    </a>
-                @endif
             </div>
             <div class="d-flex align-items-center gap-3">
-                @if($headerLanguages->isNotEmpty())
+                @if(!empty($headerTopCfg['show_language']) && $headerLanguages->isNotEmpty())
                     <div class="stayl-topbar-menu">
                         <button type="button" class="stayl-topbar-menu__btn">
-                            @lang('Language')
+                            <span id="staylCurrentLanguageLabel">{{ $languageButtonLabel }}</span>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
                         </button>
                         <div class="stayl-topbar-menu__panel">
                             @foreach($headerLanguages as $lng)
-                                <a href="{{ route('lang', $lng->code) }}" class="stayl-topbar-menu__item">
+                                <a href="{{ route('lang', $lng->code) }}" class="stayl-topbar-menu__item" data-stayl-lang-option="{{ strtoupper($lng->code) }}">
                                     <span>{{ __($lng->name) }}</span>
                                     @if(session('lang') === $lng->code)
                                         <span>✓</span>
@@ -745,9 +864,10 @@
                     </div>
                 @endif
 
+                @if(!empty($headerTopCfg['show_currency']))
                 <div class="stayl-topbar-menu">
                     <button type="button" class="stayl-topbar-menu__btn">
-                        @lang('Currency')
+                        <span id="staylCurrentCurrencyLabel">{{ $currencyButtonLabel }}</span>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
                     </button>
                     <div class="stayl-topbar-menu__panel" style="min-width:260px;">
@@ -766,33 +886,19 @@
                         </select>
                     </div>
                 </div>
+                @endif
 
-                <div class="stayl-topbar-menu">
-                    <button type="button" class="stayl-topbar-menu__btn">
-                        @lang('Support')
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
-                    </button>
-                    <div class="stayl-topbar-menu__panel">
-                        <div class="stayl-support-grid">
-                            @if($headerContactPhone !== '')
-                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $headerContactPhone) }}" class="stayl-topbar-menu__item">
-                                    <span>@lang('Call')</span>
-                                    <span>{{ $headerContactPhone }}</span>
-                                </a>
-                            @endif
-                            @if($headerContactEmail !== '')
-                                <a href="mailto:{{ $headerContactEmail }}" class="stayl-topbar-menu__item">
-                                    <span>@lang('Email')</span>
-                                    <span>@lang('Support')</span>
-                                </a>
-                            @endif
-                            <a href="{{ route('contact') }}" class="stayl-topbar-menu__item"><span>@lang('Contact page')</span></a>
-                            <a href="{{ !empty(optional($supportCenter)->data_values->help_center_url) ? optional($supportCenter)->data_values->help_center_url : route('contact.live') }}" class="stayl-topbar-menu__item"><span>@lang('Help center')</span></a>
-                            <a href="{{ route('track.order') }}" class="stayl-topbar-menu__item"><span>@lang('Track order')</span></a>
-                        </div>
-                    </div>
-                </div>
+                <a href="{{ $headerContactPhone !== '' ? 'tel:' . preg_replace('/[^0-9+]/', '', $headerContactPhone) : route('contact') }}" class="stayl-topbar-menu__btn stayl-support-inline text-decoration-none">
+                    <span class="stayl-support-icon3d" aria-hidden="true">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </span>
+                    <span>{{ $headerTopCfg['support_label'] ?? '24/7 Support' }}</span>
+                    @if($headerContactPhone !== '')
+                        <span class="ms-1">{{ $headerContactPhone }}</span>
+                    @endif
+                </a>
 
+                @if(!empty($headerTopCfg['show_apps']))
                 <div class="stayl-topbar-menu">
                     <button type="button" class="stayl-topbar-menu__btn">
                         @lang('Apps')
@@ -818,13 +924,46 @@
                         </div>
                     </div>
                 </div>
+                @endif
+
+                @if(!empty($headerTopCfg['show_seller_button']))
+                    <a href="{{ url($headerTopCfg['seller_url'] ?? '/seller/apply') }}" class="stayl-seller-btn stayl-seller-btn--top">
+                        {{ __($headerTopCfg['seller_text'] ?? 'BECOME A SELLER') }}
+                    </a>
+                @endif
+                @foreach($topCustomButtons as $tbtn)
+                    @php
+                        $tbtnLabel = trim((string) ($tbtn['label'] ?? ''));
+                        $tbtnUrl = trim((string) ($tbtn['url'] ?? '#')) ?: '#';
+                        $tbtnType = (string) ($tbtn['type'] ?? 'link');
+                        $tbtnItems = is_array($tbtn['items'] ?? null) ? $tbtn['items'] : [];
+                    @endphp
+                    @continue($tbtnLabel === '')
+                    @if($tbtnType === 'dropdown' && !empty($tbtnItems))
+                        <div class="stayl-topbar-menu">
+                            <button type="button" class="stayl-topbar-menu__btn">
+                                {{ __($tbtnLabel) }}
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                            </button>
+                            <div class="stayl-topbar-menu__panel">
+                                @foreach($tbtnItems as $tbItem)
+                                    <a href="{{ trim((string) ($tbItem['url'] ?? '#')) ?: '#' }}" class="stayl-topbar-menu__item">
+                                        <span>{{ __(trim((string) ($tbItem['label'] ?? 'Item'))) }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ $tbtnUrl }}" class="stayl-topbar-menu__btn text-decoration-none">{{ __($tbtnLabel) }}</a>
+                    @endif
+                @endforeach
             </div>
         </div>
     </div>
     @endif
 
     {{-- Row 1: The Main Action Bar --}}
-    @if(!empty($headerBarVisible['header_bar_main']))
+    @if(!empty($headerBarVisible['header_bar_main']) && !empty($headerMainCfg['enabled']))
     <div class="stayl-top-bar" style="order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
         <div class="stayl-wrap">
             {{-- Logo --}}
@@ -832,7 +971,7 @@
                 <a href="{{ route('home') }}">
                     @php $logo = getLogo('logo'); @endphp
                     @if($logo)
-                        <img src="{{ $logo }}" alt="Staylbd" style="max-height: 48px; width: auto;">
+                        <img src="{{ $logo }}" alt="Staylbd" style="max-height: {{ (int) ($headerMainCfg['logo_max_height'] ?? 48) }}px; width: auto;">
                     @else
                         <span style="font-size: 34px; font-weight: 900; color: #111; letter-spacing: -2px;">{{ strtoupper(gs('site_name')) }}</span>
                     @endif
@@ -891,7 +1030,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
                     <span class="stayl-badge show-cart-count">0</span>
                 </a>
-                <a href="{{ route('user.home') }}" class="stayl-icon-item" style="background:transparent; border:none; color:#fff !important;" title="Account">
+                <a href="{{ route('user.home') }}" class="stayl-icon-item stayl-account-icon" style="background:transparent !important;border:none !important;color:#0f172a !important;" title="Account">
                     {{-- Lucide: user-round --}}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg>
                 </a>
@@ -901,12 +1040,12 @@
     @endif
 
     {{-- Row 2: Secondary Nav Bar --}}
-    @if(!empty($headerBarVisible['header_bar_menu']))
+    @if(!empty($headerBarVisible['header_bar_menu']) && !empty($headerMenuCfg['enabled']))
     <div class="stayl-yellow-bar" style="order: {{ $headerBarOrderIndex['header_bar_menu'] ?? 3 }};">
         <div class="stayl-wrap">
             <nav class="d-flex align-items-center h-100" style="gap: clamp(12px, 1.5vw, 24px);">
                 {{-- Separate Hamburger Button --}}
-                <div class="stayl-sidebar-trigger cursor-pointer flex items-center justify-center" style="width: 42px; height: 42px; transition: 0.3s; color: #f8fafc;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" title="Open Menu">
+                <div class="stayl-sidebar-trigger cursor-pointer flex items-center justify-center" style="width: 42px; height: 42px; transition: 0.3s; color: #0f172a;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" title="Open Menu">
                     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </div>
 
@@ -946,13 +1085,36 @@
                     <li><a href="#">@lang('About Us')</a></li>
                     <li><a href="#">@lang('Latest Blog')</a></li>
                     <li><a href="{{ route('contact') }}">@lang('Contact Us')</a></li>
+                    @foreach($menuCustomButtons as $mbtn)
+                        @php
+                            $mbtnLabel = trim((string) ($mbtn['label'] ?? ''));
+                            $mbtnUrl = trim((string) ($mbtn['url'] ?? '#')) ?: '#';
+                            $mbtnType = (string) ($mbtn['type'] ?? 'link');
+                            $mbtnItems = is_array($mbtn['items'] ?? null) ? $mbtn['items'] : [];
+                        @endphp
+                        @continue($mbtnLabel === '')
+                        @if($mbtnType === 'dropdown' && !empty($mbtnItems))
+                            <li class="stayl-pages-item">
+                                <a href="#" style="display:flex; align-items:center; gap:8px;">{{ __($mbtnLabel) }} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></a>
+                                <div class="stayl-pages-dropdown">
+                                    @foreach($mbtnItems as $mbItem)
+                                        <a href="{{ trim((string) ($mbItem['url'] ?? '#')) ?: '#' }}">{{ __(trim((string) ($mbItem['label'] ?? 'Item'))) }}</a>
+                                    @endforeach
+                                </div>
+                            </li>
+                        @else
+                            <li><a href="{{ $mbtnUrl }}">{{ __($mbtnLabel) }}</a></li>
+                        @endif
+                    @endforeach
                 </ul>
             </nav>
 
-            <a href="{{ route('seller.apply') }}" class="stayl-seller-btn">
-                @lang('BECOME A SELLER')
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--stayl-yellow);"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
+            @if(!empty($headerMenuCfg['show_seller_button']))
+                <a href="{{ route('seller.apply') }}" class="stayl-seller-btn">
+                    {{ __($headerTopCfg['seller_text'] ?? 'BECOME A SELLER') }}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--stayl-yellow);"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            @endif
         </div>
     </div>
     @endif
@@ -1038,6 +1200,44 @@
                 document.documentElement.style.setProperty('--stayl-dynamic-header-height', h + 'px');
             }
         }
+        function setupHeaderScrollCollapse() {
+            const header = document.querySelector('.stayl-fixed-master');
+            if (!header) return;
+            let lastY = window.scrollY || 0;
+            let hidden = false;
+            let ticking = false;
+            let lockUntil = 0;
+            const SHOW_AT = 70;
+            const HIDE_AT = 180;
+            const DELTA = 8;
+            const LOCK_MS = 1300;
+            const onScroll = function () {
+                if (ticking) return;
+                ticking = true;
+                window.requestAnimationFrame(function () {
+                const y = window.scrollY || window.pageYOffset || 0;
+                const movingDown = y > lastY + DELTA;
+                const movingUp = y < lastY - DELTA;
+                const now = Date.now();
+
+                if (now >= lockUntil && !hidden && movingDown && y > HIDE_AT) {
+                    hidden = true;
+                    header.classList.add('is-scrolled-down');
+                    lockUntil = now + LOCK_MS;
+                } else if (now >= lockUntil && hidden && (movingUp || y < SHOW_AT)) {
+                    hidden = false;
+                    header.classList.remove('is-scrolled-down');
+                    lockUntil = now + LOCK_MS;
+                }
+
+                lastY = y;
+                syncHeaderHeightVar();
+                ticking = false;
+                });
+            };
+            onScroll();
+            window.addEventListener('scroll', onScroll, { passive: true });
+        }
 
         // Vanilla JS Toggle to avoid dependency issues
         function setupStaylSidebar() {
@@ -1070,10 +1270,12 @@
             document.addEventListener('DOMContentLoaded', function() {
                 setupStaylSidebar();
                 syncHeaderHeightVar();
+                setupHeaderScrollCollapse();
             });
         } else {
             setupStaylSidebar();
             syncHeaderHeightVar();
+            setupHeaderScrollCollapse();
         }
         window.addEventListener('resize', syncHeaderHeightVar, { passive: true });
         window.addEventListener('load', syncHeaderHeightVar, { once: true });
@@ -1082,6 +1284,8 @@
             code: @json($general->cur_text ?? 'BDT'),
             symbol: @json($general->cur_sym ?? '৳')
         };
+        const headerCurrencyLabel = document.getElementById('staylCurrentCurrencyLabel');
+        const headerLanguageLabel = document.getElementById('staylCurrentLanguageLabel');
         const currencySymbols = {
             BDT: '৳', USD: '$', EUR: '€', GBP: '£', INR: '₹', AED: 'د.إ', SAR: 'ر.س', MYR: 'RM', SGD: 'S$', JPY: '¥'
         };
@@ -1135,18 +1339,33 @@
             function applyNow(code) {
                 if (!code || code === baseCurrency.code) {
                     convertDisplayedPrices(baseCurrency.code, 1);
+                    if (headerCurrencyLabel) headerCurrencyLabel.textContent = baseCurrency.code;
                     return;
                 }
                 const rate = Number(rates[code] ?? fallbackRates[code] ?? 1);
                 convertDisplayedPrices(code, Number.isFinite(rate) && rate > 0 ? rate : 1);
+                if (headerCurrencyLabel) headerCurrencyLabel.textContent = code;
             }
             applyNow(sel.value || baseCurrency.code);
             sel.addEventListener('change', function() {
                 const code = this.value || baseCurrency.code;
                 localStorage.setItem('stayl_display_currency_code', code);
                 applyNow(code);
+                setTimeout(function () { window.location.reload(); }, 120);
             });
         }
+        function initDisplayLanguageLabel() {
+            if (!headerLanguageLabel) return;
+            const savedLang = localStorage.getItem('stayl_display_language_code');
+            if (savedLang) headerLanguageLabel.textContent = savedLang;
+            document.querySelectorAll('[data-stayl-lang-option]').forEach(function (el) {
+                el.addEventListener('click', function () {
+                    const code = this.getAttribute('data-stayl-lang-option');
+                    if (code) localStorage.setItem('stayl_display_language_code', code);
+                });
+            });
+        }
+        initDisplayLanguageLabel();
         initDisplayCurrency();
     })();
 </script>

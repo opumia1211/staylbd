@@ -1010,6 +1010,12 @@
                                     <span class="menu-title">@lang('Logo & Favicon')</span>
                                 </a>
                             </li>
+                            <li class="sidebar-menu-item {{ menuActive('admin.frontend.sections.header.index') }}">
+                                <a href="{{ route('admin.frontend.sections.header.index') }}" class="nav-link">
+                                    <i class="menu-icon las la-window-maximize"></i>
+                                    <span class="menu-title">@lang('Header Control')</span>
+                                </a>
+                            </li>
                             <li class="sidebar-menu-item {{ menuActive('admin.frontend.sections.homepage') }}">
                                 <a href="{{ route('admin.frontend.sections.homepage') }}" class="nav-link">
                                     <i class="menu-icon las la-th-large"></i>
