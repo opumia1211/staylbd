@@ -19,16 +19,72 @@
                 ->get()
         );
     }
+
+    $headerBarDefaults = [
+        'header_bar_top_notice' => true,
+        'header_bar_main' => true,
+        'header_bar_menu' => true,
+    ];
+    $headerBarOrderIndex = [];
+    $headerBarVisible = $headerBarDefaults;
+    $headerLayout = \App\Services\HomepageLayoutService::getOrderedSections();
+    foreach ($headerLayout as $layoutIndex => $layoutSlot) {
+        $layoutId = (string) ($layoutSlot['id'] ?? '');
+        if (!array_key_exists($layoutId, $headerBarDefaults)) {
+            continue;
+        }
+        $headerBarOrderIndex[$layoutId] = $layoutIndex + 1;
+        $headerBarVisible[$layoutId] = !empty($layoutSlot['enabled']);
+    }
+
+    $footerData = function_exists('getCachedFooterData') ? getCachedFooterData() : [];
+    $companyInfo = $footerData['footer_company_info'] ?? null;
+    $supportCenter = $footerData['footer_support_center'] ?? null;
+    $appPromotion = $footerData['footer_app_promotion'] ?? null;
+    $appPromotionItems = $footerData['footer_app_promotion_items'] ?? collect();
+    $contactContent = $footerData['contact'] ?? null;
+
+    $headerLanguages = $general->multi_language ? \App\Models\Language::query()->orderBy('name')->get() : collect();
+    // Keep header hotline in sync with Footer > Company Info fields.
+    $headerContactPhone = trim((string) (optional($companyInfo)->data_values->contact_phone ?? ''));
+    $headerContactEmail = trim((string) (optional($companyInfo)->data_values->contact_email ?? ''));
+    $appPromoEnabled = !empty(optional($appPromotion)->data_values->enabled);
+    $headerAppItems = $appPromoEnabled
+        ? $appPromotionItems->filter(function ($it) {
+            $dv = is_array($it->data_values ?? null) ? (object) $it->data_values : ($it->data_values ?? (object) []);
+            return trim((string) ($dv->platform ?? $dv->name ?? '')) !== '';
+        })->values()
+        : collect();
+
+    $shippingRule = \App\Models\ShippingRule::getCached();
+    $headerCodNoticeText = trim((string) (optional($shippingRule)->header_notice_text ?? ''));
+    if ($headerCodNoticeText === '') {
+        $headerCodNoticeText = __('Cash on Delivery available nationwide');
+    }
 @endphp
 
 <style>
     :root {
-        --stayl-h1: 90px;
-        --stayl-h2: 65px;
-        --stayl-yellow: #ffbb38;
-        --stayl-active-blue: #2eb4e7;
+        --stayl-h0: 38px;
+        --stayl-h1: 56px;
+        --stayl-h2: 38px;
+        --stayl-yellow: var(--stayl-color-header-menu, #0e9f90);
+        --stayl-active-blue: var(--header-accent-color, #2eb4e7);
         --stayl-bg-light: #f1f3f5;
-        --stayl-icon-gray: #f8f9fa;
+        --stayl-icon-gray: color-mix(in srgb, var(--header-bg, #ffffff) 84%, #e2e8f0);
+        --stayl-header-top-bg: var(--stayl-color-header-main, #ffffff);
+        --stayl-header-menu-bg: var(--stayl-color-header-menu, #0e9f90);
+        --stayl-header-button-bg: var(--product-button-color, #111111);
+        --stayl-header-accent: var(--product-buy-now-color, var(--stayl-active-blue));
+        --stayl-header-badge-bg: var(--product-discount-badge, #ff4d4d);
+        --stayl-header-top-glass-bg: rgba(199, 234, 254, 0.82);
+        --stayl-header-main-glass-bg: rgba(255, 255, 255, 0.74);
+        --stayl-header-menu-glass-bg: rgba(13, 110, 122, 0.86);
+        --stayl-header-glass-border: rgba(226, 232, 240, 0.22);
+        --stayl-header-glass-text: #f8fafc;
+        --stayl-header-top-text: #0f172a;
+        --stayl-header-main-text: #0f172a;
+        --stayl-header-menu-text: #f8fafc;
     }
     .stayl-fixed-master {
         position: fixed;
@@ -36,69 +92,223 @@
         left: 0;
         right: 0;
         z-index: 100000;
-        width: 100%;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 10px 35px rgba(0,0,0,0.06);
+        box-shadow: none;
         font-family: 'Outfit', sans-serif !important;
-        background: #fff;
+        background: transparent;
+        overflow: visible;
     }
     .stayl-top-bar {
         height: var(--stayl-h1);
-        background: #ffffff;
-        border-bottom: 1px solid #f1f1f1;
+        background: var(--stayl-header-main-glass-bg);
+        border-bottom: 1px solid var(--stayl-header-glass-border);
         display: flex;
         align-items: center;
         width: 100%;
+        color: var(--stayl-header-main-text);
+        backdrop-filter: blur(14px) saturate(130%);
+        -webkit-backdrop-filter: blur(14px) saturate(130%);
+        position: relative;
+        z-index: 100400;
     }
     .stayl-yellow-bar {
         height: var(--stayl-h2);
-        background: var(--stayl-yellow);
+        background: var(--stayl-header-menu-glass-bg);
         display: flex;
         align-items: center;
         width: 100%;
+        border-bottom: 1px solid var(--stayl-header-glass-border);
+        color: var(--stayl-header-menu-text);
+        backdrop-filter: blur(14px) saturate(130%);
+        -webkit-backdrop-filter: blur(14px) saturate(130%);
+        position: relative;
+        z-index: 100300;
     }
     .stayl-wrap {
-        max-width: 1650px;
+        max-width: var(--stayl-content-max, min(1320px, calc(100vw - 2 * var(--stayl-pad-x, 16px))));
         margin: 0 auto;
-        padding: 0 40px;
+        padding-left: calc(var(--stayl-pad-x, 16px) + env(safe-area-inset-left, 0px));
+        padding-right: calc(var(--stayl-pad-x, 16px) + env(safe-area-inset-right, 0px));
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
         height: 100%;
     }
+    .stayl-announcement-bar {
+        min-height: var(--stayl-h0);
+        height: var(--stayl-h0);
+        background: var(--stayl-header-top-glass-bg);
+        color: var(--stayl-header-top-text);
+        border-bottom: 1px solid var(--stayl-header-glass-border);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 600;
+        backdrop-filter: blur(14px) saturate(130%);
+        -webkit-backdrop-filter: blur(14px) saturate(130%);
+        position: relative;
+        z-index: 100500;
+    }
+    .stayl-announcement-bar .stayl-wrap {
+        gap: 16px;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        min-height: var(--stayl-h0);
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .stayl-announcement-link {
+        color: #0f172a !important;
+        text-decoration: none !important;
+        opacity: 0.92;
+        transition: opacity 0.2s;
+    }
+    .stayl-announcement-link:hover {
+        opacity: 1;
+        text-decoration: underline !important;
+    }
+    .stayl-topbar-menu {
+        position: relative;
+    }
+    .stayl-topbar-menu__btn {
+        background: transparent;
+        border: none;
+        color: var(--stayl-header-top-text);
+        border-radius: 0;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1;
+        padding: 0 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        min-height: 32px;
+        box-shadow: none;
+    }
+    .stayl-topbar-menu__panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        bottom: auto;
+        right: 0;
+        min-width: 220px;
+        background: #ffffff;
+        color: #111827;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 10px;
+        box-shadow: 0 16px 34px rgba(15, 23, 42, 0.15);
+        padding: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(8px);
+        transition: all 0.2s ease;
+        z-index: 100900;
+    }
+    .stayl-topbar-menu:hover .stayl-topbar-menu__panel,
+    .stayl-topbar-menu:focus-within .stayl-topbar-menu__panel {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .stayl-topbar-menu__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        color: #0f172a !important;
+        text-decoration: none !important;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .stayl-topbar-menu__item:hover {
+        background: #f8fafc;
+    }
+    .stayl-topbar-select {
+        width: 100%;
+        border: 1px solid #dbe3ef;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        min-height: 34px;
+        padding: 6px 10px;
+    }
+    .stayl-hotline-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.2);
+        background: rgba(255,255,255,.08);
+        color: #f8fafc;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: .2px;
+        white-space: nowrap;
+    }
+    .stayl-hotline-chip__label {
+        font-size: 12px;
+        opacity: .82;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .stayl-support-grid {
+        display: grid;
+        gap: 6px;
+    }
+    .stayl-app-grid {
+        display: grid;
+        gap: 6px;
+        max-height: 260px;
+        overflow: auto;
+    }
+    @media (max-width: 1199.98px) {
+        .stayl-topbar-menu {
+            display: none !important;
+        }
+        .stayl-announcement-bar .stayl-wrap {
+            flex-wrap: wrap;
+        }
+    }
 
     /* Professional Search UI */
     .stayl-search-pill {
         flex: 1;
-        max-width: 850px;
-        margin: 0 40px;
+        max-width: 620px;
+        margin: 0 12px;
         display: flex;
         align-items: center;
-        background: #f8f9fa;
-        border: 2px solid #f1f1f1;
-        border-radius: 999px;
-        height: 64px;
-        padding: 4px;
-        padding-right: 6px;
+        background: transparent;
+        border: 1px solid rgba(226, 232, 240, 0.35);
+        border-radius: 8px;
+        height: 42px;
+        padding: 0 8px;
+        padding-right: 8px;
         transition: 0.3s;
     }
     .stayl-search-pill:focus-within {
-        background: #ffffff;
-        border-color: var(--stayl-active-blue);
-        box-shadow: 0 10px 25px rgba(46, 180, 231, 0.12);
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(226, 232, 240, 0.65);
+        box-shadow: none;
     }
     .stayl-search-input {
         flex: 1;
         background: transparent !important;
         border: none !important;
         outline: none !important;
-        padding: 0 35px !important;
-        font-size: 16px !important;
+        padding: 0 28px !important;
+        font-size: 14px !important;
         font-weight: 500 !important;
-        color: #111 !important;
+        color: #0f172a !important;
         width: 100%;
+    }
+    .stayl-search-input::placeholder {
+        color: rgba(71, 85, 105, 0.82) !important;
     }
     .stayl-search-actions-inner {
         display: flex;
@@ -107,63 +317,66 @@
         margin-right: 10px;
     }
     .stayl-search-icon-btn {
-        width: 52px;
-        height: 52px;
-        background: var(--stayl-active-blue);
-        color: white !important;
-        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        color: #0f172a !important;
+        border-radius: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         border: none;
         cursor: pointer;
         transition: 0.3s;
-        box-shadow: 0 4px 12px rgba(46, 180, 231, 0.35);
+        box-shadow: none;
     }
     .stayl-search-icon-btn:hover {
-        background: #1e97c9;
-        transform: scale(1.04);
+        filter: none;
+        transform: none;
     }
 
     /* 3D/Professional Icons Alignment */
     .stayl-action-row {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
+        flex-shrink: 0;
     }
     .stayl-icon-item {
-        width: 54px;
-        height: 54px;
-        border-radius: 50%;
-        background: var(--stayl-icon-gray);
+        width: 42px;
+        height: 42px;
+        border-radius: 0;
+        background: transparent;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         text-decoration: none !important;
-        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        color: #111;
-        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
+        transition: color 0.2s ease;
+        color: var(--stayl-header-main-text);
+        filter: none;
+        box-shadow: none;
+        border: none;
     }
     .stayl-icon-item svg {
         stroke-width: 1.8;
-        width: 24px;
-        height: 24px;
+        width: 23px;
+        height: 23px;
     }
     .stayl-icon-item:hover {
-        background: #ffffff;
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+        background: transparent;
+        transform: none;
+        box-shadow: none;
+        filter: none;
     }
     .stayl-icon-item:hover svg {
-        color: var(--stayl-active-blue);
+        color: var(--header-accent-color, var(--stayl-header-accent));
     }
     .stayl-badge {
         position: absolute;
         top: -4px;
         right: -4px;
-        background: #ff4d4d;
+        background: var(--stayl-header-badge-bg);
         color: #fff !important;
         font-size: 11px;
         font-weight: 800;
@@ -173,21 +386,21 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 5px rgba(255, 77, 77, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: none;
     }
 
     /* Yellow Bar Navigation */
     .stayl-cat-btn {
         background: transparent !important;
         height: var(--stayl-h2);
-        padding: 0 45px;
+        padding: 0 12px;
         display: flex;
         align-items: center;
         gap: 15px;
-        color: #000;
+        color: var(--stayl-header-glass-text);
         font-weight: 800;
-        font-size: 17px;
+        font-size: 14px;
         cursor: pointer;
         border: none !important;
         outline: none !important;
@@ -201,16 +414,17 @@
     .stayl-nav-ul {
         display: flex;
         align-items: center;
-        gap: 45px;
-        margin-left: 50px;
+        gap: clamp(14px, 1.4vw, 24px);
+        margin-left: clamp(10px, 1.2vw, 20px);
         list-style: none;
         padding: 0;
         margin-bottom: 0;
+        white-space: nowrap;
     }
     .stayl-nav-ul li a {
-        color: #000 !important;
-        font-weight: 800;
-        font-size: 16px;
+        color: var(--stayl-header-menu-text) !important;
+        font-weight: 700;
+        font-size: 13px;
         text-decoration: none !important;
         transition: 0.2s;
         display: flex;
@@ -222,23 +436,41 @@
         transform: translateY(-2px);
     }
     .stayl-seller-btn {
-        background: #111;
+        background: rgba(14, 159, 144, 0.95);
         color: #fff !important;
-        padding: 16px 36px;
-        border-radius: 14px;
-        font-weight: 900;
-        font-size: 16px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 13px;
         display: flex;
         align-items: center;
         gap: 12px;
         text-decoration: none !important;
         transition: 0.3s;
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        box-shadow: none;
     }
     .stayl-seller-btn:hover {
-        background: #000;
-        transform: translateY(-3px);
-        box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+        filter: brightness(0.95);
+        transform: none;
+        box-shadow: none;
+    }
+    .stayl-top-bar .stayl-wrap,
+    .stayl-yellow-bar .stayl-wrap {
+        gap: clamp(8px, 1vw, 14px);
+    }
+    .stayl-top-bar .stayl-wrap > .d-flex.align-items-center:first-child {
+        flex-shrink: 0;
+    }
+    .stayl-top-bar .stayl-wrap > .flex.flex-1.items-center.justify-center.gap-2 {
+        min-width: 0;
+    }
+    @media (max-width: 1599.98px) {
+        .stayl-icon-item:nth-child(1),
+        .stayl-icon-item:nth-child(2),
+        .stayl-icon-item:nth-child(3),
+        .stayl-icon-item:nth-child(4) {
+            display: none !important;
+        }
     }
 
     /* Categories Dropdown CSS */
@@ -282,7 +514,7 @@
     }
     .stayl-cat-dropdown li a:hover {
         background: #f8f9fa;
-        color: var(--stayl-active-blue) !important;
+        color: var(--stayl-header-accent) !important;
         padding-left: 35px;
     }
 
@@ -322,7 +554,7 @@
     }
     .stayl-pages-dropdown a:hover {
         background: #f8f9fa;
-        color: var(--stayl-active-blue) !important;
+        color: var(--stayl-header-accent) !important;
         padding-left: 30px;
     }
 
@@ -395,7 +627,7 @@
         box-shadow: 0 15px 35px rgba(0,0,0,0.08);
         border-color: #f1f1f1;
         transform: translateY(-3px);
-        color: var(--stayl-active-blue);
+        color: var(--stayl-header-accent);
     }
     .stayl-sb-item-icon {
         width: 50px;
@@ -410,7 +642,7 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
     .stayl-sb-item:hover .stayl-sb-item-icon {
-        background: var(--stayl-active-blue);
+        background: var(--stayl-header-accent);
         color: #ffffff;
     }
     .stayl-sb-item-text {
@@ -451,7 +683,7 @@
         transition: 0.3s;
     }
     .stayl-btn-dark:hover {
-        background: var(--stayl-active-blue);
+        background: var(--stayl-header-accent);
         transform: translateY(-2px);
         box-shadow: 0 10px 25px rgba(46, 180, 231, 0.3);
     }
@@ -479,15 +711,128 @@
 </style>
 
 <header class="stayl-fixed-master">
+    @if(!empty($headerBarVisible['header_bar_top_notice']))
+    <div class="stayl-announcement-bar" style="order: {{ $headerBarOrderIndex['header_bar_top_notice'] ?? 1 }};">
+        <div class="stayl-wrap">
+            <div class="d-flex align-items-center gap-3">
+                <span>@lang('Need help?') <a href="{{ route('contact') }}" class="stayl-announcement-link">@lang('Contact support')</a></span>
+                <span class="d-none d-md-inline">|</span>
+                <span>{{ __($headerCodNoticeText) }}</span>
+                @if($headerContactPhone !== '')
+                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $headerContactPhone) }}" class="stayl-hotline-chip ms-1">
+                        <span class="stayl-hotline-chip__label">@lang('Hotline')</span>
+                        <span>{{ __($headerContactPhone) }}</span>
+                    </a>
+                @endif
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                @if($headerLanguages->isNotEmpty())
+                    <div class="stayl-topbar-menu">
+                        <button type="button" class="stayl-topbar-menu__btn">
+                            @lang('Language')
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                        </button>
+                        <div class="stayl-topbar-menu__panel">
+                            @foreach($headerLanguages as $lng)
+                                <a href="{{ route('lang', $lng->code) }}" class="stayl-topbar-menu__item">
+                                    <span>{{ __($lng->name) }}</span>
+                                    @if(session('lang') === $lng->code)
+                                        <span>✓</span>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <div class="stayl-topbar-menu">
+                    <button type="button" class="stayl-topbar-menu__btn">
+                        @lang('Currency')
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                    </button>
+                    <div class="stayl-topbar-menu__panel" style="min-width:260px;">
+                        <label class="small text-muted d-block px-1 pb-1 mb-1">@lang('Display product prices in')</label>
+                        <select id="staylDisplayCurrency" class="stayl-topbar-select">
+                            <option value="{{ $general->cur_text }}" selected>{{ $general->cur_text }} ({{ $general->cur_sym }})</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                            <option value="INR">INR (₹)</option>
+                            <option value="AED">AED (د.إ)</option>
+                            <option value="SAR">SAR (ر.س)</option>
+                            <option value="MYR">MYR (RM)</option>
+                            <option value="SGD">SGD (S$)</option>
+                            <option value="JPY">JPY (¥)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stayl-topbar-menu">
+                    <button type="button" class="stayl-topbar-menu__btn">
+                        @lang('Support')
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                    </button>
+                    <div class="stayl-topbar-menu__panel">
+                        <div class="stayl-support-grid">
+                            @if($headerContactPhone !== '')
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $headerContactPhone) }}" class="stayl-topbar-menu__item">
+                                    <span>@lang('Call')</span>
+                                    <span>{{ $headerContactPhone }}</span>
+                                </a>
+                            @endif
+                            @if($headerContactEmail !== '')
+                                <a href="mailto:{{ $headerContactEmail }}" class="stayl-topbar-menu__item">
+                                    <span>@lang('Email')</span>
+                                    <span>@lang('Support')</span>
+                                </a>
+                            @endif
+                            <a href="{{ route('contact') }}" class="stayl-topbar-menu__item"><span>@lang('Contact page')</span></a>
+                            <a href="{{ !empty(optional($supportCenter)->data_values->help_center_url) ? optional($supportCenter)->data_values->help_center_url : route('contact.live') }}" class="stayl-topbar-menu__item"><span>@lang('Help center')</span></a>
+                            <a href="{{ route('track.order') }}" class="stayl-topbar-menu__item"><span>@lang('Track order')</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stayl-topbar-menu">
+                    <button type="button" class="stayl-topbar-menu__btn">
+                        @lang('Apps')
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                    </button>
+                    <div class="stayl-topbar-menu__panel" style="min-width:270px;">
+                        <div class="stayl-app-grid">
+                            @forelse($headerAppItems as $item)
+                                @php
+                                    $dv = is_array($item->data_values ?? null) ? (object) $item->data_values : ($item->data_values ?? (object) []);
+                                    $itemPlatform = trim((string) ($dv->platform ?? 'App'));
+                                    $itemLink = trim((string) ($dv->link ?? '#')) ?: '#';
+                                    $itemFile = trim((string) ($dv->app_file ?? ''));
+                                    $itemHref = $itemFile !== '' ? asset('assets/files/frontend/apps/' . ltrim($itemFile, '/')) : $itemLink;
+                                @endphp
+                                <a href="{{ $itemHref }}" class="stayl-topbar-menu__item" @if($itemFile !== '') download @endif target="_blank" rel="noopener">
+                                    <span>{{ $itemPlatform }}</span>
+                                    <span>@lang('Open')</span>
+                                </a>
+                            @empty
+                                <span class="stayl-topbar-menu__item text-muted">@lang('No apps added from admin panel')</span>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Row 1: The Main Action Bar --}}
-    <div class="stayl-top-bar">
+    @if(!empty($headerBarVisible['header_bar_main']))
+    <div class="stayl-top-bar" style="order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
         <div class="stayl-wrap">
             {{-- Logo --}}
             <div class="d-flex align-items-center">
                 <a href="{{ route('home') }}">
                     @php $logo = getLogo('logo'); @endphp
                     @if($logo)
-                        <img src="{{ $logo }}" alt="Staylbd" style="max-height: 75px; width: auto;">
+                        <img src="{{ $logo }}" alt="Staylbd" style="max-height: 48px; width: auto;">
                     @else
                         <span style="font-size: 34px; font-weight: 900; color: #111; letter-spacing: -2px;">{{ strtoupper(gs('site_name')) }}</span>
                     @endif
@@ -496,7 +841,7 @@
 
             {{-- Search Pill & External Lens --}}
             <div class="flex flex-1 items-center justify-center gap-2"> {{-- Tight gap for unified look --}}
-                <form action="{{ route('products') }}" method="GET" class="stayl-search-pill" style="margin: 0 !important; flex: 1; max-width: 800px;">
+                <form action="{{ route('products') }}" method="GET" class="stayl-search-pill" style="margin: 0 !important; flex: 1; max-width: 620px;">
                     <input type="text" name="search" class="stayl-search-input" placeholder="@lang('Search products, brands, and more')..." value="{{ request()->search ?? null }}" autocomplete="off">
                     <div class="stayl-search-actions-inner" style="gap: 12px; margin-right: 8px;">
                         {{-- Voice Search --}}
@@ -510,7 +855,7 @@
                     </div>
                 </form>
                 {{-- Professional Lens Icon (Outside but Right Next to Search) --}}
-                <div id="cameraSearchBtn" title="Camera Search" style="width: 58px; height: 58px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid #f1f1f1; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: 0.3s; flex-shrink: 0;" onmouseover="this.style.boxShadow='0 8px 25px rgba(0,0,0,0.12)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.06)'; this.style.transform='translateY(0)';" onclick="alert('Camera Search feature');">
+                <div id="cameraSearchBtn" title="Camera Search" style="width: 34px; height: 34px; border-radius: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; box-shadow: none; transition: 0.2s; flex-shrink: 0;" onclick="alert('Camera Search feature');">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
                         <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
@@ -533,36 +878,35 @@
                 <a href="{{ route('track.order') }}" class="stayl-icon-item" title="Track Order">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
                 </a>
-                <a href="#" class="stayl-icon-item" title="Language">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                </a>
                 <a href="{{ route('user.wishlist') }}" class="stayl-icon-item" title="Wishlist">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     <span class="stayl-badge show-wishlist-count">0</span>
                 </a>
                 <a href="#" class="stayl-icon-item" title="Compare">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m16 4 4 4-4 4"></path><path d="M20 8H4"></path><path d="m8 20-4-4 4-4"></path><path d="M4 16h16"></path></svg>
-                    <span class="stayl-badge">0</span>
+                    <span class="stayl-badge show-compare-count">0</span>
                 </a>
                 <a href="{{ route('user.cart') }}" class="stayl-icon-item" title="Cart">
                     {{-- Lucide: shopping-cart --}}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
                     <span class="stayl-badge show-cart-count">0</span>
                 </a>
-                <a href="{{ route('user.home') }}" class="stayl-icon-item" style="background:#111; color:#fff !important;" title="Account">
+                <a href="{{ route('user.home') }}" class="stayl-icon-item" style="background:transparent; border:none; color:#fff !important;" title="Account">
                     {{-- Lucide: user-round --}}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg>
                 </a>
             </div>
         </div>
     </div>
+    @endif
 
     {{-- Row 2: Secondary Nav Bar --}}
-    <div class="stayl-yellow-bar">
+    @if(!empty($headerBarVisible['header_bar_menu']))
+    <div class="stayl-yellow-bar" style="order: {{ $headerBarOrderIndex['header_bar_menu'] ?? 3 }};">
         <div class="stayl-wrap">
-            <nav class="d-flex align-items-center h-100" style="gap: 50px;"> {{-- Fixed huge gap --}}
+            <nav class="d-flex align-items-center h-100" style="gap: clamp(12px, 1.5vw, 24px);">
                 {{-- Separate Hamburger Button --}}
-                <div class="stayl-sidebar-trigger cursor-pointer flex items-center justify-center" style="width: 42px; height: 42px; transition: 0.3s; color: #000;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" title="Open Menu">
+                <div class="stayl-sidebar-trigger cursor-pointer flex items-center justify-center" style="width: 42px; height: 42px; transition: 0.3s; color: #f8fafc;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" title="Open Menu">
                     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </div>
 
@@ -611,6 +955,7 @@
             </a>
         </div>
     </div>
+    @endif
 </header>
 
 <div class="glass-mobile-menu" id="glassSidebar" style="font-family: 'Outfit', sans-serif;">
@@ -685,6 +1030,15 @@
 </div>
 <script>
     (function() {
+        function syncHeaderHeightVar() {
+            const header = document.querySelector('.stayl-fixed-master');
+            if (!header) return;
+            const h = Math.max(0, Math.ceil(header.offsetHeight || 0));
+            if (h > 0) {
+                document.documentElement.style.setProperty('--stayl-dynamic-header-height', h + 'px');
+            }
+        }
+
         // Vanilla JS Toggle to avoid dependency issues
         function setupStaylSidebar() {
             const triggers = document.querySelectorAll('.stayl-sidebar-trigger');
@@ -713,9 +1067,86 @@
 
         // Initialize
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupStaylSidebar);
+            document.addEventListener('DOMContentLoaded', function() {
+                setupStaylSidebar();
+                syncHeaderHeightVar();
+            });
         } else {
             setupStaylSidebar();
+            syncHeaderHeightVar();
         }
+        window.addEventListener('resize', syncHeaderHeightVar, { passive: true });
+        window.addEventListener('load', syncHeaderHeightVar, { once: true });
+
+        const baseCurrency = {
+            code: @json($general->cur_text ?? 'BDT'),
+            symbol: @json($general->cur_sym ?? '৳')
+        };
+        const currencySymbols = {
+            BDT: '৳', USD: '$', EUR: '€', GBP: '£', INR: '₹', AED: 'د.إ', SAR: 'ر.س', MYR: 'RM', SGD: 'S$', JPY: '¥'
+        };
+        const fallbackRates = {
+            BDT: 1, USD: 0.0082, EUR: 0.0075, GBP: 0.0064, INR: 0.69, AED: 0.03, SAR: 0.031, MYR: 0.039, SGD: 0.011, JPY: 1.24
+        };
+        const priceSelectors = [
+            '.staylbd-rt-price', '.price', '.old-price', '.qv-price', '.qv-price-old',
+            '.subtotal-price', '.total-price', '.discount-price', '.grand-total-price',
+            '.checkout-shipping-charge', '.track-quick-btn__amount', '.pro-detail-special-price',
+            '.pro-detail-regular-price', '.sticky-add-to-cart-bar__price'
+        ];
+
+        function parseAmountFromText(text, sym) {
+            if (!text) return null;
+            const cleaned = text.replace(new RegExp('\\' + sym, 'g'), '').replace(/[^0-9.,-]/g, '').replace(/,/g, '');
+            const n = parseFloat(cleaned);
+            return Number.isFinite(n) ? n : null;
+        }
+        function formatAmount(value) {
+            return (Math.round((value + Number.EPSILON) * 100) / 100).toFixed(2);
+        }
+        function convertDisplayedPrices(targetCode, targetRate) {
+            const targetSym = currencySymbols[targetCode] || targetCode + ' ';
+            const elements = new Set();
+            priceSelectors.forEach(sel => document.querySelectorAll(sel).forEach(el => elements.add(el)));
+            elements.forEach(el => {
+                if (!el.dataset.staylBaseText) el.dataset.staylBaseText = (el.textContent || '').trim();
+                const baseText = el.dataset.staylBaseText || '';
+                const baseAmount = parseAmountFromText(baseText, baseCurrency.symbol);
+                if (baseAmount === null) return;
+                const converted = formatAmount(baseAmount * targetRate);
+                el.textContent = targetSym + converted;
+            });
+        }
+        async function loadRates(baseCode) {
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/' + encodeURIComponent(baseCode), { method: 'GET' });
+                const data = await res.json();
+                if (data && data.result === 'success' && data.rates) return data.rates;
+            } catch (err) {}
+            return null;
+        }
+        async function initDisplayCurrency() {
+            const sel = document.getElementById('staylDisplayCurrency');
+            if (!sel) return;
+            const saved = localStorage.getItem('stayl_display_currency_code');
+            if (saved) sel.value = saved;
+            let rates = await loadRates(baseCurrency.code);
+            if (!rates) rates = fallbackRates;
+            function applyNow(code) {
+                if (!code || code === baseCurrency.code) {
+                    convertDisplayedPrices(baseCurrency.code, 1);
+                    return;
+                }
+                const rate = Number(rates[code] ?? fallbackRates[code] ?? 1);
+                convertDisplayedPrices(code, Number.isFinite(rate) && rate > 0 ? rate : 1);
+            }
+            applyNow(sel.value || baseCurrency.code);
+            sel.addEventListener('change', function() {
+                const code = this.value || baseCurrency.code;
+                localStorage.setItem('stayl_display_currency_code', code);
+                applyNow(code);
+            });
+        }
+        initDisplayCurrency();
     })();
 </script>

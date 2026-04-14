@@ -585,6 +585,83 @@
   user-select: none;
 }
 
+/* Compact advanced mode for frontend/icon page */
+.admin-icon-page.admin-icon-page--compact .card {
+  border-radius: 10px !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .card-header {
+  padding: 0.55rem 0.8rem !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .card-header h5,
+.admin-icon-page.admin-icon-page--compact .card-header h6 {
+  font-size: 0.92rem !important;
+  line-height: 1.2 !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .icon-upload-card .card-body,
+.admin-icon-page.admin-icon-page--compact .admin-icon-section-card .card-body {
+  padding: 0.75rem !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .logo-preview-box {
+  min-height: 104px !important;
+  max-height: 116px !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .logo-preview-img {
+  max-height: 54px !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .logo-preview-img--favicon {
+  max-width: 34px !important;
+  max-height: 34px !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .logo-placeholder-content i {
+  font-size: 24px !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .logo-placeholder-content p {
+  font-size: 0.79rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .logo-placeholder-content small {
+  font-size: 0.68rem !important;
+  line-height: 1.32 !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .form-control,
+.admin-icon-page.admin-icon-page--compact .form-select {
+  min-height: 33px !important;
+  font-size: 0.8rem !important;
+  padding-top: 0.32rem !important;
+  padding-bottom: 0.32rem !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .form-label {
+  font-size: 0.76rem !important;
+  margin-bottom: 0.28rem !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .admin-icon-action-row .btn {
+  min-height: 34px !important;
+  font-size: 0.8rem !important;
+  padding: 0.38rem 0.72rem !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .admin-icon-info-cards .card-body {
+  padding: 0.68rem 0.8rem !important;
+}
+
+.admin-icon-page.admin-icon-page--compact .admin-icon-info-cards li {
+  font-size: 0.74rem !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.3 !important;
+}
+
 /* ================================================================
    4. CATEGORY & BRAND CARDS — Consistent Square Thumbnails
    ================================================================ */

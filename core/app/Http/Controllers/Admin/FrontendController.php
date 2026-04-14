@@ -472,9 +472,10 @@ class FrontendController extends Controller
                                 mkdir($uploadPath, 0755, true);
                             }
 
-                            // Professional banner: store in desktop/ + thumb/; 5MB validated above
+                            // Professional banner: store in desktop/ or mobile/ + thumb/; 5MB validated above
                             if ($key == 'banner') {
-                                $inputContentValue[$imgKey] = $this->storeBannerImage($uploadedFile, @$content->data_values->$imgKey);
+                                $sub = ($imgKey === 'mobile_image') ? BannerService::MOBILE_DIR : BannerService::DESKTOP_DIR;
+                                $inputContentValue[$imgKey] = $this->storeBannerImage($uploadedFile, @$content->data_values->$imgKey, $sub);
                             } else {
                                 $inputContentValue[$imgKey] = $this->storeImage($imgJson, $type, $key, $uploadedFile, $imgKey, @$content->data_values->$imgKey);
                             }
@@ -858,9 +859,9 @@ class FrontendController extends Controller
      * Returns filename (stored under desktop/); thumb created when possible.
      * $old_image can be filename (legacy) or array with desktop/mobile/thumb keys.
      */
-    protected function storeBannerImage($file, $old_image = null)
+    protected function storeBannerImage($file, $old_image = null, $subFolder = BannerService::DESKTOP_DIR)
     {
-        $desktopPath = BannerService::uploadPath(BannerService::DESKTOP_DIR);
+        $targetPath = BannerService::uploadPath($subFolder);
         $thumbPath = BannerService::uploadPath(BannerService::THUMB_DIR);
         $extension = strtolower($file->getClientOriginalExtension());
         if (!BannerService::isAllowedExtension($extension)) {
@@ -871,9 +872,9 @@ class FrontendController extends Controller
         if ($old_image) {
             $oldFiles = is_array($old_image) ? $old_image : ['desktop' => $old_image, 'mobile' => null, 'thumb' => null];
             foreach (['desktop', 'mobile', 'thumb'] as $sub) {
-                $f = $oldFiles[$sub] ?? $oldFiles['desktop'] ?? null;
+                $f = $oldFiles[$sub] ?? ($sub === $subFolder ? $old_image : null);
                 if ($f && is_string($f)) {
-                    $p = $sub === 'desktop' ? $desktopPath : ($sub === 'thumb' ? $thumbPath : BannerService::uploadPath(BannerService::MOBILE_DIR));
+                    $p = BannerService::uploadPath($sub);
                     $full = $p . '/' . basename($f);
                     if (file_exists($full) && is_file($full)) {
                         @unlink($full);
@@ -883,23 +884,23 @@ class FrontendController extends Controller
         }
 
         try {
-            $file->move($desktopPath, $filename);
-            if (!file_exists($desktopPath . '/' . $filename)) {
+            $file->move($targetPath, $filename);
+            if (!file_exists($targetPath . '/' . $filename)) {
                 throw new \Exception('File upload failed - file not found after move');
             }
         } catch (\Exception $e) {
             $tempPath = $file->getRealPath();
-            if ($tempPath && file_exists($tempPath) && copy($tempPath, $desktopPath . '/' . $filename)) {
+            if ($tempPath && file_exists($tempPath) && copy($tempPath, $targetPath . '/' . $filename)) {
                 // ok
             } else {
                 throw new \Exception('Failed to upload banner: ' . $e->getMessage());
             }
         }
         $isVideo = in_array($extension, ['mp4'], true);
-        $srcPath = $desktopPath . '/' . $filename;
+        $srcPath = $targetPath . '/' . $filename;
         if (!$isVideo && file_exists($srcPath) && in_array($extension, ['jpg', 'jpeg', 'png'], true) && function_exists('imagewebp')) {
             $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
-            $webpPath = $desktopPath . '/' . $webpFilename;
+            $webpPath = $targetPath . '/' . $webpFilename;
             if ($this->convertImageToWebp($srcPath, $webpPath)) {
                 @unlink($srcPath);
                 $filename = $webpFilename;
@@ -1026,25 +1027,23 @@ class FrontendController extends Controller
                             $filename = $dataValues->$imgKey ?? null;
                             if (!empty($filename) && is_string($filename)) {
                                 if ($key === 'banner') {
-                                    $desktopPath = BannerService::uploadPath(BannerService::DESKTOP_DIR) . '/' . $filename;
-                                    $thumbPath = BannerService::uploadPath(BannerService::THUMB_DIR) . '/thumb_' . $filename;
-                                    if (file_exists($desktopPath) && is_file($desktopPath)) {
-                                        @unlink($desktopPath);
+                                    foreach (['desktop', 'mobile', 'thumb'] as $sub) {
+                                        $p = BannerService::uploadPath($sub);
+                                        $f = ($sub === 'thumb') ? 'thumb_' . $filename : $filename;
+                                        $full = $p . '/' . $f;
+                                        if (file_exists($full) && is_file($full)) {
+                                            @unlink($full);
+                                        }
+                                        // Legacy cleanup
+                                        $legacy = base_path('../' . BannerService::UPLOAD_BASE . '/' . $sub . '/' . $f);
+                                        if (file_exists($legacy) && is_file($legacy)) {
+                                            @unlink($legacy);
+                                        }
                                     }
-                                    if (file_exists($thumbPath) && is_file($thumbPath)) {
-                                        @unlink($thumbPath);
-                                    }
-                                    $legacyDesktop = base_path('../' . BannerService::UPLOAD_BASE . '/' . BannerService::DESKTOP_DIR . '/' . $filename);
-                                    $legacyThumb = base_path('../' . BannerService::UPLOAD_BASE . '/' . BannerService::THUMB_DIR . '/thumb_' . $filename);
-                                    $legacyRoot = base_path('../' . BannerService::UPLOAD_BASE . '/' . $filename);
-                                    if (file_exists($legacyDesktop) && is_file($legacyDesktop)) {
-                                        @unlink($legacyDesktop);
-                                    }
-                                    if (file_exists($legacyThumb) && is_file($legacyThumb)) {
-                                        @unlink($legacyThumb);
-                                    }
-                                    if (file_exists($legacyRoot) && is_file($legacyRoot)) {
-                                        @unlink($legacyRoot);
+                                    // Root legacy cleanup
+                                    $rootLegacy = base_path('../' . BannerService::UPLOAD_BASE . '/' . $filename);
+                                    if (file_exists($rootLegacy) && is_file($rootLegacy)) {
+                                        @unlink($rootLegacy);
                                     }
                                     continue;
                                 }

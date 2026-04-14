@@ -29,6 +29,11 @@
                                 <input type="number" step="0.01" class="form-control" name="free_shipping_min_amount" value="{{ old('free_shipping_min_amount', $rule->free_shipping_min_amount) }}" min="0" placeholder="@lang('Leave empty to disable free shipping')">
                                 <small class="text-muted">@lang('Orders above this amount get free shipping.')</small>
                             </div>
+                            <div class="col-12">
+                                <label class="form-label text-dark fw-medium">@lang('Header top notice text')</label>
+                                <input type="text" class="form-control" name="header_notice_text" value="{{ old('header_notice_text', $rule->header_notice_text ?? 'Cash on Delivery available nationwide') }}" maxlength="255" placeholder="@lang('e.g. Cash on Delivery available nationwide')">
+                                <small class="text-muted">@lang('Shown on the storefront top header bar.')</small>
+                            </div>
                             <div class="col-md-6">
                                 <label class="form-label text-dark fw-medium">@lang('COD extra charge') ({{ __($general->cur_text) }})</label>
                                 <input type="number" step="0.01" class="form-control" name="cod_extra_charge" value="{{ old('cod_extra_charge', $rule->cod_extra_charge ?? 0) }}" min="0" required>

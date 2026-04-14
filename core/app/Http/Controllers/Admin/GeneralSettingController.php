@@ -480,7 +480,7 @@ class GeneralSettingController extends Controller
         $request->validate([
             'logo'      => ['nullable', 'file', new FileTypeValidate(['svg','png','jpg','jpeg','webp','gif']), 'max:2048'],
             'logo_dark' => ['nullable', 'file', new FileTypeValidate(['svg','png','jpg','jpeg','webp','gif']), 'max:2048'],
-            'favicon'   => ['nullable', 'file', new FileTypeValidate(['png','ico','jpg','jpeg','webp']), 'max:512'],
+            'favicon'   => ['nullable', 'file', new FileTypeValidate(['svg','png','ico','jpg','jpeg','webp']), 'max:512'],
             'invoice_logo' => ['nullable', 'file', new FileTypeValidate(['svg','png','jpg','jpeg','webp','gif']), 'max:2048'],
             'invoice_signature' => ['nullable', 'file', new FileTypeValidate(['svg','png','jpg','jpeg','webp','gif']), 'max:1024'],
             'invoice_authorized_name' => ['nullable', 'string', 'max:191'],

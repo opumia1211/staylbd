@@ -14,16 +14,115 @@
     $slideIntervalSeconds = (int)($settings['slide_interval_seconds'] ?? 5);
     $bannerAutoplay = (int)($settings['autoplay'] ?? 1);
     $bannerWidth = (int)($settings['banner_width'] ?? 2560);
-    $bannerHeight = (int)($settings['banner_height'] ?? 600);
+    $bannerHeight = (int)($settings['banner_height'] ?? 400);
     if ($bannerWidth < 100) {
         $bannerWidth = 2560;
     }
     if ($bannerHeight < 50) {
-        $bannerHeight = 600;
+        $bannerHeight = 400;
     }
     $bannerSizesAttr = '(max-width: 640px) 100vw, (max-width: 1024px) 100vw, min(1920px, 100vw)';
     $bannerImgOnError = "this.onerror=null;var l=this.closest('.banner-slide-link');if(l){l.classList.add('is-banner-media-error');}this.style.visibility='hidden';";
 @endphp
+
+<style>
+    /* STANDARD SAFE RESPONSIVE OPTIMIZATION */
+    /* Keeps banner safely inside .main-container maximum bounds */
+    html body #home-banner-section {
+        display: block !important;
+        width: 100% !important;
+        background: transparent !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    html body #home-banner-section .banner-fullscreen-inner {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        position: relative !important;
+    }
+
+    html body #home-banner-section .banner-slider {
+        display: block !important;
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: hidden !important;
+        border-radius: 0 !important;
+    }
+
+    /* All slides */
+    html body #home-banner-section .banner-slider .banner-slide-inner {
+        width: 100% !important;
+        height: 100% !important;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+        pointer-events: none !important;
+        position: absolute !important;
+        inset: 0 !important;
+    }
+    
+    /* Active Slide */
+    html body #home-banner-section .banner-slider .banner-slide-inner.banner-slide-active {
+        opacity: 1;
+        visibility: visible;
+        z-index: 2;
+        pointer-events: auto !important;
+        transform: translateZ(0);
+        will-change: opacity;
+    }
+
+    /* The first slide dictates the container height */
+    html body #home-banner-section .banner-slider .banner-slide-inner:first-child {
+        position: relative !important;
+        height: auto !important;
+    }
+
+    html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        position: absolute !important;
+        inset: 0 !important;
+        background: transparent !important;
+    }
+
+    html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link {
+        position: relative !important;
+        height: auto !important;
+    }
+
+    /* Standard responsive images */
+    html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link img,
+    html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link picture,
+    html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link picture img {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        object-fit: fill !important; 
+        object-position: center !important;
+        max-height: none !important;
+        background-color: transparent !important;
+        transform: none !important;
+        position: absolute !important;
+        inset: 0 !important;
+    }
+
+    /* First slide's image pushes physical height naturally */
+    html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link img,
+    html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link picture,
+    html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link picture img {
+        position: relative !important;
+        height: auto !important;
+        object-fit: contain !important; /* Safety for natural flow */
+    }
+</style>
 <section id="home-banner-section" class="banner-module banner-section" style="--hb-w: {{ $bannerWidth }}; --hb-h: {{ $bannerHeight }};" aria-label="@lang('Banner')">
     <div class="banner-fullscreen-inner">
         @if($flashEnd && $flashEnd->isFuture())
@@ -72,7 +171,7 @@
                         @else
                         <img src="{{ $imgUrl }}" alt="{{ $bc['title'] ?? 'banner' }}" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" {{ $index === 0 ? 'fetchpriority="high"' : '' }} decoding="async" width="{{ $bannerWidth }}" height="{{ $bannerHeight }}" class="banner-img-fullscreen banner-slide-media" sizes="{{ $bannerSizesAttr }}" onerror="{{ $bannerImgOnError }}">
                         @endif
-                        <div class="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-slate-950/90 via-slate-900/35 to-slate-900/10" aria-hidden="true"></div>
+                        {{-- Dark Obscuring Gradient Removed as requested --}}
                         @if(!empty($bc['title']) || !empty($bc['subtitle']) || !empty($bc['button_text']))
                         <div class="banner-overlay hero-overlay-motion pointer-events-none absolute inset-0 z-[3] flex flex-col justify-center gap-2 p-4 sm:p-6 md:p-8" style="{{ $overlayStyle }}">
                             @if(!empty($bc['badge']))<span class="banner-badge">{{ $bc['badge'] }}</span>@endif
@@ -86,16 +185,7 @@
                 </div>
             @endforeach
             @if($banners->isNotEmpty())
-            <div class="pointer-events-none absolute inset-0 z-[18] flex flex-col justify-end pb-10 pl-4 pr-4 pt-16 sm:items-start sm:justify-center sm:pb-0 sm:pl-8 sm:pr-8 md:pl-12 lg:pl-14">
-                <div class="pointer-events-auto flex max-w-lg flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-                    <a href="{{ route('products') }}" class="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition duration-200 hover:from-emerald-500 hover:to-teal-400 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900/50">
-                        @lang('Shop Now')
-                    </a>
-                    <a href="{{ route('product.hot.deal') }}" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border-2 border-white/90 bg-white/10 px-6 py-2.5 text-sm font-bold text-white backdrop-blur-sm transition duration-200 hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900/50">
-                        @lang('View Deals')
-                    </a>
-                </div>
-            </div>
+            {{-- Extra Buttons Removed to ensure full banner visibility as requested --}}
             @endif
             @if($banners->isEmpty())
             <div class="banner-slide-inner banner-slide-active flex min-h-[200px] items-center justify-center bg-gradient-to-br from-slate-400 via-slate-500 to-slate-700">

@@ -13,6 +13,9 @@
             "images": {
                 "image": {
                     "size": "1920x600"
+                },
+                "mobile_image": {
+                    "size": "1024x1024"
                 }
             },
             "url": "text",

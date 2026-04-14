@@ -59,6 +59,22 @@
     $footerBottomButtons = $footerCustomButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'bottom'));
 @endphp
 
+<style>
+    .site-footer.footer-glass {
+        background: var(--footer-bg-color, #0f172a);
+    }
+    .site-footer .btn.btn-outline-light {
+        border-color: var(--product-button-color, #1f2937);
+        color: #fff;
+        background: color-mix(in srgb, var(--product-button-color, #1f2937) 84%, transparent);
+    }
+    .site-footer .btn.btn-outline-light:hover {
+        border-color: var(--product-buy-now-color, #0e9f90);
+        background: var(--product-buy-now-color, #0e9f90);
+        color: #fff;
+    }
+</style>
+
 <footer class="site-footer footer-glass footer-glass--premium" role="contentinfo">
     {{-- Width/padding: footer-glass.css uses same :root tokens as header (.glass-header__shell) + main (.main-container) --}}
     <div class="footer-glass__inner">

@@ -1,21 +1,335 @@
+@php
+    $uiSource = [
+        'product_card_bg' => optional($uiSettings)->product_card_bg ?? $general->product_card_color ?? '#ffffff',
+        'product_button_color' => optional($uiSettings)->product_button_color ?? $general->button_color ?? '#1f2937',
+        'product_buy_now_color' => optional($uiSettings)->product_buy_now_color ?? '#0e9f90',
+        'product_buy_now_hover' => optional($uiSettings)->product_buy_now_hover ?? '#0c8a7d',
+        'product_price_color' => optional($uiSettings)->product_price_color ?? optional($uiSettings)->product_buy_now_color ?? '#0e9f90',
+        'rating_color' => optional($uiSettings)->rating_color ?? $general->rating_star_color ?? '#f59e0b',
+        'discount_badge_color' => optional($uiSettings)->discount_badge_color ?? $general->discount_badge_color ?? '#dc2626',
+        'stock_color' => optional($uiSettings)->stock_color ?? '#16a34a',
+        'shipping_badge_color' => optional($uiSettings)->shipping_badge_color ?? '#2563eb',
+        'header_top_bg' => optional($uiSettings)->header_top_bg ?? '#0f172a',
+        'header_bg' => optional($uiSettings)->header_bg ?? '#ffffff',
+        'footer_bg' => optional($uiSettings)->footer_bg ?? '#0f172a',
+        'theme_template' => optional($uiSettings)->theme_template ?? 'default',
+    ];
+
+    $previewEncoded = request()->query('ui_preview');
+    if (is_string($previewEncoded) && $previewEncoded !== '') {
+        try {
+            $decoded = base64_decode(strtr($previewEncoded, ' ', '+'), true);
+            if (is_string($decoded) && $decoded !== '') {
+                $parsed = json_decode($decoded, true, 512, JSON_THROW_ON_ERROR);
+                if (is_array($parsed)) {
+                    foreach ($uiSource as $key => $currentValue) {
+                        if (array_key_exists($key, $parsed) && is_string($parsed[$key])) {
+                            $candidate = trim($parsed[$key]);
+                            if ($candidate !== '' && strlen($candidate) <= 50) {
+                                $uiSource[$key] = $candidate;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // ignore malformed preview payload
+        }
+    }
+@endphp
 {{-- Admin-driven CSS variables (must stay server-rendered) --}}
 <style id="stayl-storefront-ui-vars">
         :root{
             --footer-bg-image:url('{{ url("serve-css/img/footer-bg.png") }}?v={{ $assetVersion }}');
-            --product-card-bg:{{ optional($uiSettings)->product_card_bg ?? $general->product_card_color ?? '#ffffff' }};
-            --product-button-color:{{ optional($uiSettings)->product_button_color ?? $general->button_color ?? '#1f2937' }};
-            --product-button-hover:{{ optional($uiSettings)->product_buy_now_hover ?? $general->button_hover_color ?? '#374151' }};
-            --product-buy-now-color:{{ optional($uiSettings)->product_buy_now_color ?? '#0e9f90' }};
-            --product-buy-now-hover:{{ optional($uiSettings)->product_buy_now_hover ?? '#0c8a7d' }};
-            --product-price-color:{{ optional($uiSettings)->product_price_color ?? optional($uiSettings)->product_buy_now_color ?? '#0e9f90' }};
-            --product-rating-color:{{ optional($uiSettings)->rating_color ?? $general->rating_star_color ?? '#f59e0b' }};
-            --product-discount-badge:{{ optional($uiSettings)->discount_badge_color ?? $general->discount_badge_color ?? '#dc2626' }};
-            --product-stock-color:{{ optional($uiSettings)->stock_color ?? '#16a34a' }};
-            --product-shipping-color:{{ optional($uiSettings)->shipping_badge_color ?? '#2563eb' }};
-            @if(!empty(optional($uiSettings)->header_bg))--header-bg:{{ optional($uiSettings)->header_bg }};@endif
-            @if(!empty(optional($uiSettings)->footer_bg))--footer-bg-color:{{ optional($uiSettings)->footer_bg }};@endif
+            --product-card-bg:{{ $uiSource['product_card_bg'] }};
+            --product-button-color:{{ $uiSource['product_button_color'] }};
+            --product-button-hover:{{ $uiSource['product_buy_now_hover'] }};
+            --product-buy-now-color:{{ $uiSource['product_buy_now_color'] }};
+            --product-buy-now-hover:{{ $uiSource['product_buy_now_hover'] }};
+            --product-price-color:{{ $uiSource['product_price_color'] }};
+            --product-rating-color:{{ $uiSource['rating_color'] }};
+            --product-discount-badge:{{ $uiSource['discount_badge_color'] }};
+            --product-stock-color:{{ $uiSource['stock_color'] }};
+            --product-shipping-color:{{ $uiSource['shipping_badge_color'] }};
+            --category-card-bg:{{ $uiSource['product_card_bg'] }};
+            --category-card-text:{{ $uiSource['product_button_color'] }};
+            --category-title-color:{{ $uiSource['product_button_color'] }};
+            --header-bg:{{ $uiSource['header_bg'] ?: '#ffffff' }};
+            --header-top-bg:{{ $uiSource['header_top_bg'] ?: '#0f172a' }};
+            --footer-bg-color:{{ $uiSource['footer_bg'] ?: '#0f172a' }};
+            --header-icon-color:{{ $uiSource['product_button_color'] }};
+            --header-accent-color:{{ $uiSource['product_buy_now_color'] }};
+            /* Unified premium storefront palette */
+            --stayl-color-header-top:{{ $uiSource['header_top_bg'] ?: '#0f172a' }};
+            --stayl-color-header-main:#ffffff;
+            --stayl-color-header-menu:#0e9f90;
+            --stayl-color-surface:#f3f7fb;
+            --stayl-color-surface-soft:#ffffff;
+            --stayl-color-text:#0f172a;
+            --stayl-color-text-soft:#475569;
+            --stayl-glass-bg:rgba(255,255,255,.72);
+            --stayl-glass-border:rgba(148,163,184,.26);
+            --stayl-glass-shadow:0 14px 34px rgba(15,23,42,.09);
         }
-        @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default')
-        body[data-theme="{{ optional($uiSettings)->theme_template }}"] { }
-        @endif
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --stayl-color-surface:#070b13;
+                --stayl-color-surface-soft:#0b1220;
+                --stayl-color-text:#e2e8f0;
+                --stayl-color-text-soft:#94a3b8;
+                --stayl-glass-bg:rgba(15,23,42,.68);
+                --stayl-glass-border:rgba(148,163,184,.18);
+                --stayl-glass-shadow:0 18px 36px rgba(2,6,23,.45);
+                --header-bg:#0b1220;
+            }
+        }
+        body[data-theme="template_2"] {
+            --product-card-bg:#f8fbff;
+            --product-button-color:#0f172a;
+            --product-buy-now-color:#0284c7;
+            --product-buy-now-hover:#0369a1;
+            --product-price-color:#0ea5e9;
+            --header-bg:#ffffff;
+            --footer-bg-color:#082f49;
+        }
+        body[data-theme="template_3"] {
+            --product-card-bg:#111827;
+            --product-button-color:#f59e0b;
+            --product-buy-now-color:#f97316;
+            --product-buy-now-hover:#ea580c;
+            --product-price-color:#fbbf24;
+            --header-bg:#0b1220;
+            --footer-bg-color:#020617;
+        }
+        body[data-theme="template_4"] {
+            --product-card-bg:#f7fffb;
+            --product-button-color:#065f46;
+            --product-buy-now-color:#0d9488;
+            --product-buy-now-hover:#0f766e;
+            --product-price-color:#0f766e;
+            --header-bg:#ecfdf5;
+            --footer-bg-color:#022c22;
+        }
+        body[data-theme="template_5"] {
+            --product-card-bg:#fff7fb;
+            --product-button-color:#be185d;
+            --product-buy-now-color:#ec4899;
+            --product-buy-now-hover:#db2777;
+            --product-price-color:#be185d;
+            --header-bg:#fff1f2;
+            --footer-bg-color:#4a044e;
+        }
+        body[data-theme="template_6"] {
+            --product-card-bg:#eef4ff;
+            --product-button-color:#1e3a8a;
+            --product-buy-now-color:#2563eb;
+            --product-buy-now-hover:#1d4ed8;
+            --product-price-color:#1d4ed8;
+            --header-bg:#f8fbff;
+            --footer-bg-color:#0f1f3d;
+        }
+        body[data-theme="template_7"] {
+            --product-card-bg:#f8f5ff;
+            --product-button-color:#5b21b6;
+            --product-buy-now-color:#7c3aed;
+            --product-buy-now-hover:#6d28d9;
+            --product-price-color:#7c3aed;
+            --header-bg:#f6f3ff;
+            --footer-bg-color:#2e1065;
+        }
+        body[data-theme="template_8"] {
+            --product-card-bg:#f3f4f6;
+            --product-button-color:#111827;
+            --product-buy-now-color:#0f766e;
+            --product-buy-now-hover:#115e59;
+            --product-price-color:#0f766e;
+            --header-bg:#ffffff;
+            --footer-bg-color:#111827;
+        }
+
+        .home-category-section__title { color: var(--category-title-color, #374151) !important; }
+        .home-category-section__card {
+            background: var(--category-card-bg, #f5f5f5) !important;
+            color: var(--category-card-text, #1f2937) !important;
+            border-color: color-mix(in srgb, var(--category-card-text, #1f2937) 24%, transparent) !important;
+        }
+        .home-category-section__card-icon { color: color-mix(in srgb, var(--category-card-text, #1f2937) 72%, #ffffff) !important; }
+        .home-category-section__card:hover .home-category-section__card-icon { color: var(--product-buy-now-color, #0e9f90) !important; }
+
+        .btn.btn--primary,
+        .btn.btn-primary,
+        .footer-glass__btn--primary,
+        .custom-newsletter-btn {
+            background: var(--product-buy-now-color, #0e9f90) !important;
+            border-color: var(--product-buy-now-color, #0e9f90) !important;
+            color: #ffffff !important;
+        }
+        .btn.btn--primary:hover,
+        .btn.btn-primary:hover,
+        .footer-glass__btn--primary:hover,
+        .custom-newsletter-btn:hover {
+            background: var(--product-buy-now-hover, #0c8a7d) !important;
+            border-color: var(--product-buy-now-hover, #0c8a7d) !important;
+        }
+        .footer-glass__btn--outline,
+        .stayl-footer-social-link {
+            border-color: var(--product-button-color, #1f2937) !important;
+            color: var(--product-button-color, #1f2937) !important;
+        }
+        .footer-glass__btn--outline:hover,
+        .stayl-footer-social-link:hover {
+            background: var(--product-button-color, #1f2937) !important;
+            color: #ffffff !important;
+        }
+</style>
+<style id="stayl-storefront-live-glass-overrides">
+    :root{
+        --stayl-color-header-top:var(--header-top-bg, #0f172a);
+        --stayl-color-header-main:#ffffff;
+        --stayl-color-header-menu:#0e9f90;
+        --stayl-surface-bg:#eef4fb;
+        --stayl-surface-card:rgba(255,255,255,.72);
+        --stayl-surface-card-border:rgba(148,163,184,.28);
+        --stayl-surface-shadow:0 16px 36px rgba(15,23,42,.10);
+        --stayl-text-main:#0f172a;
+        --stayl-text-soft:#475569;
+    }
+
+    body.antialiased{
+        background:
+            radial-gradient(120% 90% at 0% 0%, #dbeafe 0%, rgba(219,234,254,0) 42%),
+            radial-gradient(140% 100% at 100% 0%, #ccfbf1 0%, rgba(204,251,241,0) 44%),
+            var(--stayl-surface-bg) !important;
+        color: var(--stayl-text-main) !important;
+    }
+
+    /* Header 3-bar exact color system + glass depth */
+    .stayl-fixed-master{
+        background: transparent !important;
+        box-shadow: 0 18px 36px rgba(15,23,42,.12) !important;
+    }
+    .stayl-announcement-bar{
+        background: rgba(199, 234, 254, 0.82) !important;
+        backdrop-filter: blur(14px) saturate(130%) !important;
+        -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
+        min-height: 38px !important;
+        height: 38px !important;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.22) !important;
+        color: #0f172a !important;
+        position: relative !important;
+        z-index: 100500 !important;
+    }
+    .stayl-top-bar{
+        background: rgba(255, 255, 255, 0.74) !important;
+        backdrop-filter: blur(14px) saturate(130%) !important;
+        -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
+        min-height: 56px !important;
+        height: 56px !important;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.22) !important;
+        color: #0f172a !important;
+        position: relative !important;
+        z-index: 100400 !important;
+    }
+    .stayl-yellow-bar{
+        background: rgba(13, 110, 122, 0.86) !important;
+        backdrop-filter: blur(14px) saturate(130%) !important;
+        -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
+        min-height: 38px !important;
+        height: 38px !important;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.22) !important;
+        color: #f8fafc !important;
+        position: relative !important;
+        z-index: 100300 !important;
+    }
+    .stayl-announcement-bar .stayl-wrap{
+        min-height: 38px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    .stayl-topbar-menu__panel{
+        top: calc(100% + 8px) !important;
+        bottom: auto !important;
+        transform: translateY(8px) !important;
+        z-index: 100900 !important;
+    }
+    .stayl-topbar-menu:hover .stayl-topbar-menu__panel,
+    .stayl-topbar-menu:focus-within .stayl-topbar-menu__panel{
+        transform: translateY(0) !important;
+    }
+    /* Slim bars with comfortable action targets */
+    .stayl-topbar-menu__btn{
+        min-height: 32px !important;
+        padding: 0 8px !important;
+        font-size: 13px !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+    }
+    .stayl-icon-item{
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .stayl-seller-btn{
+        min-height: 40px !important;
+        padding: 10px 18px !important;
+        font-size: 13px !important;
+    }
+
+    /* Header <-> banner gap */
+    body.antialiased{ padding-top: calc(var(--stayl-dynamic-header-height, 175px) + 14px) !important; }
+    .storefront-main{ padding-top: 0 !important; }
+    #home-banner-section{ margin-top: 10px !important; }
+
+    /* Banner নিচের gap আরও professional */
+    .storefront-banner-separation{ height: 14px !important; }
+    .storefront-section-separation{ height: 18px !important; }
+
+    /* Public page global glass cards */
+    .storefront-main .card,
+    .storefront-main .checkout-card,
+    .storefront-main .cart-sidebar,
+    .storefront-main .product-card,
+    .storefront-main .footer-glass__card,
+    .storefront-main .modal-content,
+    .storefront-main .home-category-section__card,
+    .storefront-main .power-zone-unified-card,
+    .storefront-main .deal__item,
+    .storefront-main .track-quick-btn{
+        background: var(--stayl-surface-card) !important;
+        border: 1px solid var(--stayl-surface-card-border) !important;
+        box-shadow: var(--stayl-surface-shadow) !important;
+        backdrop-filter: blur(10px) saturate(130%) !important;
+        -webkit-backdrop-filter: blur(10px) saturate(130%) !important;
+    }
+
+    /* Sections readable spacing on all public pages */
+    .storefront-main > .main-container{ padding-top: clamp(10px, 1.1vw, 16px) !important; padding-bottom: clamp(10px, 1.1vw, 16px) !important; }
+    .storefront-main section{ margin-bottom: clamp(14px, 1.6vw, 24px) !important; }
+
+    /* Buttons + accents consistent */
+    .btn--primary, .btn.btn-primary, .stayl-seller-btn{
+        background: var(--stayl-color-header-menu) !important;
+        border-color: var(--stayl-color-header-menu) !important;
+    }
+    .btn--primary:hover, .btn.btn-primary:hover, .stayl-seller-btn:hover{
+        filter: brightness(.95);
+    }
+
+    @media (prefers-color-scheme: dark){
+        :root{
+            --stayl-surface-bg:#070d17;
+            --stayl-surface-card:rgba(15,23,42,.66);
+            --stayl-surface-card-border:rgba(148,163,184,.20);
+            --stayl-surface-shadow:0 18px 38px rgba(2,6,23,.44);
+            --stayl-text-main:#e2e8f0;
+            --stayl-text-soft:#a8b3c7;
+        }
+        body.antialiased{ color: var(--stayl-text-main) !important; }
+    }
 </style>

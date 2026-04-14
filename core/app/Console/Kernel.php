@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('maintenance:clean-logs', ['--keep-days' => config('maintenance.log_keep_days', 7)])->daily()->at('04:30');
         $schedule->command('maintenance:run-full', ['--skip-db' => true])->weeklyOn(0, '05:00');
         $schedule->command('activity:archive')->daily()->at('02:00');
+        $schedule->command('ui-settings:health --repair')->everySixHours();
 
         // Abandoned cart: mark inactive carts as abandoned and queue reminders
         $schedule->command('abandoned-cart:detect')->everyThirtyMinutes();

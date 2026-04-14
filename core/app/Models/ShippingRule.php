@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 class ShippingRule extends Model
 {
     protected $fillable = [
-        'free_shipping_min_amount', 'cod_extra_charge', 'express_extra_charge', 'international_enabled',
+        'free_shipping_min_amount', 'cod_extra_charge', 'express_extra_charge', 'international_enabled', 'header_notice_text',
     ];
 
     protected $casts = [

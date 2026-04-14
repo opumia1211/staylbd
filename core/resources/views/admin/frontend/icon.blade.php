@@ -12,7 +12,7 @@
     $footerLogoHeight = $general->footer_logo_height ?? 35;
 @endphp
 
-<div class="row gy-4 admin-icon-page">
+<div class="row gy-3 admin-icon-page admin-icon-page--compact">
     {{-- Main Card --}}
     <div class="col-12">
         <div class="card">
@@ -22,19 +22,19 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.frontend.sections.icon.update') }}" method="POST" enctype="multipart/form-data" id="logoForm">
+                <form action="{{ route('admin.frontend.sections.icon.update') }}" method="POST" enctype="multipart/form-data" id="logoForm" class="admin-icon-form">
                     @csrf
                     
                     {{-- Logo Upload Section --}}
-                    <div class="row g-4 mb-4">
+                    <div class="row g-3 mb-3">
                         {{-- Main Logo --}}
-                        <div class="col-xl-4 col-lg-6">
-                            <div class="card border">
-                                <div class="card-header py-2">
+                        <div class="col-xl-4 col-lg-4 col-md-6">
+                            <div class="card icon-upload-card h-100 border">
+                                <div class="card-header py-2 px-3">
                                     <span class="badge bg--primary">@lang('Main Logo')</span>
                                 </div>
-                                <div class="card-body text-center">
-                                    <div class="logo-preview-box logo-preview-box--light mb-3" id="logoPreviewBox" data-type="logo">
+                                <div class="card-body text-center p-3">
+                                    <div class="logo-preview-box logo-preview-box--light mb-2" id="logoPreviewBox" data-type="logo">
                                         @if(getLogo('logo'))
                                             <img src="{{ getLogo('logo') }}" alt="Logo" id="logoPreviewImg" class="logo-preview-img">
                                             <button type="button" class="btn btn-danger btn-sm logo-remove-btn" data-remove-type="logo" title="@lang('Remove logo')">
@@ -54,19 +54,19 @@
                                     </div>
                                     <input type="file" name="logo" id="logoInput" class="form-control" accept=".svg,.png,.jpg,.jpeg,.webp,.gif" onchange="previewLogo(this, 'logo', 'logoPreviewBox', 'logoPreviewImg', 'logoPlaceholder')">
                                     <input type="hidden" name="remove_logo" id="removeLogo" value="0">
-                                    <small class="text-muted d-block mt-2 text-start">@lang('Supported'): 320×70 px – 460×100 px (min–max)</small>
+                                    <small class="text-muted d-block mt-1 text-start">@lang('Supported'): 320×70 px – 460×100 px</small>
                                 </div>
                             </div>
                         </div>
                         
                         {{-- Dark Logo --}}
-                        <div class="col-xl-4 col-lg-6">
-                            <div class="card border">
-                                <div class="card-header py-2 bg-dark-card">
+                        <div class="col-xl-4 col-lg-4 col-md-6">
+                            <div class="card icon-upload-card h-100 border">
+                                <div class="card-header py-2 px-3 bg-dark-card">
                                     <span class="badge bg-light text-dark">@lang('Dark Mode Logo')</span>
                                 </div>
-                                <div class="card-body text-center bg-dark-card">
-                                    <div class="logo-preview-box logo-preview-box--dark mb-3" id="logoDarkPreviewBox" data-type="logo_dark">
+                                <div class="card-body text-center p-3 bg-dark-card">
+                                    <div class="logo-preview-box logo-preview-box--dark mb-2" id="logoDarkPreviewBox" data-type="logo_dark">
                                         @if(getLogo('logo_dark'))
                                             <img src="{{ getLogo('logo_dark') }}" alt="Dark Logo" id="logoDarkPreviewImg" class="logo-preview-img">
                                             <button type="button" class="btn btn-danger btn-sm logo-remove-btn" data-remove-type="logo_dark" title="@lang('Remove logo')">
@@ -86,18 +86,18 @@
                                     </div>
                                     <input type="file" name="logo_dark" id="logoDarkInput" class="form-control" accept=".svg,.png,.jpg,.jpeg,.webp,.gif" onchange="previewLogo(this, 'logo_dark', 'logoDarkPreviewBox', 'logoDarkPreviewImg', 'logoDarkPlaceholder')">
                                     <input type="hidden" name="remove_logo_dark" id="removeLogoDark" value="0">
-                                    <small class="text-white-50 d-block mt-2 text-start">@lang('Supported'): 320×70 px – 460×100 px (min–max)</small>
+                                    <small class="text-white-50 d-block mt-1 text-start">@lang('Supported'): 320×70 px – 460×100 px</small>
                                 </div>
                             </div>
                         </div>
                         
                         {{-- Favicon --}}
-                        <div class="col-xl-4 col-lg-6">
-                            <div class="card border">
-                                <div class="card-header py-2">
+                        <div class="col-xl-4 col-lg-4 col-md-6">
+                            <div class="card icon-upload-card h-100 border">
+                                <div class="card-header py-2 px-3">
                                     <span class="badge bg--success">@lang('Browser Favicon')</span>
                                 </div>
-                                <div class="card-body text-center">
+                                <div class="card-body text-center p-3">
                                     <div class="logo-preview-box logo-preview-box--favicon mb-2" id="faviconPreviewBox" data-type="favicon">
                                         @if(getLogo('favicon'))
                                             <img src="{{ getLogo('favicon') }}" alt="Favicon" id="faviconPreviewImg" class="logo-preview-img logo-preview-img--favicon">
@@ -108,26 +108,26 @@
                                             <div class="text-muted logo-placeholder-content" id="faviconPlaceholder">
                                                 <i class="las la-window-maximize" style="font-size: 42px;"></i>
                                                 <p class="mb-1 fw-bold">@lang('Click to upload')</p>
-                                                <small class="d-block"><strong>@lang('Formats'):</strong> PNG, ICO, JPG, WEBP</small>
+                                                <small class="d-block"><strong>@lang('Formats'):</strong> SVG, PNG, ICO, JPG, WEBP</small>
                                                 <small class="d-block"><strong>@lang('Size'):</strong> 32×32 px, 64×64 px</small>
                                                 <small class="d-block"><strong>@lang('PWA/Mobile Tab'):</strong> 180×180 px</small>
                                                 <small class="d-block"><strong>@lang('Max File'):</strong> 512 KB</small>
                                             </div>
                                         @endif
                                     </div>
-                                    <input type="file" name="favicon" id="faviconInput" class="form-control mt-2" accept=".png,.ico,.jpg,.jpeg,.webp" data-preview-type="favicon">
+                                    <input type="file" name="favicon" id="faviconInput" class="form-control mt-2" accept=".svg,.png,.ico,.jpg,.jpeg,.webp" data-preview-type="favicon">
                                     <input type="hidden" name="remove_favicon" id="removeFavicon" value="0">
                                     <button type="submit" class="btn btn--success btn-sm mt-2" id="faviconUploadBtn" style="display:none;">
                                         <i class="las la-upload me-1"></i>@lang('Upload Favicon Now')
                                     </button>
-                                    <small class="text-muted d-block mt-2 text-start">@lang('Supported'): 32×32, 64×64, 180×180 px. PNG, ICO, JPG, WEBP. @lang('Click') "Upload Favicon Now" @lang('after selecting file')</small>
+                                    <small class="text-muted d-block mt-1 text-start">@lang('Supported'): 32×32, 64×64, 180×180 px. SVG, PNG, ICO, JPG, WEBP</small>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {{-- Animation & Effects --}}
-                    <div class="card mb-4">
+                    <div class="card mb-3 admin-icon-section-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h6 class="mb-0"><i class="las la-magic me-2"></i>@lang('Logo Animation & Effects')</h6>
                             <label class="form-switch mb-0">
@@ -135,7 +135,7 @@
                                 <span class="ms-2">@lang('Enable')</span>
                             </label>
                         </div>
-                        <div class="card-body {{ $logoEffectsEnabled ? '' : 'logo-effects-disabled' }}" id="effectsBody">
+                        <div class="card-body p-3 {{ $logoEffectsEnabled ? '' : 'logo-effects-disabled' }}" id="effectsBody">
                             <div class="row g-3">
                                 <div class="col-md-6 col-lg-3">
                                     <label class="form-label">@lang('Hover Effect')</label>
@@ -179,8 +179,8 @@
                             </div>
                             
                             {{-- Live Preview --}}
-                            <div class="mt-4 p-4 bg-light rounded text-center">
-                                <label class="form-label d-block mb-3">@lang('Live Preview') - @lang('Hover over logo to test effects')</label>
+                            <div class="mt-3 p-3 bg-light rounded text-center">
+                                <label class="form-label d-block mb-2">@lang('Live Preview') - @lang('Hover over logo to test effects')</label>
                                 <div id="effectPreview" style="display: inline-block;">
                                     @if(getLogo('logo'))
                                         <img src="{{ getLogo('logo') }}" alt="Preview" id="previewImage" class="{{ getLogoEffectClasses() }}" style="max-height: 80px; {{ getLogoStyle() }}">
@@ -197,11 +197,11 @@
 
                     {{-- Invoice QR Caption (Customer) - shown above QR on invoice --}}
                     @if(\Schema::hasColumn('general_settings', 'invoice_qr_caption_en'))
-                    <div class="card mb-4">
+                    <div class="card mb-3 admin-icon-section-card">
                         <div class="card-header">
                             <h6 class="mb-0"><i class="las la-qrcode me-2"></i>@lang('Invoice QR Caption') (@lang('Customer scan'))</h6>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-3">
                             <p class="small text-muted">@lang('Text above customer QR on invoice. Use') <code>@{{ name }}</code> @lang('for customer name. You can set any language.')</p>
                             <div class="row g-3">
                                 <div class="col-md-6">
@@ -218,11 +218,11 @@
                     @endif
 
                     {{-- Display Settings --}}
-                    <div class="card mb-4">
+                    <div class="card mb-3 admin-icon-section-card">
                         <div class="card-header">
                             <h6 class="mb-0"><i class="las la-ruler-combined me-2"></i>@lang('Display Settings')</h6>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-3">
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label">@lang('Header Logo Max Width')</label>
@@ -250,7 +250,7 @@
                     </div>
 
                     {{-- Submit --}}
-                    <div class="d-flex gap-3">
+                    <div class="d-flex gap-2 flex-wrap admin-icon-action-row">
                         <button type="submit" class="btn btn--primary btn-lg">
                             <i class="las la-save me-2"></i>@lang('Save All Changes')
                         </button>
@@ -264,12 +264,12 @@
     </div>
 
     {{-- File Formats Recommended --}}
-    <div class="col-12">
+    <div class="col-12 admin-icon-info-cards">
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0"><i class="las la-file-image me-2"></i>@lang('File Formats (Recommended)')</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body p-3">
                 <div class="row g-3">
                     <div class="col-md-3">
                         <span class="badge bg-primary">@lang('Primary')</span>
@@ -297,14 +297,14 @@
     </div>
 
     {{-- Info Card --}}
-    <div class="col-12">
+    <div class="col-12 admin-icon-info-cards">
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0"><i class="las la-info-circle me-2"></i>@lang('Logo Usage Locations')</h5>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
+            <div class="card-body p-3">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
                         <h6 class="text-primary"><i class="las la-image me-1"></i> @lang('Main Logo') (320×70 – 460×100 px)</h6>
                         <ul class="list-unstyled small">
                             <li><i class="las la-check text-success me-1"></i> @lang('User Header - Home Button')</li>
@@ -316,7 +316,7 @@
                             <li><i class="las la-home text-primary me-1"></i> <strong>@lang('Logo = Home Button')</strong></li>
                         </ul>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-lg-4 col-md-6">
                         <h6 class="text-dark"><i class="las la-moon me-1"></i> @lang('Dark Logo')</h6>
                         <ul class="list-unstyled small">
                             <li><i class="las la-check text-success me-1"></i> @lang('Admin Sidebar')</li>
@@ -324,7 +324,7 @@
                             <li><i class="las la-check text-success me-1"></i> @lang('Admin Login Page')</li>
                         </ul>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-lg-4 col-md-12">
                         <h6 class="text-success"><i class="las la-window-maximize me-1"></i> @lang('Browser Favicon') (32×32 – 180×180 px)</h6>
                         <ul class="list-unstyled small">
                             <li><i class="las la-check text-success me-1"></i> @lang('Browser Tabs')</li>
@@ -431,7 +431,7 @@ function removeLogo(type, event) {
     var placeholderHtml = type === 'logo_dark' 
         ? '<div class="text-white-50 logo-placeholder-content" id="logoDarkPlaceholder"><i class="las la-cloud-upload-alt" style="font-size: 42px;"></i><p class="mb-1 fw-bold">Click to upload</p><small class="d-block"><strong>Formats:</strong> SVG, PNG, WEBP, JPG</small><small class="d-block"><strong>Size:</strong> 320×70 – 460×100 px</small><small class="d-block"><strong>Min-Max:</strong> 320×70 (min) – 460×100 (max)</small><small class="d-block"><strong>Max File:</strong> 2 MB</small></div>'
         : type === 'favicon'
-        ? '<div class="text-muted logo-placeholder-content" id="faviconPlaceholder"><i class="las la-window-maximize" style="font-size: 42px;"></i><p class="mb-1 fw-bold">Click to upload</p><small class="d-block"><strong>Formats:</strong> PNG, ICO, JPG, WEBP</small><small class="d-block"><strong>Size:</strong> 32×32, 64×64, 180×180 px</small><small class="d-block"><strong>PWA/Mobile:</strong> 180×180 px</small><small class="d-block"><strong>Max File:</strong> 512 KB</small></div>'
+        ? '<div class="text-muted logo-placeholder-content" id="faviconPlaceholder"><i class="las la-window-maximize" style="font-size: 42px;"></i><p class="mb-1 fw-bold">Click to upload</p><small class="d-block"><strong>Formats:</strong> SVG, PNG, ICO, JPG, WEBP</small><small class="d-block"><strong>Size:</strong> 32×32, 64×64, 180×180 px</small><small class="d-block"><strong>PWA/Mobile:</strong> 180×180 px</small><small class="d-block"><strong>Max File:</strong> 512 KB</small></div>'
         : '<div class="text-muted logo-placeholder-content" id="logoPlaceholder"><i class="las la-cloud-upload-alt" style="font-size: 42px;"></i><p class="mb-1 fw-bold">Click to upload</p><small class="d-block"><strong>Formats:</strong> SVG, PNG, WEBP, JPG</small><small class="d-block"><strong>Size:</strong> 320×70 – 460×100 px</small><small class="d-block"><strong>Min-Max:</strong> 320×70 (min) – 460×100 (max)</small><small class="d-block"><strong>Max File:</strong> 2 MB</small></div>';
     
     box.innerHTML = placeholderHtml;

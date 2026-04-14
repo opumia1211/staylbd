@@ -869,6 +869,12 @@
                         <span class="menu-title">@lang('System Configuration')</span>
                     </a>
                 </li>
+                <li class="sidebar-menu-item {{ menuActive('admin.ui.settings') }} {{ menuActive('admin.theme.settings') }}">
+                    <a href="{{ route('admin.ui.settings') }}" class="nav-link">
+                        <i class="menu-icon las la-palette"></i>
+                        <span class="menu-title">@lang('UI & Theme Settings')</span>
+                    </a>
+                </li>
                 @endif
                 @if($canAccess('extensions'))
                 <li class="sidebar-menu-item {{ menuActive('admin.extensions.index') }}">

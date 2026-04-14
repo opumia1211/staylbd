@@ -51,15 +51,14 @@
         $homeRowScrollIntervalSec = max(2, min(30, (int) $categoryScrollIntervalSec));
     @endphp
 
-    {{-- ব্যানার সেকশন (Banner মডিউল) – সবসময় হেডারের নিচে --}}
-    <div style="margin-top: 2px;">
-        @include('modules.Banner::home_banner', array_merge($bannerModuleData, [
-            'flashSaleEndsAt' => config('stayl.flash_sale_ends_at'),
-        ]))
-    </div>
+    @include('modules.Banner::home_banner', array_merge($bannerModuleData, [
+        'flashSaleEndsAt' => config('stayl.flash_sale_ends_at'),
+    ]))
+    <div class="storefront-banner-separation" aria-hidden="true"></div>
     {{-- Banner নিচে ticker/scrollbar restore --}}
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_above', 'options' => ['page' => 'home']])
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_below', 'options' => ['page' => 'home']])
+    <div class="storefront-section-separation" aria-hidden="true"></div>
     {{-- Keep banner and category tightly synchronized; no extra banner-adjacent rows --}}
 
     @php

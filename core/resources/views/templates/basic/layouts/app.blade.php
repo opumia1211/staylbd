@@ -9,6 +9,21 @@
     $disableLegacyWow = $disableLegacyWow ?? true;
     $disableLegacyCarouselJs = $disableLegacyCarouselJs ?? true;
     $disableLegacyOwl = $disableLegacyOwl ?? true;
+    $previewThemeTemplate = null;
+    $previewEncoded = request()->query('ui_preview');
+    if (is_string($previewEncoded) && $previewEncoded !== '') {
+        try {
+            $decoded = base64_decode(strtr($previewEncoded, ' ', '+'), true);
+            if (is_string($decoded) && $decoded !== '') {
+                $parsed = json_decode($decoded, true, 512, JSON_THROW_ON_ERROR);
+                if (is_array($parsed) && !empty($parsed['theme_template']) && is_string($parsed['theme_template'])) {
+                    $previewThemeTemplate = trim($parsed['theme_template']);
+                }
+            }
+        } catch (\Throwable $e) {
+            $previewThemeTemplate = null;
+        }
+    }
 @endphp
 <!doctype html>
 <html lang="{{ config('app.locale') }}" itemscope itemtype="http://schema.org/WebPage">
@@ -95,9 +110,62 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 
     @include('partials.tracking_scripts')
+    <script>
+    (function () {
+        if (window.__staylPreviewListenerBound) return;
+        window.__staylPreviewListenerBound = true;
+        window.addEventListener('message', function (event) {
+            if (!event || event.origin !== window.location.origin) return;
+            var data = event.data || {};
+            if (data.type !== 'stayl-ui-preview' || !data.payload) return;
+
+            var p = data.payload;
+            var root = document.documentElement;
+            var map = {
+                product_card_bg: '--product-card-bg',
+                product_button_color: '--product-button-color',
+                product_buy_now_color: '--product-buy-now-color',
+                product_buy_now_hover: '--product-buy-now-hover',
+                product_price_color: '--product-price-color',
+                rating_color: '--product-rating-color',
+                discount_badge_color: '--product-discount-badge',
+                stock_color: '--product-stock-color',
+                shipping_badge_color: '--product-shipping-color',
+                header_top_bg: '--header-top-bg',
+                header_bg: '--header-bg',
+                footer_bg: '--footer-bg-color'
+            };
+
+            Object.keys(map).forEach(function (key) {
+                var val = (p[key] || '').toString().trim();
+                if (!val) return;
+                root.style.setProperty(map[key], val);
+            });
+            var topBg = (p.header_top_bg || '').toString().trim();
+            if (topBg) root.style.setProperty('--stayl-color-header-top', topBg);
+
+            var btnColor = (p.product_button_color || '').toString().trim();
+            if (btnColor) root.style.setProperty('--header-icon-color', btnColor);
+            var accent = (p.product_buy_now_color || '').toString().trim();
+            if (accent) root.style.setProperty('--header-accent-color', accent);
+
+            var tpl = (p.theme_template || '').toString().trim();
+            if (document.body) {
+                if (!tpl || tpl === 'default') {
+                    document.body.removeAttribute('data-theme');
+                } else {
+                    document.body.setAttribute('data-theme', tpl);
+                }
+            }
+        });
+    })();
+    </script>
 </head>
 
-<body class="antialiased" style="font-family: 'Outfit', sans-serif; padding-top: 155px !important;" @if(optional($uiSettings)->theme_template && optional($uiSettings)->theme_template !== 'default') data-theme="{{ $uiSettings->theme_template }}" @endif @stack('body_attrs')>
+<body class="antialiased" style="font-family: 'Outfit', sans-serif; padding-top: var(--stayl-dynamic-header-height, 175px) !important;"
+    @php $activeThemeTemplate = $previewThemeTemplate ?: (optional($uiSettings)->theme_template ?? 'default'); @endphp
+    @if($activeThemeTemplate && $activeThemeTemplate !== 'default') data-theme="{{ $activeThemeTemplate }}" @endif
+    @stack('body_attrs')>
     <!-- Preloader removed for instant page loads -->
     @yield('app')
     @include($activeTemplate . 'partials.mobile_bottom_nav')

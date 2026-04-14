@@ -52,6 +52,12 @@
             $tailwindAdminPath = public_path('css/tailwind-admin.css');
         }
         $tailwindAdminVer = is_file($tailwindAdminPath) ? (string) filemtime($tailwindAdminPath) : ($assetVersion ?? config('app.version'));
+        $adminAppCssPath = public_path('assets/admin/css/app.css');
+        $adminAppCssVer = is_file($adminAppCssPath) ? (string) filemtime($adminAppCssPath) : ($assetVersion ?? config('app.version'));
+        $adminProUiCssPath = public_path('assets/admin/css/admin-pro-ui.css');
+        $adminProUiCssVer = is_file($adminProUiCssPath) ? (string) filemtime($adminProUiCssPath) : ($assetVersion ?? config('app.version'));
+        $dashGlassPath = public_path('assets/admin/css/dashboard-glass.css');
+        $dashGlassVer = is_file($dashGlassPath) ? (string) filemtime($dashGlassPath) : ($assetVersion ?? config('app.version'));
     @endphp
     @include('partials.inter-font-preload', ['assetVersion' => $assetVersion ?? config('app.asset_version') ?? config('app.version')])
 
@@ -63,9 +69,9 @@
     <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}?v={{ $assetVersion }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/bootstrap-toggle.min.css') }}?v={{ $assetVersion }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor/select2.min.css') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/app.css') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/dashboard-glass.css') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/admin-pro-ui.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/app.css') }}?v={{ $adminAppCssVer }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/dashboard-glass.css') }}?v={{ $dashGlassVer }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/admin-pro-ui.css') }}?v={{ $adminProUiCssVer }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/monokai.min.css') }}?v={{ $assetVersion }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/verification_code.css') }}?v={{ $assetVersion }}">
 

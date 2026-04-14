@@ -23,6 +23,7 @@ class ShippingRuleController extends Controller
                 'cod_extra_charge' => 0,
                 'express_extra_charge' => 0,
                 'international_enabled' => true,
+                'header_notice_text' => 'Cash on Delivery available nationwide',
             ]);
             $rule->id = 0;
         }
@@ -40,6 +41,7 @@ class ShippingRuleController extends Controller
             'cod_extra_charge' => 'required|numeric|min:0',
             'express_extra_charge' => 'required|numeric|min:0',
             'international_enabled' => 'nullable|in:0,1',
+            'header_notice_text' => 'nullable|string|max:255',
         ]);
 
         $rule = ShippingRule::first();
@@ -50,6 +52,7 @@ class ShippingRuleController extends Controller
         $rule->cod_extra_charge = $request->cod_extra_charge ?? 0;
         $rule->express_extra_charge = $request->express_extra_charge ?? 0;
         $rule->international_enabled = (bool) $request->international_enabled;
+        $rule->header_notice_text = trim((string) $request->input('header_notice_text', 'Cash on Delivery available nationwide'));
         $rule->save();
 
         ShippingRule::clearCache();

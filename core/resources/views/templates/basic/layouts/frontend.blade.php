@@ -10,7 +10,7 @@
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'header_above'])
     @include($activeTemplate . 'partials.header')
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'header_below'])
-    {{-- storefront-main: padding-top zeroed out to prevent double-gap with body padding --}}
+    {{-- storefront-main: padding zeroed to allow body padding-top (line 100 in app.blade.php) to manage the header-banner gap --}}
     <main class="storefront-main" style="padding-top: 0 !important;">
         @include($activeTemplate . 'partials.inline_public_ads')
         @include($activeTemplate . 'partials.scrollbar', ['position' => 'content_top'])

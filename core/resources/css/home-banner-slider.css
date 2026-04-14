@@ -32,12 +32,27 @@
     max-width: 100%;
     position: relative;
     overflow: hidden;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 40px -12px rgba(15, 23, 42, 0.25);
+    border-radius: 0 !important;
+    box-shadow: none !important;
     height: auto !important;
     min-height: 0 !important;
-    aspect-ratio: var(--hb-w, 2560) / var(--hb-h, 600);
+    /* aspect-ratio removed to allow natural height */
 }
+
+/* Force sharp corners on all slide children */
+#home-banner-section .banner-slider *,
+#home-banner-section .banner-slider .banner-slide-inner,
+#home-banner-section .banner-slider .banner-slide-link,
+#home-banner-section .banner-slider img {
+    border-radius: 0 !important;
+}
+
+@media (min-width: 1025px) {
+    #home-banner-section .banner-slider {
+        /* No fixed height, use aspect-ratio or natural height */
+    }
+}
+
 
 #home-banner-section .banner-slider svg,
 #home-banner-section .banner-slider i,
@@ -68,16 +83,19 @@
 #home-banner-section .banner-slider .banner-slide-inner picture {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto !important;
+    /* Allow dynamic length */
+    object-fit: contain;
+    /* Changed from cover to show full image without cropping */
     object-position: center;
 }
 
 #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    display: block;
+    width: 100%;
     overflow: hidden;
-    background: #e8eaed;
+    background: transparent;
 }
 
 #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link.is-banner-media-error {
@@ -172,6 +190,7 @@
         opacity: 0;
         transform: translateY(14px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -221,7 +240,7 @@
         width: 100%;
     }
 
-    .product-line-flex-row.home-product-strip > .product-card-col {
+    .product-line-flex-row.home-product-strip>.product-card-col {
         width: 100% !important;
         min-width: 0 !important;
         flex: none !important;

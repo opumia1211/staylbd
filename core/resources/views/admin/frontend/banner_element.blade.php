@@ -10,195 +10,73 @@
         $slideInterval = 5;
         $autoplay = 1;
         $bannerWidth = 2560;
-        $bannerHeight = 600;
+        $bannerHeight = 400;
         if ($bannerSliderSettings && isset($bannerSliderSettings->data_values)) {
             $dv = $bannerSliderSettings->data_values;
             $slideInterval = (int)($dv->slide_interval_seconds ?? 5);
             $autoplay = (int)($dv->autoplay ?? 1);
             $bannerWidth = (int)($dv->banner_width ?? 2560);
-            $bannerHeight = (int)($dv->banner_height ?? 600);
+            $bannerHeight = (int)($dv->banner_height ?? 400);
         }
         if ($bannerWidth < 100) $bannerWidth = 2560;
-        if ($bannerHeight < 50) $bannerHeight = 600;
+        if ($bannerHeight < 50) $bannerHeight = 400;
         if ($slideInterval < 1 || $slideInterval > 60) $slideInterval = 5;
     @endphp
 
     @php $bannerStats = $bannerStats ?? ['impressions' => 0, 'clicks' => 0, 'ctr' => 0]; @endphp
     <div class="row g-3">
-        <div class="col-12">
-            <p class="small text-muted mb-0">
-                <strong>@lang('Hero')</strong> — @lang('full-width slider below.') 
-                <strong>@lang('Row promos')</strong> — @lang('large + small pair per line; position = drag in') <a href="{{ route('admin.frontend.sections.homepageCustomRows') }}">@lang('Homepage layout')</a>.
-                @lang('Site-wide offer bars:') <a href="{{ route('admin.offer-timers.index') }}">@lang('Offer timers')</a>.
-            </p>
-        </div>
-
-        <!-- Analytics strip -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm banner-top-bar">
-                <div class="card-body py-2 px-3">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="d-flex flex-wrap align-items-center gap-4">
-                            <div class="banner-stat-item">
-                                <span class="text-muted small text-uppercase d-block" style="font-size: 10px;">@lang('Impressions')</span>
-                                <strong class="text--primary">{{ number_format($bannerStats['impressions']) }}</strong>
-                            </div>
-                            <div class="banner-stat-item">
-                                <span class="text-muted small text-uppercase d-block" style="font-size: 10px;">@lang('Clicks')</span>
-                                <strong>{{ number_format($bannerStats['clicks']) }}</strong>
-                            </div>
-                            <div class="banner-stat-item">
-                                <span class="text-muted small text-uppercase d-block" style="font-size: 10px;">@lang('CTR')</span>
-                                <strong>{{ $bannerStats['ctr'] }}%</strong>
-                            </div>
+        @if($totalBanners < 30)
+            <div class="col-12 mb-1">
+                <div class="card border-0 shadow-sm border-start border-4 border--primary">
+                    <div class="card-body py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <h5 class="mb-0 fw-bold fs-6">@lang('Hero Banner Manager')</h5>
+                            <p class="small text-muted mb-0" style="font-size: 11px;">@lang('Upload and manage homepage slides. Desktop: 1920x400, Mobile: 1024x1024.')</p>
                         </div>
-                        <div class="small text-muted">@lang('Hero banner analytics')</div>
+                        <div class="d-flex gap-2">
+                             <form action="{{ route('admin.frontend.sections.banner.addNew') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn--primary btn-sm px-3 rounded-pill shadow-sm">
+                                    <i class="las la-plus-circle"></i> @lang('Add New Slide')
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
 
-        <!-- Slider dimensions + timing (hero) -->
-        <div class="col-12 mb-1">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom py-2 px-3">
-                    <span class="fw-bold small text-uppercase text-muted">@lang('Hero slider')</span>
-                    <span class="text-muted small ms-2">@lang('Default aspect 2560×600.')</span>
-                </div>
-                <div class="card-body py-3 px-3">
-                    <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" class="banner-slider-form">
-                        @csrf
-                        <input type="hidden" name="type" value="content">
-                        <div class="d-flex flex-wrap align-items-end gap-3">
-                            <div class="form-group mb-0">
-                                <label class="form-label small mb-0">@lang('Slide interval (sec)')</label>
-                                <input type="number" name="slide_interval_seconds" class="form-control form-control-sm" style="width: 70px;" value="{{ $slideInterval }}" min="1" max="60" title="@lang('Seconds between each banner on public page (1-60)')">
-                                <small class="text-muted d-block" style="font-size: 10px;">@lang('Public page: change banner every') … @lang('sec')</small>
-                            </div>
-                            <div class="form-group mb-0">
-                                <label class="form-label small mb-0">@lang('Autoplay')</label>
-                                <select name="autoplay" class="form-select form-select-sm" style="width: 80px;">
-                                    <option value="1" {{ $autoplay == 1 ? 'selected' : '' }}>@lang('On')</option>
-                                    <option value="0" {{ $autoplay == 0 ? 'selected' : '' }}>@lang('Off')</option>
-                                </select>
-                            </div>
-                            <div class="form-group mb-0">
-                                <label class="form-label small mb-0">@lang('Width')</label>
-                                <input type="number" name="banner_width" class="form-control form-control-sm" style="width: 80px;" value="{{ $bannerWidth }}" min="100" max="4000">
-                            </div>
-                            <div class="form-group mb-0">
-                                <label class="form-label small mb-0">@lang('Height')</label>
-                                <input type="number" name="banner_height" class="form-control form-control-sm" style="width: 80px;" value="{{ $bannerHeight }}" min="50" max="2000">
-                            </div>
-                            <button type="submit" class="btn btn--primary btn-sm">
-                                <i class="las la-save"></i> @lang('Save')
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Split row promos — which line = layout order -->
-        @php $homepageProductRows = $homepageProductRows ?? collect(); @endphp
+        <!-- 1. MAIN BANNER GRID (Priority #1) -->
         <div class="col-12 mb-3">
-            <div class="card border-0 shadow-sm border-start border-4 border-warning">
-                <div class="card-header bg-white border-0 py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-                    <span class="fw-bold">@lang('Row promos (large + small)')</span>
-                    <a href="{{ route('admin.frontend.sections.homepageCustomRows') }}" class="btn btn-outline-secondary btn-sm shrink-0"><i class="las la-stream"></i> @lang('Layout order')</a>
-                </div>
-                <div class="card-body py-3 px-3">
-                    <p class="small text-muted mb-3">@lang('Layout ID must be enabled in layout. Use Public / Private to hide a promo from the storefront in one click.')</p>
-                    @if($homepageProductRows->isEmpty())
-                        <p class="small text-muted mb-0">@lang('No custom product rows yet. Create one, then edit it to add split banners.')</p>
-                    @else
-                        <div class="table-responsive mb-0">
-                            <table class="table table-sm table-hover align-middle mb-0">
-                                <thead><tr><th>@lang('Layout ID')</th><th>@lang('Title')</th><th>@lang('Promo')</th><th>@lang('Storefront')</th><th class="text-end">@lang('Actions')</th></tr></thead>
-                                <tbody>
-                                    @foreach($homepageProductRows as $hpRow)
-                                        @php
-                                            $sjRaw = $hpRow->split_banner_json ?? null;
-                                            $sj = is_array($sjRaw) ? $sjRaw : (is_string($sjRaw) ? (json_decode($sjRaw, true) ?: []) : []);
-                                            $on = !empty($sj['enabled']) && (!empty($sj['large']) || !empty($sj['small']['image']));
-                                            $isPub = !array_key_exists('is_public', $sj) || $sj['is_public'] === true || $sj['is_public'] === 1 || $sj['is_public'] === '1';
-                                        @endphp
-                                        <tr>
-                                            <td class="text-muted"><code>custom_row_{{ $hpRow->id }}</code></td>
-                                            <td>{{ $hpRow->title }} @if(!$hpRow->is_active)<span class="badge bg-secondary">@lang('Row off')</span>@endif</td>
-                                            <td>
-                                                @if($on)
-                                                    <span class="badge bg-success">@lang('Ready')</span>
-                                                @else
-                                                    <span class="badge bg-light text-dark">@lang('Empty')</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if(!$on)
-                                                    <span class="text-muted small">—</span>
-                                                @elseif($isPub)
-                                                    <span class="badge bg-primary">@lang('Public')</span>
-                                                @else
-                                                    <span class="badge bg-dark">@lang('Private')</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-end text-nowrap">
-                                                @if($on)
-                                                    <form action="{{ route('admin.frontend.sections.banner.rowPromoVisibility', $hpRow->id) }}" method="POST" class="d-inline me-1">
-                                                        @csrf
-                                                        <input type="hidden" name="is_public" value="{{ $isPub ? '0' : '1' }}">
-                                                        <button type="submit" class="btn btn-sm {{ $isPub ? 'btn-outline-secondary' : 'btn--success' }}" title="@lang('Toggle public')">
-                                                            {{ $isPub ? __('Private') : __('Public') }}
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                                <a href="{{ route('admin.frontend.sections.homepageCustomRows.edit', $hpRow->id) }}" class="btn btn-sm btn-outline--primary">
-                                                    @lang('Edit / upload')
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Banner Upload Grid -->
-        <div class="col-12 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent border-0 py-2 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-0 py-2 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h6 class="mb-0 fw-600">@lang('Hero slides') <span class="text-muted fw-normal small">({{ $totalBanners }}/30)</span></h6>
-                        <p class="small text-muted mb-0 mt-1">@lang('Specs appear inside empty slots below.')</p>
+                        <h6 class="mb-0 fw-bold small text-uppercase text-muted">@lang('Live Slideshow') <span class="badge bg-light text-dark ms-1">({{ $totalBanners }}/30)</span></h6>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex gap-2">
                         <form action="{{ route('admin.frontend.sections.banner') }}" method="GET" class="d-inline">
                             <input type="hidden" name="edit" value="{{ request()->get('edit') }}">
                             <div class="input-group input-group-sm" style="width: 180px;">
-                                <input type="text" name="search" class="form-control form-control-sm" value="{{ request()->get('search') }}" placeholder="@lang('Search...')">
-                                <button type="submit" class="btn btn--primary btn-sm"><i class="las la-search"></i></button>
+                                <input type="text" name="search" class="form-control form-control-sm border-0 bg-light rounded-start shadow-none" value="{{ request()->get('search') }}" placeholder="@lang('Quick search...')">
+                                <button type="submit" class="btn btn-light btn-sm border-0 rounded-end"><i class="las la-search text-muted"></i></button>
                             </div>
                         </form>
                         @if($totalBanners < 30)
                             <form action="{{ route('admin.frontend.sections.banner.addNew') }}" method="POST" class="d-inline">
                                 @csrf
-                                <button type="submit" class="btn btn--primary btn-sm">
-                                    <i class="las la-plus"></i> @lang('Add Banner')
+                                <button type="submit" class="btn btn--primary btn-sm rounded-pill px-3">
+                                    <i class="las la-plus"></i> @lang('Add Slide')
                                 </button>
                             </form>
-                        @else
-                            <span class="badge bg-warning text-dark small">@lang('Max 30')</span>
                         @endif
                     </div>
                 </div>
                 <div class="card-body pt-0 px-3 pb-3">
                     @if($totalBanners == 0)
-                        <div class="text-center py-4 text-muted">
-                            <i class="las la-images opacity-50" style="font-size: 2.5rem;"></i>
-                            <p class="mt-2 mb-0 small">@lang('No banners yet. Click "Add Banner" to create your first.')</p>
+                        <div class="text-center py-5 text-muted bg-light rounded-4">
+                            <i class="las la-images opacity-25 mb-2" style="font-size: 3rem;"></i>
+                            <p class="mb-0 fw-semibold text-muted">@lang('No active banners.')</p>
+                            <small class="d-block">@lang('Click "Add Slide" to start.')</small>
                         </div>
                     @else
                     <div class="banner-upload-grid" id="bannerGrid">
@@ -207,7 +85,6 @@
                                 $bannerId = $banner ? $banner->id : null;
                                 $hasImage = false;
                                 $imageUrl = null;
-                                $imageFile = null;
                                 $displayOrder = @$banner->data_values->display_order ?? ($i + 1);
                                 
                                 if ($banner && isset($banner->data_values->image) && !empty($banner->data_values->image)) {
@@ -225,115 +102,51 @@
                                     }
                                 }
                             @endphp
-                            <div class="banner-upload-cell" 
-                                 data-cell-index="{{ $i + 1 }}" 
+                            <div class="banner-upload-cell border rounded-4 position-relative overflow-hidden group shadow-none hover-shadow-sm transition-all bg-white" 
                                  data-banner-id="{{ $bannerId }}"
                                  id="bannerCell{{ $bannerId ?? $i }}">
                                 @if($hasImage && $imageUrl && $bannerId)
-                                    <!-- Banner Uploaded - Show Image -->
-                                    <div class="banner-cell-content uploaded">
-                                        <div class="banner-cell-image-container">
-                                            <img src="{{ $imageUrl }}" alt="Banner {{ $displayOrder }}" class="banner-cell-img" onerror="this.style.display='none'; var err=this.nextElementSibling; if(err) err.classList.remove('d-none');">
-                                            <div class="banner-cell-image-error text-center p-4 d-none" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#f8f9fa;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:1;">
-                                                <i class="las la-image" style="font-size:48px;color:#ccc;"></i>
-                                                <small class="mt-2">Image not found</small>
+                                    <div class="banner-cell-content uploaded h-100 d-flex flex-column">
+                                        <div class="banner-cell-image-container position-relative bg-light overflow-hidden" style="height: 120px;">
+                                            <img src="{{ $imageUrl }}" alt="Banner {{ $displayOrder }}" class="w-100 h-100 object-fit-cover shadow-sm">
+                                            <div class="position-absolute top-0 start-0 p-2">
+                                                <span class="badge bg-dark opacity-75">#{{ $displayOrder }}</span>
                                             </div>
-                                            <div class="banner-cell-overlay" style="z-index:2;">
-                                                <div class="banner-cell-order-badge">
-                                                    <strong>#{{ $displayOrder }}</strong>
-                                                </div>
-                                                <div class="banner-cell-actions">
-                                                    <button type="button" class="btn btn-sm {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'btn--warning' : 'btn--success' }} banner-toggle-status" data-banner-id="{{ $bannerId }}" data-current="{{ (int)(@$banner->data_values->is_active ?? 1) }}" title="@lang('Enable/Disable')">
-                                                        <i class="las {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'la-eye-slash' : 'la-eye' }}"></i>
-                                                    </button>
-                                                    <label class="btn btn-sm btn--success mb-0 banner-replace-upload" title="@lang('Upload / Replace')">
-                                                        <i class="las la-cloud-upload-alt"></i>
-                                                        <input type="file" class="d-none banner-replace-input" 
-                                                               data-banner-id="{{ $bannerId }}"
-                                                               accept=".png, .jpg, .jpeg, .webp">
-                                                    </label>
-                                                    <a href="{{ route('admin.frontend.sections.banner') }}?edit={{ $bannerId }}{{ request()->get('search') ? '&search='.urlencode(request()->get('search')) : '' }}" 
-                                                       class="btn btn-sm btn--primary" 
-                                                       title="@lang('Edit')">
-                                                        <i class="las la-edit"></i>
-                                                    </a>
-                                                    <a href="{{ route('admin.frontend.sections.banner.preview', $bannerId) }}" target="_blank" class="btn btn-sm btn--dark" title="@lang('Live Preview')">
-                                                        <i class="las la-external-link-alt"></i>
-                                                    </a>
-                                                    <form method="POST" action="{{ route('admin.frontend.sections.banner.duplicate', $bannerId) }}" class="d-inline banner-duplicate-form" data-confirm="{{ __('Duplicate this banner?') }}">
+                                            <div class="banner-cell-overlay d-flex align-items-center justify-content-center bg-dark bg-opacity-60 position-absolute top-0 start-0 w-100 h-100">
+                                                <div class="d-flex gap-1 p-2 flex-wrap justify-content-center">
+                                                    <a href="{{ route('admin.frontend.sections.banner') }}?edit={{ $bannerId }}" class="btn btn-xs btn--primary p-1 rounded-circle" style="width: 28px; height: 28px;"><i class="las la-pen fs-6"></i></a>
+                                                    <button type="button" class="btn btn-xs {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'btn--warning' : 'btn--success' }} p-1 rounded-circle banner-toggle-status" style="width: 28px; height: 28px;" data-banner-id="{{ $bannerId }}" data-current="{{ (int)(@$banner->data_values->is_active ?? 1) }}"><i class="las {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'la-eye-slash' : 'la-eye' }} fs-6"></i></button>
+                                                    <form method="POST" action="{{ route('admin.frontend.remove', $bannerId) }}" class="d-inline banner-delete-form">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-sm btn--info" title="@lang('Duplicate')">
-                                                            <i class="las la-copy"></i>
-                                                        </button>
-                                                    </form>
-                                                    <form method="POST" action="{{ route('admin.frontend.remove', $bannerId) }}" class="d-inline banner-delete-form" data-confirm="{{ __('Are you sure to remove this banner?') }}">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm btn--danger" title="@lang('Remove')">
-                                                            <i class="las la-trash"></i>
-                                                        </button>
+                                                        <button type="submit" class="btn btn-xs btn--danger p-1 rounded-circle" style="width: 28px; height: 28px;"><i class="las la-trash fs-6"></i></button>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="banner-cell-footer">
-                                            <div class="banner-cell-footer-inner">
-                                                <div class="banner-order-control">
-                                                    <label class="banner-order-label">@lang('Position')</label>
-                                                    <input type="number"
-                                                           class="banner-order-input form-control form-control-sm"
-                                                           value="{{ $displayOrder }}"
-                                                           min="1" max="30"
-                                                           data-banner-id="{{ $bannerId }}"
-                                                           title="@lang('1 = first on public page, 30 = last')">
-                                                    <button type="button" class="btn btn-sm btn--success save-order-btn" data-banner-id="{{ $bannerId }}" style="display: none;"><i class="las la-check"></i></button>
-                                                </div>
-                                                <div class="banner-effect-control">
-                                                    <label class="banner-effect-label">@lang('Effect'):</label>
-                                                    <select class="form-control form-control-sm banner-effect-select" data-banner-id="{{ $bannerId }}" title="@lang('Transition effect on homepage')">
-                                                        <option value="none" {{ (@$banner->data_values->animation_type ?? 'none') == 'none' ? 'selected' : '' }}>@lang('None')</option>
-                                                        <option value="fadeIn" {{ (@$banner->data_values->animation_type ?? '') == 'fadeIn' ? 'selected' : '' }}>@lang('Fade In')</option>
-                                                        <option value="slideInLeft" {{ (@$banner->data_values->animation_type ?? '') == 'slideInLeft' ? 'selected' : '' }}>@lang('Slide L')</option>
-                                                        <option value="slideInRight" {{ (@$banner->data_values->animation_type ?? '') == 'slideInRight' ? 'selected' : '' }}>@lang('Slide R')</option>
-                                                        <option value="zoomIn" {{ (@$banner->data_values->animation_type ?? '') == 'zoomIn' ? 'selected' : '' }}>@lang('Zoom')</option>
-                                                    </select>
-                                                </div>
+                                        <div class="p-2 bg-white d-flex align-items-center justify-content-between border-top mt-auto">
+                                            <span class="text-muted fw-bold" style="font-size: 10px;">@lang('SLIDE') {{ $displayOrder }}</span>
+                                            <div class="d-flex align-items-center gap-1">
+                                                <div class="dot {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'bg-success' : 'bg-secondary' }}" style="width: 8px; height: 8px; border-radius: 50%;"></div>
+                                                <span class="text-muted" style="font-size: 9px;">{{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? __('LIVE') : __('OFF') }}</span>
                                             </div>
                                         </div>
                                     </div>
                                 @else
-                                    <!-- Banner Not Uploaded - Show Upload Form (or re-upload when image file missing) -->
-                                    <div class="banner-cell-content empty">
-                                        <form action="{{ route('admin.frontend.sections.content.banner') }}" 
-                                              method="POST" 
-                                              enctype="multipart/form-data" 
-                                              class="banner-upload-form"
-                                              data-cell-index="{{ $i }}">
+                                    <div class="banner-cell-content empty h-100">
+                                        <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" enctype="multipart/form-data" class="banner-upload-form h-100">
                                             @csrf
                                             <input type="hidden" name="type" value="element">
-                                            @if($bannerId)
-                                            <input type="hidden" name="id" value="{{ $bannerId }}">
-                                            @if($hasImage)
-                                            <input type="hidden" name="has_image" value="1">
-                                            @endif
-                                            @endif
+                                            @if($bannerId) <input type="hidden" name="id" value="{{ $bannerId }}"> @endif
                                             <input type="hidden" name="display_order" value="{{ $displayOrder }}">
-                                            <input type="hidden" name="animation_type" value="{{ $banner && isset($banner->data_values->animation_type) ? $banner->data_values->animation_type : 'none' }}">
-                                            
-                                            <div class="banner-upload-placeholder">
-                                                <div class="upload-icon"><i class="las la-cloud-upload-alt"></i></div>
-                                                <strong class="upload-title">@lang('Banner') {{ $displayOrder }}</strong>
-                                                <div class="upload-specs">
-                                                    <span><strong>@lang('Recommended'):</strong> 2560 × 600 px</span>
-                                                    <span><strong>@lang('Format'):</strong> JPG, PNG, WEBP, MP4</span>
-                                                    <span class="text-muted">@lang('Max') 5MB · @lang('Thumbnail auto-generated')</span>
-                                                </div>
-                                                <div class="upload-input-wrapper">
-                                                    <input type="file" class="banner-file-input" name="image_input[image]"
-                                                           id="bannerUpload{{ $bannerId ?? $i }}" accept=".png, .jpg, .jpeg, .webp" required>
-                                                    <label for="bannerUpload{{ $bannerId ?? $i }}" class="btn btn-sm btn--primary">
-                                                        <i class="las la-upload"></i> @lang('Upload Banner')
-                                                    </label>
-                                                </div>
+                                            <div class="d-flex flex-column align-items-center justify-content-center h-100 bg-light py-4 px-2 text-center border-dashed border-2 rounded-4 hover-bg-white transition-all cursor-pointer">
+                                                <input type="file" class="banner-file-input d-none" name="image_input[image]" id="upz{{ $bannerId ?? $i }}" accept="image/*">
+                                                <label for="upz{{ $bannerId ?? $i }}" class="mb-0 cursor-pointer w-100">
+                                                    <div class="mb-1"><i class="las la-cloud-upload-alt fs-2 text-muted"></i></div>
+                                                    <span class="d-block small fw-bold mb-1">@lang('Fast Upload')</span>
+                                                    <span class="d-block text-muted opacity-75" style="font-size: 9px;">@lang('Format: JPG, PNG, WEBP, MP4')</span>
+                                                    <span class="d-block text-muted opacity-75" style="font-size: 8px;">@lang('Image: 1920x400 | Mobile: 1024x1024')</span>
+                                                    <span class="d-block text-muted opacity-75" style="font-size: 8px;">@lang('Video: 1080p | Max: 5MB')</span>
+                                                </label>
                                             </div>
                                         </form>
                                     </div>
@@ -341,24 +154,86 @@
                             </div>
                         @endforeach
                     </div>
-                    @if($totalBanners < 30)
-                    <div class="mt-3 pt-2 border-top d-flex flex-wrap align-items-center justify-content-center gap-2">
-                        <form action="{{ route('admin.frontend.sections.banner.addNew') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn--primary btn-sm"><i class="las la-plus"></i> @lang('Add hero slide')</button>
-                        </form>
-                        <a href="{{ route('admin.frontend.sections.homepageCustomRows.create') }}" class="btn btn-warning btn-sm text-dark fw-semibold">
-                            <i class="las la-plus"></i> @lang('Add row promo (large + small)')
-                        </a>
-                    </div>
-                    @else
                     <div class="mt-3 pt-2 border-top text-center">
                         <a href="{{ route('admin.frontend.sections.homepageCustomRows.create') }}" class="btn btn-warning btn-sm text-dark fw-semibold">
                             <i class="las la-plus"></i> @lang('Add row promo (large + small)')
                         </a>
                     </div>
                     @endif
-                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ANALYTICS & SETTINGS (Clean Footer) -->
+        <div class="col-12 mt-3 mb-4">
+            <div class="row g-3">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                        <div class="card-header bg-white py-2 px-3 border-bottom d-flex align-items-center justify-content-between">
+                            <span class="fw-bold small text-muted text-uppercase" style="letter-spacing: 0.5px;">@lang('Slider Engine Configuration')</span>
+                            <div class="d-flex align-items-center gap-3 border-start ps-3">
+                                <div class="text-center"><span class="text-muted d-block mb-0" style="font-size: 8px;">@lang('VIEW')</span><strong class="text--primary small">{{ number_format($bannerStats['impressions']) }}</strong></div>
+                                <div class="text-center"><span class="text-muted d-block mb-0" style="font-size: 8px;">@lang('CLICK')</span><strong class="small">{{ number_format($bannerStats['clicks']) }}</strong></div>
+                                <div class="text-center"><span class="text-muted d-block mb-0" style="font-size: 8px;">@lang('CTR')</span><strong class="small">{{ $bannerStats['ctr'] }}%</strong></div>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="type" value="content">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-3">
+                                        <label class="small fw-bold text-muted mb-1" style="font-size: 10px;">@lang('Interval')</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" name="slide_interval_seconds" class="form-control border-end-0" value="{{ $slideInterval }}" min="1">
+                                            <span class="input-group-text bg-white border-start-0 text-muted">s</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="small fw-bold text-muted mb-1" style="font-size: 10px;">@lang('Autoplay')</label>
+                                        <select name="autoplay" class="form-select form-select-sm shadow-none border">
+                                            <option value="1" {{ $autoplay == 1 ? 'selected' : '' }}>@lang('Enabled')</option>
+                                            <option value="0" {{ $autoplay == 0 ? 'selected' : '' }}>@lang('Disabled')</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="small fw-bold text-muted mb-1" style="font-size: 10px;">@lang('Width')</label>
+                                        <input type="number" name="banner_width" class="form-control form-control-sm" value="{{ $bannerWidth }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="small fw-bold text-muted mb-1" style="font-size: 10px;">@lang('Height')</label>
+                                        <input type="number" name="banner_height" class="form-control form-control-sm" value="{{ $bannerHeight }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn--primary btn-sm w-100 rounded-pill shadow-sm"><i class="las la-save me-1"></i>@lang('Save')</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-header bg-white py-2 px-3 border-bottom d-flex align-items-center justify-content-between">
+                            <span class="fw-bold small text-muted text-uppercase" style="letter-spacing: 0.5px;">@lang('Category Sliders')</span>
+                            <a href="{{ route('admin.frontend.sections.homepageCustomRows') }}" class="small text-muted text-decoration-none">@lang('All Rows') &rarr;</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless align-middle mb-0" style="font-size: 11px;">
+                                    <tbody>
+                                        @foreach($homepageProductRows->take(3) as $hpRow)
+                                            <tr class="border-bottom border-light">
+                                                <td class="ps-3 py-2"><strong>{{ $hpRow->title }}</strong></td>
+                                                <td class="text-end pe-3"><a href="{{ route('admin.frontend.sections.homepageCustomRows.edit', $hpRow->id) }}" class="text--primary text-decoration-none fw-600">@lang('UPLOAD')</a></td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -366,15 +241,10 @@
         <!-- Edit Banner Form (only shown when editing) -->
         @if(@$data && request()->get('edit'))
             <div class="col-12 mb-3">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-transparent border-0 py-2 px-3 d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-600">@lang('Edit Banner') #{{ @$data->data_values->display_order ?? $data->id }}</h6>
-                        <div class="d-flex gap-1">
-                            @if(!empty($data->data_values->image ?? null))
-                            <a href="{{ route('admin.frontend.sections.banner.preview', $data->id) }}" target="_blank" class="btn btn-sm btn--dark"><i class="las la-external-link-alt"></i></a>
-                            @endif
-                            <a href="{{ route('admin.frontend.sections.banner') }}" class="btn btn-sm btn-outline-secondary"><i class="las la-times"></i></a>
-                        </div>
+                <div class="card border-0 shadow-sm border-start border-4 border--info rounded-4 overflow-hidden">
+                    <div class="card-header bg-white border-0 py-2 px-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold small text-uppercase text-muted"><i class="las la-pen-fancy me-1"></i>@lang('Refine Slide Content') #{{ @$data->data_values->display_order ?? $data->id }}</h6>
+                        <a href="{{ route('admin.frontend.sections.banner') }}" class="btn btn-xs btn-outline-secondary rounded-pill px-2">@lang('Close')</a>
                     </div>
                     <div class="card-body pt-0 px-3 pb-3">
                         <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" enctype="multipart/form-data">
@@ -382,181 +252,97 @@
                             <input type="hidden" name="type" value="element">
                             <input type="hidden" name="id" value="{{ $data->id }}">
                             
-                            <div class="row g-2">
-                                <!-- Banner Image -->
-                                <div class="col-12">
-                                    <input type="hidden" name="has_image" value="1">
-                                    <div class="image-upload d-flex flex-wrap align-items-start gap-3">
-                                        @php
-                                            $previewImg = \App\Services\BannerService::thumbImageUrl(@$data->data_values->image ?? '');
-                                            if ($previewImg === '') {
-                                                $previewImg = \App\Services\BannerService::bannerImageUrl(@$data->data_values->image ?? '');
-                                            }
-                                        @endphp
-                                        <div class="profilePicPreview banner-upload-preview flex-shrink-0 position-relative" style="width: 200px; height: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url({{ $previewImg ?: asset('assets/images/default.png') }}); border: 1px solid #dee2e6; border-radius: 6px;">
-                                            <button type="button" class="remove-image btn btn-sm btn-danger position-absolute" style="top: 4px; right: 4px; padding: 0 6px;"><i class="fa fa-times"></i></button>
+                            <!-- Split Layout: Media vs Metadata -->
+                            <div class="row g-4">
+                                <!-- LEFT: Media Sources -->
+                                <div class="col-lg-5">
+                                    <div class="p-3 bg-light rounded-4 border border-dashed text-center">
+                                        <h6 class="small fw-bold text-muted text-uppercase mb-3"><i class="las la-image me-1"></i>@lang('Visual Sources')</h6>
+                                        
+                                        <!-- Desktop Media -->
+                                        <div class="mb-4">
+                                            <div class="position-relative d-inline-block mb-2 shadow-sm rounded-3 overflow-hidden bg-white" style="width: 100%; height: 100px;">
+                                                <img src="{{ \App\Services\BannerService::bannerImageUrl(@$data->data_values->image ?? '') ?: asset('assets/images/default.png') }}" class="w-100 h-100 object-fit-cover shadow-sm">
+                                                <div class="position-absolute bottom-0 end-0 bg-dark text-white px-2 py-1 small rounded-start">@lang('DESKTOP')</div>
+                                            </div>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="las la-laptop"></i></span>
+                                                <input type="file" class="form-control" name="image_input[image]" accept="image/*">
+                                            </div>
+                                            <small class="text-muted d-block mt-1" style="font-size: 9px;">@lang('Ideal for laptops/desktops: 1920 &times; 400 px')</small>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <label class="form-label small mb-1">@lang('Banner Image')</label>
-                                            <input type="file" class="profilePicUpload form-control form-control-sm" name="image_input[image]" id="profilePicUploadEdit" accept=".png, .jpg, .jpeg, .webp">
-                                            <small class="text-muted">JPG, PNG, WEBP · 5MB · 2560×600 (@lang('recommended'))</small>
+
+                                        <!-- Mobile Media -->
+                                        <div class="mb-0">
+                                            <div class="position-relative d-inline-block mb-2 shadow-sm rounded-3 overflow-hidden bg-white" style="width: 100%; height: 100px;">
+                                                @php $mImg = @$data->data_values->mobile_image; @endphp
+                                                <img src="{{ $mImg ? \App\Services\BannerService::bannerImageUrl($mImg) : asset('assets/images/default.png') }}" class="w-100 h-100 object-fit-cover shadow-sm">
+                                                <div class="position-absolute bottom-0 end-0 bg--info text-white px-2 py-1 small rounded-start">@lang('MOBILE')</div>
+                                            </div>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="las la-mobile-alt"></i></span>
+                                                <input type="file" class="form-control" name="image_input[mobile_image]" accept="image/*">
+                                            </div>
+                                            <small class="text-muted d-block mt-1" style="font-size: 9px;">@lang('Ideal for mobile/tab: 1024 &times; 1024 px (1:1 aspect)')</small>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Schedule & Visibility -->
-                                <div class="col-12"><hr class="my-2"><strong class="text-muted small">@lang('Schedule & Visibility')</strong></div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label small mb-0">@lang('Start date')</label>
-                                    <input type="date" class="form-control form-control-sm" name="start_date" value="{{ @$data->data_values->start_date }}">
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label small mb-0">@lang('End date')</label>
-                                    <input type="date" class="form-control form-control-sm" name="end_date" value="{{ @$data->data_values->end_date }}">
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label small mb-0">@lang('Visibility')</label>
-                                    <select class="form-select form-select-sm" name="visibility">
-                                        <option value="public" {{ (@$data->data_values->visibility ?? 'public') == 'public' ? 'selected' : '' }}>@lang('Public')</option>
-                                        <option value="logged_in_only" {{ (@$data->data_values->visibility ?? '') == 'logged_in_only' ? 'selected' : '' }}>@lang('Logged in only')</option>
-                                        <option value="guest_only" {{ (@$data->data_values->visibility ?? '') == 'guest_only' ? 'selected' : '' }}>@lang('Guest only')</option>
-                                        <option value="campaign_only" {{ (@$data->data_values->visibility ?? '') == 'campaign_only' ? 'selected' : '' }}>@lang('Campaign only')</option>
-                                    </select>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label small mb-0">@lang('Status')</label>
-                                    <select class="form-select form-select-sm" name="is_active">
-                                        <option value="1" {{ (int)(@$data->data_values->is_active ?? 1) === 1 ? 'selected' : '' }}>@lang('Enabled')</option>
-                                        <option value="0" {{ (int)(@$data->data_values->is_active ?? 1) === 0 ? 'selected' : '' }}>@lang('Disabled')</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small">@lang('Layout')</label>
-                                    <select class="form-select form-select-sm" name="layout_type">
-                                        <option value="hero_full_width" {{ (@$data->data_values->layout_type ?? 'hero_full_width') == 'hero_full_width' ? 'selected' : '' }}>@lang('Hero Full Width')</option>
-                                        <option value="centered_content" {{ (@$data->data_values->layout_type ?? '') == 'centered_content' ? 'selected' : '' }}>@lang('Centered Content')</option>
-                                        <option value="left_content" {{ (@$data->data_values->layout_type ?? '') == 'left_content' ? 'selected' : '' }}>@lang('Left Content')</option>
-                                        <option value="right_content" {{ (@$data->data_values->layout_type ?? '') == 'right_content' ? 'selected' : '' }}>@lang('Right Content')</option>
-                                        <option value="split_banner" {{ (@$data->data_values->layout_type ?? '') == 'split_banner' ? 'selected' : '' }}>@lang('Split Banner')</option>
-                                        <option value="image_only" {{ (@$data->data_values->layout_type ?? '') == 'image_only' ? 'selected' : '' }}>@lang('Image Only')</option>
-                                        <option value="video_banner" {{ (@$data->data_values->layout_type ?? '') == 'video_banner' ? 'selected' : '' }}>@lang('Video Banner')</option>
-                                    </select>
-                                </div>
+                                <!-- RIGHT: Configuration & Content -->
+                                <div class="col-lg-7">
+                                    <div class="row g-3">
+                                        <div class="col-md-9">
+                                            <label class="small fw-bold text-muted mb-1">@lang('Target Redirect URL')</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white"><i class="las la-link"></i></span>
+                                                <input type="url" name="url" class="form-control" value="{{ @$data->data_values->url }}" placeholder="https://...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="small fw-bold text-muted mb-1">@lang('Slide Pos.')</label>
+                                            <input type="number" name="display_order" class="form-control form-control-sm" value="{{ @$data->data_values->display_order }}">
+                                        </div>
 
-                                <!-- Text Overlay (Content Builder) -->
-                                <div class="col-12"><hr><strong class="text-muted small">@lang('Text Overlay')</strong></div>
-                                @php $bc = @$data->data_values->banner_content ?? (object)[]; @endphp
-                                <div class="col-md-6">
-                                    <label class="form-label small">@lang('Title')</label>
-                                    <input type="text" class="form-control form-control-sm" name="banner_title" value="{{ $bc->title ?? '' }}" placeholder="@lang('Headline')">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small">@lang('Subtitle')</label>
-                                    <input type="text" class="form-control form-control-sm" name="banner_subtitle" value="{{ $bc->subtitle ?? '' }}" placeholder="@lang('Subheadline')">
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="form-label small">@lang('Description')</label>
-                                    <textarea class="form-control form-control-sm" name="banner_description" rows="2" placeholder="@lang('Short description')">{{ $bc->description ?? '' }}</textarea>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">@lang('Badge')</label>
-                                    <input type="text" class="form-control form-control-sm" name="banner_badge" value="{{ $bc->badge ?? '' }}" placeholder="@lang('e.g. NEW')">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">@lang('Button text')</label>
-                                    <input type="text" class="form-control form-control-sm" name="banner_button_text" value="{{ $bc->button_text ?? '' }}" placeholder="@lang('Shop Now')">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small">@lang('Button URL')</label>
-                                    <input type="url" class="form-control form-control-sm" name="banner_button_url" value="{{ $bc->button_url ?? '' }}" placeholder="https://">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">@lang('Overlay color')</label>
-                                    <input type="text" class="form-control form-control-sm" name="banner_overlay_color" value="{{ $bc->overlay_color ?? 'rgba(0,0,0,0.3)' }}" placeholder="rgba(0,0,0,0.3)">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">@lang('Text color')</label>
-                                    <input type="text" class="form-control form-control-sm" name="banner_text_color" value="{{ $bc->text_color ?? '#ffffff' }}" placeholder="#ffffff">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">@lang('Title align')</label>
-                                    <select class="form-select form-select-sm" name="banner_title_align">
-                                        <option value="left" {{ (@$bc->title_align ?? 'center') == 'left' ? 'selected' : '' }}>@lang('Left')</option>
-                                        <option value="center" {{ (@$bc->title_align ?? 'center') == 'center' ? 'selected' : '' }}>@lang('Center')</option>
-                                        <option value="right" {{ (@$bc->title_align ?? '') == 'right' ? 'selected' : '' }}>@lang('Right')</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">@lang('Title font size')</label>
-                                    <input type="text" class="form-control form-control-sm" name="banner_title_font_size" value="{{ $bc->title_font_size ?? '' }}" placeholder="e.g. 2rem, 32px">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">@lang('Title font weight')</label>
-                                    <select class="form-select form-select-sm" name="banner_title_font_weight">
-                                        <option value="400" {{ (@$bc->title_font_weight ?? '700') == '400' ? 'selected' : '' }}>400</option>
-                                        <option value="600" {{ (@$bc->title_font_weight ?? '') == '600' ? 'selected' : '' }}>600</option>
-                                        <option value="700" {{ (@$bc->title_font_weight ?? '700') == '700' ? 'selected' : '' }}>700</option>
-                                        <option value="800" {{ (@$bc->title_font_weight ?? '') == '800' ? 'selected' : '' }}>800</option>
-                                    </select>
-                                </div>
+                                        <div class="col-md-6">
+                                            <label class="small fw-bold text-muted mb-1">@lang('Overlay Title')</label>
+                                            <input type="text" name="banner_title" class="form-control form-control-sm" value="{{ @$data->data_values->banner_content->title ?? '' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="small fw-bold text-muted mb-1">@lang('Subtitle')</label>
+                                            <input type="text" name="banner_subtitle" class="form-control form-control-sm" value="{{ @$data->data_values->banner_content->subtitle ?? '' }}">
+                                        </div>
 
-                                <!-- Banner Size (Width x Height) -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>@lang('Banner Width') <small class="text-muted">(px)</small></label>
-                                        <input type="number" class="form-control" name="banner_width" value="{{ @$data->data_values->banner_width ?? '2560' }}" min="100" max="4000" placeholder="2560">
+                                        <div class="col-12">
+                                            <label class="small fw-bold text-muted mb-1">@lang('Short Description')</label>
+                                            <textarea name="banner_description" class="form-control form-control-sm" rows="1">{{ @$data->data_values->banner_content->description ?? '' }}</textarea>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="small fw-bold text-muted mb-1">@lang('Entrance Effect')</label>
+                                            <select name="animation_type" class="form-select form-select-sm">
+                                                <option value="none" {{ (@$data->data_values->animation_type ?? 'none') == 'none' ? 'selected' : '' }}>@lang('None')</option>
+                                                <option value="fadeIn" {{ (@$data->data_values->animation_type ?? '') == 'fadeIn' ? 'selected' : '' }}>@lang('Fade In')</option>
+                                                <option value="slideInLeft" {{ (@$data->data_values->animation_type ?? '') == 'slideInLeft' ? 'selected' : '' }}>@lang('Slide from Left')</option>
+                                                <option value="slideInRight" {{ (@$data->data_values->animation_type ?? '') == 'slideInRight' ? 'selected' : '' }}>@lang('Slide from Right')</option>
+                                                <option value="zoomIn" {{ (@$data->data_values->animation_type ?? '') == 'zoomIn' ? 'selected' : '' }}>@lang('Zoom In')</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="small fw-bold text-muted mb-1">@lang('Visibility')</label>
+                                            <select name="is_active" class="form-select form-select-sm">
+                                                <option value="1" {{ (int)(@$data->data_values->is_active ?? 1) === 1 ? 'selected' : '' }}>@lang('Live on Site')</option>
+                                                <option value="0" {{ (int)(@$data->data_values->is_active ?? 1) === 0 ? 'selected' : '' }}>@lang('Hidden Preview')</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4 align-self-end">
+                                            <button type="submit" class="btn btn--primary btn-sm w-100 rounded-pill shadow-sm py-2">
+                                                <i class="las la-check-circle me-1"></i> @lang('Commit Changes')
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>@lang('Banner Height') <small class="text-muted">(px)</small></label>
-                                        <input type="number" class="form-control" name="banner_height" value="{{ @$data->data_values->banner_height ?? '400' }}" min="50" max="2000" placeholder="400">
-                                    </div>
-                                </div>
-
-                                <!-- URL Field -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>@lang('Banner URL') <small class="text-muted">(@lang('Optional'))</small></label>
-                                        <input type="url" class="form-control" name="url" value="{{ @$data->data_values->url }}" placeholder="https://example.com">
-                                    </div>
-                                </div>
-
-                                <!-- Display Order Field -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>@lang('Display Order')</label>
-                                        <input type="number" class="form-control" name="display_order" value="{{ @$data->data_values->display_order ?? '' }}" min="1" max="30">
-                                    </div>
-                                </div>
-
-                                <!-- Animation Type -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>@lang('Animation Type') <span class="text-danger">*</span></label>
-                                        <select class="form-control" name="animation_type" required>
-                                            <option value="none" {{ (@$data->data_values->animation_type ?? 'none') == 'none' ? 'selected' : '' }}>@lang('None')</option>
-                                            <option value="fadeIn" {{ (@$data->data_values->animation_type ?? '') == 'fadeIn' ? 'selected' : '' }}>@lang('Fade In')</option>
-                                            <option value="slideInLeft" {{ (@$data->data_values->animation_type ?? '') == 'slideInLeft' ? 'selected' : '' }}>@lang('Slide In Left')</option>
-                                            <option value="slideInRight" {{ (@$data->data_values->animation_type ?? '') == 'slideInRight' ? 'selected' : '' }}>@lang('Slide In Right')</option>
-                                            <option value="slideInUp" {{ (@$data->data_values->animation_type ?? '') == 'slideInUp' ? 'selected' : '' }}>@lang('Slide In Up')</option>
-                                            <option value="slideInDown" {{ (@$data->data_values->animation_type ?? '') == 'slideInDown' ? 'selected' : '' }}>@lang('Slide In Down')</option>
-                                            <option value="zoomIn" {{ (@$data->data_values->animation_type ?? '') == 'zoomIn' ? 'selected' : '' }}>@lang('Zoom In')</option>
-                                            <option value="rotateIn" {{ (@$data->data_values->animation_type ?? '') == 'rotateIn' ? 'selected' : '' }}>@lang('Rotate In')</option>
-                                            <option value="bounceIn" {{ (@$data->data_values->animation_type ?? '') == 'bounceIn' ? 'selected' : '' }}>@lang('Bounce In')</option>
-                                            <option value="flipInX" {{ (@$data->data_values->animation_type ?? '') == 'flipInX' ? 'selected' : '' }}>@lang('Flip In X')</option>
-                                            <option value="flipInY" {{ (@$data->data_values->animation_type ?? '') == 'flipInY' ? 'selected' : '' }}>@lang('Flip In Y')</option>
-                                            <option value="lightSpeedIn" {{ (@$data->data_values->animation_type ?? '') == 'lightSpeedIn' ? 'selected' : '' }}>@lang('Light Speed In')</option>
-                                            <option value="rollIn" {{ (@$data->data_values->animation_type ?? '') == 'rollIn' ? 'selected' : '' }}>@lang('Roll In')</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <button type="submit" class="btn btn--primary btn-sm">
-                                    <i class="las la-save"></i> @lang('Update Banner')
-                                </button>
                             </div>
                         </form>
                     </div>
@@ -812,4 +598,16 @@
         window.location.href = '{{ route("admin.frontend.sections.banner.addNew") }}';
     }
 </script>
+
+<style>
+    .banner-upload-cell .banner-cell-overlay {
+        opacity: 0;
+        transition: all 0.3s ease-in-out;
+        pointer-events: none;
+    }
+    .banner-upload-cell:hover .banner-cell-overlay {
+        opacity: 1;
+        pointer-events: auto;
+    }
+</style>
 @endpush

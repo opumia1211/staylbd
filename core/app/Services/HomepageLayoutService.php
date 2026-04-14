@@ -12,6 +12,13 @@ class HomepageLayoutService
 {
     public const DATA_KEYS = 'homepage.layout_order';
 
+    /** Header bar ids (shared by all public pages). */
+    public const HEADER_BARS = [
+        'header_bar_top_notice',
+        'header_bar_main',
+        'header_bar_menu',
+    ];
+
     /** Built-in section ids (fixed order for defaults) */
     public const BUILTIN_BEFORE_CUSTOM = [
         'scrollbar',
@@ -33,6 +40,9 @@ class HomepageLayoutService
     public static function sectionLabels(): array
     {
         return [
+            'header_bar_top_notice' => __('Header bar: top notice'),
+            'header_bar_main' => __('Header bar: main (logo + search)'),
+            'header_bar_menu' => __('Header bar: menu (categories + nav)'),
             'scrollbar' => __('Scrollbar (under banner)'),
             'home_category' => __('Category row'),
             'quick_deals' => __('Quick Deals'),
@@ -124,6 +134,7 @@ class HomepageLayoutService
         }
 
         return array_merge(
+            self::HEADER_BARS,
             self::BUILTIN_BEFORE_CUSTOM,
             $custom,
             $ads,
@@ -245,6 +256,9 @@ class HomepageLayoutService
     private static function buildDefaultLayout(array $customKeys): array
     {
         $a = [];
+        foreach (self::HEADER_BARS as $id) {
+            $a[] = ['id' => $id, 'enabled' => true];
+        }
         foreach (self::BUILTIN_BEFORE_CUSTOM as $id) {
             $a[] = ['id' => $id, 'enabled' => true];
         }
