@@ -191,6 +191,10 @@
     $headerTopHeight = (int) ($headerControlAppearance['top_height'] ?? 38);
     $headerMainHeight = (int) ($headerControlAppearance['main_height'] ?? 56);
     $headerMenuHeight = (int) ($headerControlAppearance['menu_height'] ?? 38);
+    $layoutWidthDesktop = (int) ($headerControlAppearance['width_desktop'] ?? 1920);
+    $layoutWidthLaptop = (int) ($headerControlAppearance['width_laptop'] ?? 1600);
+    $layoutWidthTablet = (int) ($headerControlAppearance['width_tablet'] ?? 1200);
+    $layoutWidthMobile = (int) ($headerControlAppearance['width_mobile'] ?? 100);
 @endphp
 <style id="stayl-storefront-live-glass-overrides">
     :root{
@@ -203,6 +207,23 @@
         --stayl-surface-shadow:0 16px 36px rgba(15,23,42,.10);
         --stayl-text-main:#0f172a;
         --stayl-text-soft:#475569;
+        --stayl-content-max:min({{ $layoutWidthDesktop }}px, calc(100vw - 2 * var(--stayl-pad-x)));
+    }
+
+    @media (max-width: 1599.98px){
+        :root{
+            --stayl-content-max:min({{ $layoutWidthLaptop }}px, calc(100vw - 2 * var(--stayl-pad-x)));
+        }
+    }
+    @media (max-width: 1199.98px){
+        :root{
+            --stayl-content-max:min({{ $layoutWidthTablet }}px, calc(100vw - 2 * var(--stayl-pad-x)));
+        }
+    }
+    @media (max-width: 767.98px){
+        :root{
+            --stayl-content-max:min({{ $layoutWidthMobile }}px, calc(100vw - 2 * var(--stayl-pad-x)));
+        }
     }
 
     body.antialiased{

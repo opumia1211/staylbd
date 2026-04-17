@@ -85,6 +85,10 @@ class HeaderControlService
                 'top_height' => 38,
                 'main_height' => 56,
                 'menu_height' => 38,
+                'width_desktop' => 1920,
+                'width_laptop' => 1600,
+                'width_tablet' => 1200,
+                'width_mobile' => 100,
             ],
             'top_bar' => [
                 'enabled' => true,
@@ -95,6 +99,7 @@ class HeaderControlService
                 'currency_mode' => 'code',
                 'support_label' => '24/7 Support',
                 'support_phone' => '',
+                'support_email' => '',
                 'show_seller_button' => true,
                 'seller_text' => 'BECOME A SELLER',
                 'seller_url' => '/seller/apply',
@@ -140,6 +145,10 @@ class HeaderControlService
         $merged['appearance']['top_height'] = max(30, min(80, (int) $merged['appearance']['top_height']));
         $merged['appearance']['main_height'] = max(40, min(100, (int) $merged['appearance']['main_height']));
         $merged['appearance']['menu_height'] = max(30, min(80, (int) $merged['appearance']['menu_height']));
+        $merged['appearance']['width_desktop'] = max(1280, min(1920, (int) ($merged['appearance']['width_desktop'] ?? 1920)));
+        $merged['appearance']['width_laptop'] = max(1024, min(1800, (int) ($merged['appearance']['width_laptop'] ?? 1600)));
+        $merged['appearance']['width_tablet'] = max(768, min(1400, (int) ($merged['appearance']['width_tablet'] ?? 1200)));
+        $merged['appearance']['width_mobile'] = max(320, min(900, (int) ($merged['appearance']['width_mobile'] ?? 100)));
         $merged['main_bar']['logo_max_height'] = max(28, min(90, (int) $merged['main_bar']['logo_max_height']));
         $merged['main_bar']['icon_size'] = max(28, min(72, (int) $merged['main_bar']['icon_size']));
         $merged['top_bar']['custom_buttons'] = self::normalizeButtons($merged['top_bar']['custom_buttons'] ?? []);
@@ -188,6 +197,7 @@ class HeaderControlService
                 'type' => $type,
                 'is_active' => (int) (!empty($button['is_active'] ?? 1)),
                 'display_order' => max(0, (int) ($button['display_order'] ?? 0)),
+                'tracking_key' => mb_substr((string) ($button['tracking_key'] ?? ''), 0, 80),
                 'dropdown_style' => in_array((string) ($button['dropdown_style'] ?? 'dropdown'), ['dropdown', 'mega'], true)
                     ? (string) ($button['dropdown_style'] ?? 'dropdown')
                     : 'dropdown',
@@ -262,6 +272,10 @@ class HeaderControlService
                 'top_height' => 38,
                 'main_height' => 56,
                 'menu_height' => 38,
+                'width_desktop' => 1920,
+                'width_laptop' => 1600,
+                'width_tablet' => 1200,
+                'width_mobile' => 100,
             ],
             'top_bar' => [
                 'enabled' => true,
@@ -272,6 +286,7 @@ class HeaderControlService
                 'currency_mode' => 'code',
                 'support_label' => '24/7 Support',
                 'support_phone' => '',
+                'support_email' => '',
                 'show_seller_button' => true,
                 'seller_text' => 'BECOME A SELLER',
                 'seller_url' => '/seller/apply',

@@ -88,7 +88,39 @@
     @stack('style-lib')
     @stack('style')
 
+    @php
+        $adminHeaderControl = \App\Services\HeaderControlService::getLiveConfig();
+        $adminLayoutAppearance = (array) ($adminHeaderControl['appearance'] ?? []);
+        $adminWidthDesktop = (int) ($adminLayoutAppearance['width_desktop'] ?? 1920);
+        $adminWidthLaptop = (int) ($adminLayoutAppearance['width_laptop'] ?? 1600);
+        $adminWidthTablet = (int) ($adminLayoutAppearance['width_tablet'] ?? 1200);
+        $adminWidthMobile = (int) ($adminLayoutAppearance['width_mobile'] ?? 100);
+    @endphp
     <style>
+        :root {
+            --stayl-admin-content-max: {{ $adminWidthDesktop }}px;
+        }
+        @media (max-width: 1599.98px) {
+            :root {
+                --stayl-admin-content-max: {{ $adminWidthLaptop }}px;
+            }
+        }
+        @media (max-width: 1199.98px) {
+            :root {
+                --stayl-admin-content-max: {{ $adminWidthTablet }}px;
+            }
+        }
+        @media (max-width: 767.98px) {
+            :root {
+                --stayl-admin-content-max: {{ $adminWidthMobile }}px;
+            }
+        }
+        .bodywrapper__inner {
+            width: 100%;
+            max-width: var(--stayl-admin-content-max);
+            margin-left: auto;
+            margin-right: auto;
+        }
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.5) !important;
             z-index: 1040 !important;
