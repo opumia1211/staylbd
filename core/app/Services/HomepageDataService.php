@@ -16,8 +16,14 @@ use Illuminate\Support\Facades\Log;
  */
 class HomepageDataService
 {
-    public const CACHE_KEY = 'homepage.sections.data';
+    public const CACHE_BASE_KEY = 'homepage.sections.data';
     public const TTL = 600; // 10 min
+
+    /** Locale-aware cache key */
+    public static function getCacheKey(): string
+    {
+        return self::CACHE_BASE_KEY . '.' . app()->getLocale();
+    }
 
     /** Columns needed for product cards and available() scope (smaller payload, faster load) */
     private const PRODUCT_SELECT_BASE = [
@@ -89,19 +95,30 @@ class HomepageDataService
 
     public static function getCachedData(): array
     {
-        return Cache::remember(self::CACHE_KEY, self::TTL, function () {
+        return Cache::remember(self::getCacheKey(), self::TTL, function () {
             return self::loadAll();
         });
     }
 
     public static function clearCache(): void
     {
-        Cache::forget(self::CACHE_KEY);
+        $locales = self::getAllLocales();
+        foreach ($locales as $l) {
+            Cache::forget(self::CACHE_BASE_KEY . '.' . $l);
+        }
         self::clearBelowFoldFragmentCache();
     }
 
     /** Invalidate deferred homepage HTML (all locales). */
     public static function clearBelowFoldFragmentCache(): void
+    {
+        $locales = self::getAllLocales();
+        foreach ($locales as $l) {
+            Cache::forget('home.below_fold.v2.' . $l);
+        }
+    }
+
+    private static function getAllLocales(): array
     {
         $locales = [config('app.locale', 'en')];
         try {
@@ -113,9 +130,7 @@ class HomepageDataService
             }
         } catch (\Throwable $e) {
         }
-        foreach ($locales as $l) {
-            Cache::forget('home.below_fold.v2.' . $l);
-        }
+        return $locales;
     }
 
     /**

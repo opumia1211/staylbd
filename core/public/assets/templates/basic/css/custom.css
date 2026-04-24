@@ -643,3 +643,83 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
     border-radius: 8px;
 }
+
+/* =========================================================================
+   Home Features (Policy Section) - Elite CSS Refactor
+   ========================================================================= */
+.stayl-feature-card { transition: all 0.5s ease; border: 1px solid transparent; }
+.stayl-feature-card:hover { box-shadow: 0 15px 30px rgba(0, 0, 0, 0.06); transform: scale(1.02); }
+.stayl-feature-title { color: #1a202c; }
+.stayl-feature-desc { color: #718096; opacity: 0.8; }
+
+/* Theme 0 (Warm) */
+.stayl-feature-theme-0 { background-color: #fff9f0; }
+.stayl-feature-theme-0 .stayl-feature-icon-box { background-color: #ffac2f; box-shadow: 0 8px 16px rgba(255, 172, 47, 0.25); }
+
+/* Theme 1 (Cyan) */
+.stayl-feature-theme-1 { background-color: #f0fdff; }
+.stayl-feature-theme-1 .stayl-feature-icon-box { background-color: #2eb4e7; box-shadow: 0 8px 16px rgba(46, 180, 231, 0.25); }
+
+/* Theme 2 (Green) */
+.stayl-feature-theme-2 { background-color: #f0fff4; }
+.stayl-feature-theme-2 .stayl-feature-icon-box { background-color: #48bb78; box-shadow: 0 8px 16px rgba(72, 187, 120, 0.25); }
+
+/* Theme 3 (Teal) */
+.stayl-feature-theme-3 { background-color: #e6fffa; }
+.stayl-feature-theme-3 .stayl-feature-icon-box { background-color: #0e9f90; box-shadow: 0 8px 16px rgba(14, 159, 144, 0.25); }
+
+/* =========================================================================
+   Elite Storefront Header Layout & Structure (CSS Library Consolidation)
+   ========================================================================= */
+.stayl-search-container {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+.stayl-search-inner-wrap {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 680px;
+    gap: 12px;
+}
+.stayl-search-form-layout {
+    margin: 0 !important;
+    flex: 1;
+    position: relative;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    padding: 4px 6px 4px 22px !important;
+    height: 54px !important;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.stayl-voice-btn {
+    color: #64748b;
+    background: transparent;
+    border: none;
+    padding: 0 12px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+.stayl-camera-btn {
+    background: transparent;
+    border: none;
+    color: #1e293b;
+    padding: 0;
+    outline: none;
+    transition: all 0.3s ease;
+}
+.stayl-action-row-layout {
+    display: flex;
+    gap: clamp(8px, 1.5vw, 18px);
+    flex-wrap: nowrap;
+    align-items: center;
+}
+.stayl-theme-toggle-btn {
+    outline: none;
+}

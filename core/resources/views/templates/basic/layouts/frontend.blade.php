@@ -97,11 +97,6 @@
                     modalEl = staylResolveModal(modalEl);
                     if (!modalEl) return;
                     modalEl.classList.add('is-open', 'show');
-                    modalEl.style.display = 'block';
-                    modalEl.style.opacity = '1';
-                    modalEl.style.visibility = 'visible';
-                    modalEl.style.pointerEvents = 'auto';
-                    modalEl.style.zIndex = '100050';
                     modalEl.removeAttribute('aria-hidden');
                     document.body.classList.add('modal-open');
                     try { modalEl.dispatchEvent(new CustomEvent('stayl:modal:shown')); } catch (e) {}
@@ -111,11 +106,6 @@
                     modalEl = staylResolveModal(modalEl);
                     if (!modalEl) return;
                     modalEl.classList.remove('is-open', 'show');
-                    modalEl.style.display = 'none';
-                    modalEl.style.opacity = '';
-                    modalEl.style.visibility = '';
-                    modalEl.style.pointerEvents = '';
-                    modalEl.style.zIndex = '';
                     modalEl.setAttribute('aria-hidden', 'true');
                     if (!document.querySelector('.modal.is-open')) {
                         document.body.classList.remove('modal-open');
@@ -204,7 +194,7 @@
                         openContactPanel();
                         var chatThread = document.getElementById('contactPanelChatThread');
                         if (chatThread && selectedChannel === 'livechat') {
-                            chatThread.style.display = 'flex';
+                            chatThread.classList.add('is-visible');
                             var subjEl = document.getElementById('contactPanelSubject');
                             if (subjEl && !subjEl.value) subjEl.value = 'Live Chat Message';
                             loadChatMessages();
@@ -227,7 +217,7 @@
                     var chatThread = document.getElementById('contactPanelChatThread');
                     var chatMessages = document.getElementById('contactPanelChatMessages');
                     if (!chatThread || !chatMessages) return;
-                    chatThread.style.display = 'flex';
+                    chatThread.classList.add('is-visible');
                     var forceScroll = arguments[0] !== false;
                     var isFirstLoad = !chatMessages.querySelector('.contact-chat-msg') && !chatMessages.querySelector('.text-muted');
                     if (isFirstLoad) chatMessages.innerHTML = '<span class="text-muted small">{{ __("Loading...") }}</span>';
@@ -295,8 +285,10 @@
                             b.classList.toggle('contact-panel-select-active', b === btn);
                         });
                         if (channelInput) channelInput.value = selectedChannel;
-                        var chatThread = document.getElementById('contactPanelChatThread');
-                        if (chatThread) chatThread.style.display = (selectedChannel === 'livechat') ? 'flex' : 'none';
+                        if (chatThread) {
+                            if (selectedChannel === 'livechat') chatThread.classList.add('is-visible');
+                            else chatThread.classList.remove('is-visible');
+                        }
                         if (sendBtnOther) sendBtnOther.classList.toggle('d-none', selectedChannel === 'livechat');
                         if (selectedChannel === 'livechat') {
                             var subjEl = document.getElementById('contactPanelSubject');

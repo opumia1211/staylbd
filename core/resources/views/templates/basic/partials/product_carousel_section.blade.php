@@ -17,21 +17,21 @@
     $hasProducts = $products->isNotEmpty();
     $autoScrollAttr = $hasProducts ? '1' : '0';
 @endphp
-<section class="{{ $sectionClass }} product-carousel-section mb-8 sm:mb-10" id="{{ $sectionId }}" data-section-id="{{ $sectionId }}" @if($sectionKey) data-section-key="{{ $sectionKey }}" data-load-more-offset="{{ \App\Services\HomepageDataService::INITIAL_PAGE_SIZE }}" @endif>
-    <div class="w-full">
+<section class="stayl-section product-carousel-section" id="{{ $sectionId }}" data-section-id="{{ $sectionId }}" @if($sectionKey) data-section-key="{{ $sectionKey }}" data-load-more-offset="{{ \App\Services\HomepageDataService::INITIAL_PAGE_SIZE }}" @endif>
+    <div class="stayl-section-header">
         @if($sectionTitle)
-            <div class="mb-4 flex flex-col gap-3 sm:mb-5 sm:flex-row sm:items-center sm:justify-between">
-                <h2 class="flex min-w-0 items-center gap-2 text-lg font-bold tracking-tight text-slate-900 sm:text-xl md:text-2xl">
-                    {!! $sectionTitle !!}
-                </h2>
-                @if($sectionLink)
-                    <a href="{{ $sectionLink }}" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-emerald-600 transition hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-lg px-1 py-0.5">
-                        {{ $sectionLinkText }}
-                        @include($activeTemplate . 'partials.icon', ['name' => 'chevron-right', 'class' => 'h-4 w-4'])
-                    </a>
-                @endif
-            </div>
+            <h2 class="stayl-section-title">
+                {!! $sectionTitle !!}
+            </h2>
         @endif
+        @if($sectionLink)
+            <a href="{{ $sectionLink }}" class="stayl-section-link">
+                {{ $sectionLinkText }}
+                @include($activeTemplate . 'partials.icon', ['name' => 'chevron-right', 'sizePx' => 16])
+            </a>
+        @endif
+    </div>
+
 
         @if($hasProducts)
             <div class="product-carousel-wrap">
@@ -60,5 +60,4 @@
                 </a>
             </div>
         @endif
-    </div>
 </section>

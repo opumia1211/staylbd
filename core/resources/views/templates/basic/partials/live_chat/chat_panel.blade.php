@@ -3,7 +3,7 @@ Live Chat Panel - Main Chat Interface
 This file contains the unified chat layout with message history and floating input bar
 --}}
 
-<div id="contactPanelChatThread" class="contact-panel-message-box contact-panel-unified-chat" style="display:flex;"
+<div id="contactPanelChatThread" class="contact-panel-message-box contact-panel-unified-chat contact-panel-chat-thread"
     role="region" aria-label="@lang('Chat messages and typing area')">
     {{-- Message history and typing area combined --}}
     <div class="contact-panel-chat-scroll-area" id="contactPanelChatScrollArea">

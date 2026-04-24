@@ -90,11 +90,17 @@
         var str = listingCfg().strings || {};
 
         root.querySelectorAll('.staylbd-rt-price').forEach(function (el) {
+            if (d.effective != null && d.effective !== '') {
+                el.setAttribute('data-base-price', String(d.effective));
+            }
             el.textContent = curSym + effFormatted;
         });
 
         root.querySelectorAll('.staylbd-rt-price-compare').forEach(function (el) {
             if (d.has_savings && d.compare_formatted) {
+                if (d.compare != null && d.compare !== '') {
+                    el.setAttribute('data-base-price', String(d.compare));
+                }
                 el.textContent = curSym + d.compare_formatted;
                 el.classList.remove('hidden');
             } else {

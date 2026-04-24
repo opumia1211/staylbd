@@ -105,6 +105,12 @@ class FileInfo
             'path' => 'assets/images/review',
             'size' => '800x600',
         ];
+
+        $data['service'] = [
+            'path' => 'assets/images/frontend/service',
+            'size' => '100x100',
+        ];
+
         return $data;
     }
 }

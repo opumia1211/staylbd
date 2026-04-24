@@ -36,7 +36,7 @@
 
                 {{-- লাইন ১: দাম ও ডিসকাউন্ট --}}
                 <div class="qv-price-row">
-                    <span class="qv-price">{{ $general->cur_sym }}{{ showAmount($detailPrice) }}</span>
+                    <span class="qv-price staylbd-rt-price">{{ $general->cur_sym }}{{ showAmount($detailPrice) }}</span>
                     @if($hasDiscount && $qvCompareAt !== null)
                         <del class="qv-price-old">{{ $general->cur_sym }}{{ showAmount($qvCompareAt) }}</del>
                         <span class="qv-badge">{{ $savePercent }}% @lang('OFF')</span>
@@ -51,7 +51,7 @@
                         <span class="qv-sku">@lang('Product ID'): {{ $product->id }}</span>
                     @endif
                     @if(isset($general->display_stock) && $general->display_stock == \App\Constants\Status::ENABLE)
-                        <span class="qv-stock qv-stock--{{ $product->quantity ? 'ok' : 'out' }}">
+                        <span class="qv-stock staylbd-rt-stock qv-stock--{{ $product->quantity ? 'ok' : 'out' }}">
                             {{ $product->quantity ? __('In Stock') : __('Out of Stock') }}
                             @if($product->quantity) ({{ $product->quantity }} @lang('available')) @endif
                         </span>
@@ -82,7 +82,7 @@
                         </div>
                     </div>
                     @if($product->quantity)
-                        <a href="#0" class="cmn--btn add-to-cart btn-cart qv-btn-cart" data-product_id="{{ $product->id }}">@lang('Add To Cart')</a>
+                        <a href="#0" class="cmn--btn add-to-cart btn-cart qv-btn-cart staylbd-rt-atc" data-product_id="{{ $product->id }}">@lang('Add To Cart')</a>
                         <a href="#0" class="cmn--btn buy-now qv-btn-buy" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.icon', ['name' => 'bolt', 'class' => 'me-1'])@lang('Buy Now')</a>
                     @endif
                 </div>

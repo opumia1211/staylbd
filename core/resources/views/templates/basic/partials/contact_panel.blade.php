@@ -36,7 +36,7 @@
         <div class="contact-panel-header contact-panel-header--branded contact-panel-header--centered">
             <div class="contact-panel-header-center">
                 @if($chatLogo)
-                    <img src="{{ $chatLogo }}" alt="{{ $siteName }}" class="contact-panel-logo" style="max-width: {{ getLogoMaxWidth() }}px; max-height: {{ getLogoMaxHeight() }}px; {{ getLogoStyle() }}">
+                    <img src="{{ $chatLogo }}" alt="{{ $siteName }}" class="contact-panel-logo stayl-contact-logo" style="--contact-logo-max-w: {{ getLogoMaxWidth() }}px; --contact-logo-max-h: {{ getLogoMaxHeight() }}px; {{ getLogoStyle() }}">
                 @else
                     <div class="contact-panel-logo contact-panel-logo-placeholder">
                         @include($activeTemplate . 'partials.icon', ['name' => 'comments'])

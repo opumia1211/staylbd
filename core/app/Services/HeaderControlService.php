@@ -279,6 +279,7 @@ class HeaderControlService
             ],
             'top_bar' => [
                 'enabled' => true,
+                'is_public' => true,
                 'show_language' => true,
                 'show_currency' => true,
                 'show_apps' => true,
@@ -294,12 +295,14 @@ class HeaderControlService
             ],
             'main_bar' => [
                 'enabled' => true,
+                'is_public' => true,
                 'logo_max_height' => 48,
                 'icon_size' => 48,
                 'show_language_icon' => false,
             ],
             'menu_bar' => [
                 'enabled' => true,
+                'is_public' => true,
                 'show_sidebar_trigger' => true,
                 'show_category_button' => true,
                 'category_button_label' => 'ALL CATEGORIES',

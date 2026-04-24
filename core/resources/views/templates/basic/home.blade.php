@@ -36,7 +36,7 @@
 @endpush
 @endif
 @push('style')
-
+{{-- Premium Features CSS injected via partial --}}
 {{-- inline style moved to critical-storefront.css --}}
 
 @endpush
@@ -58,6 +58,10 @@
     {{-- Banner নিচে ticker/scrollbar restore --}}
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_above', 'options' => ['page' => 'home']])
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_below', 'options' => ['page' => 'home']])
+
+    {{-- Premium Services/Promo Features section --}}
+    @include($activeTemplate . 'partials.home_features')
+
     <div class="storefront-section-separation" aria-hidden="true"></div>
     {{-- Keep banner and category tightly synchronized; no extra banner-adjacent rows --}}
 
@@ -125,7 +129,7 @@
                 'products' => $todayDealProducts ?? collect(),
                 'general' => $general,
                 'activeTemplate' => $activeTemplate,
-                'sectionTitle' => '<svg class="inline-block h-6 w-6 shrink-0 text-amber-500 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="ml-2">' . e($hpLabel) . '</span>',
+                'sectionTitle' => '<svg class="inline-block h-6 w-6 shrink-0 text-amber-500 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="ml-2">' . e(__($hpLabel)) . '</span>',
                 'sectionLink' => route('product.hot.deal'),
                 'sectionLinkText' => __('View All'),
                 'sectionId' => 'home-quick-deals',
@@ -218,7 +222,7 @@
                     'products' => $customRowsById[$crid]['products'] ?? collect(),
                     'general' => $general,
                     'activeTemplate' => $activeTemplate,
-                    'sectionLabel' => '<svg style="width: 1.15em; height: 1.15em; vertical-align: -0.15em; margin-right: 0.35em; color: #14b8a6;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>' . e($hpLabel),
+                    'sectionLabel' => '<svg style="width: 1.15em; height: 1.15em; vertical-align: -0.15em; margin-right: 0.35em; color: #14b8a6;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>' . e(__($hpLabel)),
                     'carouselIntervalSec' => $hpInterval,
                     'carouselSpeedMs' => $hpSpeedMs,
                 ])

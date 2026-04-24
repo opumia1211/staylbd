@@ -1,8 +1,0 @@
-/* Auto-split from main.css — run: node tools/split-main-legacy-css.cjs */
-/* Full legacy stack — prefer route-specific imports in Mix (tailwind-storefront-deferred*.css). */
-@import "./main-legacy-shell.css";
-@import "./main-legacy-home.css";
-@import "./main-legacy-product.css";
-@import "./main-legacy-extras.css";
-@import "./main-legacy-classic.css";
-@import "./main-legacy-widgets.css";

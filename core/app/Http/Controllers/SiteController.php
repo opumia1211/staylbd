@@ -44,7 +44,7 @@ class SiteController extends Controller
     {
         $pageTitle = 'Home';
 
-        $todayDealProducts = Cache::remember('homepage.today_deals', 600, function () {
+        $todayDealProducts = Cache::remember('homepage.today_deals.' . app()->getLocale(), 600, function () {
             return Product::available()
                 ->todayDeal()
                 ->with(['category:id,name', 'brand:id,name', 'activeVariants'])
@@ -56,8 +56,11 @@ class SiteController extends Controller
 
         // Allow forcing banner cache refresh (e.g. after admin upload)
         if (request()->has('refresh_banner')) {
-            Cache::forget('homepage.banner.guest');
-            Cache::forget('homepage.banner.auth');
+            $locales = Language::pluck('code')->toArray() ?: ['en', 'bn'];
+            foreach ($locales as $l) {
+                Cache::forget('homepage.banner.guest.' . $l);
+                Cache::forget('homepage.banner.auth.' . $l);
+            }
         }
 
         $bannerData = $this->getBannerDataForHomepage();
@@ -172,7 +175,10 @@ class SiteController extends Controller
         $general = gs();
         $activeTemplate = $this->activeTemplate;
         $html = view($activeTemplate . 'partials.product_cards_fragment', compact('products', 'general', 'activeTemplate'))->render();
-        return response()->json(['html' => $html, 'count' => $products->count()]);
+        return response()
+            ->json(['html' => $html, 'count' => $products->count()])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 
     /**
@@ -181,7 +187,8 @@ class SiteController extends Controller
     protected function getBannerDataForHomepage(): array
     {
         $now = now()->format('Y-m-d');
-        $bannerCacheKey = auth()->check() ? 'homepage.banner.auth' : 'homepage.banner.guest';
+        $locale = app()->getLocale();
+        $bannerCacheKey = auth()->check() ? "homepage.banner.auth.{$locale}" : "homepage.banner.guest.{$locale}";
         $cached = Cache::remember($bannerCacheKey, 120, function () {
             return [
                 'elements' => Frontend::where('data_keys', 'banner.element')->orderBy('id', 'asc')->get(),
@@ -388,7 +395,7 @@ class SiteController extends Controller
 
     protected function productDetailPage(int $id)
     {
-        $cacheKey = 'product.detail.' . $id;
+        $cacheKey = 'product.detail.' . $id . '.' . app()->getLocale();
         $cacheTtl = config('optimization.product_detail_cache_ttl', 600);
 
         $data = Cache::remember($cacheKey, $cacheTtl, function () use ($id) {
@@ -1246,38 +1253,31 @@ class SiteController extends Controller
 
     public function changeLanguage($lang = null)
     {
-        $normalized = $this->normalizeLocaleCode((string) $lang);
-        $language = Language::where('code', $normalized)->first();
-
-        if (!$language && $normalized === 'hn') {
-            $language = Language::where('code', 'hi')->first();
-            if ($language) {
-                $normalized = 'hi';
-            }
-        }
+        $inputCode = strtoupper(trim((string) $lang));
+        $language = Language::where('code', $inputCode)->first();
 
         if (!$language) {
-            $defaultCode = (string) optional(Language::where('is_default', Status::YES)->first())->code;
-            $normalized = $this->normalizeLocaleCode($defaultCode ?: 'en');
+            $language = Language::where('is_default', Status::YES)->first();
+        }
+        
+        $code = $language ? strtoupper($language->code) : 'EN';
+
+        // Laravel locale handle usually lowercase
+        $localeHandle = strtolower($code);
+        if (!$this->localeExists($localeHandle)) {
+            $localeHandle = 'en';
         }
 
-        // JSON-first locale fallback: if locale file not present, keep English.
-        if (!$this->localeExists($normalized)) {
-            $normalized = 'en';
-        }
-
-        session()->put('lang', $normalized);
-        app()->setLocale($normalized);
+        session()->put('lang', $code);
+        app()->setLocale($localeHandle);
+        
         return back();
     }
 
     private function normalizeLocaleCode(string $code): string
     {
         $code = strtolower(trim($code));
-        return match ($code) {
-            'hi' => 'hn', // legacy Hindi code support
-            default => $code !== '' ? $code : 'en',
-        };
+        return $code !== '' ? $code : 'en';
     }
 
     private function localeExists(string $code): bool

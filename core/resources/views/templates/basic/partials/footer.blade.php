@@ -59,23 +59,10 @@
     $footerBottomButtons = $footerCustomButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'bottom'));
 @endphp
 
-<style>
-    .site-footer.footer-glass {
-        background: var(--footer-bg-color, #0f172a);
-    }
-    .site-footer .btn.btn-outline-light {
-        border-color: var(--product-button-color, #1f2937);
-        color: #fff;
-        background: color-mix(in srgb, var(--product-button-color, #1f2937) 84%, transparent);
-    }
-    .site-footer .btn.btn-outline-light:hover {
-        border-color: var(--product-buy-now-color, #0e9f90);
-        background: var(--product-buy-now-color, #0e9f90);
-        color: #fff;
-    }
-</style>
 
-<footer class="site-footer footer-glass footer-glass--premium" role="contentinfo">
+
+<footer class="site-footer stayl-footer" role="contentinfo">
+
     {{-- Width/padding: footer-glass.css uses same :root tokens as header (.glass-header__shell) + main (.main-container) --}}
     <div class="footer-glass__inner">
         <div class="footer-glass__card w-full">
@@ -94,33 +81,6 @@
             @endforeach
         </div>
         @endif
-        @if($showPromoFeaturesBar)
-        <div class="promo-features-bar footer-glass__promo-strip" aria-label="@lang('Highlights')">
-            <div class="w-full">
-                <div class="promo-features-grid grid">
-                    @foreach ($services as $service)
-                        @php
-                            $dv = $service->data_values ?? (object)[];
-                            $url = $dv->url ?? null;
-                            $href = $url ? e($url) : '#';
-                            $img = $dv->image ?? null;
-                        @endphp
-                        <a href="{{ $href }}" class="promo-feature-card"{{ $url ? '' : ' aria-disabled="true"' }}>
-                            @if($img)
-                                <div class="promo-feature-icon">
-                                    <img src="{{ getImage('assets/images/frontend/service/' . $img, '50x50') }}" alt="{{ __($dv->title ?? '') }}" loading="lazy" width="40" height="40">
-                                </div>
-                            @endif
-                            <div class="promo-feature-content">
-                                <h6 class="promo-feature-title">{{ __($dv->title ?? '') }}</h6>
-                                <p class="promo-feature-desc">{{ __($dv->short_detail ?? '') }}</p>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
         <div class="footer-bottom">
             <div class="footer__wrapper footer-grid flex flex-wrap">
 
@@ -128,17 +88,18 @@
                 <div class="footer__bottom__widget footer-about-widget">
                     <h6 class="title footer-col-title">@lang('About Us')</h6>
                     @if(!empty($companyInfo->data_values->about_text))
-                        <p class="mb-0 text-white small">{{ __($companyInfo->data_values->about_text) }}</p>
+                        <p class="mb-0 small">{{ __($companyInfo->data_values->about_text) }}</p>
                     @endif
                     @if(!empty($companyInfo->data_values->mission_text))
-                        <p class="mb-0 text-white small">{{ __($companyInfo->data_values->mission_text) }}</p>
+                        <p class="mb-0 small">{{ __($companyInfo->data_values->mission_text) }}</p>
                     @endif
                     @if(!empty($companyInfo->data_values->registration_info))
-                        <p class="mb-0 small text-white-50">{{ __($companyInfo->data_values->registration_info) }}</p>
+                        <p class="mb-0 small opacity-75">{{ __($companyInfo->data_values->registration_info) }}</p>
                     @endif
                     @if(!empty($companyInfo->data_values->business_license))
-                        <p class="mb-0 small text-white-50">{{ __($companyInfo->data_values->business_license) }}</p>
+                        <p class="mb-0 small opacity-75">{{ __($companyInfo->data_values->business_license) }}</p>
                     @endif
+
                     @if($contactContent && !empty($contactContent->data_values->address))
                         @php
                             $aboutAddress = trim((string)($contactContent->data_values->address ?? ''));
@@ -189,8 +150,9 @@
                     <ul class="list-unstyled mb-0" role="list">
                         @foreach ($validQuickLinks as $link)
                             @php $dv = $link->data_values ?? (object)[]; $u = $dv->url ?? '#'; @endphp
-                            <li role="listitem"><a href="{{ $u }}" class="text-white" @if($u !== '#') target="_blank" rel="noopener noreferrer" @endif>{{ __($dv->title ?? '') }}</a></li>
+                            <li role="listitem"><a href="{{ $u }}" @if($u !== '#') target="_blank" rel="noopener noreferrer" @endif>{{ __($dv->title ?? '') }}</a></li>
                         @endforeach
+
                     </ul>
                 </div>
                 @endif
@@ -202,21 +164,22 @@
                     <ul class="list-unstyled mb-0" role="list">
                         @php $sc = $supportCenter ? ($supportCenter->data_values ?? (object)[]) : (object)[]; @endphp
                         @if(!empty($sc->help_center_url))
-                            <li role="listitem"><a href="{{ $sc->help_center_url }}" class="text-white" target="_blank" rel="noopener noreferrer">@lang('Help Center')</a></li>
+                            <li role="listitem"><a href="{{ $sc->help_center_url }}" target="_blank" rel="noopener noreferrer">@lang('Help Center')</a></li>
                         @endif
                         @if(!empty($sc->return_policy_url))
-                            <li role="listitem"><a href="{{ $sc->return_policy_url }}" class="text-white">@lang('Return Policy')</a></li>
+                            <li role="listitem"><a href="{{ $sc->return_policy_url }}">@lang('Return Policy')</a></li>
                         @endif
                         @if(!empty($sc->refund_policy_url))
-                            <li role="listitem"><a href="{{ $sc->refund_policy_url }}" class="text-white">@lang('Refund Policy')</a></li>
+                            <li role="listitem"><a href="{{ $sc->refund_policy_url }}">@lang('Refund Policy')</a></li>
                         @endif
-                        <li role="listitem"><a href="{{ !empty($sc->track_order_url) ? $sc->track_order_url : route('track.order') }}" class="text-white">@lang('Track Order')</a></li>
+                        <li role="listitem"><a href="{{ !empty($sc->track_order_url) ? $sc->track_order_url : route('track.order') }}">@lang('Track Order')</a></li>
                         @if(($sc->support_ticket_enabled ?? 1) && route('message.open', [], false))
-                            <li role="listitem"><a href="{{ route('message.open') }}" class="text-white">@lang('Support Ticket')</a></li>
+                            <li role="listitem"><a href="{{ route('message.open') }}">@lang('Support Ticket')</a></li>
                         @endif
                         @if(!empty($sc->support_email))
-                            <li role="listitem"><a href="mailto:{{ $sc->support_email }}" class="text-white">@lang('Contact Support')</a></li>
+                            <li role="listitem"><a href="mailto:{{ $sc->support_email }}">@lang('Contact Support')</a></li>
                         @endif
+
                     </ul>
                 </div>
                 @endif
@@ -294,7 +257,7 @@
                     
 {{-- inline style moved to critical-storefront.css --}}
 
-                    <div class="footer-newsletter-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+                    <div class="footer-newsletter-card stayl-footer-newsletter-card">
                         <h6 class="custom-newsletter-heading footer-col-title">@lang('Subscribe Newsletter')</h6>
                         @php $subT = $subscribeSubtitle ? __($subscribeSubtitle) : ''; $mainT = __($subscribeTitle); @endphp
                         @if($subT && $subT !== $mainT)
@@ -311,28 +274,28 @@
                                     @include($activeTemplate . 'partials.icon', ['name' => 'paper-plane'])
                                 </button>
                             </div>
-                            <div class="subscribe-inline-message mt-2" style="font-size: 12px; font-weight: 500; color: #10b981;" aria-live="polite"></div>
+                            <div class="subscribe-inline-message mt-2 stayl-footer-msg-success" aria-live="polite"></div>
                         </form>
                         @guest
-                        <div class="footer-glass__auth-actions footer-glass__auth-actions--newsletter" style="margin-top: 16px; padding-top: 16px;" role="navigation" aria-label="@lang('Account')">
+                        <div class="footer-glass__auth-actions footer-glass__auth-actions--newsletter stayl-footer-auth-row" role="navigation" aria-label="@lang('Account')">
                             <a href="{{ route('user.login') }}?open=login&redirect={{ urlencode(url()->current()) }}" class="footer-glass__btn footer-glass__btn--outline footer-glass__btn--compact js-footer-floating-login">@lang('Login')</a>
                             <a href="{{ route('user.register') }}?open=register&redirect={{ urlencode(url()->current()) }}" class="footer-glass__btn footer-glass__btn--primary footer-glass__btn--compact js-footer-floating-register">@lang('Registration')</a>
                             <a href="{{ $sellerAccountHref }}" class="footer-glass__btn footer-glass__btn--outline footer-glass__btn--compact" title="{{ $sellerAccountFeatureOn ? __('Seller registration') : __('Contact us about seller account') }}"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
                         </div>
                         @else
-                        <div class="footer-glass__auth-actions footer-glass__auth-actions--newsletter" style="margin-top: 16px; padding-top: 16px;" role="navigation" aria-label="@lang('Account')">
+                        <div class="footer-glass__auth-actions footer-glass__auth-actions--newsletter stayl-footer-auth-row" role="navigation" aria-label="@lang('Account')">
                             <a href="{{ route('user.home') }}" class="footer-glass__btn footer-glass__btn--primary footer-glass__btn--compact">@lang('My account')</a>
                             <a href="{{ $sellerAccountHref }}" class="footer-glass__btn footer-glass__btn--outline footer-glass__btn--compact" title="{{ $sellerAccountFeatureOn ? __('Seller account') : __('Contact us about seller account') }}"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
                         </div>
                         @endguest
                     @if($showShippingInfo && $shippingPayment)
                     <div class="footer-shipping-info mt-3 pt-3">
-                        <h6 class="custom-newsletter-heading footer-col-title mb-1.5" style="font-size: 14px;">@lang('Payment & Shipping')</h6>
+                        <h6 class="custom-newsletter-heading footer-col-title mb-1.5 stayl-footer-small-title">@lang('Payment & Shipping')</h6>
                         @if(($shippingPayment->data_values->cod_enabled ?? 1) == 1)
-                            <p class="mb-1 text-xs text-slate-500 font-medium flex items-center"><span class="w-1.5 h-1.5 rounded-full mr-2" style="background:#10b981;display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;"></span>@lang('Cash on Delivery available')</p>
+                            <p class="mb-1 text-xs text-slate-500 font-medium flex items-center"><span class="stayl-footer-dot"></span>@lang('Cash on Delivery available')</p>
                         @endif
                         @if(!empty($shippingPayment->data_values->estimated_delivery_text))
-                            <p class="mb-1 text-xs text-slate-500 font-medium flex items-center">@include($activeTemplate . 'partials.icon', ['name' => 'truck', 'style' => 'margin-right:6px;']) @lang('Delivery'): {{ __($shippingPayment->data_values->estimated_delivery_text) }}</p>
+                            <p class="mb-1 text-xs text-slate-500 font-medium flex items-center">@include($activeTemplate . 'partials.icon', ['name' => 'truck', 'class' => 'stayl-mr-6']) @lang('Delivery'): {{ __($shippingPayment->data_values->estimated_delivery_text) }}</p>
                         @endif
                         @if(!empty($shippingPayment->data_values->shipping_partners_text))
                             <p class="mb-1 text-xs text-slate-500 font-medium">{{ __($shippingPayment->data_values->shipping_partners_text) }}</p>
@@ -506,7 +469,7 @@
                     @php $footerLogo = getLogo('logo') ?: getLogo('logo_dark'); @endphp
                     @if($footerLogo)
                         <a href="{{ route('home') }}" class="me-3" title="@lang('Home')">
-                            <img src="{{ $footerLogo }}" alt="{{ gs('site_name') }}" class="footer-logo site-logo-img" style="height: {{ getFooterLogoHeight() }}px; {{ getLogoStyle() }}" loading="lazy" width="120" height="{{ getFooterLogoHeight() }}">
+                            <img src="{{ $footerLogo }}" alt="{{ gs('site_name') }}" class="footer-logo site-logo-img stayl-footer-logo" style="--stayl-footer-logo-h: {{ getFooterLogoHeight() }}px; {{ getLogoStyle() }}" loading="lazy" width="120" height="{{ getFooterLogoHeight() }}">
                         </a>
                     @endif
                     @php

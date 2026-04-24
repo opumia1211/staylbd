@@ -1,0 +1,183 @@
+/**
+ * Home Premium Features - Redesigned card-based layout
+ * MATCHING USER SCREENSHOT EXACTLY: Icon box offset to the left.
+ * PREVENTING GLOBAL HOVER BLUE OVERLAY.
+ */
+.home-features-section {
+    padding: 2rem 0;
+    width: 100%;
+    /* Allow the offset icons to be visible without causing horizontal scroll */
+    overflow: visible; 
+}
+
+.home-features-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 2rem;
+    padding: 1.5rem 1.5rem 1.5rem 2rem; /* Space for offset icon boxes */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+}
+
+.home-features-grid::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+@media (min-width: 992px) {
+    .home-features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        overflow-x: visible;
+        padding-left: 2rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .home-features-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.feature-card {
+    display: flex !important;
+    align-items: center !important;
+    padding: 1rem 1rem 1rem 3.5rem !important; /* Left padding for the icon */
+    border-radius: 1.25rem !important;
+    text-decoration: none !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    border: none !important;
+    position: relative !important;
+    height: 100% !important;
+    min-height: 80px !important;
+    width: 100%;
+    min-width: 240px;
+    flex-shrink: 0; /* Prevent overlapping on flex horizontally scroll */
+    z-index: 1 !important;
+}
+
+/* 
+ * CRITICAL: Overriding any global blue hover effects (#0056fb).
+ * We force the background and text colors to stay consistent or 
+ * use a very subtle brightening.
+ */
+.feature-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    /* Block any background overlay from other CSS */
+    background-image: none !important;
+}
+
+/* Ensuring text remains dark/readable on hover */
+.feature-card:hover .feature-title,
+.feature-card:hover .feature-desc {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* Block pseudo-elements often used for hover overlays in these templates */
+.feature-card:hover::before, 
+.feature-card:hover::after,
+.feature-card::before, 
+.feature-card::after {
+    display: none !important;
+    background: transparent !important;
+    content: none !important;
+}
+
+.feature-icon-box {
+    width: 4rem;
+    height: 4rem;
+    min-width: 4rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute !important;
+    left: -1.5rem !important; /* Offset sticking out to the left */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.12) !important;
+    z-index: 5 !important;
+}
+
+.feature-icon-box img,
+.feature-icon-box i {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 2.25rem;
+    object-fit: contain;
+    color: #FFFFFF !important; /* Force white icons */
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-content {
+    flex: 1;
+    min-width: 0;
+    pointer-events: none;
+}
+
+.feature-title {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: #2D3748 !important; /* Precise slate-dark color */
+    margin: 0 0 0.15rem 0 !important;
+    line-height: 1.2 !important;
+}
+
+.feature-desc {
+    font-size: 0.85rem !important;
+    color: #718096 !important; /* Precise slate-grey color */
+    margin: 0 !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+}
+
+/* Color Themes - MATCHING SCREENSHOT PALETTE EXACTLY */
+
+/* Theme 1: Orange/Amber (Gift Voucher) */
+.feature-card--orange {
+    background-color: #FFF5E5 !important;
+}
+.feature-card--orange .feature-icon-box {
+    background-color: #FF9F00 !important;
+}
+.feature-card--orange:hover {
+    background-color: #FFF0D6 !important;
+}
+
+/* Theme 2: Cyan/LightBlue (Support) */
+.feature-card--cyan {
+    background-color: #E0F7FA !important;
+}
+.feature-card--cyan .feature-icon-box {
+    background-color: #00C1D4 !important;
+}
+.feature-card--cyan:hover {
+    background-color: #D1F2F7 !important;
+}
+
+/* Theme 3: Green (Money Back) */
+.feature-card--green {
+    background-color: #F0F9EB !important;
+}
+.feature-card--green .feature-icon-box {
+    background-color: #7ED321 !important;
+}
+.feature-card--green:hover {
+    background-color: #E6F5DD !important;
+}
+
+/* Theme 4: Teal (Free Shipping) */
+.feature-card--teal {
+    background-color: #E0F2F1 !important;
+}
+.feature-card--teal .feature-icon-box {
+    background-color: #00BFA5 !important;
+}
+.feature-card--teal:hover {
+    background-color: #D1EDED !important;
+}

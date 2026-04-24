@@ -17,9 +17,11 @@ class LanguageMiddleware
 
     public function handle($request, Closure $next)
     {
-        $code = $this->resolveLocale($this->getCode());
-        session()->put('lang', $code);
-        app()->setLocale($code);
+        $code = $this->getCode();
+        $normalized = $this->resolveLocale($code);
+        
+        session()->put('lang', $code); // Keep original casing in session for template matches
+        app()->setLocale(strtolower($normalized)); // Laravel handle as lowercase
         return $next($request);
     }
 
@@ -58,10 +60,7 @@ class LanguageMiddleware
     private function normalizeLocaleCode(string $code): string
     {
         $code = strtolower(trim($code));
-        return match ($code) {
-            'hi' => 'hn', // keep legacy DB/code compatibility
-            default => $code !== '' ? $code : 'en',
-        };
+        return $code !== '' ? $code : 'en';
     }
 
     private function localeExists(string $code): bool

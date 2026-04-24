@@ -4,9 +4,9 @@ Subject (Category), Name, Email
 --}}
 
 <div class="contact-panel-fields-two-rows mb-2" id="contactPanelFormFields">
-    <div class="contact-panel-fields-row" style="display:flex!important;flex-wrap:nowrap!important;gap:6px;">
+    <div class="contact-panel-fields-row stayl-flex-wrap-nowrap">
         {{-- Subject/Category Dropdown --}}
-        <div class="form-group mb-2 contact-panel-field-half" style="flex:1!important;min-width:0;">
+        <div class="form-group mb-2 contact-panel-field-half stayl-flex-1-min-0">
             <label class="form-label" for="contactPanelSubject">@lang('Subject')</label>
             <select name="subject" id="contactPanelSubject" class="form-control form-control-sm" required
                 aria-label="@lang('Subject')">
@@ -19,7 +19,7 @@ Subject (Category), Name, Email
         </div>
 
         {{-- Name Field --}}
-        <div class="form-group mb-2 contact-panel-field-half" style="flex:1!important;min-width:0;">
+        <div class="form-group mb-2 contact-panel-field-half stayl-flex-1-min-0">
             <label class="form-label" for="contactPanelName">@lang('Name')</label>
             <input type="text" name="name" id="contactPanelName" class="form-control form-control-sm"
                 value="{{ old('name', optional(auth()->user())->fullname ?? '') }}" placeholder="@lang('Your name')"
@@ -27,9 +27,9 @@ Subject (Category), Name, Email
         </div>
     </div>
 
-    <div class="contact-panel-fields-row" style="display:flex!important;flex-wrap:nowrap!important;gap:6px;">
+    <div class="contact-panel-fields-row stayl-flex-wrap-nowrap">
         {{-- Email Field --}}
-        <div class="form-group mb-2 contact-panel-field-full" style="flex:1!important;min-width:0;">
+        <div class="form-group mb-2 contact-panel-field-full stayl-flex-1-min-0">
             <label class="form-label" for="contactPanelEmail">@lang('Email')</label>
             <input type="email" name="email" id="contactPanelEmail" class="form-control form-control-sm"
                 value="{{ old('email', optional(auth()->user())->email ?? '') }}" placeholder="@lang('Your email')"

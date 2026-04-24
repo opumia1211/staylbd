@@ -2159,7 +2159,8 @@ function getDefaultFooterData(): array
 function getCachedFooterData()
 {
     try {
-        return Cache::remember(FOOTER_CACHE_KEY, FOOTER_CACHE_TTL, function () {
+        $cacheKey = FOOTER_CACHE_KEY . '.' . app()->getLocale();
+        return Cache::remember($cacheKey, FOOTER_CACHE_TTL, function () {
             try {
                 $footerElements = frontendOrderByDisplayOrder(Frontend::where('data_keys', 'footer.element'))->get();
                 $footerQuickLinks = frontendOrderByDisplayOrder(Frontend::where('data_keys', 'footer.quick_links'))->get();
@@ -2246,7 +2247,10 @@ function sanitizeSocialIconInlineMarkup(?string $raw): string
 /** Clear footer partial cache (call after saving footer, contact, social, policy, or service in admin). */
 function clearFooterCache()
 {
-    Cache::forget(FOOTER_CACHE_KEY);
+    $locales = ['en', 'bn']; // Clear for all supported locales
+    foreach ($locales as $l) {
+        Cache::forget(FOOTER_CACHE_KEY . '.' . $l);
+    }
 }
 
 const HOMEPAGE_SECTION_CACHE_KEY = 'frontend_home_section_data';
@@ -2297,7 +2301,8 @@ function getHomeSectionSettingsDefaults()
  */
 function getCachedHomeSectionData()
 {
-    return Cache::remember(HOMEPAGE_SECTION_CACHE_KEY, HOMEPAGE_SECTION_CACHE_TTL, function () {
+    $cacheKey = HOMEPAGE_SECTION_CACHE_KEY . '.' . app()->getLocale();
+    return Cache::remember($cacheKey, HOMEPAGE_SECTION_CACHE_TTL, function () {
         $keys = [
             'home_section.settings',
             'home_section.trust',
@@ -2344,7 +2349,10 @@ function getCachedHomeSectionData()
 
 function clearHomeSectionCache()
 {
-    Cache::forget(HOMEPAGE_SECTION_CACHE_KEY);
+    $locales = ['en', 'bn'];
+    foreach ($locales as $l) {
+        Cache::forget(HOMEPAGE_SECTION_CACHE_KEY . '.' . $l);
+    }
 }
 
 const PRODUCT_SLIDER_CACHE_KEY = 'frontend_product_slider_settings';

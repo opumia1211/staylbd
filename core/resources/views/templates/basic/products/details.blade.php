@@ -100,7 +100,7 @@ data-product-id="{{ $product->id }}"
         $totalGallery = count($product->gallery ?? []) + 1;
     @endphp
 
-    <section class="products-single-section pt-80 pb-80 pro-detail-page">
+    <section class="products-single-section pt-80 pb-80 pro-detail-page" data-product-id="{{ $product->id }}">
         <div class="container">
             <div class="row g-4">
                 {{-- Left: Vertical thumbnails + Large main image (hover zoom below + click lightbox) --}}
@@ -196,7 +196,7 @@ data-product-id="{{ $product->id }}"
                         </div>
 
                         <div class="pro-detail-price-block pro-detail-price-one-line">
-                            <span class="pro-detail-special-price product-price">{{ $general->cur_sym }}{{ showAmount($detailPrice) }}</span>
+                            <span class="pro-detail-special-price product-price staylbd-rt-price">{{ $general->cur_sym }}{{ showAmount($detailPrice) }}</span>
                             @if ($hasDiscount && $detailShowStrike && $detailCompareAt !== null)
                                 <span class="pro-detail-regular-price">{{ $general->cur_sym }}{{ showAmount($detailCompareAt) }}</span>
                                 <span class="badge bg-success pro-detail-discount-badge">{{ $detailPercent }}% @lang('OFF')</span>
@@ -217,7 +217,7 @@ data-product-id="{{ $product->id }}"
                                     @if(!$detailQty)
                                         @lang('Out Of Stock')
                                     @else
-                                        {{ $detailStockLabel }} (<span class="amount" id="productStockDisplay">{{ $product->has_variants && $product->activeVariants->isNotEmpty() ? $product->activeVariants->first()->quantity : $product->quantity }}</span> @lang('available'))
+                                        {{ $detailStockLabel }} (<span class="amount staylbd-rt-stock" id="productStockDisplay">{{ $product->has_variants && $product->activeVariants->isNotEmpty() ? $product->activeVariants->first()->quantity : $product->quantity }}</span> @lang('available'))
                                         @if($detailStockStatus === 'low' && $detailQty > 0)
                                             <span class="text-danger ms-1 fw-semibold">{{ __('Only :count left!', ['count' => $detailQty]) }}</span>
                                         @endif
@@ -327,7 +327,7 @@ data-product-id="{{ $product->id }}"
                                 </div>
                                 <div class="action-buttons pdp-actions-scroll" aria-label="{{ __('Product actions') }}">
                                     <button type="button"
-                                            class="cart-btn add-to-cart"
+                                            class="cart-btn add-to-cart staylbd-rt-atc"
                                             data-product_id="{{ $product->id }}"
                                             id="addToCartBtn"
                                             title="{{ __('Add to cart — click again when red to remove') }}">
@@ -718,7 +718,7 @@ data-product-id="{{ $product->id }}"
                 <div class="pro-detail-sticky-cart-price">
                     <span class="cur_sym">{{ $general->cur_sym }}</span><span class="sticky-price-amount">{{ showAmount($detailPrice) }}</span>
                 </div>
-                <button type="button" class="btn--base add-to-cart inline-flex flex-1 items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" data-product_id="{{ $product->id }}" id="addToCartStickyBtn">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Add To Cart')</button>
+                <button type="button" class="btn--base add-to-cart staylbd-rt-atc inline-flex flex-1 items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" data-product_id="{{ $product->id }}" id="addToCartStickyBtn">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Add To Cart')</button>
                 <a href="#0" class="btn-outline--base buy-now inline-flex items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" id="pdpStickyBuyNowLink" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
                 <span class="st-btn-secondary flex-1 cursor-not-allowed opacity-70 pointer-events-none select-none {{ $detailMaxQtySticky > 0 ? 'd-none' : '' }}" id="pdpStickyOos">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
             </div>

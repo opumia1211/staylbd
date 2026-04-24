@@ -151,6 +151,25 @@
 
 
     @if(@$section->element)
+        @if($key == 'service')
+        <div class="card border-0 shadow-sm mb-3 font-sans">
+            <div class="card-body py-2 px-3 text-sm text-slate-600">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="bg-primary-soft p-1.5 rounded-pill">
+                        <i class="las la-info-circle text-primary fs-5"></i>
+                    </div>
+                    <p class="mb-0 fw-bold text-slate-800">@lang('Homepage Feature Cards Design Guide')</p>
+                </div>
+                <ul class="mb-0 ps-3 small text-slate-500">
+                    <li>@lang('Each item becomes a premium card on the homepage (below banner).')</li>
+                    <li>@lang('Optimal Image Format'): <span class="badge badge-soft--success">SVG</span> or <span class="badge badge-soft--info">PNG (Transparent)</span> / <span class="badge badge-soft--warning">WebP</span>.</li>
+                    <li>@lang('Recommended Size'): <b>128x128 px</b> (@lang('for high-quality rendering')).</li>
+                    <li>@lang('Design Note'): @lang('Images will be placed inside the offset colorful icon box on the left.')</li>
+                </ul>
+            </div>
+        </div>
+        @endif
+
         @if($key == 'social_icon')
         <div class="card border-0 shadow-sm mb-3 font-sans">
             <div class="card-body py-2 px-3 text-sm text-slate-600">

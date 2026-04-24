@@ -377,7 +377,7 @@ class FileManager
             $path = json_decode(json_encode($filePaths[$method]));
             return $path;
         } else {
-            $this->$method(...$args);
+            throw new \Exception("The method or FileInfo key '{$method}' does not exist in FileManager.");
         }
     }
 

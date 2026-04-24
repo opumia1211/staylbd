@@ -25,7 +25,7 @@
     @endauth
     <a href="{{ route('user.cart', $mbNewTab) }}" target="_blank" rel="noopener noreferrer" class="mobile-bottom-nav__item {{ menuActive('user.cart') }}">
         <span class="mobile-bottom-nav__icon-wrap">
-            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 19, 'height' => 19, 'alt' => ''])
+            @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 19, 'height' => 19, 'alt' => '', 'class' => 'stayl-header-icon-cart'])
             <span class="mobile-bottom-nav__badge show-cart-count">{{ $mobileNavCartCount }}</span>
         </span>
         <span>@lang('Cart')</span>

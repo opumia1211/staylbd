@@ -131,10 +131,10 @@
 @endphp
 <div class="row g-3">
     <div class="col-12">
-        <div class="card shadow-sm mb-3">
+        <div class="card shadow-sm mb-3 border-start border-primary border-4">
             <div class="card-body p-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="m-0"><i class="las la-eye me-1"></i> @lang('Instant Live Preview')</h5>
+                    <h5 class="m-0 text-primary"><i class="las la-eye me-1"></i> @lang('Instant Live Preview')</h5>
                     <div id="headerDraftPreviewStats" class="d-flex gap-3 small fw-bold">
                         <span class="text-secondary">@lang('Total'): <span id="statTotal">0</span></span>
                         <span class="text-success">@lang('Public'): <span id="statPublic">0</span></span>
@@ -147,8 +147,10 @@
                     <div id="mockMainBar" class="mock-bar"></div>
                     <div id="mockMenuBar" class="mock-bar"></div>
                 </div>
-                <div class="text-muted small mt-2">
-                    <i class="las la-info-circle"></i> @lang('This represents a live mockup of your header design.')
+                <div class="alert alert-info mt-3 mb-0 py-2 border-0 small">
+                    <i class="las la-lightbulb me-1"></i> <strong>Professional Tip:</strong> 
+                    You can set direct links (e.g. <code>https://google.com</code> or <code>/shop</code>) in the "Link/URL" field. 
+                    Even if a button has a dropdown, the parent button remains clickable on the public site.
                 </div>
             </div>
         </div>
@@ -232,6 +234,7 @@
                         <div class="row g-3">
                             <div class="col-md-12 d-flex flex-wrap gap-3 mb-3">
                                 <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="top_bar[enabled]" value="1" @checked(!empty($topBar['enabled']))><label class="form-check-label fw-bold">@lang('Enable Top Bar')</label></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="top_bar[is_public]" value="1" @checked(!empty($topBar['is_public']))><label class="form-check-label fw-bold text--primary">@lang('Visibility (Public / Private)')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="top_bar[show_language]" value="1" @checked(!empty($topBar['show_language']))><label class="form-check-label">@lang('Language')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="top_bar[show_currency]" value="1" @checked(!empty($topBar['show_currency']))><label class="form-check-label">@lang('Currency')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="top_bar[show_apps]" value="1" @checked(!empty($topBar['show_apps']))><label class="form-check-label">@lang('Apps Menu')</label></div>
@@ -246,7 +249,11 @@
                     <!-- Main Bar Tab -->
                     <div class="tab-pane fade" id="tab-mainbar" role="tabpanel">
                         <div class="row g-3">
-                            <div class="col-md-3"><div class="form-check form-switch mt-4"><input class="form-check-input" type="checkbox" name="main_bar[enabled]" value="1" @checked(!empty($mainBar['enabled']))><label class="form-check-label fw-bold">@lang('Enable Main Bar')</label></div><div class="form-check mt-3"><input class="form-check-input" type="checkbox" name="main_bar[show_language_icon]" value="1" @checked(!empty($mainBar['show_language_icon']))><label class="form-check-label">@lang('Show Lang Icon')</label></div></div>
+                             <div class="col-md-5 d-flex flex-wrap gap-3">
+                                <div class="form-check form-switch mt-4"><input class="form-check-input" type="checkbox" name="main_bar[enabled]" value="1" @checked(!empty($mainBar['enabled']))><label class="form-check-label fw-bold">@lang('Enable Main Bar')</label></div>
+                                <div class="form-check form-switch mt-4"><input class="form-check-input" type="checkbox" name="main_bar[is_public]" value="1" @checked(!empty($mainBar['is_public']))><label class="form-check-label fw-bold text--primary">@lang('Visibility (Public / Private)')</label></div>
+                                <div class="form-check mt-3 w-100"><input class="form-check-input" type="checkbox" name="main_bar[show_language_icon]" value="1" @checked(!empty($mainBar['show_language_icon']))><label class="form-check-label">@lang('Show Lang Icon')</label></div>
+                            </div>
                             <div class="col-md-4"><label class="form-label small fw-bold">@lang('Logo Max Height (px)')</label><input type="number" min="28" max="90" class="form-control" name="main_bar[logo_max_height]" value="{{ (int) ($mainBar['logo_max_height'] ?? 48) }}"><div class="form-text small">@lang('Ensures logo doesn\'t break layout')</div></div>
                             <div class="col-md-4"><label class="form-label small fw-bold">@lang('Icon Size (px)')</label><input type="number" min="28" max="72" class="form-control" name="main_bar[icon_size]" value="{{ (int) ($mainBar['icon_size'] ?? 48) }}"><div class="form-text small">@lang('Cart, Wishlist, User icons size')</div></div>
                         </div>
@@ -257,6 +264,7 @@
                         <div class="row g-3">
                             <div class="col-md-12 d-flex flex-wrap gap-3 mb-3">
                                 <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="menu_bar[enabled]" value="1" @checked(!empty($menuBar['enabled']))><label class="form-check-label fw-bold">@lang('Enable 3rd Bar')</label></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="menu_bar[is_public]" value="1" @checked(!empty($menuBar['is_public']))><label class="form-check-label fw-bold text--primary">@lang('Visibility (Public)')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="menu_bar[show_sidebar_trigger]" value="1" @checked(!empty($menuBar['show_sidebar_trigger']))><label class="form-check-label">@lang('Sidebar Toggle')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="menu_bar[show_category_button]" value="1" @checked(!empty($menuBar['show_category_button']))><label class="form-check-label">@lang('Category Button')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="menu_bar[show_seller_button]" value="1" @checked(!empty($menuBar['show_seller_button']))><label class="form-check-label">@lang('Seller Button')</label></div>
@@ -315,9 +323,10 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="input-group input-group-sm">
-                                                    <span class="input-group-text bg--primary text-white">@lang('Link/URL')</span>
-                                                    <input class="form-control url-field-highlight" name="{{ $g['prefix'] }}[{{ $idx }}][url]" value="{{ $btn['url'] ?? '#' }}" placeholder="https://...">
+                                                    <span class="input-group-text bg--primary text-white" title="Link set directly inside button">@lang('Link/URL')</span>
+                                                    <input class="form-control url-field-highlight" name="{{ $g['prefix'] }}[{{ $idx }}][url]" value="{{ $btn['url'] ?? '#' }}" placeholder="e.g. https://google.com">
                                                 </div>
+                                                <div class="form-text x-small text-muted mt-1">@lang('Set direct page link here (Admin only control)')</div>
                                             </div>
                                             <div class="col-md-2">
                                                 <select class="form-control form-control-sm header-btn-type" name="{{ $g['prefix'] }}[{{ $idx }}][type]">
@@ -538,15 +547,20 @@
                                         <div class="col-md-4"><label class="small text-muted">@lang('Dropdown Panel Style')</label><select class="form-control form-control-sm header-panel-style" name="${prefix}[${idx}][dropdown_style]"><option value="dropdown">@lang('Simple Vertical List')</option><option value="mega">@lang('Full Width Mega Menu')</option></select></div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 header-btn-items-wrap mt-2" style="display:none;">
+                                            <div class="col-12 header-btn-items-wrap mt-2" style="display:none;">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label class="small fw-bold text--primary mb-0">@lang('Sub-menu Items (Visual Nested List)')</label>
-                                    <div class="btn-group btn-group-sm"><button type="button" class="btn btn-xs btn-outline-secondary px-2" onclick="window.insertNestedLine(this, '/')" title="@lang('Add Level 1')">+ L1</button><button type="button" class="btn btn-xs btn-outline-secondary px-2" onclick="window.insertNestedLine(this, '//')" title="@lang('Add Level 2')">+ L2</button><button type="button" class="btn btn-xs btn-outline-secondary px-2" onclick="window.insertNestedLine(this, '///')" title="@lang('Add Level 3')">+ L3</button><button type="button" class="btn btn-xs btn-outline-info px-2" onclick="alert('@lang('Syntax: Name|/url\nUse / for depth: //Child|/url')')">?</button></div>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-xs btn-outline-primary px-2" onclick="window.loadTemplateLinks(this)" title="@lang('Load Professional Examples')">✨ @lang('Load Examples')</button>
+                                        <button type="button" class="btn btn-xs btn-outline-secondary px-2" onclick="window.insertNestedLine(this, '/')" title="@lang('Add Level 1')">+ L1</button>
+                                        <button type="button" class="btn btn-xs btn-outline-secondary px-2" onclick="window.insertNestedLine(this, '//')" title="@lang('Add Level 2')">+ L2</button>
+                                        <button type="button" class="btn btn-xs btn-outline-info px-2" onclick="alert('@lang('Syntax: Name|/url\nUse / for depth: //Child|/url')')">?</button>
+                                    </div>
                                 </div>
-                                <textarea class="form-control form-control-sm" rows="4" name="${prefix}[${idx}][items_text]" placeholder="Name|/url&#10;/Nested Name|/url"></textarea>
-                                <div class="form-text small">@lang('Use slashes (/, //, ///) to create up to 3 levels of nesting. Example: /Category|/url')</div>
+                                <textarea class="form-control form-control-sm" rows="4" name="${prefix}[${idx}][items_text]" placeholder="/All Categories|/categories&#10;/Track Order|/track-order&#10;/Customer Support|/contact"></textarea>
+                                <div class="form-text small text-muted">@lang('Format: /Name|/link (Use slashes for nested levels)')</div>
                             </div>
+             </div>
                         </div>
                     </div>
                 </div>`;
@@ -587,9 +601,9 @@
             var mainH = Math.max(25, parseInt(document.querySelector('[name="appearance[main_height]"]')?.value || '56') / 2);
             var menuH = Math.max(15, parseInt(document.querySelector('[name="appearance[menu_height]"]')?.value || '38') / 2);
 
-            mockTop.style.cssText = 'height:' + topH + 'px; background:' + topBg + '; color: white; display:' + (document.querySelector('[name="top_bar[enabled]"]')?.checked ? 'flex' : 'none') + ';';
-            mockMain.style.cssText = 'height:' + mainH + 'px; background:' + mainBg + '; color: #0f172a; display:' + (document.querySelector('[name="main_bar[enabled]"]')?.checked ? 'flex' : 'none') + ';';
-            mockMenu.style.cssText = 'height:' + menuH + 'px; background:' + menuBg + '; color: #0f172a; display:' + (document.querySelector('[name="menu_bar[enabled]"]')?.checked ? 'flex' : 'none') + ';';
+            mockTop.style.cssText = 'height:' + topH + 'px; background:' + topBg + '; color: white; display:' + (document.querySelector('[name="top_bar[enabled]"]')?.checked ? 'flex' : 'none') + '; opacity:' + (document.querySelector('[name="top_bar[is_public]"]')?.checked ? '1' : '0.4') + ';';
+            mockMain.style.cssText = 'height:' + mainH + 'px; background:' + mainBg + '; color: #0f172a; display:' + (document.querySelector('[name="main_bar[enabled]"]')?.checked ? 'flex' : 'none') + '; opacity:' + (document.querySelector('[name="main_bar[is_public]"]')?.checked ? '1' : '0.4') + ';';
+            mockMenu.style.cssText = 'height:' + menuH + 'px; background:' + menuBg + '; color: #0f172a; display:' + (document.querySelector('[name="menu_bar[enabled]"]')?.checked ? 'flex' : 'none') + '; opacity:' + (document.querySelector('[name="menu_bar[is_public]"]')?.checked ? '1' : '0.4') + ';';
 
             // Stats
             var stats = { total: 0, public: 0, dropdown: 0 };
@@ -702,6 +716,7 @@
                 },
                 top_bar: {
                     enabled: document.querySelector('[name="top_bar[enabled]"]')?.checked ? 1 : 0,
+                    is_public: document.querySelector('[name="top_bar[is_public]"]')?.checked ? 1 : 0,
                     show_language: document.querySelector('[name="top_bar[show_language]"]')?.checked ? 1 : 0,
                     show_currency: document.querySelector('[name="top_bar[show_currency]"]')?.checked ? 1 : 0,
                     show_apps: document.querySelector('[name="top_bar[show_apps]"]')?.checked ? 1 : 0,
@@ -717,12 +732,14 @@
                 },
                 main_bar: {
                     enabled: document.querySelector('[name="main_bar[enabled]"]')?.checked ? 1 : 0,
+                    is_public: document.querySelector('[name="main_bar[is_public]"]')?.checked ? 1 : 0,
                     logo_max_height: parseInt(document.querySelector('[name="main_bar[logo_max_height]"]')?.value || '48', 10),
                     icon_size: parseInt(document.querySelector('[name="main_bar[icon_size]"]')?.value || '48', 10),
                     show_language_icon: document.querySelector('[name="main_bar[show_language_icon]"]')?.checked ? 1 : 0
                 },
                 menu_bar: {
                     enabled: document.querySelector('[name="menu_bar[enabled]"]')?.checked ? 1 : 0,
+                    is_public: document.querySelector('[name="menu_bar[is_public]"]')?.checked ? 1 : 0,
                     show_sidebar_trigger: document.querySelector('[name="menu_bar[show_sidebar_trigger]"]')?.checked ? 1 : 0,
                     show_category_button: document.querySelector('[name="menu_bar[show_category_button]"]')?.checked ? 1 : 0,
                     category_button_label: document.querySelector('[name="menu_bar[category_button_label]"]')?.value || '',
@@ -859,6 +876,16 @@
             reader.readAsText(file);
             event.target.value = '';
         });
+
+        window.loadTemplateLinks = function (btn) {
+            var row = btn.closest('.header-btn-row');
+            var textarea = row ? row.querySelector('textarea') : null;
+            if (!textarea) return;
+            var template = "/Alibaba|https://www.alibaba.com/\n/All Categories|/categories\n/Track Order|/track-order\n/Customer Support|/contact";
+            textarea.value = template;
+            textarea.focus();
+            renderQuickPreview();
+        };
 
         window.insertNestedLine = function (btn, prefix) {
             var row = btn.closest('.header-btn-row');

@@ -5,14 +5,8 @@
     $saveAmount = $product->price - $price;
     $savePercent = $product->price > 0 ? (int) round(($saveAmount / $product->price) * 100) : 0;
     $hasDiscount = ($product->discount != 0 || $product->today_deals == 1) && $saveAmount > 0;
-    $isNew = $product->created_at && $product->created_at->gt(now()->subDays(14));
     
     $primaryImg = getImageWebP(getFilePath('product') . '/' . $product->image, getFileSize('product'));
-    $hoverImg = null;
-    if (is_array($product->gallery ?? null) && count($product->gallery) > 0) {
-        $hoverImg = getImageWebP(getFilePath('productGallery') . '/' . $product->gallery[0], getFileSize('productGallery'));
-    }
-    
     $qty = $product->has_variants && $product->activeVariants->isNotEmpty()
         ? (int) $product->activeVariants->sum('quantity')
         : (int) ($product->quantity ?? 0);
@@ -20,96 +14,89 @@
     $displayName = __($product->name);
 
     $rating = 0;
-    if ($product->reviews_count > 0) {
-        $rating = $product->reviews_sum_rating / $product->reviews_count;
+    if (($product->reviews_count ?? 0) > 0) {
+        $rating = ($product->reviews_sum_rating ?? 0) / $product->reviews_count;
     }
+    
+    $lowStockMax = (int) config('product_upload.low_stock_max', 20);
+    $stockTier = $qty > $lowStockMax ? 'in' : ($qty >= 1 ? 'low' : 'out');
+    $stockLabel = $stockTier === 'in' ? __('In Stock') : ($stockTier === 'low' ? __('Low Stock') : __('Out of Stock'));
 @endphp
 
-<div class="group relative bg-white overflow-hidden rounded-xl border border-gray-100 flex flex-col h-full transition-shadow duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-    <!-- Image Wrapper -->
-    <div class="relative bg-[#f5f6f8] aspect-[4/5] flex-shrink-0 overflow-hidden">
-        <!-- Badges -->
-        <div class="absolute top-4 left-4 z-20 flex flex-col gap-2 items-start">
-            @if($hasDiscount)
-                <span class="bg-[#e24a4a] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-sm">- {{ $savePercent }}%</span>
-            @endif
-            @if($isNew)
-                <span class="bg-[#1266e3] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-sm">New</span>
-            @endif
+{{-- Elite Premium Product Card (Ryans/Compact Style) --}}
+<div class="stayl-product-card group bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full overflow-hidden" data-product-id="{{ $product->id }}">
+    
+    {{-- Discount Badge (Top Left) --}}
+    @if($hasDiscount)
+        <div class="stayl-card-badge absolute top-3 left-3 z-10 pointer-events-none">
+            <span class="stayl-badge-promo bg-red-500 text-white text-[11px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wide">
+                -{{ $savePercent }}%
+            </span>
         </div>
+    @endif
 
-        <!-- Float Actions (Top Right) -->
-        <div class="absolute right-4 top-4 z-20 flex flex-col gap-2 transform translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
-            <!-- Add to Cart -->
-            @if($canPurchase)
-            <button type="button" class="add-to-cart size-9 rounded-full bg-white text-gray-800 shadow-md flex items-center justify-center hover:bg-zenis-primary hover:text-white transition-colors" data-product_id="{{ $product->id }}" data-qty="1" title="Add to Cart">
-                <i class="fa-solid fa-cart-plus text-sm"></i>
-            </button>
-            @endif
-            <!-- Compare -->
-            <button type="button" class="size-9 rounded-full bg-white text-gray-800 shadow-md flex items-center justify-center hover:bg-zenis-primary hover:text-white transition-colors" title="Compare">
-                <i class="fa-solid fa-right-left text-sm"></i>
-            </button>
-            <!-- Wishlist -->
-            <button type="button" class="add-wishlist size-9 rounded-full bg-white text-gray-800 shadow-md flex items-center justify-center hover:bg-zenis-primary hover:text-white transition-colors" data-product_id="{{ $product->id }}" title="Wishlist">
-                <i class="fa-regular fa-heart text-sm"></i>
-            </button>
-            <!-- Quick View -->
-            <button type="button" class="quickView size-9 rounded-full bg-white text-gray-800 shadow-md flex items-center justify-center hover:bg-zenis-primary hover:text-white transition-colors" data-product_id="{{ $product->id }}" title="Quick View">
-                <i class="fa-regular fa-eye text-sm"></i>
-            </button>
-        </div>
+    {{-- Hover Actions (Top Right) --}}
+    <div class="stayl-card-actions absolute top-3 right-3 flex flex-col gap-1.5 z-10 opacity-0 translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+        <button type="button" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center transition-all duration-200 hover:bg-sky-500 hover:border-sky-500 hover:text-white dark:hover:bg-sky-500 dark:hover:text-white quickView" data-product_id="{{ $product->id }}" title="{{ __('Quick View') }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button type="button" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center transition-all duration-200 hover:bg-sky-500 hover:border-sky-500 hover:text-white dark:hover:bg-sky-500 dark:hover:text-white add-wishlist" data-product_id="{{ $product->id }}" title="{{ __('Wishlist') }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </button>
+    </div>
 
-        <!-- Product Image -->
-        <a href="{{ product_detail_url($product) }}" class="absolute inset-0 block w-full h-full">
-            <img src="{{ $primaryImg }}" alt="{{ $displayName }}" class="w-full h-full object-cover object-top transition-all duration-700 group-hover:scale-110 {{ $hoverImg ? 'group-hover:opacity-0' : '' }}">
-            @if($hoverImg)
-                <img src="{{ $hoverImg }}" alt="{{ $displayName }}" class="absolute top-0 left-0 w-full h-full object-cover object-top opacity-0 group-hover:opacity-100 transition-all duration-700">
-            @endif
+    {{-- Product Image --}}
+    <div class="stayl-card-media relative p-4 bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden aspect-square border-b border-slate-100 dark:border-slate-800">
+        <a href="{{ product_detail_url($product) }}" class="d-block w-100 h-100 flex-center">
+            <img src="{{ $primaryImg }}" alt="{{ $displayName }}" class="stayl-card-img w-full h-full object-contain transition-transform duration-500 group-hover:scale-110" loading="lazy">
         </a>
     </div>
 
-    <!-- Content Wrapper -->
-    <div class="p-4 flex flex-col flex-1 bg-white">
-        <!-- Title -->
-        <h3 class="text-[#333333] font-bold text-[15px] mb-2 leading-tight line-clamp-1 hover:text-zenis-primary transition-colors">
-            <a href="{{ product_detail_url($product) }}" title="{{ $displayName }}">{{ $displayName }}</a>
+    {{-- Product Information --}}
+    <div class="stayl-card-content p-4 flex flex-col grow text-left">
+        <span class="text-[11px] text-slate-500 dark:text-slate-400 mb-1.5 uppercase font-semibold tracking-wide">{{ $product->category->name ?? __('General') }}</span>
+
+        <h3 class="stayl-card-title text-[14px] font-semibold leading-tight mb-2.5 text-slate-800 dark:text-slate-100 line-clamp-2 h-[40px]">
+            <a href="{{ product_detail_url($product) }}" class="transition-colors duration-200 hover:text-sky-500">{{ $displayName }}</a>
         </h3>
 
-        <!-- Price -->
-        <div class="flex items-center gap-2 mb-2">
-            <span class="text-[15px] font-bold text-[#fbaf00]">
-                {{ $general->cur_sym }}{{ showAmount($price) }}
+        {{-- Micro-data list (Ryans style bullet points / compact data) --}}
+        <div class="stayl-card-micro-data flex items-center gap-3 text-[11px] font-medium mb-3 flex-wrap">
+            <span class="stayl-micro-item flex items-center gap-1 {{ $stockTier === 'in' ? 'text-green-600' : ($stockTier === 'low' ? 'text-yellow-600' : 'text-red-600') }}">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/></svg>
+                {{ $stockLabel }}
             </span>
-            @if($hasDiscount)
-                <span class="text-[13px] text-gray-500 line-through">
-                    {{ $general->cur_sym }}{{ showAmount($product->price) }}
-                </span>
+            @if($rating > 0)
+            <span class="stayl-micro-item flex items-center gap-1 text-yellow-500">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                {{ number_format($rating, 1) }}
+            </span>
             @endif
         </div>
 
-        <!-- Rating -->
-        <div class="flex items-center gap-1.5 mb-3">
-            <div class="flex text-[#fbaf00] text-[13px]">
-                @for($i=1; $i<=5; $i++)
-                    @if($i <= $rating)
-                        <i class="fa-solid fa-star"></i>
-                    @else
-                        <i class="fa-regular fa-star"></i>
-                    @endif
-                @endfor
+        {{-- Pricing --}}
+        <div class="stayl-card-pricing flex items-end justify-between mt-auto pt-2.5 border-t border-slate-200 dark:border-slate-800 border-dotted">
+            <div class="stayl-price-stack flex flex-col leading-tight">
+                @if($hasDiscount)
+                    <span class="stayl-price-old text-[11px] text-slate-400 line-through mb-0.5 staylbd-rt-price-compare notranslate" data-base-price="{{ $product->price }}">
+                        {{ $general->cur_sym }}{{ showAmount($product->price) }}
+                    </span>
+                @else
+                    <span class="stayl-price-spacer text-[11px] mb-0.5 invisible">&nbsp;</span>
+                @endif
+                <span class="stayl-price-current text-[16px] font-bold text-red-500 staylbd-rt-price notranslate" data-base-price="{{ $price }}">
+                    {{ $general->cur_sym }}{{ showAmount($price) }}
+                </span>
             </div>
-            <span class="text-[13px] text-gray-500">({{ $product->reviews_count ?? 0 }} Reviews)</span>
-        </div>
-
-        <!-- Color Swatches (Dummy for now, as it needs variant data) -->
-        <div class="flex items-center gap-1.5 mt-auto">
-            <div class="size-4 rounded-full bg-[#df4f4f] text-white flex items-center justify-center text-[10px]">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <div class="size-4 rounded-full bg-[#5f9c34]"></div>
-            <div class="size-4 rounded-full bg-[#1b5df9]"></div>
-            <div class="size-4 rounded-full bg-[#fab206]"></div>
+            
+            {{-- Cart Button injected inline for max space efficiency --}}
+            <button type="button" class="add-to-cart stayl-compact-atc w-9 h-9 rounded-md bg-transparent border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:bg-sky-500 hover:border-sky-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed staylbd-rt-atc" 
+                data-product_id="{{ $product->id }}" 
+                data-qty="1" 
+                {{ $canPurchase ? '' : 'disabled' }}
+                title="{{ __('Add to Cart') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </button>
         </div>
     </div>
 </div>

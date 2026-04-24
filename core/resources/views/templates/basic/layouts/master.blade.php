@@ -6,7 +6,7 @@
 
 @section('app')
     @include($activeTemplate . 'partials.header')
-    <div class="dashboard-section pt-30 pb-30 bg-white" id="user-dashboard-root" data-user-dashboard="1">
+    <div class="dashboard-section pt-30 pb-30 stayl-bg-dynamic" id="user-dashboard-root" data-user-dashboard="1">
         <div class="dashboard-two-panels-container dashboard-responsive-shell">
             <div class="row g-0 align-items-stretch dashboard-row-equal-no-gap">
                 <div class="col-xxl-3 col-lg-3 dashboard-aside-col">

@@ -50,6 +50,7 @@ class HeaderControlController extends Controller
     {
         $validated = $request->validate([
             'menu_bar.enabled' => ['nullable', 'boolean'],
+            'menu_bar.is_public' => ['nullable', 'boolean'],
             'menu_bar.show_sidebar_trigger' => ['nullable', 'boolean'],
             'menu_bar.show_category_button' => ['nullable', 'boolean'],
             'menu_bar.category_button_label' => ['required', 'string', 'max:60'],
@@ -98,6 +99,7 @@ class HeaderControlController extends Controller
     {
         $validated = $request->validate([
             'top_bar.enabled' => ['nullable', 'boolean'],
+            'top_bar.is_public' => ['nullable', 'boolean'],
             'top_bar.show_language' => ['nullable', 'boolean'],
             'top_bar.show_currency' => ['nullable', 'boolean'],
             'top_bar.show_apps' => ['nullable', 'boolean'],
@@ -122,6 +124,7 @@ class HeaderControlController extends Controller
     {
         $validated = $request->validate([
             'main_bar.enabled' => ['nullable', 'boolean'],
+            'main_bar.is_public' => ['nullable', 'boolean'],
             'main_bar.logo_max_height' => ['required', 'integer', 'min:28', 'max:90'],
             'main_bar.icon_size' => ['required', 'integer', 'min:28', 'max:72'],
             'main_bar.show_language_icon' => ['nullable', 'boolean'],
