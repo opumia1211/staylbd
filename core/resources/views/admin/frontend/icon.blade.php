@@ -296,42 +296,87 @@
         </div>
     </div>
 
-    {{-- Info Card --}}
-    <div class="col-12 admin-icon-info-cards">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="las la-info-circle me-2"></i>@lang('Logo Usage Locations')</h5>
+    {{-- Advanced Technical Audit (System Health) --}}
+    <div class="col-12 admin-icon-audit-section mt-4">
+        <div class="card border-info">
+            <div class="card-header bg-info d-flex justify-content-between align-items-center">
+                <h5 class="card-title text-white mb-0">
+                    <i class="las la-microscope me-2"></i>@lang('Advanced Technical Audit & System Health')
+                </h5>
+                <span class="badge bg-white text-info">@lang('Live Status')</span>
             </div>
-            <div class="card-body p-3">
-                <div class="row g-3">
-                    <div class="col-lg-4 col-md-6">
-                        <h6 class="text-primary"><i class="las la-image me-1"></i> @lang('Main Logo') (320×70 – 460×100 px)</h6>
-                        <ul class="list-unstyled small">
-                            <li><i class="las la-check text-success me-1"></i> @lang('User Header - Home Button')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Admin Panel Sidebar')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Login & Register Pages')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Footer Section')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Invoice & Contact Pages')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Error Pages (404, 419)')</li>
-                            <li><i class="las la-home text-primary me-1"></i> <strong>@lang('Logo = Home Button')</strong></li>
-                        </ul>
+            <div class="card-body">
+                @php $audit = getLogoAudit(); @endphp
+                <div class="table-responsive">
+                    <table class="table table--light table-bordered">
+                        <thead>
+                            <tr>
+                                <th>@lang('Asset Type')</th>
+                                <th>@lang('Storage Status')</th>
+                                <th>@lang('Resolution URL')</th>
+                                <th>@lang('Metadata')</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(['logo', 'logo_dark', 'favicon', 'invoice_logo'] as $type)
+                                @php $item = $audit[$type] ?? ['exists' => false]; @endphp
+                                <tr>
+                                    <td class="fw-bold text-capitalize">{{ str_replace('_', ' ', $type) }}</td>
+                                    <td>
+                                        @if($item['exists'])
+                                            <span class="badge bg--success"><i class="las la-check-circle me-1"></i>@lang('Physical File Found')</span>
+                                        @else
+                                            <span class="badge bg--danger"><i class="las la-exclamation-triangle me-1"></i>@lang('File Missing')</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <code class="small text-break">{{ $item['url'] ?? 'N/A' }}</code>
+                                    </td>
+                                    <td class="small">
+                                        @if($item['exists'])
+                                            <div><strong>@lang('Size'):</strong> {{ round(($item['size'] ?? 0) / 1024, 2) }} KB</div>
+                                            <div><strong>@lang('Modified'):</strong> {{ date('Y-m-d H:i', $item['mtime'] ?? time()) }}</div>
+                                        @else
+                                            <span class="text-muted">@lang('No data')</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border">
+                            <h6 class="mb-2"><i class="las la-server me-2"></i>@lang('Server Environment')</h6>
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1">
+                                    <strong>@lang('Upload Directory'):</strong> <code class="text-break">{{ $audit['system']['path'] }}</code>
+                                    @if($audit['system']['is_writable'])
+                                        <i class="las la-check-circle text-success ms-1" title="Writable"></i>
+                                    @else
+                                        <i class="las la-times-circle text-danger ms-1" title="Not Writable"></i>
+                                    @endif
+                                </li>
+                                <li class="mb-1"><strong>@lang('APP_URL'):</strong> <code>{{ $audit['system']['app_url_config'] }}</code></li>
+                                <li><strong>@lang('ASSET_URL'):</strong> <code>{{ $audit['system']['asset_url_config'] ?: 'None (Default)' }}</code></li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <h6 class="text-dark"><i class="las la-moon me-1"></i> @lang('Dark Logo')</h6>
-                        <ul class="list-unstyled small">
-                            <li><i class="las la-check text-success me-1"></i> @lang('Admin Sidebar')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Dark Footer')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Admin Login Page')</li>
-                        </ul>
-                    </div>
-                    <div class="col-lg-4 col-md-12">
-                        <h6 class="text-success"><i class="las la-window-maximize me-1"></i> @lang('Browser Favicon') (32×32 – 180×180 px)</h6>
-                        <ul class="list-unstyled small">
-                            <li><i class="las la-check text-success me-1"></i> @lang('Browser Tabs')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('Bookmarks')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('PWA / Mobile Tab - 180×180')</li>
-                            <li><i class="las la-check text-success me-1"></i> @lang('All New Tab Links')</li>
-                        </ul>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border h-100">
+                            <h6 class="mb-2"><i class="las la-tools me-2"></i>@lang('Advanced Troubleshooting')</h6>
+                            <p class="small text-muted mb-2">@lang('If icons are not showing despite being "Found", it may be due to browser caching or incorrect ASSET_URL configuration in .env.')</p>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline--info btn-sm" onclick="window.location.reload(true)">
+                                    <i class="las la-sync"></i> @lang('Force Refresh')
+                                </button>
+                                <a href="{{ route('admin.optimize.clear') }}" class="btn btn-outline--warning btn-sm">
+                                    <i class="las la-broom"></i> @lang('Clear System Cache')
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,93 +3,26 @@
 @section('panel')
 @push('style')
 <style>
-    .header-preview-stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    .header-preview-stat {
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 10px;
-        background: #fff;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        text-align: center;
-    }
-    .header-preview-stat .label {
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #64748b;
-        display: block;
-        margin-bottom: 2px;
-    }
-    .header-preview-stat .value {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0f172a;
-    }
     .header-preview-sticky {
         position: sticky;
         top: 80px;
         z-index: 100;
         transition: all 0.3s ease;
     }
-    .header-preview-frame {
-        height: 300px;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        background: #fff;
-    }
-    /* Visual Live Preview Mock */
-    #headerVisualMock {
-        background: #f1f5f9;
-        border-radius: 8px;
-        padding: 5px;
-        border: 1px dashed #cbd5e1;
-        margin-bottom: 15px;
-        overflow: hidden;
-    }
-    .mock-bar {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        padding: 0 10px;
-        font-size: 10px;
-        box-sizing: border-box;
-        overflow: hidden;
-        white-space: nowrap;
-        margin-bottom: 2px;
-        border-radius: 4px;
-    }
-    .mock-btn {
-        padding: 2px 6px;
-        background: rgba(255,255,255,0.2);
-        border: 1px solid rgba(255,255,255,0.3);
-        border-radius: 4px;
-        margin-right: 4px;
-        max-width: 60px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .mock-btn.inactive { opacity: 0.4; text-decoration: line-through; }
     .nav-tabs-custom .nav-link {
         border: none;
         border-bottom: 2px solid transparent;
-        padding: 8px 15px;
-        font-weight: 600;
+        padding: 10px 20px;
+        font-weight: 700;
         color: #64748b;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .nav-tabs-custom .nav-link.active {
         color: #4e73df;
         border-bottom: 2px solid #4e73df;
         background: transparent;
-    }
-    .compact-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 15px;
     }
     .header-btn-row {
         border-left: 3px solid #4e73df !important;
@@ -103,6 +36,130 @@
         background: #f0f7ff !important;
         border-color: #4e73df !important;
         font-weight: 500;
+    }
+
+    /* High-Fidelity Virtual Header Preview */
+    .v-header {
+        width: 100%;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        border: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        font-family: 'Inter', sans-serif;
+    }
+    .v-bar {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 30px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .v-bar--private { opacity: 0.5; filter: grayscale(0.5); }
+    .v-bar--private::after {
+        content: 'PRIVATE';
+        position: absolute;
+        right: 10px;
+        top: 2px;
+        font-size: 8px;
+        font-weight: 900;
+        color: #ef4444;
+        letter-spacing: 1px;
+    }
+    
+    .v-bar-top { font-size: 11px; font-weight: 600; }
+    .v-bar-main { border-bottom: 1px solid rgba(0,0,0,0.04); }
+    .v-bar-menu { border-bottom: 1px solid rgba(0,0,0,0.02); }
+    
+    .v-logo { font-weight: 900; font-size: 20px; letter-spacing: -0.5px; color: #0f172a; white-space: nowrap; }
+    .v-search { 
+        flex-grow: 1; 
+        max-width: 500px; 
+        height: 36px; 
+        background: #f1f5f9; 
+        border-radius: 18px; 
+        margin: 0 40px; 
+        display: flex; 
+        align-items: center; 
+        padding: 0 15px; 
+        color: #94a3b8; 
+        font-size: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .v-icons { display: flex; align-items: center; gap: 15px; }
+    .v-icon { width: 32px; height: 32px; background: #f1f5f9; border-radius: 50%; border: 1px solid #e2e8f0; flex-shrink: 0; }
+    
+    .v-link { 
+        margin-right: 25px; 
+        font-size: 11px; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        letter-spacing: 0.5px; 
+        display: flex; 
+        align-items: center; 
+        gap: 5px;
+        cursor: default;
+    }
+    .v-pill {
+        padding: 4px 10px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 6px;
+        margin-left: 10px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+    .v-link--inactive { opacity: 0.3; text-decoration: line-through; }
+    .v-dropdown-icon { font-size: 8px; opacity: 0.5; }
+    
+    .v-cat-btn {
+        padding: 0 20px;
+        height: 100%;
+        background: rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        font-weight: 800;
+        margin-right: 20px;
+        font-size: 11px;
+    }
+    
+    .preview-mode-badge {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        background: #0f172a;
+        color: #fff;
+        font-size: 10px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        z-index: 50;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    /* Advanced Color Picker Styling */
+    .advanced-color-picker {
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        padding: 2px !important;
+        cursor: pointer;
+        background-color: #fff;
+    }
+    .advanced-color-picker::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+    .advanced-color-picker::-webkit-color-swatch {
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+    }
+    .color-hex-input {
+        font-family: monospace;
+        font-size: 13px !important;
+        letter-spacing: 0.5px;
+        min-width: 250px;
     }
 </style>
 @endpush
@@ -131,26 +188,32 @@
 @endphp
 <div class="row g-3">
     <div class="col-12">
-        <div class="card shadow-sm mb-3 border-start border-primary border-4">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="m-0 text-primary"><i class="las la-eye me-1"></i> @lang('Instant Live Preview')</h5>
+        <div class="card shadow-sm mb-3 border-0 overflow-hidden">
+            <div class="card-body p-0 position-relative">
+                <div class="preview-mode-badge"><i class="las la-broadcast-tower me-1"></i> @lang('LIVE FRONTEND SYNC')</div>
+                
+                <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 text-primary"><i class="las la-eye me-1"></i> @lang('High-Fidelity Virtual Header')</h5>
                     <div id="headerDraftPreviewStats" class="d-flex gap-3 small fw-bold">
                         <span class="text-secondary">@lang('Total'): <span id="statTotal">0</span></span>
                         <span class="text-success">@lang('Public'): <span id="statPublic">0</span></span>
                         <span class="text-primary">@lang('Menus'): <span id="statDropdown">0</span></span>
                     </div>
                 </div>
-                <!-- Visual Mockup -->
-                <div id="headerVisualMock" class="bg-light border rounded p-2 mb-0" style="min-height: 100px;">
-                    <div id="mockTopBar" class="mock-bar"></div>
-                    <div id="mockMainBar" class="mock-bar"></div>
-                    <div id="mockMenuBar" class="mock-bar"></div>
-                </div>
-                <div class="alert alert-info mt-3 mb-0 py-2 border-0 small">
-                    <i class="las la-lightbulb me-1"></i> <strong>Professional Tip:</strong> 
-                    You can set direct links (e.g. <code>https://google.com</code> or <code>/shop</code>) in the "Link/URL" field. 
-                    Even if a button has a dropdown, the parent button remains clickable on the public site.
+
+                <!-- High-Fidelity Virtual Header -->
+                <div class="p-4 bg-light">
+                    <div class="v-header" id="virtualHeaderContainer">
+                        <div id="vTopBar" class="v-bar v-bar-top"></div>
+                        <div id="vMainBar" class="v-bar v-bar-main"></div>
+                        <div id="vMenuBar" class="v-bar v-bar-menu"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-4 small text-muted mt-2">
+                        <span><i class="las la-check-circle text-success"></i> @lang('Real-time Appearance Sync')</span>
+                        <span><i class="las la-check-circle text-success"></i> @lang('Public/Private Status Visualization')</span>
+                        <span><i class="las la-check-circle text-success"></i> @lang('Pro-Layout Preview')</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -235,44 +298,72 @@
                     <div class="tab-pane fade show active" id="tab-appearance" role="tabpanel">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold">@lang('Top Bar Background')</label>
+                                <label class="form-label small fw-bold text-primary">@lang('Top Bar Background')</label>
                                 <div class="input-group">
-                                    <input class="form-control form-control-color" type="color" name="appearance[top_bg]" value="{{ $appearance['top_bg'] ?? '#0f172a' }}">
-                                    <input type="text" class="form-control" value="{{ $appearance['top_bg'] ?? '#0f172a' }}" readonly>
+                                    <input class="form-control advanced-color-picker color-bg-picker flex-shrink-0" type="color" data-target="top_bg_input" data-idx="1" value="{{ preg_match('/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/', $appearance['top_bg'] ?? '#0f172a', $m) ? $m[0] : '#0f172a' }}" title="@lang('Primary Color')">
+                                    <input class="form-control advanced-color-picker color-bg-picker flex-shrink-0" type="color" data-target="top_bg_input" data-idx="2" value="{{ preg_match('/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/', $appearance['top_bg'] ?? '#0f172a', $m) ? $m[0] : '#0f172a' }}" title="@lang('Gradient Color (Optional)')">
+                                    <input type="text" class="form-control color-hex-input px-1" id="top_bg_input" name="appearance[top_bg]" value="{{ $appearance['top_bg'] ?? '#0f172a' }}" placeholder="#HEX">
+                                    <button type="button" class="btn btn-dark px-2 reset-bg-btn" data-target="top_bg_input" data-default="#0f172a" title="@lang('Reset')"><i class="las la-redo"></i></button>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold">@lang('Main Bar Background')</label>
+                                <label class="form-label small fw-bold text-primary">@lang('Main Bar Background')</label>
                                 <div class="input-group">
-                                    <input class="form-control form-control-color" type="color" name="appearance[main_bg]" value="{{ $appearance['main_bg'] ?? '#f8fafc' }}">
-                                    <input type="text" class="form-control" value="{{ $appearance['main_bg'] ?? '#f8fafc' }}" readonly>
+                                    <input class="form-control advanced-color-picker color-bg-picker flex-shrink-0" type="color" data-target="main_bg_input" data-idx="1" value="{{ preg_match('/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/', $appearance['main_bg'] ?? '#f8fafc', $m) ? $m[0] : '#f8fafc' }}">
+                                    <input class="form-control advanced-color-picker color-bg-picker flex-shrink-0" type="color" data-target="main_bg_input" data-idx="2" value="{{ preg_match('/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/', $appearance['main_bg'] ?? '#f8fafc', $m) ? $m[0] : '#f8fafc' }}">
+                                    <input type="text" class="form-control color-hex-input px-1" id="main_bg_input" name="appearance[main_bg]" value="{{ $appearance['main_bg'] ?? '#f8fafc' }}">
+                                    <button type="button" class="btn btn-dark px-2 reset-bg-btn" data-target="main_bg_input" data-default="#f8fafc"><i class="las la-redo"></i></button>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold">@lang('Menu Bar Background')</label>
+                                <label class="form-label small fw-bold text-primary">@lang('Menu Bar Background')</label>
                                 <div class="input-group">
-                                    <input class="form-control form-control-color" type="color" name="appearance[menu_bg]" value="{{ $appearance['menu_bg'] ?? '#c7eafe' }}">
-                                    <input type="text" class="form-control" value="{{ $appearance['menu_bg'] ?? '#c7eafe' }}" readonly>
+                                    <input class="form-control advanced-color-picker color-bg-picker flex-shrink-0" type="color" data-target="menu_bg_input" data-idx="1" value="{{ preg_match('/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/', $appearance['menu_bg'] ?? '#c7eafe', $m) ? $m[0] : '#c7eafe' }}">
+                                    <input class="form-control advanced-color-picker color-bg-picker flex-shrink-0" type="color" data-target="menu_bg_input" data-idx="2" value="{{ preg_match('/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/', $appearance['menu_bg'] ?? '#c7eafe', $m) ? $m[0] : '#c7eafe' }}">
+                                    <input type="text" class="form-control color-hex-input px-1" id="menu_bg_input" name="appearance[menu_bg]" value="{{ $appearance['menu_bg'] ?? '#c7eafe' }}">
+                                    <button type="button" class="btn btn-dark px-2 reset-bg-btn" data-target="menu_bg_input" data-default="#c7eafe"><i class="las la-redo"></i></button>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">@lang('Bar Heights (px)')</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light p-1 px-2" title="Top">T</span>
-                                    <input type="number" min="30" max="80" class="form-control" name="appearance[top_height]" value="{{ (int) ($appearance['top_height'] ?? 38) }}">
-                                    <span class="input-group-text bg-light p-1 px-2" title="Main">M</span>
-                                    <input type="number" min="40" max="100" class="form-control" name="appearance[main_height]" value="{{ (int) ($appearance['main_height'] ?? 56) }}">
-                                    <span class="input-group-text bg-light p-1 px-2" title="Menu">B</span>
-                                    <input type="number" min="30" max="80" class="form-control" name="appearance[menu_height]" value="{{ (int) ($appearance['menu_height'] ?? 38) }}">
+
+                            <!-- Bar Heights Split -->
+                            <div class="col-12 mt-4 pt-2">
+                                <h6 class="mb-2 small fw-bold text-muted">@lang('Bar Heights (px)')</h6>
+                                <div class="d-flex gap-3">
+                                    <div class="input-group input-group-sm" style="width: 130px;">
+                                        <span class="input-group-text bg-light text-muted">T</span>
+                                        <input type="number" min="30" max="80" class="form-control text-center" name="appearance[top_height]" value="{{ (int) ($appearance['top_height'] ?? 38) }}">
+                                    </div>
+                                    <div class="input-group input-group-sm" style="width: 130px;">
+                                        <span class="input-group-text bg-light text-muted">M</span>
+                                        <input type="number" min="40" max="100" class="form-control text-center" name="appearance[main_height]" value="{{ (int) ($appearance['main_height'] ?? 56) }}">
+                                    </div>
+                                    <div class="input-group input-group-sm" style="width: 130px;">
+                                        <span class="input-group-text bg-light text-muted">B</span>
+                                        <input type="number" min="30" max="80" class="form-control text-center" name="appearance[menu_height]" value="{{ (int) ($appearance['menu_height'] ?? 38) }}">
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Container Widths -->
                             <div class="col-12 mt-4 pt-2 border-top">
-                                <h6 class="mb-2">@lang('Container Widths (Responsive Control)')</h6>
+                                <h6 class="mb-2 small text-muted">@lang('Container Widths (Responsive Control)')</h6>
                                 <div class="row g-2">
-                                    <div class="col-md-3"><label class="small text-muted">@lang('Desktop')</label><input type="number" min="1280" max="1920" class="form-control form-control-sm" name="appearance[width_desktop]" value="{{ (int) ($appearance['width_desktop'] ?? 1920) }}"></div>
-                                    <div class="col-md-3"><label class="small text-muted">@lang('Laptop')</label><input type="number" min="1024" max="1800" class="form-control form-control-sm" name="appearance[width_laptop]" value="{{ (int) ($appearance['width_laptop'] ?? 1600) }}"></div>
-                                    <div class="col-md-3"><label class="small text-muted">@lang('Tablet')</label><input type="number" min="768" max="1400" class="form-control form-control-sm" name="appearance[width_tablet]" value="{{ (int) ($appearance['width_tablet'] ?? 1200) }}"></div>
-                                    <div class="col-md-3"><label class="small text-muted">@lang('Mobile layout width (px)')</label><input type="number" min="320" max="900" class="form-control form-control-sm" name="appearance[width_mobile]" value="{{ (int) ($appearance['width_mobile'] ?? 100) }}"></div>
+                                    <div class="col-md-3">
+                                        <label class="small fw-bold text-muted">@lang('Desktop')</label>
+                                        <input type="number" min="1280" max="1920" class="form-control form-control-sm" name="appearance[width_desktop]" value="{{ (int) ($appearance['width_desktop'] ?? 1920) }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="small fw-bold text-muted">@lang('Laptop')</label>
+                                        <input type="number" min="1024" max="1800" class="form-control form-control-sm" name="appearance[width_laptop]" value="{{ (int) ($appearance['width_laptop'] ?? 1600) }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="small fw-bold text-muted">@lang('Tablet')</label>
+                                        <input type="number" min="768" max="1400" class="form-control form-control-sm" name="appearance[width_tablet]" value="{{ (int) ($appearance['width_tablet'] ?? 1200) }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="small fw-bold text-muted">@lang('Mobile layout width (px)')</label>
+                                        <input type="number" min="320" max="900" class="form-control form-control-sm" name="appearance[width_mobile]" value="{{ (int) ($appearance['width_mobile'] ?? 100) }}">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -419,13 +510,12 @@
 
     <div class="col-lg-4 order-lg-2 order-1 px-lg-0">
         <div class="header-preview-sticky">
-            <div class="card shadow-sm border-0 mb-3">
-                <div class="card-header py-2 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0"><i class="las la-desktop me-2"></i>@lang('Full Preview')</h6>
-                    <button type="button" class="btn btn-xs btn-outline-secondary" id="refreshHeaderDraftFrameBtn" title="@lang('Reload')"><i class="las la-sync-alt"></i></button>
-                </div>
-                <div class="card-body p-0">
-                    <iframe class="w-100" id="headerDraftIframePreview" src="{{ route('admin.frontend.sections.header.preview') }}" loading="lazy" style="border:none; height: 350px;"></iframe>
+            <div class="card shadow-sm border-0 mb-3 bg--primary text-white">
+                <div class="card-body p-3">
+                    <h6 class="mb-2 text-white"><i class="las la-info-circle me-2"></i>@lang('How it works')</h6>
+                    <p class="small mb-0 opacity-75">
+                        @lang('This editor allows you to manage all three header bars from one place. Changes are saved as a "Draft" so you can refine your layout before going live.')
+                    </p>
                 </div>
             </div>
 
@@ -631,29 +721,67 @@
         }
 
         function renderQuickPreview() {
-            var mockTop = document.getElementById('mockTopBar');
-            var mockMain = document.getElementById('mockMainBar');
-            var mockMenu = document.getElementById('mockMenuBar');
-            if (!mockTop || !mockMain || !mockMenu) return;
+            var vTop = document.getElementById('vTopBar');
+            var vMain = document.getElementById('vMainBar');
+            var vMenu = document.getElementById('vMenuBar');
+            if (!vTop || !vMain || !vMenu) return;
 
             // Appearance settings
             var topBg = document.querySelector('[name="appearance[top_bg]"]')?.value || '#0f172a';
             var mainBg = document.querySelector('[name="appearance[main_bg]"]')?.value || '#f8fafc';
             var menuBg = document.querySelector('[name="appearance[menu_bg]"]')?.value || '#c7eafe';
-            var topH = Math.max(15, parseInt(document.querySelector('[name="appearance[top_height]"]')?.value || '38') / 2);
-            var mainH = Math.max(25, parseInt(document.querySelector('[name="appearance[main_height]"]')?.value || '56') / 2);
-            var menuH = Math.max(15, parseInt(document.querySelector('[name="appearance[menu_height]"]')?.value || '38') / 2);
+            
+            var topH = parseInt(document.querySelector('[name="appearance[top_height]"]')?.value || '38');
+            var mainH = parseInt(document.querySelector('[name="appearance[main_height]"]')?.value || '56');
+            var menuH = parseInt(document.querySelector('[name="appearance[menu_height]"]')?.value || '38');
+            
+            var topEnabled = document.querySelector('[name="top_bar[enabled]"]')?.checked;
+            var mainEnabled = document.querySelector('[name="main_bar[enabled]"]')?.checked;
+            var menuEnabled = document.querySelector('[name="menu_bar[enabled]"]')?.checked;
+            
+            var topPublic = document.querySelector('[name="top_bar[is_public]"]')?.checked;
+            var mainPublic = document.querySelector('[name="main_bar[is_public]"]')?.checked;
+            var menuPublic = document.querySelector('[name="menu_bar[is_public]"]')?.checked;
 
-            mockTop.style.cssText = 'height:' + topH + 'px; background:' + topBg + '; color: white; display:' + (document.querySelector('[name="top_bar[enabled]"]')?.checked ? 'flex' : 'none') + '; opacity:' + (document.querySelector('[name="top_bar[is_public]"]')?.checked ? '1' : '0.4') + ';';
-            mockMain.style.cssText = 'height:' + mainH + 'px; background:' + mainBg + '; color: #0f172a; display:' + (document.querySelector('[name="main_bar[enabled]"]')?.checked ? 'flex' : 'none') + '; opacity:' + (document.querySelector('[name="main_bar[is_public]"]')?.checked ? '1' : '0.4') + ';';
-            mockMenu.style.cssText = 'height:' + menuH + 'px; background:' + menuBg + '; color: #0f172a; display:' + (document.querySelector('[name="menu_bar[enabled]"]')?.checked ? 'flex' : 'none') + '; opacity:' + (document.querySelector('[name="menu_bar[is_public]"]')?.checked ? '1' : '0.4') + ';';
+            // Apply Styles
+            vTop.style.cssText = `height:${topH}px; background:${topBg}; color:white; display:${topEnabled ? 'flex' : 'none'};`;
+            vTop.className = 'v-bar v-bar-top' + (topPublic ? '' : ' v-bar--private');
+            
+            vMain.style.cssText = `height:${mainH}px; background:${mainBg}; color:#0f172a; display:${mainEnabled ? 'flex' : 'none'};`;
+            vMain.className = 'v-bar v-bar-main' + (mainPublic ? '' : ' v-bar--private');
+            
+            vMenu.style.cssText = `height:${menuH}px; background:${menuBg}; color:#0f172a; display:${menuEnabled ? 'flex' : 'none'};`;
+            vMenu.className = 'v-bar v-bar-menu' + (menuPublic ? '' : ' v-bar--private');
 
-            // Stats
+            // Render Content
             var stats = { total: 0, public: 0, dropdown: 0 };
-            mockTop.innerHTML = '<span class="me-2" style="opacity:0.5; text-transform:uppercase;">Top:</span>';
-            mockMain.innerHTML = '<span class="me-2" style="font-weight:bold;">LOGO</span>';
-            mockMenu.innerHTML = '';
+            
+            // Top Bar Content
+            var supportLabel = document.querySelector('[name="top_bar[support_label]"]')?.value || 'Support';
+            var supportPhone = document.querySelector('[name="top_bar[support_phone]"]')?.value || '';
+            vTop.innerHTML = `<span><i class="las la-headset me-1"></i> ${supportLabel}: ${supportPhone}</span><div style="flex-grow:1"></div>`;
+            
+            // Main Bar Content
+            var logoH = parseInt(document.querySelector('[name="main_bar[logo_max_height]"]')?.value || '48');
+            var iconS = parseInt(document.querySelector('[name="main_bar[icon_size]"]')?.value || '32');
+            vMain.innerHTML = `
+                <div class="v-logo" style="max-height:${logoH}px">STAYLBD</div>
+                <div class="v-search">Search for products...</div>
+                <div class="v-icons">
+                    <div class="v-icon" style="width:${iconS}px; height:${iconS}px"></div>
+                    <div class="v-icon" style="width:${iconS}px; height:${iconS}px"></div>
+                    <div class="v-icon" style="width:${iconS}px; height:${iconS}px"></div>
+                </div>
+            `;
 
+            // Menu Bar Content
+            vMenu.innerHTML = '';
+            if (document.querySelector('[name="menu_bar[show_category_button]"]')?.checked) {
+                var catLabel = document.querySelector('[name="menu_bar[category_button_label]"]')?.value || 'CATEGORIES';
+                vMenu.innerHTML += `<div class="v-cat-btn"><i class="las la-bars me-2"></i> ${catLabel}</div>`;
+            }
+
+            // Buttons Rendering
             ['topButtonsWrap', 'menuNavButtonsWrap', 'menuButtonsWrap'].forEach(function (id) {
                 var wrap = document.getElementById(id);
                 if (!wrap) return;
@@ -667,9 +795,15 @@
                     if (active) stats.public++;
                     if (type === 'dropdown') stats.dropdown++;
 
-                    var btnHtml = '<div class="mock-btn ' + (active ? '' : 'inactive') + '" title="' + label + '">' + label + (type === 'dropdown' ? ' ▾' : '') + '</div>';
-                    if (id === 'topButtonsWrap') mockTop.insertAdjacentHTML('beforeend', btnHtml);
-                    else mockMenu.insertAdjacentHTML('beforeend', btnHtml);
+                    if (id === 'topButtonsWrap') {
+                        vTop.innerHTML += `<div class="v-pill ${active ? '' : 'v-link--inactive'}">${label}</div>`;
+                    } else {
+                        vMenu.innerHTML += `
+                            <div class="v-link ${active ? '' : 'v-link--inactive'}">
+                                ${label} ${type === 'dropdown' ? '<span class="v-dropdown-icon">▼</span>' : ''}
+                            </div>
+                        `;
+                    }
                 });
             });
 
@@ -710,11 +844,6 @@
             });
         });
 
-        document.getElementById('refreshHeaderDraftFrameBtn')?.addEventListener('click', function () {
-            var iframe = document.getElementById('headerDraftIframePreview');
-            if (!iframe) return;
-            iframe.src = '{{ route('admin.frontend.sections.header.preview') }}?t=' + Date.now();
-        });
 
         function readButtonRows(wrapId) {
             var wrap = document.getElementById(wrapId);
@@ -940,6 +1069,62 @@
             textarea.focus();
             renderQuickPreview();
         };
+
+        // Color Grading / Gradient and Reset Logic
+        document.querySelectorAll('.color-bg-picker').forEach(function(picker) {
+            picker.addEventListener('input', function() {
+                var targetId = this.getAttribute('data-target');
+                var textInput = document.getElementById(targetId);
+                var picker1 = document.querySelector(`.color-bg-picker[data-target="${targetId}"][data-idx="1"]`);
+                var picker2 = document.querySelector(`.color-bg-picker[data-target="${targetId}"][data-idx="2"]`);
+                
+                if (picker1 && picker2 && textInput) {
+                    var val1 = picker1.value;
+                    var val2 = picker2.value;
+                    
+                    if (val1 !== val2) {
+                        textInput.value = `linear-gradient(90deg, ${val1}, ${val2})`;
+                    } else {
+                        textInput.value = val1;
+                    }
+                    renderQuickPreview();
+                }
+            });
+        });
+
+        document.querySelectorAll('.reset-bg-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-target');
+                var defVal = this.getAttribute('data-default');
+                var textInput = document.getElementById(targetId);
+                var picker1 = document.querySelector(`.color-bg-picker[data-target="${targetId}"][data-idx="1"]`);
+                var picker2 = document.querySelector(`.color-bg-picker[data-target="${targetId}"][data-idx="2"]`);
+                
+                if (textInput) textInput.value = defVal;
+                if (picker1) picker1.value = defVal;
+                if (picker2) picker2.value = defVal;
+                renderQuickPreview();
+            });
+        });
+
+        document.querySelectorAll('.color-hex-input').forEach(function(input) {
+            input.addEventListener('input', function() {
+                var targetId = this.id;
+                var picker1 = document.querySelector(`.color-bg-picker[data-target="${targetId}"][data-idx="1"]`);
+                var picker2 = document.querySelector(`.color-bg-picker[data-target="${targetId}"][data-idx="2"]`);
+                var val = this.value.trim();
+                
+                var hexMatches = val.match(/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/g);
+                if (hexMatches && hexMatches.length >= 2) {
+                    if (picker1) picker1.value = hexMatches[0];
+                    if (picker2) picker2.value = hexMatches[1];
+                } else if (hexMatches && hexMatches.length === 1) {
+                    if (picker1) picker1.value = hexMatches[0];
+                    if (picker2) picker2.value = hexMatches[0];
+                }
+                renderQuickPreview();
+            });
+        });
 
         window.addHeaderButtonRow = addRow;
         window.duplicateHeaderButtonRow = duplicateRow;

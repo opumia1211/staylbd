@@ -782,7 +782,6 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             Route::get('header', [HeaderControlController::class, 'index'])->name('sections.header.index');
             Route::post('header/draft', [HeaderControlController::class, 'saveDraft'])->name('sections.header.saveDraft');
             Route::post('header/publish', [HeaderControlController::class, 'publish'])->name('sections.header.publish');
-            Route::get('header/preview', [HeaderControlController::class, 'preview'])->name('sections.header.preview');
             Route::post('headericons/buttons', [FrontendController::class, 'headerButtonStore'])->name('sections.headericons.buttons.store');
             Route::post('headericons/buttons/{id}/delete', [FrontendController::class, 'headerButtonDelete'])->whereNumber('id')->name('sections.headericons.buttons.delete');
             Route::get('social_icon', function () {

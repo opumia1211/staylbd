@@ -39,12 +39,6 @@ class HeaderControlController extends Controller
         return back()->with('success', 'Header configuration published');
     }
 
-    public function preview(): View
-    {
-        return view('admin.frontend.header_control.preview', [
-            'config' => HeaderControlService::getDraftConfig(),
-        ]);
-    }
 
     private function validatedMenuBar(Request $request): array
     {
@@ -71,9 +65,9 @@ class HeaderControlController extends Controller
     private function validatedAppearance(Request $request): array
     {
         $validated = $request->validate([
-            'appearance.top_bg' => ['required', 'string', 'max:20'],
-            'appearance.main_bg' => ['required', 'string', 'max:20'],
-            'appearance.menu_bg' => ['required', 'string', 'max:20'],
+            'appearance.top_bg' => ['required', 'string', 'max:255'],
+            'appearance.main_bg' => ['required', 'string', 'max:255'],
+            'appearance.menu_bg' => ['required', 'string', 'max:255'],
             'appearance.top_height' => ['required', 'integer', 'min:30', 'max:80'],
             'appearance.main_height' => ['required', 'integer', 'min:40', 'max:100'],
             'appearance.menu_height' => ['required', 'integer', 'min:30', 'max:80'],
@@ -296,6 +290,10 @@ class HeaderControlController extends Controller
     private function sanitizeColor(string $value, string $fallback): string
     {
         $value = trim($value);
+        if (preg_match('/^(#[0-9a-fA-F]{3,8}|(rgb|rgba|hsl|hsla)\(.*?\)|(linear|radial)-gradient\(.*?\)|[a-zA-Z]+)$/i', $value)) {
+            return $value;
+        }
+        // Basic fallback for simple hex regex if no match found
         return preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $value) ? strtolower($value) : $fallback;
     }
 

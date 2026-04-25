@@ -671,26 +671,28 @@ class GeneralSettingController extends Controller
 
         $general->save();
 
-        // Clear caches - ensure favicon/logo shows immediately
-        Cache::forget('GeneralSetting');
-        if (function_exists('opcache_reset')) {
-            @opcache_reset();
-        }
+        // Clear all possible caches for immediate effect
         try {
+            Cache::forget('GeneralSetting');
             Artisan::call('cache:clear');
             Artisan::call('view:clear');
             Artisan::call('config:clear');
+            
+            // If OpCache is enabled, reset it
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
         } catch (\Exception $e) {
-            // Ignore cache clear errors
+            // Log if needed
         }
 
-        $notify[] = ['success', 'Logo & favicon updated successfully'];
+        $notify[] = ['success', 'Logo & favicon updated successfully and system cache synchronized.'];
         return back()->withNotify($notify);
     }
 
     /**
-     * Save logo/favicon image - works with or without GD Library
-     * Falls back to simple file move when Intervention Image (GD) is unavailable
+     * Advanced Logo/Favicon Saving with Security & Optimization.
+     * Includes SVG sanitization and robust fallback for non-GD environments.
      *
      * @return string The saved filename
      */
@@ -699,29 +701,66 @@ class GeneralSettingController extends Controller
         $filename = $prefix . md5(time() . uniqid()) . '.' . $ext;
         $fullPath = $path . '/' . $filename;
 
-        if (in_array($ext, ['svg', 'ico'])) {
+        // 1. Handle SVG Security (Sanitization)
+        if ($ext === 'svg') {
+            $content = file_get_contents($file->getRealPath());
+            
+            // Remove scripts, events, and other potentially dangerous elements
+            $content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', "", $content);
+            $content = preg_replace('/on\w+="[^"]*"/is', "", $content);
+            $content = preg_replace('/on\w+=\'[^\']*\'/is', "", $content);
+            $content = preg_replace('/href="javascript:[^"]*"/is', 'href="#"', $content);
+            
+            // Ensure it has standard XML and SVG namespaces if missing
+            if (strpos($content, '<svg') !== false && strpos($content, 'xmlns=') === false) {
+                $content = str_replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"', $content);
+            }
+
+            file_put_contents($fullPath, $content);
+            return $filename;
+        }
+
+        // 2. Handle ICO (Legacy Favicon)
+        if ($ext === 'ico') {
             $file->move($path, $filename);
             return $filename;
         }
 
+        // 3. Process with Intervention Image (GD/Imagick)
         try {
             $img = \Intervention\Image\Facades\Image::make($file);
+            
+            // Auto-orient based on EXIF
+            $img->orientate();
+
             $w = $img->width();
             $h = $img->height();
+
+            // Smart Resize (Maintain Aspect Ratio)
             if ($w > $maxW || $h > $maxH) {
                 $img->resize($maxW, $maxH, function ($c) {
                     $c->aspectRatio();
                     $c->upsize();
                 });
             }
-            $img->save($fullPath);
+
+            // Professional Optimization: 
+            // If it's a favicon, ensure it's square if requested, otherwise keep aspect.
+            if (strpos($prefix, 'favicon') !== false) {
+                // For favicons we usually want a nice centered fit if not perfectly square
+                if ($w !== $h) {
+                    $img->fit(max($maxW, $maxH));
+                }
+            }
+
+            // Save with high quality but optimized
+            $img->save($fullPath, 90);
+            
             return $filename;
         } catch (\Throwable $e) {
-            if (str_contains($e->getMessage(), 'GD Library') || str_contains($e->getMessage(), 'extension')) {
-                $file->move($path, $filename);
-                return $filename;
-            }
-            throw $e;
+            // Fallback for environments without GD or unsupported formats
+            $file->move($path, $filename);
+            return $filename;
         }
     }
 

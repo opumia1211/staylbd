@@ -315,52 +315,99 @@ function getPageSections($arr = false)
     return $sections ?? ($arr ? [] : (object) []);
 }
 
-function getLogo($type = 'logo', $size = null)
+/**
+ * Robust logo/favicon retrieval for XAMPP subdirectory and production.
+ * Uses url() instead of asset() to ensure resolution relative to APP_URL (project root),
+ * bypassing potential ASSET_URL (core/public) mismatches.
+ *
+ * @param string $type logo|logo_dark|favicon|invoice_logo|invoice_signature
+ * @param string|null $size minimum|standard|maximum (optional)
+ * @param bool $audit If true, returns [url, exists, path, mtime]
+ * @return string|array|null
+ */
+function getLogo($type = 'logo', $size = null, $audit = false)
 {
     try {
-        // If size is specified, try to get that specific size first
+        $logoPath = getLogoIconPath();
+        $filename = null;
+
+        // 1. Try specific size first
         if ($size) {
             $sizeMap = [
                 'minimum' => 'logo_minimum',
                 'standard' => 'logo_standard',
                 'maximum' => 'logo_maximum',
             ];
-
             if (isset($sizeMap[$size])) {
                 $filename = gs($sizeMap[$size]);
-                $logoPath = getLogoIconPath();
-                if ($filename && file_exists($logoPath . '/' . $filename)) {
-                    return asset('assets/images/logoIcon/' . $filename) . '?v=' . filemtime($logoPath . '/' . $filename);
-                }
             }
         }
 
-        // Try to get the requested type
-        $filename = gs($type);
-        $logoPath = getLogoIconPath();
-        if ($filename && file_exists($logoPath . '/' . $filename)) {
-            return asset('assets/images/logoIcon/' . $filename) . '?v=' . filemtime($logoPath . '/' . $filename);
+        // 2. Fallback to requested type
+        if (!$filename) {
+            $filename = gs($type);
         }
 
-        // Fallback: if requesting logo and size not found, try standard sizes
-        if ($type === 'logo' && !$size) {
-            $standardLogo = gs('logo_standard');
-            if ($standardLogo && file_exists($logoPath . '/' . $standardLogo)) {
-                return asset('assets/images/logoIcon/' . $standardLogo) . '?v=' . filemtime($logoPath . '/' . $standardLogo);
+        // 3. Fallback for 'logo' type to standard sizes if main logo is missing
+        if (!$filename && $type === 'logo') {
+            foreach (['logo_standard', 'logo_maximum', 'logo_minimum'] as $fallback) {
+                $filename = gs($fallback);
+                if ($filename && file_exists($logoPath . '/' . $filename)) break;
+                $filename = null;
             }
-            $maximumLogo = gs('logo_maximum');
-            if ($maximumLogo && file_exists($logoPath . '/' . $maximumLogo)) {
-                return asset('assets/images/logoIcon/' . $maximumLogo) . '?v=' . filemtime($logoPath . '/' . $maximumLogo);
+        }
+
+        if ($filename) {
+            $fullPath = $logoPath . '/' . $filename;
+            $exists = file_exists($fullPath);
+            // Use url() to ensure it points to {APP_URL}/assets/...
+            $url = url('assets/images/logoIcon/' . $filename);
+            
+            if ($exists) {
+                $url .= '?v=' . filemtime($fullPath);
             }
-            $minimumLogo = gs('logo_minimum');
-            if ($minimumLogo && file_exists($logoPath . '/' . $minimumLogo)) {
-                return asset('assets/images/logoIcon/' . $minimumLogo) . '?v=' . filemtime($logoPath . '/' . $minimumLogo);
+
+            if ($audit) {
+                return [
+                    'url' => $url,
+                    'exists' => $exists,
+                    'path' => $fullPath,
+                    'filename' => $filename,
+                    'mtime' => $exists ? filemtime($fullPath) : null,
+                    'size' => $exists ? filesize($fullPath) : 0,
+                ];
             }
+
+            return $exists ? $url : null;
         }
     } catch (\Exception $e) {
-        // Log error if needed
+        if ($audit) return ['error' => $e->getMessage(), 'exists' => false];
     }
-    return null; // No default image, return null if no logo uploaded
+    return $audit ? ['exists' => false, 'url' => null] : null;
+}
+
+/**
+ * Technical audit of all site logos and icons.
+ */
+function getLogoAudit()
+{
+    $types = ['logo', 'logo_dark', 'favicon', 'invoice_logo', 'invoice_signature'];
+    $results = [];
+    foreach ($types as $type) {
+        $results[$type] = getLogo($type, null, true);
+    }
+    
+    // Check directory permissions
+    $path = getLogoIconPath();
+    $results['system'] = [
+        'path' => $path,
+        'is_writable' => is_writable($path),
+        'is_dir' => is_dir($path),
+        'asset_url_config' => config('app.asset_url'),
+        'app_url_config' => config('app.url'),
+    ];
+    
+    return $results;
 }
 
 function getThemeLogo($isDark = false, $size = null)
