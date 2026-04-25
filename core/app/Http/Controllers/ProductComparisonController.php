@@ -17,31 +17,14 @@ class ProductComparisonController extends Controller
     public function index(Request $request)
     {
         $pageTitle = 'Product Comparison';
-        $products = ProductComparison::getItems()
-            ->filter(function ($item) {
-                return $item->product !== null;
-            })
-            ->values()
-            ->take(self::COMPARE_MAX);
-
-        // Guest: if no items by cookie but we have items by session_id, use them and set cookie
-        if (!auth()->check() && $products->isEmpty()) {
-            $sessionId = session()->getId();
-            if ($sessionId !== null && $sessionId !== '') {
-                $bySession = ProductComparison::with(['product' => function($q) {
-                        $q->with(['category', 'brand', 'activeVariants'])->withCount(['reviews' => fn($r) => $r->visibleOnProduct()]);
-                    }])
-                    ->where('session_id', $sessionId)
-                    ->latest()
-                    ->get()
-                    ->filter(fn ($item) => $item->product !== null)
-                    ->values()
-                    ->take(self::COMPARE_MAX);
-                if ($bySession->isNotEmpty()) {
-                    $products = $bySession;
-                }
-            }
-        }
+        
+        // ProductComparison::getItems() already loads: product.category, product.brand, product.reviews, product.activeVariants
+        // It also handles guest identification via cookie or session ID.
+        $items = ProductComparison::getItems();
+        
+        $products = $items->filter(function ($item) {
+            return $item->product !== null;
+        })->values()->take(self::COMPARE_MAX);
 
         $userId = auth()->id();
         $wishListProductIds = [];
@@ -60,7 +43,8 @@ class ProductComparisonController extends Controller
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
 
-        // Guest: ensure cookie is set when we have items
+        // For guests: ensure the persistence cookie is set if they have items in their list.
+        // This ensures the compare list survives browser close/reopen and session clears.
         if (!auth()->check() && $products->isNotEmpty()) {
             $guestId = $request->cookie(ProductComparison::GUEST_COOKIE_NAME) ?: ProductComparison::getGuestCompareId();
             if ($guestId !== null) {

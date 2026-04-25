@@ -74,7 +74,7 @@
                                 </td>
                                 <td class="py-2 text-center align-middle">
                                     <span class="ratings d-inline-block">{!! showProductRatings($product->avg_rate ?? 0) !!}</span>
-                                    <span class="small text-muted">({{ $product->reviews->count() ?? 0 }})</span>
+                                    <span class="small text-muted">({{ $product->reviews_count ?? 0 }})</span>
                                 </td>
                                 <td class="py-2 pe-2 align-middle">
                                     <div class="action-buttons product-list-row__action-btns d-flex flex-wrap gap-2 justify-content-end">
@@ -123,7 +123,7 @@
                                 <div class="compare-mobile-card__price-row d-flex align-items-center flex-wrap gap-2">
                                     <span class="compare-mobile-card__price staylbd-rt-price fw-bold text-success">{{ $general->cur_sym }}{{ showAmount($price) }}</span>
                                     <span class="ratings d-inline-block">{!! showProductRatings($product->avg_rate ?? 0) !!}</span>
-                                    <span class="small text-muted">({{ $product->reviews->count() ?? 0 }})</span>
+                                    <span class="small text-muted">({{ $product->reviews_count ?? 0 }})</span>
                                 </div>
                                 <div class="compare-mobile-card__actions action-buttons d-flex flex-wrap gap-2">
                                     <a href="{{ product_detail_url($product) }}" class="btn btn-primary list-page-action-btn" data-no-ajax>@lang('View')</a>

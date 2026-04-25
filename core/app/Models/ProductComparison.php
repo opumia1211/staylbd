@@ -69,7 +69,10 @@ class ProductComparison extends Model
      */
     public static function getItems()
     {
-        $query = self::with('product.category', 'product.brand', 'product.reviews', 'product.activeVariants');
+        $query = self::with(['product' => function ($q) {
+            $q->with(['category:id,name', 'brand:id,name', 'activeVariants'])
+              ->withCount(['reviews' => fn ($r) => $r->visibleOnProduct()]);
+        }]);
 
         if (auth()->check()) {
             $query->where('user_id', auth()->id());
