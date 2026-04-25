@@ -12,15 +12,21 @@ class HeaderControlService
 
     public static function getLiveConfig(): array
     {
-        $live = self::readByKey(self::LIVE_KEY);
-        if ($live !== []) {
-            return self::hydrateMissingFromLegacy(self::normalize($live));
+        $cacheKey = 'header_control_live_v1';
+        $live = \Illuminate\Support\Facades\Cache::get($cacheKey);
+        
+        if (!$live) {
+            $live = self::readByKey(self::LIVE_KEY);
+            if ($live !== []) {
+                $live = self::hydrateMissingFromLegacy(self::normalize($live));
+            } else {
+                $live = self::seedFromLegacy();
+                self::saveLive($live);
+            }
+            \Illuminate\Support\Facades\Cache::put($cacheKey, $live, 3600);
         }
 
-        $seed = self::seedFromLegacy();
-        self::saveLive($seed);
-
-        return $seed;
+        return $live;
     }
 
     public static function getDraftConfig(): array
@@ -41,6 +47,7 @@ class HeaderControlService
     public static function saveLive(array $config): void
     {
         self::upsert(self::LIVE_KEY, self::hydrateMissingFromLegacy(self::normalize($config)));
+        \Illuminate\Support\Facades\Cache::forget('header_control_live_v1');
     }
 
     public static function publishDraft(): array

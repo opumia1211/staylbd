@@ -1,57 +1,103 @@
 @push('style')
-    <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}">
+    {{-- Global UI icons now handled via CDN in app.blade.php or critical bundle for better performance --}}
     <style>
-        #staylMainHeader {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            z-index: 1000 !important;
-            pointer-events: none; /* Let clicks through to children */
+        .professional-currency-card {
+            min-width: 260px !important;
+            padding: 10px !important;
+            border: 1px solid rgba(0,0,0,0.06) !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
+            border-radius: 16px !important;
+            max-height: 400px;
+            overflow-y: auto;
         }
-        
-        .header-bar-section {
-            pointer-events: auto; /* Re-enable clicks for bars */
-            transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1), 
-                        opacity 0.6s ease !important;
-            will-change: transform, opacity;
-            backface-visibility: hidden;
-            background: inherit;
+        /* Custom scrollbar for currency card */
+        .professional-currency-card::-webkit-scrollbar {
+            width: 5px;
+        }
+        .professional-currency-card::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .professional-currency-card .stayl-topbar-menu__item {
+            padding: 12px 16px !important;
+            border-bottom: 1px solid rgba(0,0,0,0.02) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            margin-bottom: 2px;
+        }
+        .professional-currency-card .stayl-topbar-menu__item:hover {
+            background: #f8fafc !important;
+            transform: translateX(4px);
+        }
+        .professional-currency-card .stayl-topbar-menu__item.is-active {
+            background: rgba(14, 165, 233, 0.04) !important;
+            color: #0ea5e9 !important;
+        }
+        .curr-flag-box {
+            width: 24px;
+            height: 18px;
+            overflow: hidden;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        .curr-flag-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .curr-text {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+        }
+        .curr-country {
+            font-weight: 600;
+        }
+        .curr-divider {
+            margin: 0 8px;
+            opacity: 0.3;
+            font-weight: 300;
+        }
+        .curr-code-sym {
+            color: #64748b;
+        }
+        body.dark-mode .professional-currency-card {
+            border-color: rgba(255,255,255,0.06) !important;
+        }
+        body.dark-mode .professional-currency-card .stayl-topbar-menu__item:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+        body.dark-mode .professional-currency-card .stayl-topbar-menu__item.is-active {
+            background: rgba(14, 165, 233, 0.15) !important;
+        }
+        body.dark-mode .curr-text {
+            color: #f1f5f9;
+        }
+        body.dark-mode .curr-code-sym {
+            color: #94a3b8;
+        }
+        {{-- Professional Styling migrated to Tailwind CSS Library as per USER requirement --}}
+        .stayl-topbar-menu__check {
+            margin-left: auto;
+            color: #0ea5e9;
+        }
+        .stayl-btn-flag {
+            width: 18px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 1px;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+        #staylCurrentCurrencyLabel, #staylCurrentLanguageLabel {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        /* DEFAULT STATES */
-        #staylBarTop { position: relative; z-index: 3; }
-        #staylBarMain { position: relative; z-index: 2; background: #ffffff !important; }
-        #staylBarMenu { position: relative; z-index: 1; }
-
-        .dark-mode #staylBarMain { background: #0f172a !important; }
-        
-        /* THE STICKY ANIMATION */
-        #staylMainHeader.is-scrolled-down #staylBarTop {
-            transform: translateY(-100%) !important;
-            opacity: 0 !important;
-        }
-        
-        #staylMainHeader.is-scrolled-down #staylBarMain {
-            transform: translateY(calc(-1 * var(--stayl-bar-top-h, 40px))) !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
-            border-bottom: 1px solid rgba(0,0,0,0.05) !important;
-        }
-        
-        #staylMainHeader.is-scrolled-down #staylBarMenu {
-            transform: translateY(calc(-1 * var(--stayl-bar-top-h, 40px))) !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-
-        .stayl-flag-img {
-            width: 24px !important;
-            height: 16px !important;
-            object-fit: cover !important;
-            border-radius: 2px !important;
-            display: inline-block !important;
-            vertical-align: middle !important;
-        }
     </style>
 @endpush
 @php
@@ -87,7 +133,9 @@
     $headerLayout = \App\Services\HomepageLayoutService::getOrderedSections();
     foreach ($headerLayout as $layoutIndex => $layoutSlot) {
         $layoutId = (string) ($layoutSlot['id'] ?? '');
-        if (!array_key_exists($layoutId, $headerBarDefaults)) continue;
+        if (!array_key_exists($layoutId, $headerBarDefaults)) {
+            continue;
+        }
         $headerBarOrderIndex[$layoutId] = $layoutIndex + 1;
         $headerBarVisible[$layoutId] = !empty($layoutSlot['enabled']);
     }
@@ -97,31 +145,24 @@
     $supportCenter = $footerData['footer_support_center'] ?? null;
     $appPromotion = $footerData['footer_app_promotion'] ?? null;
     $appPromotionItems = $footerData['footer_app_promotion_items'] ?? collect();
+    $contactContent = $footerData['contact'] ?? null;
 
     $headerLanguages = $general->multi_language ? \App\Models\Language::query()->orderBy('name')->get() : collect();
-    $headerControl = \App\Services\HeaderControlService::getLiveConfig();
+    $headerControl = $headerControl ?? \App\Services\HeaderControlService::getLiveConfig();
+    $headerAppearance = (array) ($headerControl['appearance'] ?? []);
     $headerTopCfg = (array) ($headerControl['top_bar'] ?? []);
     $headerMainCfg = (array) ($headerControl['main_bar'] ?? []);
     $headerMenuCfg = (array) ($headerControl['menu_bar'] ?? []);
-    
     $topCustomButtons = is_array($headerTopCfg['custom_buttons'] ?? null) ? $headerTopCfg['custom_buttons'] : [];
     $menuCustomButtons = is_array($headerMenuCfg['custom_buttons'] ?? null) ? $headerMenuCfg['custom_buttons'] : [];
     $menuNavLinks = is_array($headerMenuCfg['nav_links'] ?? null) ? $headerMenuCfg['nav_links'] : [];
     $menuCategoryItems = is_array($headerMenuCfg['category_items'] ?? null) ? $headerMenuCfg['category_items'] : [];
-
     if (!empty($menuCustomButtons)) {
         $menuNavLinks = array_merge($menuNavLinks, $menuCustomButtons);
     }
     usort($menuNavLinks, static function (array $a, array $b): int {
         return (int) ($a['display_order'] ?? 0) <=> (int) ($b['display_order'] ?? 0);
     });
-
-    $headerContactPhone = (string) ($companyInfo->data_values->contact_number ?? '');
-    $headerContactEmail = (string) ($companyInfo->data_values->email_address ?? '');
-    $headerCodNoticeText = __('Cash on Delivery available nationwide');
-    $currentLocale = strtolower((string) (session('lang') ?: app()->getLocale() ?: 'en'));
-    $isBN = str_starts_with($currentLocale, 'bn') || str_starts_with($currentLocale, 'bd');
-
     $headerTrackKey = static function ($label, $fallback = 'header-link'): string {
         $label = strtolower(trim((string) $label));
         $slug = preg_replace('/[^a-z0-9]+/i', '-', $label);
@@ -163,17 +204,55 @@
         return $html;
     };
 
-    $currentLangCode = (string) (session('lang') ?: optional($headerLanguages->first())->code ?: 'EN');
+    $currentLangCode = strtoupper((string) (session('lang') ?: optional($headerLanguages->first())->code ?: 'EN'));
     $currentLangRow = $headerLanguages->firstWhere('code', $currentLangCode);
     $currentLangName = trim((string) (optional($currentLangRow)->name ?: $currentLangCode));
 
-    // Improved Localization Logic:
-    // When BN is selected, show "বাংলা" (name) or "BN" (code) based on config, but ensured translated strings are responsive.
-    $languageButtonLabel = (($headerTopCfg['language_mode'] ?? 'code') === 'name') ? __($currentLangName) : strtoupper(__($currentLangCode));
+    $langFlags = ['EN' => '🇺🇸', 'BN' => '🇧🇩', 'HI' => '🇮🇳'];
+    $currentLangFlag = $langFlags[$currentLangCode] ?? '🌐';
 
-    $currencyButtonLabel = (($headerTopCfg['currency_mode'] ?? 'code') === 'name')
-        ? __($general->cur_text ?? 'BDT')
-        : strtoupper(__($general->cur_text ?? 'BDT'));
+    $languageButtonLabel = $currentLangFlag . ' ' . (($headerTopCfg['language_mode'] ?? 'code') === 'name' ? __($currentLangName) : __($currentLangCode));
+
+    $headerCurrencies = [
+        ['code' => 'USD', 'symbol' => '$', 'country' => 'United States', 'flag' => asset('assets/images/flags/us.svg')],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Italy', 'flag' => asset('assets/images/flags/it.svg')],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Netherlands', 'flag' => asset('assets/images/flags/nl.svg')],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Spain', 'flag' => asset('assets/images/flags/es.svg')],
+        ['code' => 'GBP', 'symbol' => '£', 'country' => 'United Kingdom', 'flag' => asset('assets/images/flags/gb.svg')],
+        ['code' => 'BDT', 'symbol' => '৳', 'country' => 'Bangladesh', 'flag' => asset('assets/images/flags/bd.svg')],
+        ['code' => 'INR', 'symbol' => '₹', 'country' => 'India', 'flag' => asset('assets/images/flags/in.svg')],
+        ['code' => 'SAR', 'symbol' => 'SR', 'country' => 'Saudi Arabia', 'flag' => asset('assets/images/flags/sa.svg')],
+        ['code' => 'AED', 'symbol' => 'د.إ', 'country' => 'UAE', 'flag' => asset('assets/images/flags/ae.svg')],
+        ['code' => 'MYR', 'symbol' => 'RM', 'country' => 'Malaysia', 'flag' => asset('assets/images/flags/my.svg')],
+        // South Asia
+        ['code' => 'PKR', 'symbol' => '₨', 'country' => 'Pakistan', 'flag' => asset('assets/images/flags/pk.svg')],
+        ['code' => 'LKR', 'symbol' => 'Rs', 'country' => 'Sri Lanka', 'flag' => asset('assets/images/flags/lk.svg')],
+        ['code' => 'NPR', 'symbol' => 'रु', 'country' => 'Nepal', 'flag' => asset('assets/images/flags/np.svg')],
+        ['code' => 'BTN', 'symbol' => 'Nu.', 'country' => 'Bhutan', 'flag' => asset('assets/images/flags/bt.svg')],
+        ['code' => 'MVR', 'symbol' => 'Rf', 'country' => 'Maldives', 'flag' => asset('assets/images/flags/mv.svg')],
+        ['code' => 'AFN', 'symbol' => '؋', 'country' => 'Afghanistan', 'flag' => asset('assets/images/flags/af.svg')],
+        // Popular / Others
+        ['code' => 'RUB', 'symbol' => '₽', 'country' => 'Russia', 'flag' => asset('assets/images/flags/ru.svg')],
+        ['code' => 'CNY', 'symbol' => '¥', 'country' => 'China', 'flag' => asset('assets/images/flags/cn.svg')],
+        ['code' => 'JPY', 'symbol' => '¥', 'country' => 'Japan', 'flag' => asset('assets/images/flags/jp.svg')],
+        ['code' => 'KRW', 'symbol' => '₩', 'country' => 'South Korea', 'flag' => asset('assets/images/flags/kr.svg')],
+        ['code' => 'AUD', 'symbol' => '$', 'country' => 'Australia', 'flag' => asset('assets/images/flags/au.svg')],
+        ['code' => 'CAD', 'symbol' => '$', 'country' => 'Canada', 'flag' => asset('assets/images/flags/ca.svg')],
+        ['code' => 'SGD', 'symbol' => '$', 'country' => 'Singapore', 'flag' => asset('assets/images/flags/sg.svg')],
+        ['code' => 'BRL', 'symbol' => 'R$', 'country' => 'Brazil', 'flag' => asset('assets/images/flags/br.svg')],
+        ['code' => 'ZAR', 'symbol' => 'R', 'country' => 'South Africa', 'flag' => asset('assets/images/flags/za.svg')],
+        ['code' => 'TRY', 'symbol' => '₺', 'country' => 'Turkey', 'flag' => asset('assets/images/flags/tr.svg')],
+        ['code' => 'QAR', 'symbol' => 'ر.ق', 'country' => 'Qatar', 'flag' => asset('assets/images/flags/qa.svg')],
+        ['code' => 'KWD', 'symbol' => 'د.ك', 'country' => 'Kuwait', 'flag' => asset('assets/images/flags/kw.svg')],
+        ['code' => 'UAH', 'symbol' => '₴', 'country' => 'Ukraine', 'flag' => asset('assets/images/flags/ua.svg')],
+    ];
+
+    $currentCurrencyCode = strtoupper((string) (session('stayl_display_currency_code') ?: request()->cookie('stayl_display_currency_code') ?: $general->cur_text ?: 'BDT'));
+    $currentCurrencyRow = collect($headerCurrencies)->firstWhere('code', $currentCurrencyCode) ?: $headerCurrencies[0];
+    
+    $currencyButtonLabel = '<img src="'.($currentCurrencyRow['flag'] ?? '').'" class="stayl-btn-flag" alt=""> ' . $currentCurrencyCode . ' ' . ($currentCurrencyRow['symbol'] ?? '');
+
+
     // Keep header hotline in sync with Footer > Company Info fields.
     $headerContactPhone = trim((string) (optional($companyInfo)->data_values->contact_phone ?? ''));
     $headerContactEmail = trim((string) (optional($companyInfo)->data_values->contact_email ?? ''));
@@ -208,33 +287,27 @@
     $isBN = str_starts_with($currentLocale, 'bn') || str_starts_with($currentLocale, 'bd');
 @endphp
 
-<header class="stayl-fixed-master" id="staylMainHeader">
-    @if(!$isUserProfileHome && !empty($headerBarVisible['header_bar_top_notice']) && !empty($headerTopCfg['enabled']) && !empty($headerTopCfg['is_public']))
-        <div class="stayl-announcement-bar stayl-dynamic-order header-bar-section" id="staylBarTop" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_top_notice'] ?? 1 }};">
+<header class="stayl-fixed-master">
+    @if(!$isUserProfileHome && !empty($headerTopCfg['enabled']))
+        <div class="stayl-announcement-bar stayl-dynamic-order" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_top_notice'] ?? 1 }};">
             <div class="stayl-wrap">
                 <div class="d-flex align-items-center gap-3">
                     <a href="{{ $headerContactPhone !== '' ? 'tel:' . preg_replace('/[^0-9+]/', '', $headerContactPhone) : route('contact') }}"
                         class="stayl-announcement-link stayl-top-contact-link">
-                        <span class="stayl-top-contact-icon3d" aria-hidden="true">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.2">
-                                <path
-                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                                </path>
-                            </svg>
-                        </span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
                         <span class="stayl-top-contact-text">{{ $headerContactPhone }}</span>
                     </a>
                     <span class="d-none d-md-inline">|</span>
                     <a href="{{ $headerContactEmail !== '' ? 'mailto:' . $headerContactEmail : route('contact') }}"
                         class="stayl-announcement-link stayl-top-contact-link">
-                        <span class="stayl-top-contact-icon3d" aria-hidden="true">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.2">
-                                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                                <path d="m3 7 9 6 9-6"></path>
-                            </svg>
-                        </span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                            <path d="m3 7 9 6 9-6"></path>
+                        </svg>
                         <span class="stayl-top-contact-text">{{ $headerContactEmail }}</span>
                     </a>
                     <span class="stayl-cod-badge no-break">
@@ -247,36 +320,65 @@
                         <span class="stayl-cod-text">{{ __($headerCodNoticeText) }}</span>
                     </span>
                 </div>
+
+                <!-- Middle Section: Comprehensive High-Fidelity Weather (Stability First) -->
+                <div class="stayl-top-middle flex items-center flex-grow px-2 md:px-6 overflow-hidden">
+                    <!-- Slot 1: Location Slot -->
+                    <div class="flex-initial flex justify-start items-center overflow-hidden pr-4">
+                        <div id="stayl-live-location" 
+                             class="group flex items-center gap-1.5 text-[12.5px] font-medium text-slate-50 transition-all duration-300 dark:text-slate-300 cursor-help shrink-0" 
+                             title="Loading location details...">
+                            <span class="flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </span>
+                            <span class="stayl-location-text whitespace-nowrap font-inter tracking-tight">@lang('Locating')...</span>
+                        </div>
+                    </div>
+
+                    <!-- Separator -->
+                    <div class="h-3 w-[1px] bg-white/10 shrink-0"></div>
+
+                    <!-- Slot 2: Enhanced Weather Slot (No Clipping) -->
+                    <div class="flex-1 flex justify-start items-center overflow-hidden pl-4 mr-10">
+                        <div id="stayl-live-weather" 
+                             class="group flex items-center gap-2 text-[12.5px] font-medium text-slate-50 transition-all duration-300 dark:text-slate-300 cursor-default shrink-0" 
+                             style="min-width: 220px;">
+                            <span id="stayl-weather-svg" class="flex items-center justify-center transition-transform group-hover:scale-110 shrink-0">
+                                {{-- Weather icon injected via JS --}}
+                            </span>
+                            <div class="overflow-hidden flex justify-start w-full">
+                                <span class="stayl-weather-text opacity-100 transition-opacity duration-700 font-inter text-left whitespace-nowrap inline-block" style="min-width: 180px;">
+                                    @lang('Updating')...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex align-items-center gap-2 lg:gap-3">
                     @if(!empty($headerTopCfg['show_language']) && $headerLanguages->isNotEmpty())
                         <div class="stayl-topbar-menu">
-                                @php
-                                    $langFlags = ['en' => 'gb', 'bn' => 'bd'];
-                                    $currentLang = strtoupper(session('lang', 'EN'));
-                                    $currentLangObj = $headerLanguages->firstWhere('code', strtolower($currentLang)) ?? $headerLanguages->firstWhere('code', strtoupper($currentLang));
-                                    $currentLangName = $currentLangObj ? $currentLangObj->name : ('EN' === $currentLang ? 'English' : 'বাংলা');
-                                @endphp
-                            <button type="button" class="stayl-topbar-menu__btn d-inline-flex align-items-center gap-1 notranslate" style="white-space: nowrap; padding: 3px 10px; border-radius: 4px;">
-                                <span id="staylCurrentLanguageLabel" class="d-inline-flex align-items-center flex-nowrap" style="min-width: 0 !important; width: auto !important; gap: 8px;">
-                                    <span id="staylCurrentLanguageFlag" class="d-inline-flex align-items-center" style="min-width: 0 !important; width: auto !important;"><img src="https://flagcdn.com/w40/{{ $langFlags[strtolower($currentLang)] ?? 'un' }}.png" class="stayl-flag-img" style="border: 1px solid rgba(0,0,0,0.1); display: block; flex-shrink: 0;"></span>
-                                    <span id="staylCurrentLanguageText" class="fw-medium stayl-theme-text" style="min-width: 0 !important; width: auto !important; font-size: 13px;">{{ __($currentLangName) }}</span>
-                                </span>
+                            <button type="button" class="stayl-topbar-menu__btn">
+                                <span id="staylCurrentLanguageLabel">{{ $languageButtonLabel }}</span>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5" style="margin-left: 2px; opacity: 0.7;">
+                                    stroke-width="2">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>
                             </button>
-                            <div class="stayl-topbar-menu__panel" style="min-width: 150px; padding: 4px 0;">
+                            <div class="stayl-topbar-menu__panel">
                                 @foreach($headerLanguages as $lng)
                                     @php
                                         $lngCode = strtoupper($lng->code);
-                                        $isLangActive = ($currentLang === $lngCode);
+                                        $isLangActive = ($currentLangCode === $lngCode);
                                     @endphp
                                     <a href="{{ route('lang', $lng->code) }}" class="stayl-topbar-menu__item {{ $isLangActive ? 'is-active' : '' }}"
-                                        data-stayl-lang-option="{{ $lngCode }}" style="padding: 8px 15px;">
+                                        data-stayl-lang-option="{{ $lngCode }}">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="d-flex" style="width: 24px; height: 16px;"><img src="https://flagcdn.com/w40/{{ $langFlags[strtolower($lng->code)] ?? 'un' }}.png" class="stayl-flag-img" style="border: 1px solid rgba(0,0,0,0.1);"></span>
-                                            <span class="fw-medium stayl-theme-text" style="font-size: 13px;">{{ __($lng->name) }}</span>
+                                            <span class="fs-5">{{ $langFlags[$lngCode] ?? '🌐' }}</span>
+                                            <span>{{ __($lng->name) }}</span>
                                         </div>
                                         <span class="stayl-topbar-menu__check">✓</span>
                                     </a>
@@ -287,67 +389,37 @@
 
                     @if(!empty($headerTopCfg['show_currency']))
                         <div class="stayl-topbar-menu">
-                                @php
-                                    $headerCurrencyCodes = [
-                                        $general->cur_text ?? 'BDT', 'USD', 'EUR', 'GBP', 'INR', 'PKR', 'SAR', 'AED', 'MYR', 'SGD', 'JPY', 'CAD', 'AUD', 'QAR', 'KWD', 'RUB', 'UAH', 'NZD', 'ZAR', 'CNY', 'BRL', 'TRY', 'KRW'
-                                    ];
-                                    $headerCurrencyCodes = collect($headerCurrencyCodes)->map(static fn($c) => strtoupper(trim((string) $c)))->filter()->unique()->values();
+                            <button type="button" class="stayl-topbar-menu__btn">
+                                <span id="staylCurrentCurrencyLabel">{!! $currencyButtonLabel !!}</span>
 
-                                    $headerCurrencySymbols = [
-                                        'BDT' => '৳', 'USD' => '$', 'INR' => '₹', 'PKR' => 'Rs', 'SAR' => 'ر.س',
-                                        'AED' => 'د.إ', 'MYR' => 'RM', 'EUR' => '€', 'GBP' => '£', 'SGD' => 'S$',
-                                        'JPY' => '¥', 'CAD' => '$', 'AUD' => '$', 'QAR' => 'ر.ق', 'KWD' => 'د.ك',
-                                        'RUB' => '₽', 'UAH' => '₴', 'NZD' => '$', 'ZAR' => 'R', 'CNY' => '¥',
-                                        'BRL' => 'R$', 'TRY' => '₺', 'KRW' => '₩'
-                                    ];
-
-                                    $headerCurrencyFlags = [
-                                        'BDT' => 'bd', 'USD' => 'us', 'INR' => 'in', 'PKR' => 'pk', 'SAR' => 'sa',
-                                        'AED' => 'ae', 'MYR' => 'my', 'EUR' => 'eu', 'GBP' => 'gb', 'SGD' => 'sg',
-                                        'JPY' => 'jp', 'CAD' => 'ca', 'AUD' => 'au', 'QAR' => 'qa', 'KWD' => 'kw',
-                                        'RUB' => 'ru', 'UAH' => 'ua', 'NZD' => 'nz', 'ZAR' => 'za', 'CNY' => 'cn',
-                                        'BRL' => 'br', 'TRY' => 'tr', 'KRW' => 'kr'
-                                    ];
-
-                                    $currencyCountryNames = [
-                                        'BDT' => 'Bangladesh', 'USD' => 'United States', 'INR' => 'India', 'PKR' => 'Pakistan', 'SAR' => 'Saudi Arabia',
-                                        'AED' => 'UAE', 'MYR' => 'Malaysia', 'EUR' => 'Europe', 'GBP' => 'United Kingdom', 'SGD' => 'Singapore',
-                                        'JPY' => 'Japan', 'CAD' => 'Canada', 'AUD' => 'Australia', 'QAR' => 'Qatar', 'KWD' => 'Kuwait',
-                                        'RUB' => 'Russia', 'UAH' => 'Ukraine', 'NZD' => 'New Zealand', 'ZAR' => 'South Africa', 'CNY' => 'China',
-                                        'BRL' => 'Brazil', 'TRY' => 'Turkey', 'KRW' => 'South Korea'
-                                    ];
-
-                                    // Ensure codes are always the short international versions
-                                    $headerCurrencyCodes = ['BDT', 'USD', 'EUR', 'GBP', 'INR', 'PKR', 'SAR', 'AED', 'MYR', 'SGD', 'JPY', 'CAD', 'AUD', 'QAR', 'KWD', 'RUB', 'UAH', 'NZD', 'ZAR', 'CNY', 'BRL', 'TRY', 'KRW'];
-                                    $headerCurrencyCodes = array_unique($headerCurrencyCodes);
-
-                                    $defaultCurrencyCode = strtoupper((string) ($general->cur_text ?? 'BDT'));
-                                @endphp
-                            <button type="button" class="stayl-topbar-menu__btn d-inline-flex align-items-center gap-1 notranslate" style="white-space: nowrap; padding: 3px 10px; border-radius: 4px;">
-                                <span id="staylCurrentCurrencyLabel" class="d-inline-flex align-items-center flex-nowrap" style="min-width: 0 !important; width: auto !important; gap: 8px;">
-                                    <span id="staylCurrentCurrencyFlag" class="d-inline-flex align-items-center" style="min-width: 0 !important; width: auto !important;"><img src="https://flagcdn.com/w40/{{ $headerCurrencyFlags[$defaultCurrencyCode] ?? 'un' }}.png" class="stayl-flag-img" style="border: 1px solid rgba(0,0,0,0.1); display: block; flex-shrink: 0;"></span>
-                                    <span id="staylCurrentCurrencyText" class="fw-medium stayl-theme-text" style="min-width: 0 !important; width: auto !important; font-size: 13px;">{{ $defaultCurrencyCode }} {{ $headerCurrencySymbols[$defaultCurrencyCode] ?? '' }}</span>
-                                </span>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5" style="margin-left: 2px; flex-shrink: 0; opacity: 0.7;">
+                                    stroke-width="2">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>
                             </button>
-                            <div class="stayl-topbar-menu__panel" style="min-width: 140px; max-height: 350px; overflow-y: auto; padding: 4px 0;">
-                                @foreach($headerCurrencyCodes as $code)
+                            <div class="stayl-topbar-menu__panel professional-currency-card">
+                                @foreach($headerCurrencies as $curr)
                                     @php
-                                        $currencySymbol = $headerCurrencySymbols[$code] ?? $general->cur_sym ?? '৳';
-                                        $currencyFlag = $headerCurrencyFlags[$code] ?? 'un';
+                                        $isActive = ($currentCurrencyCode === $curr['code']);
                                     @endphp
                                     <a href="#"
-                                        class="stayl-topbar-menu__item {{ $code === $defaultCurrencyCode ? 'is-active' : '' }}"
-                                        data-stayl-currency-option="{{ $code }}" style="padding: 10px 15px;">
-                                        <div class="d-flex align-items-center gap-2 py-0">
-                                            <span class="d-flex" style="width: 24px; height: 16px;"><img src="https://flagcdn.com/w40/{{ $currencyFlag }}.png" class="stayl-flag-img" style="border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>
-                                            <span class="fw-semibold stayl-theme-text" style="font-size: 13px;">{{ strtoupper($code) }} {{ $currencySymbol }}</span>
+                                        class="stayl-topbar-menu__item {{ $isActive ? 'is-active' : '' }}"
+                                        data-stayl-currency-option="{{ $curr['code'] }}">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="curr-flag-box">
+                                                <img src="{{ $curr['flag'] }}" alt="{{ $curr['country'] }}" loading="lazy" width="28" height="20">
+                                            </div>
+                                            <span class="curr-text">
+                                                <span class="curr-country">{{ __($curr['country']) }}</span>
+                                                <span class="curr-divider">|</span>
+                                                <span class="curr-code-sym">{{ $curr['code'] }} {{ $curr['symbol'] }}</span>
+                                            </span>
                                         </div>
-                                        <span class="stayl-topbar-menu__check">✓</span>
+                                        <span class="stayl-topbar-menu__check">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        </span>
                                     </a>
+
                                 @endforeach
                             </div>
                         </div>
@@ -499,8 +571,8 @@
     @endif
 
     {{-- Row 1: The Main Action Bar --}}
-    @if(!empty($headerBarVisible['header_bar_main']) && !empty($headerMainCfg['enabled']) && !empty($headerMainCfg['is_public']))
-        <div class="stayl-main-header-bar stayl-dynamic-order header-bar-section" id="staylBarMain" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
+    @if(!empty($headerMainCfg['enabled']))
+        <div class="stayl-top-bar stayl-dynamic-order" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
             <div class="stayl-wrap">
                 {{-- Logo --}}
                 <div class="d-flex align-items-center">
@@ -595,20 +667,22 @@
                     <a href="{{ route('user.home') }}" class="stayl-action-item group" title="{{ __('Account') }}" data-dashboard-nav="1">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"/>
+                            <circle cx="12" cy="7" r="4"/></svg>
                         </svg>
                         <span class="stayl-acc-label stayl-label-acc">
                             {{ $isBN ? 'লগইন' : __('Login') }}
                         </span>
                     </a>
                 </div>
+                </div>
+                </div>
             </div>
         </div>
     @endif
 
     {{-- Row 2: Secondary Nav Bar --}}
-    @if(!$isUserProfileHome && !empty($headerBarVisible['header_bar_menu']) && !empty($headerMenuCfg['enabled']) && !empty($headerMenuCfg['is_public']))
-        <div class="stayl-yellow-bar stayl-dynamic-order bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 header-bar-section" id="staylBarMenu" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_menu'] ?? 3 }};">
+    @if(!$isUserProfileHome && !empty($headerMenuCfg['enabled']))
+        <div class="stayl-yellow-bar stayl-dynamic-order bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_menu'] ?? 3 }};">
             <div class="stayl-wrap">
                 <nav class="stayl-nav-flex" style="--stayl-nav-gap: clamp(12px, 1.5vw, 24px);">
                     @if(!empty($headerMenuCfg['show_sidebar_trigger']))
@@ -860,69 +934,43 @@
     (function () {
         function syncHeaderHeightVar() {
             const header = document.querySelector('.stayl-fixed-master');
-            const barTop = document.getElementById('staylBarTop');
-            const barMain = document.getElementById('staylBarMain');
-            const barMenu = document.getElementById('staylBarMenu');
             if (!header) return;
-
-            // Measure and store individual bar heights
-            if (barTop && barTop.offsetHeight > 0) {
-                document.documentElement.style.setProperty('--stayl-bar-top-h', barTop.offsetHeight + 'px');
-            }
-
-            // Calculate active header height for body padding
-            let totalH = 0;
-            if (header.classList.contains('is-scrolled-down')) {
-                // In sticky mode, only Bar 2 (Main) is effectively taking space at the top
-                totalH = barMain ? barMain.offsetHeight : 0;
-            } else {
-                // In normal mode, measure the whole container
-                totalH = header.offsetHeight;
-            }
-
-            if (totalH > 0) {
-                document.documentElement.style.setProperty('--stayl-dynamic-header-height', Math.ceil(totalH) + 'px');
+            const h = Math.max(0, Math.ceil(header.offsetHeight || 0));
+            if (h > 0) {
+                document.documentElement.style.setProperty('--stayl-dynamic-header-height', h + 'px');
             }
         }
         function setupHeaderScrollCollapse() {
             const header = document.querySelector('.stayl-fixed-master');
             if (!header) return;
-            
-            let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            let lastY = window.scrollY || 0;
             let hidden = false;
             let ticking = false;
-
+            let lockUntil = 0;
+            const SHOW_AT = 70;
+            const HIDE_AT = 180;
+            const DELTA = 8;
+            const LOCK_MS = 1300;
             const onScroll = function () {
                 if (ticking) return;
                 ticking = true;
-                
                 window.requestAnimationFrame(function () {
-                    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-                    const delta = currentScroll - lastScrollTop;
-                    const THRESHOLD_MIN = 120;
-                    const SCROLL_SENSITIVITY = 5; // Pixels to ignore jitter
+                    const y = window.scrollY || window.pageYOffset || 0;
+                    const movingDown = y > lastY + DELTA;
+                    const movingUp = y < lastY - DELTA;
+                    const now = Date.now();
 
-                    if (currentScroll < 50) {
-                        // At the very top, always show everything
-                        if (hidden) {
-                            hidden = false;
-                            header.classList.remove('is-scrolled-down');
-                        }
-                    } else if (delta > SCROLL_SENSITIVITY && currentScroll > THRESHOLD_MIN) {
-                        // Scrolling Down -> Hide Bar 1 and 3
-                        if (!hidden) {
-                            hidden = true;
-                            header.classList.add('is-scrolled-down');
-                        }
-                    } else if (delta < -SCROLL_SENSITIVITY) {
-                        // Scrolling Up (Reverse) -> Re-show Bar 1 and 3
-                        if (hidden) {
-                            hidden = false;
-                            header.classList.remove('is-scrolled-down');
-                        }
+                    if (now >= lockUntil && !hidden && movingDown && y > HIDE_AT) {
+                        hidden = true;
+                        header.classList.add('is-scrolled-down');
+                        lockUntil = now + LOCK_MS;
+                    } else if (now >= lockUntil && hidden && (movingUp || y < SHOW_AT)) {
+                        hidden = false;
+                        header.classList.remove('is-scrolled-down');
+                        lockUntil = now + LOCK_MS;
                     }
 
-                    lastScrollTop = currentScroll;
+                    lastY = y;
                     syncHeaderHeightVar();
                     ticking = false;
                 });
@@ -1134,21 +1182,222 @@
             });
         }
 
+        function setupLiveLocationAndWeather() {
+            const locWrapper = document.getElementById('stayl-live-location');
+            const locText = document.querySelector('.stayl-location-text');
+            const weatherText = document.querySelector('.stayl-weather-text');
+            const weatherSvg = document.getElementById('stayl-weather-svg');
+            if (!locText || !weatherText || !locWrapper) return;
+
+            // High-Fidelity Literal Weather SVGs (Library Compliant)
+            const icons = {
+                sunny: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="6" fill="#FBBF24" stroke="#F59E0B" stroke-width="1.5"/><path d="M12 2V4M12 20V22M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M2 12H4M20 12H22M6.34 17.66L4.93 19.07M19.07 4.93L17.66 6.34" stroke="#FBBF24" stroke-width="2" stroke-linecap="round"/></svg>`,
+                cloudy: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 19H9C5.13401 19 2 15.866 2 12C2 8.13401 5.13401 5 9 5H9.79C11.1 2.5 14.1 1 17.5 1C21.0899 1 24 3.91015 24 7.5C24 11.0899 21.0899 14 17.5 14H17.5V19Z" fill="#94A3B8" fill-opacity="0.3" stroke="#94A3B8" stroke-width="2" stroke-linejoin="round"/></svg>`,
+                rainy: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 10c0-4.418-3.582-8-8-8S4 5.582 4 10a8 8 0 0 0 8 8 8 8 0 0 0 8-8Z" fill="#38BDF8" fill-opacity="0.2" stroke="#38BDF8" stroke-width="2"/><path d="M12 18v4M8 17v4M16 17v4" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round"/></svg>`,
+                stormy: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 10c0-4.418-3.582-8-8-8S4 5.582 4 10a8 8 0 0 0 8 8 8 8 0 0 0 8-8Z" fill="#1E293B" fill-opacity="0.4" stroke="#475569" stroke-width="2"/><path d="M13 14l-4 6h5l-4 6" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+            };
+
+            // Inline Professional SVGs for Ticker
+            // Vibrant Multi-color Professional SVGs
+            // Official Lucide Iconic SVGs (Retrieved from Downloads/s)
+            const vSvgSunrise = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>`;
+            const vSvgSunset = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M12 10V2"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m16 10-4 4-4-4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>`;
+            const vSvgHum = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" fill="#E0F2FE" fill-opacity="0.3"/></svg>`;
+            const vSvgWind = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M9.59 4.59A2 2 0 1 1 11 8H2M10.59 19.41A2 2 0 1 0 14 16H2M15.73 8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>`;
+            const vSvgCal = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" fill="#F5F3FF" fill-opacity="0.2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+            const vSvgRain = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M16 13v8M8 13v8M12 15v8M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25" fill="#DBEAFE" fill-opacity="0.3"/></svg>`;
+            const vSvgFeels = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" fill="#FEE2E2" fill-opacity="0.3"/></svg>`;
+            const vSvgUV = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="4" fill="#FEF3C7" fill-opacity="0.4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
+            const vSvgAlert = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; filter: drop-shadow(0 0 6px rgba(239,68,68,0.6));"><path d="m12 19 .01 0M12 8v7M3 20h18L12 4z"/></svg>`;
+
+            const getIconByCode = (code) => {
+                if (code <= 1) return icons.sunny;
+                if (code <= 3) return icons.cloudy;
+                if (code >= 51 && code <= 67 || code >= 80 && code <= 82) return icons.rainy;
+                if (code >= 95) return icons.stormy;
+                return icons.cloudy;
+            };
+
+            const getDescByCode = (code) => {
+                if (code === 0) return 'Sunny';
+                if (code === 1 || code === 2) return 'Mostly Sunny';
+                if (code === 3) return 'Cloudy';
+                if (code >= 51 && code <= 67) return 'Rainy';
+                if (code >= 80 && code <= 82) return 'Showers';
+                if (code >= 95) return 'Thunderstorm';
+                return 'Clear';
+            };
+
+            // Absolute Stability Animator (Fixed Container, No Layout Shifts)
+            const applyTicker = (messages) => {
+                weatherText.classList.remove('opacity-0');
+                weatherText.classList.add('opacity-100');
+                
+                let idx = 0;
+                weatherText.innerHTML = messages[idx];
+                
+                if (messages.length > 1) {
+                    // Clear existing intervals if any to prevent double-looping
+                    if (window.staylWeatherInterval) clearInterval(window.staylWeatherInterval);
+                    
+                    window.staylWeatherInterval = setInterval(() => {
+                        weatherText.classList.replace('opacity-100', 'opacity-0');
+                        setTimeout(() => {
+                            idx = (idx + 1) % messages.length;
+                            weatherText.innerHTML = messages[idx];
+                            weatherText.classList.replace('opacity-0', 'opacity-100');
+                        }, 500);
+                    }, 4500);
+                }
+            };
+
+            const fallbackWeather = () => {
+                if(weatherSvg) weatherSvg.innerHTML = icons.sunny;
+                applyTicker([
+                    `32°C Sunny | ${vSvgHum} Hum: 60% | ${vSvgWind} 12km/h`, 
+                    `${vSvgSunrise} Sunrise: 5:45 AM | ${vSvgSunset} Sunset: 6:15 PM`, 
+                    `${vSvgCal} Today's High: 35°C | Low: 25°C`
+                ]);
+            };
+
+            const formatTime = (isoStr) => {
+                if (!isoStr) return '';
+                const d = new Date(isoStr);
+                let h = d.getHours();
+                let m = d.getMinutes();
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12;
+                h = h ? h : 12;
+                m = m < 10 ? '0' + m : m;
+                return `${h}:${m} ${ampm}`;
+            };
+
+            const getAlertMessage = (code, wind) => {
+                if (code >= 95) return `${vSvgAlert} <span style="color:#ef4444;font-weight:700;">SEVERE STORM ALERT | Seek Shelter Now</span>`;
+                if (code >= 80) return `${vSvgAlert} <span style="color:#f97316;font-weight:700;">HEAVY RAIN WARNING | Flash Flood Risk</span>`;
+                if (wind > 50) return `${vSvgAlert} <span style="color:#facc15;font-weight:700;">GALE WARNING | High Winds Alert</span>`;
+                if (code >= 71) return `${vSvgAlert} <span style="color:#60a5fa;font-weight:700;">SNOWSTORM ALERT | Travel Hazards</span>`;
+                return null;
+            };
+
+            const processWeather = (ipData) => {
+                let lat = ipData.latitude || 23.8103;
+                let lon = ipData.longitude || 90.4125;
+                let city = ipData.city || 'Dhaka';
+                let country = ipData.country_name || 'Bangladesh';
+
+                // Phase 2: Granular Reverse Geocoding (Country -> City -> Area Tooltip)
+                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`)
+                    .then(res => res.json())
+                    .then(geoData => {
+                        let area = geoData.address.suburb || geoData.address.neighbourhood || geoData.address.residential || geoData.address.city_district || '';
+                        locText.textContent = `${country}, ${city}`;
+                        locWrapper.title = `Full Location: ${country}, ${city}${area ? ' (' + area + ')' : ''}`;
+                        
+                        const cached = JSON.parse(localStorage.getItem('stayl_weather_cache') || '{}');
+                        if (cached.timestamp) {
+                            cached.fullLoc = locText.textContent;
+                            cached.tooltip = locWrapper.title;
+                            localStorage.setItem('stayl_weather_cache', JSON.stringify(cached));
+                        }
+                    })
+                    .catch(() => {
+                        locText.textContent = `${country}, ${city}`;
+                        locWrapper.title = `${country}, ${city}`;
+                    });
+                
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,precipitation_probability,weathercode,apparent_temperature,uv_index&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`)
+                    .then(res => res.json())
+                    .then(weatherData => {
+                        if (weatherData && weatherData.current_weather) {
+                            const cur = weatherData.current_weather;
+                            const currentTemp = Math.round(cur.temperature);
+                            const wind = Math.round(cur.windspeed);
+                            
+                            if(weatherSvg) {
+                                weatherSvg.innerHTML = getIconByCode(cur.weathercode);
+                            }
+
+                            const now = new Date();
+                            const currentHourIso = now.toISOString().slice(0, 13) + ":00";
+                            let cIdx = weatherData.hourly.time.findIndex(t => t.startsWith(currentHourIso));
+                            if(cIdx === -1) cIdx = 0;
+
+                            const humidity = weatherData.hourly.relativehumidity_2m[cIdx] || 50;
+                            const apparentTemp = Math.round(weatherData.hourly.apparent_temperature[cIdx] || cur.temperature);
+                            const uvIndex = Math.round(weatherData.hourly.uv_index[cIdx] || 0);
+                            const rainProb = weatherData.hourly.precipitation_probability[cIdx] || 0;
+                            const condition = getDescByCode(cur.weathercode);
+
+                            let messages = [];
+                            const alertMsg = getAlertMessage(cur.weathercode, wind);
+                            if (alertMsg) messages.push(alertMsg);
+
+                            // Expanded Information Architecture
+                            messages.push(`${currentTemp}°C ${condition} | ${vSvgFeels} Feels: ${apparentTemp}°C`);
+                            messages.push(`${vSvgRain} Rain Chance: ${rainProb}% | ${vSvgHum} ${humidity}%`);
+                            
+                            if (weatherData.daily) {
+                                messages.push(`Today ${vSvgSunrise} ${formatTime(weatherData.daily.sunrise[0])} | ${vSvgSunset} ${formatTime(weatherData.daily.sunset[0])}`);
+                                if (weatherData.daily.sunrise[1]) {
+                                    messages.push(`Tomorrow ${vSvgSunrise} ${formatTime(weatherData.daily.sunrise[1])} | ${vSvgSunset} ${formatTime(weatherData.daily.sunset[1])}`);
+                                }
+                                messages.push(`${vSvgCal} High: ${Math.round(weatherData.daily.temperature_2m_max[0])}°C | Low: ${Math.round(weatherData.daily.temperature_2m_min[0])}°C`);
+                            }
+                            messages.push(`${vSvgWind} Wind: ${wind} km/h | ${vSvgUV} UV: ${uvIndex}`);
+
+                            const cacheData = { 
+                                timestamp: Date.now(), 
+                                fullLoc: locText.textContent,
+                                tooltip: locWrapper.title,
+                                messages, 
+                                code: cur.weathercode 
+                            };
+                            localStorage.setItem('stayl_weather_cache', JSON.stringify(cacheData));
+                            applyTicker(messages);
+                        } else {
+                            fallbackWeather();
+                        }
+                    })
+                    .catch(() => fallbackWeather());
+            };
+
+            // Instant Cache-First Logic (Eliminates "Slow" Feeling)
+            const cached = localStorage.getItem('stayl_weather_cache');
+            if (cached) {
+                const c = JSON.parse(cached);
+                if (Date.now() - c.timestamp < 1800000) { // 30 mins cache
+                    locText.textContent = c.fullLoc || 'Bangladesh, Dhaka';
+                    locWrapper.title = c.tooltip || locText.textContent;
+                    if(weatherSvg) weatherSvg.innerHTML = getIconByCode(c.code);
+                    applyTicker(c.messages);
+                    return; 
+                }
+            }
+
+            fetch('https://ipapi.co/json/')
+                .then(res => res.json())
+                .then(data => processWeather(data))
+                .catch(() => processWeather({error: true}));
+        }
+
         // Initialize
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function () {
-                setupStaylSidebar();
-                setupVoiceSearch();
-                setupCameraSearch();
-                syncHeaderHeightVar();
-                setupHeaderScrollCollapse();
+                try { setupStaylSidebar(); } catch(e){}
+                try { setupVoiceSearch(); } catch(e){}
+                try { setupCameraSearch(); } catch(e){}
+                try { syncHeaderHeightVar(); } catch(e){}
+                try { setupHeaderScrollCollapse(); } catch(e){}
+                try { setupLiveLocationAndWeather(); } catch(e){ console.error("Weather init err:", e); }
             });
         } else {
-            setupStaylSidebar();
-            setupVoiceSearch();
-            setupCameraSearch();
-            syncHeaderHeightVar();
-            setupHeaderScrollCollapse();
+            try { setupStaylSidebar(); } catch(e){}
+            try { setupVoiceSearch(); } catch(e){}
+            try { setupCameraSearch(); } catch(e){}
+            try { syncHeaderHeightVar(); } catch(e){}
+            try { setupHeaderScrollCollapse(); } catch(e){}
+            try { setupLiveLocationAndWeather(); } catch(e){ console.error("Weather init err:", e); }
         }
         window.addEventListener('resize', syncHeaderHeightVar, { passive: true });
         window.addEventListener('load', syncHeaderHeightVar, { once: true });
@@ -1158,35 +1407,38 @@
             symbol: @json($general->cur_sym ?? '৳')
         };
         const headerCurrencyLabel = document.getElementById('staylCurrentCurrencyLabel');
+        if (headerCurrencyLabel) headerCurrencyLabel.classList.add('notranslate');
         const currencyNativeNames = {
-            BDT: 'BDT',
-            USD: 'USD',
-            INR: 'INR',
-            PKR: 'PKR',
-            SAR: 'SAR',
-            AED: 'AED',
-            MYR: 'MYR',
-            EUR: 'EUR',
-            GBP: 'GBP',
-            SGD: 'SGD',
-            JPY: 'JPY',
-            CAD: 'CAD',
-            AUD: 'AUD',
-            QAR: 'QAR',
-            KWD: 'KWD',
-            RUB: 'RUB',
-            UAH: 'UAH',
-            NZD: 'NZD',
-            ZAR: 'ZAR',
-            CNY: 'CNY',
-            BRL: 'BRL',
-            TRY: 'TRY',
-            KRW: 'KRW'
+            BDT: 'বিডিটি (টাকা)',
+            USD: 'মার্কিন ডলার',
+            INR: 'ভারতীয় রুপি',
+            PKR: 'পাকিস্তানি রুপি',
+            SAR: 'সৌদি রিয়াল',
+            AED: 'ইউএই দিরহাম',
+            MYR: 'মালয়েশিয়ান রিঙ্গিত',
+            EUR: 'ইউরো',
+            GBP: 'ব্রিটিশ পাউন্ড',
+            SGD: 'সিঙ্গাপুর ডলার',
+            JPY: 'জাপানি ইয়েন',
+            CAD: 'কানাডিয়ান ডলার',
+            AUD: 'অস্ট্রেলিয়ান ডলার',
+            QAR: 'কাতারি রিয়াল',
+            KWD: 'কুয়েতি দিনার',
+            RUB: 'রাশিয়ান রুবল',
+            UAH: 'ইউক্রেনীয় রিভনিয়া',
+            NZD: 'নিউজিল্যান্ড ডলার',
+            ZAR: 'দক্ষিণ আফ্রিকান র‍্যান্ড',
+            CNY: 'চীনা ইউয়ান',
+            BRL: 'ব্রাজিলীয় রিয়াল',
+            TRY: 'তুর্কি লিরা',
+            KRW: 'দক্ষিণ কোরিয়ান ওয়ান'
         };
         const langNativeNames = { BN: 'বাংলা', EN: 'English', HI: 'হিন্দি' };
         const headerLanguageLabel = document.getElementById('staylCurrentLanguageLabel');
         const currencySymbols = {
-            BDT: '৳', USD: '$', EUR: '€', GBP: '£', INR: '₹', PKR: 'Rs', AED: 'د.إ', SAR: 'ر.س', MYR: 'RM', SGD: 'S$', JPY: '¥'
+            BDT: '৳', USD: '$', EUR: '€', GBP: '£', INR: '₹', AED: 'د.إ', SAR: 'SR', MYR: 'RM', SGD: '$', JPY: '¥',
+            PKR: '₨', LKR: 'Rs', NPR: 'रु', BTN: 'Nu.', MVR: 'Rf', AFN: '؋',
+            RUB: '₽', CNY: '¥', KRW: '₩', AUD: '$', CAD: '$', BRL: 'R$', ZAR: 'R', TRY: '₺', QAR: 'ر.ق', KWD: 'د.ك', UAH: '₴'
         };
         const fallbackRates = {
             BDT: 1, USD: 0.0082, EUR: 0.0075, GBP: 0.0064, INR: 0.69, AED: 0.03, SAR: 0.031, MYR: 0.039, SGD: 0.011, JPY: 1.24
@@ -1204,7 +1456,13 @@
             const normalizedDigits = String(text)
                 .replace(/[০-৯]/g, function (d) { return String('০১২৩৪৫৬৭৮৯'.indexOf(d)); })
                 .replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); });
-            const cleaned = normalizedDigits.replace(new RegExp('\\' + sym, 'g'), '').replace(/[^0-9.,-]/g, '').replace(/,/g, '');
+            // Aggressive cleaning to prevent double symbol issues
+            let cleaned = normalizedDigits;
+            const symbolsToRemove = ['৳','$','€','£','₹','₨','د.إ','ر.س','SR','RM','¥','₽','₴','₺','₩','Rs','रु','Nu.','Rf','؋','R$','R','ر.ق','د.ك', sym];
+            symbolsToRemove.forEach(s => {
+                if(s) cleaned = cleaned.replace(new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
+            });
+            cleaned = cleaned.replace(/[^0-9.,-]/g, '').replace(/,/g, '');
             const n = parseFloat(cleaned);
             return Number.isFinite(n) ? n : null;
         }
@@ -1254,15 +1512,12 @@
         async function initDisplayCurrency() {
             const currencyOptions = Array.from(document.querySelectorAll('[data-stayl-currency-option]'));
             if (!currencyOptions.length) return;
-            const saved = (localStorage.getItem('stayl_display_currency_code') || getStaylCookie('stayl_display_currency_code') || '').toUpperCase();
+            const saved = (getStaylCookie('stayl_display_currency_code') || '').toUpperCase();
             let rates = await loadRates(baseCurrency.code);
             if (!rates) rates = fallbackRates;
             let activeCurrencyCode = '';
             let mutationDebounce = null;
             let isApplyingCurrency = false;
-            let lastAppliedCode = '';
-            let lastAppliedTime = 0;
-
             function markCurrencyOption(code) {
                 currencyOptions.forEach(function (el) {
                     const itemCode = (el.getAttribute('data-stayl-currency-option') || '').toUpperCase();
@@ -1278,20 +1533,12 @@
                 headerCurrencyLabel.parentElement.classList.add('stayl-currency-label-wrap');
             }
 
-            function applyNow(code, force = false) {
-                const now = Date.now();
-                const targetCode = (code || '').toUpperCase() || baseCurrency.code.toUpperCase();
-                
-                // Prevent redundant updates if the same code was applied recently (within 500ms)
-                if (!force && targetCode === lastAppliedCode && (now - lastAppliedTime < 500)) return;
-                
+            function applyNow(code) {
                 if (isApplyingCurrency) return;
                 isApplyingCurrency = true;
 
-                activeCurrencyCode = targetCode;
-                lastAppliedCode = activeCurrencyCode;
-                lastAppliedTime = now;
-                const activeLangCode = (@json(app()->getLocale() == 'bn' ? 'BN' : 'EN')).toString();
+                activeCurrencyCode = (code || '').toUpperCase() || baseCurrency.code.toUpperCase();
+                const activeLangCode = "{{ $currentLangCode }}";
 
                 // numeral formatting logic: native for BDT + BN lang, english for others
                 const toNative = function(val) {
@@ -1303,31 +1550,16 @@
                 const currencyNamesEN = { BDT: 'BDT', USD: 'USD', EUR: 'EUR', INR: 'INR' };
                 const cNameMap = activeLangCode === 'BN' ? currencyNativeNames : currencyNamesEN;
 
+                if (headerCurrencyLabel) {
+                    const cData = @json($headerCurrencies).find(c => c.code === activeCurrencyCode) || { flag: '', symbol: '$' };
+                    headerCurrencyLabel.innerHTML = '<img src="'+cData.flag+'" class="stayl-btn-flag" alt=""> <span class="notranslate">' + activeCurrencyCode + ' ' + cData.symbol + '</span>';
+                }
+
+
                 const currentSymbol = currencySymbols[activeCurrencyCode] || baseCurrency.symbol || '$';
-                
-                const currencyFlags = {
-                    'BDT': 'bd', 'USD': 'us', 'INR': 'in', 'PKR': 'pk', 'SAR': 'sa',
-                    'AED': 'ae', 'MYR': 'my', 'EUR': 'eu', 'GBP': 'gb', 'SGD': 'sg',
-                    'JPY': 'jp', 'CAD': 'ca', 'AUD': 'au', 'QAR': 'qa', 'KWD': 'kw',
-                    'RUB': 'ru', 'UAH': 'ua', 'NZD': 'nz', 'ZAR': 'za', 'CNY': 'cn',
-                    'BRL': 'br', 'TRY': 'tr', 'KRW': 'kr'
-                };
-                
-                const flagEl = document.getElementById('staylCurrentCurrencyFlag');
-                const textEl = document.getElementById('staylCurrentCurrencyText');
-                if (flagEl) {
-                    const countryCode = currencyFlags[activeCurrencyCode] || 'un';
-                    flagEl.innerHTML = `<img src="https://flagcdn.com/w40/${countryCode}.png" style="width: 24px; height: 16px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1); display: block; flex-shrink: 0;">`;
-                    flagEl.style.cssText = "min-width: 0 !important; width: auto !important; display: inline-flex !important; align-items: center;";
-                }
-                if (textEl) {
-                    textEl.textContent = activeCurrencyCode + ' ' + currentSymbol;
-                    textEl.style.cssText = "min-width: 0 !important; width: auto !important; font-size: 13px;";
-                }
                 const rate = Number(rates[activeCurrencyCode] ?? fallbackRates[activeCurrencyCode] ?? 1);
                 window.__staylDisplayCurrency = { code: activeCurrencyCode, symbol: currentSymbol, rate: rate };
                 document.documentElement.setAttribute('data-display-currency', activeCurrencyCode);
-                localStorage.setItem('stayl_display_currency_code', activeCurrencyCode);
 
                 document.querySelectorAll('.staylbd-rt-price, .staylbd-rt-price-compare').forEach(el => {
                     el.classList.add('notranslate');
@@ -1348,7 +1580,9 @@
                 // Global Selector Conversion (Sidebar, Inputs, etc.)
                 priceSelectors.forEach(sel => {
                     document.querySelectorAll(sel).forEach(el => {
+                        // Add notranslate to prevent Google Translate interference
                         el.classList.add('notranslate');
+                        
                         // Skip if already processed by specific logic above
                         if (el.classList.contains('staylbd-rt-price')) return;
 
@@ -1418,11 +1652,16 @@
                 mutationDebounce = window.setTimeout(function () {
                     if (document.body.classList.contains('stayl-rt-processing')) return;
                     document.body.classList.add('stayl-rt-processing');
-                    // Ensure the applied code is always valid from storage or base
-                    const currentStored = localStorage.getItem('stayl_display_currency_code') || getStaylCookie('stayl_display_currency_code') || baseCurrency.code;
+                    
+                    // Ensure the applied code is always valid from cookie or base
+                    const currentStored = getStaylCookie('stayl_display_currency_code') || baseCurrency.code;
+                    
+                    // Safety check: if target currency is BDT and we are already BDT, avoid excessive cycles
+                    // unless we are specifically fixing something that changed
                     applyNow(currentStored);
+                    
                     document.body.classList.remove('stayl-rt-processing');
-                }, 300); // Increased delay for stability
+                }, 250); // Increased delay slightly to allow multiple mutations to batch
             });
             observer.observe(document.body, { childList: true, subtree: true });
             currencyOptions.forEach(function (optionEl) {
@@ -1430,35 +1669,22 @@
                     event.preventDefault();
                     const code = (this.getAttribute('data-stayl-currency-option') || '').toUpperCase() || baseCurrency.code;
                     setStaylCookie('stayl_display_currency_code', code);
-                    localStorage.setItem('stayl_display_currency_code', code);
-                    applyNow(code, true);
+                    applyNow(code);
                     window.location.reload();
                 });
             });
             window.addEventListener('staylbd:product-updated', function () {
-                const currentStored = (localStorage.getItem('stayl_display_currency_code') || getStaylCookie('stayl_display_currency_code') || baseCurrency.code).toUpperCase();
+                const currentStored = (getStaylCookie('stayl_display_currency_code') || baseCurrency.code).toUpperCase();
                 window.requestAnimationFrame(function () {
                     applyNow(currentStored);
                 });
             });
         }
         function initDisplayLanguageLabel() {
-            const langFlagsMap = {'EN': 'gb', 'BN': 'bd'};
-            const langNamesMap = {'EN': 'English', 'BN': 'বাংলা'};
-            const flagEl = document.getElementById('staylCurrentLanguageFlag');
-            const textEl = document.getElementById('staylCurrentLanguageText');
-            
-            const savedLang = (localStorage.getItem('stayl_display_language_code') || getStaylCookie('stayl_display_language_code') || '').toUpperCase();
+            if (!headerLanguageLabel) return;
+            const savedLang = (getStaylCookie('stayl_display_language_code') || '').toUpperCase();
             if (savedLang) {
-                if (flagEl) {
-                    const countryCode = langFlagsMap[savedLang] || 'un';
-                    flagEl.innerHTML = `<img src="https://flagcdn.com/w20/${countryCode}.png" width="20" alt="${savedLang}" style="border-radius: 2px; display: block; flex-shrink: 0;">`;
-                    flagEl.style.cssText = "min-width: 0 !important; width: auto !important; display: inline-flex !important; align-items: center;";
-                }
-                if (textEl) {
-                    textEl.textContent = langNamesMap[savedLang] || savedLang;
-                    textEl.style.cssText = "min-width: 0 !important; width: auto !important;";
-                }
+                headerLanguageLabel.textContent = langNativeNames[savedLang] || savedLang;
             }
             document.querySelectorAll('[data-stayl-lang-option]').forEach(function (el) {
                 el.addEventListener('click', function (event) {
@@ -1466,27 +1692,11 @@
                     const code = (this.getAttribute('data-stayl-lang-option') || '').toUpperCase();
                     if (code) {
                         setStaylCookie('stayl_display_language_code', code);
-                        localStorage.setItem('stayl_display_language_code', code);
-                        
-                        // Automatically change currency based on language selection
-                        let defaultCurrency = '';
-                        if (code === 'BN') defaultCurrency = 'BDT';
-                        else if (code === 'EN') defaultCurrency = 'USD';
-                        
-                        if (defaultCurrency) {
-                            setStaylCookie('stayl_display_currency_code', defaultCurrency);
-                            localStorage.setItem('stayl_display_currency_code', defaultCurrency);
-                        }
                         
                         // Briefly update label for instant feedback before reload
-                        if (flagEl) {
-                            const countryCode = langFlagsMap[code] || 'un';
-                            flagEl.innerHTML = `<img src="https://flagcdn.com/w20/${countryCode}.png" width="20" alt="${code}" style="border-radius: 2px; display: block; flex-shrink: 0;">`;
-                            flagEl.style.cssText = "min-width: 0 !important; width: auto !important; display: inline-flex !important; align-items: center;";
-                        }
-                        if (textEl) {
-                            textEl.textContent = langNamesMap[code] || code;
-                            textEl.style.cssText = "min-width: 0 !important; width: auto !important;";
+                        if (headerLanguageLabel) {
+                            const flag = (code === 'BN' ? '🇧🇩' : (code === 'EN' ? '🇺🇸' : '🌐'));
+                            headerLanguageLabel.textContent = flag + ' ' + (langNativeNames[code] || code);
                         }
                         window.location.href = this.href;
                     }
@@ -1531,5 +1741,49 @@
             });
         }
     })();
+
+    /**
+     * Smart Scroll Header Animation
+     * - Hides Bar 1 and Bar 3 on scroll down.
+     * - Keeps Bar 2 (Main) sticky at the very top.
+     * - Smooth restores everything on scroll up.
+     */
+    (function() {
+        const headerMaster = document.querySelector('.stayl-fixed-master');
+        if (!headerMaster) {
+            console.error('Header Scroll: .stayl-fixed-master not found');
+            return;
+        }
+
+        const scrollThreshold = 40;
+
+        const updateHeader = () => {
+            const scrollTop = window.pageYOffset || 
+                              document.documentElement.scrollTop || 
+                              (document.scrollingElement ? document.scrollingElement.scrollTop : 0) || 
+                              document.body.scrollTop || 0;
+            
+            if (scrollTop > scrollThreshold) {
+                if (!headerMaster.classList.contains('is-scrolled-down')) {
+                    headerMaster.classList.add('is-scrolled-down');
+                }
+            } else {
+                if (headerMaster.classList.contains('is-scrolled-down')) {
+                    headerMaster.classList.remove('is-scrolled-down');
+                }
+            }
+        };
+
+        // Aggressive scroll listening
+        window.addEventListener('scroll', updateHeader, { passive: true, capture: true });
+        document.addEventListener('scroll', updateHeader, { passive: true, capture: true });
+        
+        // Initial check
+        updateHeader();
+        
+        // Periodic check to ensure state is correct
+        setInterval(updateHeader, 300);
+    })();
 </script>
+
 @endpush

@@ -174,6 +174,55 @@
                 </div>
             </div>
             <div class="card-body p-0">
+                <!-- Global Visibility Controls (Requested Feature) -->
+                <div class="bg-light p-3 border-bottom">
+                    <h6 class="mb-3 text-primary"><i class="las la-toggle-on me-2"></i>@lang('Header Visibility & Status')</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card border shadow-none bg-white mb-0">
+                                <div class="card-body p-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold">@lang('Top Bar')</span>
+                                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="top_bar[enabled]" value="1" @checked(!empty($topBar['enabled']))></div>
+                                    </div>
+                                    <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                        <label class="form-check-label x-small fw-bold text-primary">@lang('Status: Public / Private')</label>
+                                        <input class="form-check-input" type="checkbox" name="top_bar[is_public]" value="1" @checked(!empty($topBar['is_public']))>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border shadow-none bg-white mb-0">
+                                <div class="card-body p-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold">@lang('Main Bar')</span>
+                                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="main_bar[enabled]" value="1" @checked(!empty($mainBar['enabled']))></div>
+                                    </div>
+                                    <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                        <label class="form-check-label x-small fw-bold text-primary">@lang('Status: Public / Private')</label>
+                                        <input class="form-check-input" type="checkbox" name="main_bar[is_public]" value="1" @checked(!empty($mainBar['is_public']))>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border shadow-none bg-white mb-0">
+                                <div class="card-body p-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold">@lang('Menu Bar (3rd Bar)')</span>
+                                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="menu_bar[enabled]" value="1" @checked(!empty($menuBar['enabled']))></div>
+                                    </div>
+                                    <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                        <label class="form-check-label x-small fw-bold text-primary">@lang('Status: Public / Private')</label>
+                                        <input class="form-check-input" type="checkbox" name="menu_bar[is_public]" value="1" @checked(!empty($menuBar['is_public']))>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <ul class="nav nav-tabs nav-tabs-custom px-3 pt-2" id="headerEditorTabs" role="tablist">
                     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-appearance" role="tab">@lang('Appearance')</a></li>
                     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-topbar" role="tab">@lang('Top Bar')</a></li>
@@ -233,8 +282,6 @@
                     <div class="tab-pane fade" id="tab-topbar" role="tabpanel">
                         <div class="row g-3">
                             <div class="col-md-12 d-flex flex-wrap gap-3 mb-3">
-                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="top_bar[enabled]" value="1" @checked(!empty($topBar['enabled']))><label class="form-check-label fw-bold">@lang('Enable Top Bar')</label></div>
-                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="top_bar[is_public]" value="1" @checked(!empty($topBar['is_public']))><label class="form-check-label fw-bold text--primary">@lang('Visibility (Public / Private)')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="top_bar[show_language]" value="1" @checked(!empty($topBar['show_language']))><label class="form-check-label">@lang('Language')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="top_bar[show_currency]" value="1" @checked(!empty($topBar['show_currency']))><label class="form-check-label">@lang('Currency')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="top_bar[show_apps]" value="1" @checked(!empty($topBar['show_apps']))><label class="form-check-label">@lang('Apps Menu')</label></div>
@@ -250,8 +297,6 @@
                     <div class="tab-pane fade" id="tab-mainbar" role="tabpanel">
                         <div class="row g-3">
                              <div class="col-md-5 d-flex flex-wrap gap-3">
-                                <div class="form-check form-switch mt-4"><input class="form-check-input" type="checkbox" name="main_bar[enabled]" value="1" @checked(!empty($mainBar['enabled']))><label class="form-check-label fw-bold">@lang('Enable Main Bar')</label></div>
-                                <div class="form-check form-switch mt-4"><input class="form-check-input" type="checkbox" name="main_bar[is_public]" value="1" @checked(!empty($mainBar['is_public']))><label class="form-check-label fw-bold text--primary">@lang('Visibility (Public / Private)')</label></div>
                                 <div class="form-check mt-3 w-100"><input class="form-check-input" type="checkbox" name="main_bar[show_language_icon]" value="1" @checked(!empty($mainBar['show_language_icon']))><label class="form-check-label">@lang('Show Lang Icon')</label></div>
                             </div>
                             <div class="col-md-4"><label class="form-label small fw-bold">@lang('Logo Max Height (px)')</label><input type="number" min="28" max="90" class="form-control" name="main_bar[logo_max_height]" value="{{ (int) ($mainBar['logo_max_height'] ?? 48) }}"><div class="form-text small">@lang('Ensures logo doesn\'t break layout')</div></div>
@@ -263,8 +308,6 @@
                     <div class="tab-pane fade" id="tab-menubar" role="tabpanel">
                         <div class="row g-3">
                             <div class="col-md-12 d-flex flex-wrap gap-3 mb-3">
-                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="menu_bar[enabled]" value="1" @checked(!empty($menuBar['enabled']))><label class="form-check-label fw-bold">@lang('Enable 3rd Bar')</label></div>
-                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="menu_bar[is_public]" value="1" @checked(!empty($menuBar['is_public']))><label class="form-check-label fw-bold text--primary">@lang('Visibility (Public)')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="menu_bar[show_sidebar_trigger]" value="1" @checked(!empty($menuBar['show_sidebar_trigger']))><label class="form-check-label">@lang('Sidebar Toggle')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="menu_bar[show_category_button]" value="1" @checked(!empty($menuBar['show_category_button']))><label class="form-check-label">@lang('Category Button')</label></div>
                                 <div class="form-check"><input class="form-check-input" type="checkbox" name="menu_bar[show_seller_button]" value="1" @checked(!empty($menuBar['show_seller_button']))><label class="form-check-label">@lang('Seller Button')</label></div>

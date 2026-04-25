@@ -98,7 +98,7 @@
                     @foreach($midBanners as $mb)
                         <div class="col-12 mb-4 px-2">
                             <a href="{{ $mb->data_values->url ?? '#' }}" class="block overflow-hidden rounded-2xl shadow-sm border border-slate-100 hover:scale-[1.005] transition-transform duration-300">
-                                <img src="{{ getImage('assets/images/frontend/middle_banner/' . $mb->data_values->image, '1440x300') }}" alt="Banner" class="w-full h-auto">
+                                <img src="{{ getImage('assets/images/frontend/middle_banner/' . $mb->data_values->image, '1440x300') }}" alt="Banner" class="w-full h-auto" loading="lazy">
                             </a>
                         </div>
                     @endforeach
@@ -112,7 +112,7 @@
                     @foreach($bottomBanners as $bb)
                         <div class="col-12 mb-4 px-2">
                             <a href="{{ $bb->data_values->url ?? '#' }}" class="block overflow-hidden rounded-2xl shadow-sm border border-slate-100 hover:scale-[1.005] transition-transform duration-300">
-                                <img src="{{ getImage('assets/images/frontend/bottom_banner/' . $bb->data_values->image, '1440x250') }}" alt="Banner" class="w-full h-auto">
+                                <img src="{{ getImage('assets/images/frontend/bottom_banner/' . $bb->data_values->image, '1440x250') }}" alt="Banner" class="w-full h-auto" loading="lazy">
                             </a>
                         </div>
                     @endforeach
