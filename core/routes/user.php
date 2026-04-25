@@ -38,13 +38,13 @@ Route::name('user.')->group(function () {
     Route::get('/', function () {
         return auth()->check() ? redirect()->route('user.home') : redirect()->route('user.cart');
     })->name('index');
-    Route::get('cart', [\App\Http\Controllers\CartController::class, 'cartProductsDashboard'])->name('cart');
+    Route::get('cart', [\App\Http\Controllers\CartController::class, 'cartProducts'])->name('cart');
     Route::get('guest-order', [\App\Http\Controllers\GuestCheckoutController::class, 'showOrderPage'])->name('guest.order');
     Route::get('cart/quickorder', function () {
         return redirect()->route('user.guest.order', [], 302);
     })->name('cart.quickorder');
-    Route::get('wishlist', [\App\Http\Controllers\WishController::class, 'wishListProductDashboard'])->name('wishlist');
-    Route::get('compare', [\App\Http\Controllers\ProductComparisonController::class, 'indexDashboard'])->name('compare');
+    Route::get('wishlist', [\App\Http\Controllers\WishController::class, 'wishListProduct'])->name('wishlist');
+    Route::get('compare', [\App\Http\Controllers\ProductComparisonController::class, 'index'])->name('compare');
 });
 
 Route::middleware('auth')->name('user.')->group(function () {

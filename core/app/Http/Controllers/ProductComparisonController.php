@@ -14,26 +14,7 @@ class ProductComparisonController extends Controller
     /**
      * Show comparison page
      */
-    public function index()
-    {
-        $pageTitle = 'Product Comparison';
-        $products = ProductComparison::getItems()->filter(function ($item) {
-            return $item->product !== null;
-        })->values();
-
-        $wishListProductIds = [];
-        if (auth()->check()) {
-            $wishListProductIds = \App\Models\Wishlist::where('user_id', auth()->id())->pluck('product_id')->toArray();
-        } else {
-            $wishlist = session('wishlist', []);
-            $wishListProductIds = is_array($wishlist) ? array_map('intval', array_keys($wishlist)) : [];
-        }
-
-        return view($this->activeTemplate . 'compare.index', compact('pageTitle', 'products', 'wishListProductIds'));
-    }
-
-    /** Compare inside user dashboard (sidebar + menu bar stay). */
-    public function indexDashboard(Request $request)
+    public function index(Request $request)
     {
         $pageTitle = 'Product Comparison';
         $products = ProductComparison::getItems()
@@ -43,11 +24,13 @@ class ProductComparisonController extends Controller
             ->values()
             ->take(self::COMPARE_MAX);
 
-        // Guest: if no items by cookie but we have items by session_id, use them and set cookie so header + next load match
+        // Guest: if no items by cookie but we have items by session_id, use them and set cookie
         if (!auth()->check() && $products->isEmpty()) {
             $sessionId = session()->getId();
             if ($sessionId !== null && $sessionId !== '') {
-                $bySession = ProductComparison::with('product.category', 'product.brand', 'product.reviews', 'product.activeVariants')
+                $bySession = ProductComparison::with(['product' => function($q) {
+                        $q->with(['category', 'brand', 'activeVariants'])->withCount(['reviews' => fn($r) => $r->visibleOnProduct()]);
+                    }])
                     ->where('session_id', $sessionId)
                     ->latest()
                     ->get()
@@ -60,21 +43,24 @@ class ProductComparisonController extends Controller
             }
         }
 
+        $userId = auth()->id();
         $wishListProductIds = [];
-        if (auth()->check()) {
-            $wishListProductIds = \App\Models\Wishlist::where('user_id', auth()->id())->pluck('product_id')->toArray();
+        if ($userId) {
+            $wishListProductIds = \App\Models\Wishlist::where('user_id', $userId)->pluck('product_id')->toArray();
         } else {
             $wishlist = session('wishlist', []);
             $wishListProductIds = is_array($wishlist) ? array_map('intval', array_keys($wishlist)) : [];
         }
 
+        $viewName = request()->routeIs('user.compare') ? 'user.compare' : 'compare.index';
+
         $response = response()
-            ->view($this->activeTemplate . 'user.compare', compact('pageTitle', 'products', 'wishListProductIds'))
+            ->view($this->activeTemplate . $viewName, compact('pageTitle', 'products', 'wishListProductIds'))
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
 
-        // Guest: ensure cookie is set when we have items (so /user/compare and compare/count use same id)
+        // Guest: ensure cookie is set when we have items
         if (!auth()->check() && $products->isNotEmpty()) {
             $guestId = $request->cookie(ProductComparison::GUEST_COOKIE_NAME) ?: ProductComparison::getGuestCompareId();
             if ($guestId !== null) {

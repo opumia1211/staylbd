@@ -361,40 +361,6 @@ class CartController extends Controller
         $userId    = auth()->id();
         $carts     = [];
 
-        $cart = session()->get('cart');
-
-        if ($userId) {
-            $carts = Cart::where('user_id', $userId)->with('product')->orderBy('id', 'asc')->get()->filter(function ($cart) {
-                return $cart->product !== null;
-            })->values();
-        } else {
-            $carts = is_array($cart) ? array_values(array_map(function ($item) {
-                return (object) $item;
-            }, $cart)) : [];
-        }
-
-        session()->forget('total');
-        try {
-            $abandonedService = app(AbandonedCartService::class);
-            if ($userId) {
-                $abandonedService->recordUserCart($userId, request());
-            } else {
-                $abandonedService->recordGuestCart(request());
-            }
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::channel('single')->debug('Abandoned cart record failed', ['message' => $e->getMessage()]);
-        }
-        $emptyMessage = 'Your cart is empty';
-        return view($this->activeTemplate . 'cart', compact('pageTitle', 'carts', 'emptyMessage'));
-    }
-
-    /** Cart inside user dashboard (sidebar + menu bar stay). */
-    public function cartProductsDashboard()
-    {
-        $pageTitle = 'My Cart';
-        $userId    = auth()->id();
-        $carts     = [];
-
         if (!$userId && request()->boolean('open_guest_checkout')) {
             $guestCart = session('cart', []);
             if (is_array($guestCart) && $guestCart !== []) {
@@ -406,7 +372,7 @@ class CartController extends Controller
 
         if ($userId) {
             $carts = Cart::where('user_id', $userId)->with(['product' => function ($q) {
-                $q->with(['category', 'brand', 'activeVariants'])->withCount('reviews');
+                $q->with(['category', 'brand', 'activeVariants'])->withCount(['reviews' => fn($r) => $r->visibleOnProduct()]);
             }])->orderBy('id', 'asc')->get()->filter(function ($cart) {
                 return $cart->product !== null;
             })->values();
@@ -417,7 +383,7 @@ class CartController extends Controller
                 }, array_values($cart)));
                 $productIds = array_filter($productIds);
                 $products = Product::active()->whereIn('id', $productIds)
-                    ->with(['category', 'brand', 'activeVariants'])->withCount('reviews')->get()->keyBy('id');
+                    ->with(['category', 'brand', 'activeVariants'])->withCount(['reviews' => fn($r) => $r->visibleOnProduct()])->get()->keyBy('id');
                 $carts = collect();
                 foreach ($cart as $key => $item) {
                     $item = (object) $item;
@@ -444,8 +410,11 @@ class CartController extends Controller
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::channel('single')->debug('Abandoned cart record failed', ['message' => $e->getMessage()]);
         }
+
+        $viewName = request()->routeIs('user.cart') ? 'user.cart' : 'cart';
         $emptyMessage = 'Your cart is empty';
-        return view($this->activeTemplate . 'user.cart', compact('pageTitle', 'carts', 'emptyMessage'));
+
+        return view($this->activeTemplate . $viewName, compact('pageTitle', 'carts', 'emptyMessage'));
     }
 
     public function removeCart(Request $request)

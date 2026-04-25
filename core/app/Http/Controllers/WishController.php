@@ -98,60 +98,40 @@ class WishController extends Controller
 
 	public function wishListProduct()
 	{
-		$pageTitle   = 'My Wishlist';
+		$pageTitle    = 'My Wishlist';
 		$emptyMessage = 'No product in your wishlist yet';
-		$userId      = auth()->id();
-		$productIds  = [];
+		$userId       = auth()->id();
+		$productIds   = [];
 
 		if ($userId) {
 			$productIds = Wishlist::where('user_id', $userId)->pluck('product_id')->toArray();
 		} else {
-			$wishlist = session()->get('wishlist', []);
+			$wishlist   = session()->get('wishlist', []);
 			$productIds = is_array($wishlist) ? array_keys($wishlist) : [];
 		}
 
 		$products = collect();
 		if (!empty($productIds)) {
 			$productIds = array_values(array_map('intval', $productIds));
-			$products = Product::active()->whereIn('id', $productIds)->with(['category:id,name', 'brand:id,name'])->withCount('reviews')->get();
-			// Keep order same as wishlist (first added = first shown)
+			// Load with variants and review counts for both views to ensure consistency
+			$products = Product::active()->whereIn('id', $productIds)
+				->with(['category:id,name', 'brand:id,name', 'activeVariants'])
+				->withCount(['reviews' => fn($q) => $q->visibleOnProduct()])
+				->get();
+
+			// Maintain order: last added first
 			$products = $products->sortBy(function ($p) use ($productIds) {
 				$pos = array_search((int) $p->id, $productIds);
 				return $pos !== false ? $pos : 999;
 			})->values();
 		}
 
-		return view($this->activeTemplate . 'wishlist', compact('pageTitle', 'products', 'emptyMessage'));
-	}
-
-	/** Wishlist inside user dashboard (sidebar + menu bar stay). */
-	public function wishListProductDashboard()
-	{
-		$pageTitle   = 'My Wishlist';
-		$emptyMessage = 'No product in your wishlist yet';
-		$userId      = auth()->id();
-		$productIds  = [];
-
-		if ($userId) {
-			$productIds = Wishlist::where('user_id', $userId)->pluck('product_id')->toArray();
-		} else {
-			$wishlist = session()->get('wishlist', []);
-			$productIds = is_array($wishlist) ? array_keys($wishlist) : [];
-		}
-
-		$products = collect();
-		if (!empty($productIds)) {
-			$productIds = array_values(array_map('intval', $productIds));
-			$products = Product::active()->whereIn('id', $productIds)->with(['category:id,name', 'brand:id,name', 'activeVariants'])->withCount('reviews')->get();
-			$products = $products->sortBy(function ($p) use ($productIds) {
-				$pos = array_search((int) $p->id, $productIds);
-				return $pos !== false ? $pos : 999;
-			})->values();
-		}
-
-		$headerActions = ''; // Toolbar is inside wishlist_page_content
+		// Determine view based on route
+		$viewName = request()->routeIs('user.wishlist') ? 'user.wishlist' : 'wishlist';
 		$wishlistMax = Wishlist::WISHLIST_MAX;
-		return view($this->activeTemplate . 'user.wishlist', compact('pageTitle', 'products', 'emptyMessage', 'headerActions', 'wishlistMax'));
+		$headerActions = '';
+
+		return view($this->activeTemplate . $viewName, compact('pageTitle', 'products', 'emptyMessage', 'headerActions', 'wishlistMax'));
 	}
 
 

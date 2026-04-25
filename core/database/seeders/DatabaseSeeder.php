@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             ShippingZonesSeeder::class,
             GatewaySeeder::class,
             ExtensionSeeder::class,
-            ProductSizeAttributeSeeder::class,
+            ProductAttributeSeeder::class,
         ]);
     }
 }
