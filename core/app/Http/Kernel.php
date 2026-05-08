@@ -40,7 +40,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\LanguageMiddleware::class,
+            \App\Http\Middleware\Localization::class,
         ],
 
         'api' => [
@@ -84,5 +84,6 @@ class Kernel extends HttpKernel
         'registration.complete' => \App\Http\Middleware\RegistrationStep::class,
         'maintenance'           => \App\Http\Middleware\MaintenanceMode::class,
         'no-cache'              => \App\Http\Middleware\NoCacheMiddleware::class,
+        'localization'          => \App\Http\Middleware\Localization::class,
     ];
 }

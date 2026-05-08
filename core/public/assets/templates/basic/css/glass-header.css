@@ -587,7 +587,7 @@
 .glass-search-voice .ui-icon {
     width: 20px;
     height: 20px;
-    stroke-width: 2px;
+    stroke-width: 1.5px; /* Standardized to prevent "double" look */
 }
 
 .glass-search-submit {
@@ -674,13 +674,18 @@
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(8px);
+    box-shadow: none !important; /* Standard requested fix: remove shadow */
+}
+
+#cameraSearchBtn {
+    box-shadow: none !important;
 }
 
 .glass-header-camera-btn .ui-icon {
     width: 24px;
     height: 24px;
     display: block;
-    stroke-width: 1.8px;
+    stroke-width: 1.5px; /* Thinner for premium feel */
 }
 
 @media (max-width: 991.98px) {

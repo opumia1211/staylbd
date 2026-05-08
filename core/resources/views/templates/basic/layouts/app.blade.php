@@ -103,6 +103,7 @@
 
     @stack('style')
     <link rel="stylesheet" href="{{ asset('assets/templates/basic/css/stayl-elite-core.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/templates/basic/css/contact-chat.css') }}?v={{ $assetVersion }}">
 
 
 
@@ -170,6 +171,7 @@
             try {
                 if (localStorage.getItem('stayl-theme') === 'dark') {
                     document.body.classList.add('dark-mode');
+                    document.documentElement.classList.add('dark');
                 }
             } catch (e) {}
         })();
@@ -177,7 +179,7 @@
     <!-- Preloader removed for instant page loads -->
     @yield('app')
     @include($activeTemplate . 'partials.mobile_bottom_nav')
-    <div id="google_translate_element" aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"></div>
+
     @guest
         @include($activeTemplate . 'partials.guest_account_modal')
     @endguest
@@ -572,116 +574,7 @@
             top: 0 !important;
         }
     </style>
-    <script>
-        (function () {
-            "use strict";
 
-            var serverLocale = @json((string) app()->getLocale());
-            var initialized = false;
-
-            var localeMap = {
-                en: 'en',
-                bn: 'bn',
-                hi: 'hi',
-                hn: 'hi',
-                ar: 'ar',
-                ur: 'ur',
-                fr: 'fr',
-                es: 'es',
-                de: 'de',
-                it: 'it',
-                pt: 'pt',
-                ru: 'ru',
-                tr: 'tr',
-                id: 'id',
-                ms: 'ms',
-                zh: 'zh-CN',
-                ja: 'ja',
-                ko: 'ko'
-            };
-
-            function normalizeLocale(code) {
-                var key = (code || '').toString().trim().toLowerCase();
-                return localeMap[key] || (key || 'en');
-            }
-
-            function setTranslateCookie(lang) {
-                var mapped = normalizeLocale(lang);
-                var value = '/en/' + mapped;
-                var maxAge = 60 * 60 * 24 * 365;
-                document.cookie = 'googtrans=' + value + ';path=/;max-age=' + maxAge + ';SameSite=Lax';
-                document.cookie = 'googtrans=' + value + ';path=/staylbd;max-age=' + maxAge + ';SameSite=Lax';
-                try {
-                    localStorage.setItem('stayl_auto_translate_lang', mapped);
-                } catch (e) {}
-            }
-
-            function getPreferredLang() {
-                try {
-                    var stored = localStorage.getItem('stayl_auto_translate_lang');
-                    if (stored) return normalizeLocale(stored);
-                } catch (e) {}
-                return normalizeLocale(serverLocale);
-            }
-
-            function applyTranslate(lang) {
-                var mapped = normalizeLocale(lang);
-                setTranslateCookie(mapped);
-
-                if (mapped === 'en') {
-                    return;
-                }
-
-                var combo = document.querySelector('.goog-te-combo');
-                if (!combo) return;
-                if (combo.value === mapped) return;
-                combo.value = mapped;
-                combo.dispatchEvent(new Event('change'));
-            }
-
-            function syncLanguageClickHandlers() {
-                document.addEventListener('click', function (event) {
-                    var link = event.target.closest('[data-stayl-lang-option]');
-                    if (!link) return;
-                    var nextLang = (link.getAttribute('data-stayl-lang-option') || '').toLowerCase();
-                    if (!nextLang) return;
-
-                    // Keep normal navigation to /change/{lang} for server-side stability.
-                    applyTranslate(nextLang);
-                });
-            }
-
-            window.googleTranslateElementInit = function () {
-                if (initialized || !window.google || !google.translate || !google.translate.TranslateElement) return;
-                initialized = true;
-                new google.translate.TranslateElement({
-                    pageLanguage: 'en',
-                    autoDisplay: false
-                }, 'google_translate_element');
-
-                setTimeout(function () {
-                    applyTranslate(getPreferredLang());
-                }, 400);
-            };
-
-            function loadGoogleTranslateScript() {
-                if (document.querySelector('script[data-stayl-google-translate="1"]')) return;
-                var script = document.createElement('script');
-                script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-                script.async = true;
-                script.defer = true;
-                script.setAttribute('data-stayl-google-translate', '1');
-                document.body.appendChild(script);
-            }
-
-            syncLanguageClickHandlers();
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', loadGoogleTranslateScript, { once: true });
-            } else {
-                loadGoogleTranslateScript();
-            }
-        })();
-    </script>
 </body>
 
 </html>

@@ -27,6 +27,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
@@ -735,18 +737,11 @@ class SiteController extends Controller
     /** ভাসমান লাইভ চ্যাট – আলাদা পেজ নেই; হোমে রিডাইরেক্ট + প্যানেল অটো-ওপেন, চ্যাট বন্ধ করলে পিছনের পেজই দেখা যাবে */
     public function contactLive()
     {
-        if (!auth()->check()) {
-            return redirect()->route('user.login')->with('url.intended', route('contact.live'));
-        }
         return redirect()->route('home', ['open_contact' => 1]);
     }
 
     public function contactSubmit(Request $request)
     {
-        if (!auth()->check()) {
-            $notify[] = ['error', __('Please login or register to send a message.')];
-            return back()->withNotify($notify);
-        }
 
         $this->validate($request, [
             'name'    => 'required',
@@ -798,9 +793,6 @@ class SiteController extends Controller
     /** Submit from global floating contact panel (AJAX) - শুধুমাত্র লগইন ইউজার, অ্যাটাচমেন্ট সাপোর্ট */
     public function contactPanelSubmit(Request $request)
     {
-        if (!auth()->check()) {
-            return response()->json(['success' => false, 'message' => __('Please login or register to use Live Chat.')], 403);
-        }
 
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'mp3', 'm4a', 'mp4', 'webm'];
         $maxSizeMb        = (int) substr(ini_get('upload_max_filesize'), 0, -1) ?: 4;
@@ -884,6 +876,14 @@ class SiteController extends Controller
                 ->where('created_at', '>=', Carbon::now()->subDays(30))
                 ->orderBy('id', 'desc')
                 ->first();
+        } else if (!$userId && $channelCol) {
+            $guestTicket = $request->cookie('stayl_guest_ticket');
+            if ($guestTicket) {
+                $ticket = SupportTicket::where('ticket', $guestTicket)
+                    ->where('channel', SupportTicket::CHANNEL_WEB)
+                    ->whereIn('status', [Status::TICKET_OPEN, Status::TICKET_REPLY, Status::TICKET_ANSWER])
+                    ->first();
+            }
         }
 
         if (!$ticket) {
@@ -1028,13 +1028,20 @@ class SiteController extends Controller
         if ($userId) {
             \Illuminate\Support\Facades\Cache::forget('contact_chat_feed_' . $userId);
         }
-        return response()->json([
+        
+        $response = response()->json([
             'success' => true,
             'message' => __('Message sent! We will reply soon.'),
             'ticket' => $ticket->ticket,
             'messages' => $messages,
             'new_msg_id' => $message->id,
         ]);
+
+        if (!$userId) {
+            $response->cookie('stayl_guest_ticket', $ticket->ticket, 43200); // 30 days
+        }
+
+        return $response;
     }
 
     /**
@@ -1043,16 +1050,22 @@ class SiteController extends Controller
      */
     public function getChatMessages(Request $request)
     {
-        if (!auth()->check()) {
-            return response()->json(['messages' => [], 'unread_count' => 0], 200);
-        }
         $user = auth()->user();
-        $ticketIds = SupportTicket::where('user_id', $user->id)
-            ->where('created_at', '>=', now()->subDays(30))
-            ->pluck('id');
-        $lastSeen = \Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at')
-            ? $user->last_chat_seen_at
-            : null;
+        $ticketIds = collect();
+        $lastSeen = null;
+
+        if ($user) {
+            $ticketIds = SupportTicket::where('user_id', $user->id)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->pluck('id');
+            $lastSeen = \Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at') ? $user->last_chat_seen_at : null;
+        } else {
+            $guestTicket = $request->cookie('stayl_guest_ticket');
+            if ($guestTicket) {
+                $ticketIds = SupportTicket::where('ticket', $guestTicket)->pluck('id');
+            }
+        }
+
         $unreadCount = 0;
         if ($ticketIds->isNotEmpty()) {
             $q = SupportMessage::whereIn('support_ticket_id', $ticketIds)
@@ -1062,16 +1075,40 @@ class SiteController extends Controller
                 ? (clone $q)->where('created_at', '>', $lastSeen)->count()
                 : (clone $q)->count();
         }
-        $cacheKey = 'contact_chat_feed_' . $user->id;
-        $messages = \Illuminate\Support\Facades\Cache::remember($cacheKey, 12, function () use ($user) {
-            return $this->contactChannelService->buildChatFeedForUser($user);
-        });
-        $latestTicket = SupportTicket::where('user_id', $user->id)->latest('id')->first();
-        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at')) {
-            \Illuminate\Support\Facades\DB::table('users')
-                ->where('id', $user->id)
-                ->update(['last_chat_seen_at' => now()]);
+
+        if ($user) {
+            $cacheKey = 'contact_chat_feed_' . $user->id;
+            $messages = \Illuminate\Support\Facades\Cache::remember($cacheKey, 12, function () use ($user) {
+                return $this->contactChannelService->buildChatFeedForUser($user);
+            });
+            $latestTicket = SupportTicket::where('user_id', $user->id)->latest('id')->first();
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at')) {
+                \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update(['last_chat_seen_at' => now()]);
+            }
+        } else {
+            $messages = [];
+            if ($ticketIds->isNotEmpty()) {
+                $msgs = SupportMessage::whereIn('support_ticket_id', $ticketIds)->with(['admin', 'attachments'])->orderBy('id', 'asc')->get();
+                $today = Carbon::today();
+                $yesterday = Carbon::yesterday();
+                foreach ($msgs as $m) {
+                    $dt = $m->created_at;
+                    $dateLabel = $dt->isSameDay($today) ? __('Today') : ($dt->isSameDay($yesterday) ? __('Yesterday') : $dt->format('d/m/Y'));
+                    $messages[] = [
+                        'id' => $m->id,
+                        'message' => $m->message,
+                        'is_admin' => (bool) $m->admin_id,
+                        'name' => $m->admin_id ? ($m->admin->name ?? 'Staff') : __('You'),
+                        'created_at' => $dt->format('g:i A'),
+                        'created_at_full' => $dt->format('M d, H:i'),
+                        'date_label' => $dateLabel,
+                        'attachments' => $m->attachments->map(fn ($a) => route('ticket.download', encrypt($a->id)))->toArray(),
+                    ];
+                }
+            }
+            $latestTicket = SupportTicket::whereIn('id', $ticketIds)->latest('id')->first();
         }
+
         return response()->json([
             'messages' => $messages,
             'ticket' => $latestTicket ? $latestTicket->ticket : null,
@@ -1084,16 +1121,20 @@ class SiteController extends Controller
      */
     public function getChatUnreadCount(Request $request)
     {
-        if (!auth()->check()) {
-            return response()->json(['unread_count' => 0], 200);
-        }
         $user = auth()->user();
-        $ticketIds = SupportTicket::where('user_id', $user->id)
-            ->where('created_at', '>=', now()->subDays(30))
-            ->pluck('id');
-        $lastSeen = \Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at')
-            ? $user->last_chat_seen_at
-            : null;
+        $ticketIds = collect();
+        $lastSeen = null;
+
+        if ($user) {
+            $ticketIds = SupportTicket::where('user_id', $user->id)->where('created_at', '>=', now()->subDays(30))->pluck('id');
+            $lastSeen = \Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at') ? $user->last_chat_seen_at : null;
+        } else {
+            $guestTicket = $request->cookie('stayl_guest_ticket');
+            if ($guestTicket) {
+                $ticketIds = SupportTicket::where('ticket', $guestTicket)->pluck('id');
+            }
+        }
+
         $unreadCount = 0;
         if ($ticketIds->isNotEmpty()) {
             $q = SupportMessage::whereIn('support_ticket_id', $ticketIds)
@@ -1251,27 +1292,39 @@ class SiteController extends Controller
         return view($this->activeTemplate . 'policy', compact('policy', 'pageTitle', 'safeDetails', 'safeDetails2'));
     }
 
-    public function changeLanguage($lang = null)
+    public function changeLanguage(Request $request, $lang = null)
     {
-        $inputCode = strtoupper(trim((string) $lang));
-        $language = Language::where('code', $inputCode)->first();
-
-        if (!$language) {
-            $language = Language::where('is_default', Status::YES)->first();
-        }
+        $allowed = ['en', 'bn', 'hi', 'ar', 'ur', 'ru', 'zh', 'es', 'fr', 'de', 'pt', 'ja'];
+        $inputCode = strtolower(trim((string) $lang));
         
-        $code = $language ? strtoupper($language->code) : 'EN';
-
-        // Laravel locale handle usually lowercase
-        $localeHandle = strtolower($code);
-        if (!$this->localeExists($localeHandle)) {
-            $localeHandle = 'en';
+        if (!in_array($inputCode, $allowed)) {
+            $inputCode = 'en';
         }
 
-        session()->put('lang', $code);
-        app()->setLocale($localeHandle);
+        // Persist in session for middleware fallback
+        session(['locale' => $inputCode, 'lang' => $inputCode]);
+        app()->setLocale($inputCode);
+
+        $previousUrl = url()->previous();
+        $rootUrl = $request->getSchemeAndHttpHost() . $request->getBaseUrl();
         
-        return back();
+        // Check if previous URL is internal to site
+        if (str_starts_with($previousUrl, $rootUrl)) {
+            $path = trim(substr($previousUrl, strlen($rootUrl)), '/');
+            $segments = explode('/', $path);
+            
+            // If the first segment is an existing locale, replace it; otherwise unshift
+            if (isset($segments[0]) && in_array($segments[0], $allowed)) {
+                $segments[0] = $inputCode;
+            } else {
+                array_unshift($segments, $inputCode);
+            }
+            
+            $targetPath = implode('/', $segments);
+            return redirect()->to($targetPath);
+        }
+
+        return redirect()->to($inputCode);
     }
 
     private function normalizeLocaleCode(string $code): string

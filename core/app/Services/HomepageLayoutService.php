@@ -72,7 +72,7 @@ class HomepageLayoutService
             return $row ? __('Custom: :title', ['title' => $row->title]) : $id;
         }
 
-        return self::sectionLabels()[$id] ?? $id;
+        return __((self::sectionLabels()[$id] ?? $id));
     }
 
     /**
@@ -84,7 +84,7 @@ class HomepageLayoutService
     {
         $label = isset($slot['label']) ? trim((string) $slot['label']) : '';
         if ($label !== '') {
-            return $label;
+            return __($label);
         }
 
         if (preg_match('/^ad_slot_(\d+)$/', $id, $m)) {
@@ -105,7 +105,7 @@ class HomepageLayoutService
             }
         }
 
-        return self::sectionLabels()[$id] ?? $id;
+        return __((self::sectionLabels()[$id] ?? $id));
     }
 
     public static function allowedIds(): array

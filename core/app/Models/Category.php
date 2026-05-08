@@ -20,6 +20,16 @@ class Category extends Model
         static::deleted(fn () => Cache::forget('storefront.header_nav_categories_v1'));
     }
 
+    /**
+     * Localization Accessors
+     */
+    public function getNameAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($locale === 'en') return $value;
+        return $this->attributes['name_' . $locale] ?? $value;
+    }
+
     public const PUBLISH_PENDING = 'pending';
     public const PUBLISH_PUBLIC = 'public';
     public const PUBLISH_SCHEDULED = 'scheduled';

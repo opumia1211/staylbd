@@ -94,6 +94,10 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'name_bn',
+        'name_hi',
+        'name_ar',
+        'name_ru',
         'slug',
         'brand_id',
         'category_id',
@@ -120,8 +124,16 @@ class Product extends Model
         'link',
         'file',
         'summary',
+        'summary_bn',
+        'summary_hi',
+        'summary_ar',
+        'summary_ru',
         'key_features',
         'description',
+        'description_bn',
+        'description_hi',
+        'description_ar',
+        'description_ru',
         'features',
         'gallery',
         'image',
@@ -160,6 +172,30 @@ class Product extends Model
         'home_section_rank' => 'integer',
         'home_exclude_from_auto' => 'boolean',
     ];
+
+    /**
+     * Localization Accessors
+     */
+    public function getNameAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($locale === 'en') return $value;
+        return $this->attributes['name_' . $locale] ?? $value;
+    }
+
+    public function getSummaryAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($locale === 'en') return $value;
+        return $this->attributes['summary_' . $locale] ?? $value;
+    }
+
+    public function getDescriptionAttribute($value)
+    {
+        $locale = app()->getLocale();
+        if ($locale === 'en') return $value;
+        return $this->attributes['description_' . $locale] ?? $value;
+    }
 
     public function images()
     {

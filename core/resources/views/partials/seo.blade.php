@@ -21,9 +21,24 @@
         $canonicalUrl = $seoContents->canonical_url;
     }
     $pageTitle = $pageTitle ?? 'Home';
+    
+    $activeLangs = \App\Models\Language::all();
+    $currentPath = parse_url(url()->current(), PHP_URL_PATH);
+    // Remove current locale from path if it exists
+    $segments = explode('/', trim($currentPath, '/'));
+    $allowedLangs = $activeLangs->pluck('code')->map('strtolower')->toArray();
+    if (isset($segments[0]) && in_array(strtolower($segments[0]), $allowedLangs)) {
+        array_shift($segments);
+    }
+    $cleanPath = implode('/', $segments);
 @endphp
 
 <meta name="title" content="{{ $general->sitename(__($pageTitle)) }}">
+
+@foreach($activeLangs as $al)
+    <link rel="alternate" hreflang="{{ strtolower($al->code) }}" href="{{ url(strtolower($al->code) . '/' . $cleanPath) }}">
+@endforeach
+<link rel="alternate" hreflang="x-default" href="{{ url('en/' . $cleanPath) }}">
 
 @if ($seoContents)
     <link rel="canonical" href="{{ $canonicalUrl }}">

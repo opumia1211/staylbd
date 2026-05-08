@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Config;
 /**
  * Master SQL export for production: one file (wintersm_tt.sql) only.
  * Run after: php artisan migrate --force && php artisan db:seed --force
- * Then in cPanel import only database/wintersm_tt.sql – no patches/migrations needed.
+ * Then in cPanel import only staylbd_master_final.sql – no patches/migrations needed.
  */
 class StaylbdExportMasterSqlCommand extends Command
 {
     protected $signature = 'staylbd:export-master-sql
-                            {--output= : Full path to output SQL file (default: project database/wintersm_tt.sql)}
+                            {--output= : Full path to output SQL file (default: staylbd_master_final.sql)}
                             {--mysqldump= : Path to mysqldump executable (e.g. C:\\xampp\\mysql\\bin\\mysqldump.exe)}';
-    protected $description = 'Export current database to master wintersm_tt.sql for cPanel (no migration dependency)';
+    protected $description = 'Export current database to master staylbd_master_final.sql for cPanel (no migration dependency)';
 
     public function handle(): int
     {
@@ -40,7 +40,7 @@ class StaylbdExportMasterSqlCommand extends Command
         $outputPath = $this->option('output');
         if (empty($outputPath)) {
             $projectRoot = dirname(base_path());
-            $outputPath = $projectRoot . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'wintersm_tt.sql';
+            $outputPath = $projectRoot . DIRECTORY_SEPARATOR . 'staylbd_master_final.sql';
         }
         $outputPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $outputPath);
 
@@ -101,7 +101,7 @@ class StaylbdExportMasterSqlCommand extends Command
             file_put_contents($outputPath, $content);
         }
 
-        $this->info('Master SQL exported. Import database/wintersm_tt.sql in cPanel – no migrations or patches required.');
+        $this->info('Master SQL exported. Import staylbd_master_final.sql in cPanel – no migrations or patches required.');
         return self::SUCCESS;
     }
 }

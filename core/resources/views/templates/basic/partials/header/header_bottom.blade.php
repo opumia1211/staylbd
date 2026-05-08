@@ -1,4 +1,14 @@
-@php $contactContent = getContent('contact_us.content', true); @endphp
+@php
+    $contactContent = getContent('contact_us.content', true);
+    $currentLocale = app()->getLocale();
+    $segments = request()->segments();
+    $languageCodes = \App\Models\Language::pluck('code')->map(fn ($code) => strtolower(trim((string) $code)))->all();
+    if (!empty($segments) && in_array(strtolower((string) $segments[0]), $languageCodes, true)) {
+        array_shift($segments);
+    }
+    $basePath = implode('/', $segments);
+    $queryString = request()->getQueryString();
+@endphp
 <div class="header-bottom bg--section py-2">
     <div class="container">
         <div class="header-wrapper">
@@ -31,12 +41,21 @@
                     <div class="dropdown ms-2">
                         <button class="btn btn-sm btn--base dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             @include($activeTemplate . 'partials.icon', ['name' => 'language', 'class' => 'me-1'])
-                            {{ __(optional($language->firstWhere('code', session('lang')))->name ?? 'English') }}
+                            {{ __(optional($language->firstWhere('code', $currentLocale))->name ?? 'English') }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             @foreach ($language as $item)
+                                @php
+                                    $langCode = strtolower(trim((string) $item->code));
+                                    $targetUrl = url($langCode . ($basePath ? '/' . $basePath : ''));
+                                    if ($queryString) {
+                                        $targetUrl .= '?' . $queryString;
+                                    }
+                                @endphp
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('lang', $item->code) }}">{{ __($item->name) }}</a>
+                                    <a class="dropdown-item {{ $currentLocale === $langCode ? 'active fw-semibold' : '' }}" href="{{ $targetUrl }}">
+                                        {{ __($item->name) }} @if($currentLocale === $langCode) ✔ @endif
+                                    </a>
                                 </li>
                             @endforeach
                         </ul>

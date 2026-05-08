@@ -197,6 +197,11 @@ function showAmount($amount, $decimal = 2, $separate = true, $exceptZeros = fals
     if ($separate) {
         $separator = ',';
     }
+    
+    // Multi-currency support: convert amount using session rate
+    $rate = (float) (session('stayl_display_currency_rate') ?: 1);
+    $amount = $amount * $rate;
+    
     $printAmount = number_format($amount, $decimal, '.', $separator);
     if ($exceptZeros) {
         $exp = explode('.', $printAmount);
@@ -207,6 +212,32 @@ function showAmount($amount, $decimal = 2, $separate = true, $exceptZeros = fals
         }
     }
     return $printAmount;
+}
+
+/**
+ * Returns current display currency symbol (session based).
+ */
+function currency_symbol()
+{
+    $general = gs();
+    return session('stayl_display_currency_symbol') ?: $general->cur_sym ?: '৳';
+}
+
+/**
+ * Returns current display currency code (session based).
+ */
+function currency_text()
+{
+    $general = gs();
+    return session('stayl_display_currency_code') ?: $general->cur_text ?: 'BDT';
+}
+
+/**
+ * Returns current display currency conversion rate (session based).
+ */
+function currency_rate()
+{
+    return (float) (session('stayl_display_currency_rate') ?: 1);
 }
 
 /**

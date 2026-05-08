@@ -1,105 +1,4 @@
-@push('style')
-    {{-- Global UI icons now handled via CDN in app.blade.php or critical bundle for better performance --}}
-    <style>
-        .professional-currency-card {
-            min-width: 260px !important;
-            padding: 10px !important;
-            border: 1px solid rgba(0,0,0,0.06) !important;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
-            border-radius: 16px !important;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        /* Custom scrollbar for currency card */
-        .professional-currency-card::-webkit-scrollbar {
-            width: 5px;
-        }
-        .professional-currency-card::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-        .professional-currency-card .stayl-topbar-menu__item {
-            padding: 12px 16px !important;
-            border-bottom: 1px solid rgba(0,0,0,0.02) !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            margin-bottom: 2px;
-        }
-        .professional-currency-card .stayl-topbar-menu__item:hover {
-            background: #f8fafc !important;
-            transform: translateX(4px);
-        }
-        .professional-currency-card .stayl-topbar-menu__item.is-active {
-            background: rgba(14, 165, 233, 0.04) !important;
-            color: #0ea5e9 !important;
-        }
-        .curr-flag-box {
-            width: 24px;
-            height: 18px;
-            overflow: hidden;
-            border-radius: 2px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            flex-shrink: 0;
-        }
-        .curr-flag-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .curr-text {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            font-weight: 500;
-            color: #334155;
-        }
-        .curr-country {
-            font-weight: 600;
-        }
-        .curr-divider {
-            margin: 0 8px;
-            opacity: 0.3;
-            font-weight: 300;
-        }
-        .curr-code-sym {
-            color: #64748b;
-        }
-        body.dark-mode .professional-currency-card {
-            border-color: rgba(255,255,255,0.06) !important;
-        }
-        body.dark-mode .professional-currency-card .stayl-topbar-menu__item:hover {
-            background: rgba(255, 255, 255, 0.05) !important;
-        }
-        body.dark-mode .professional-currency-card .stayl-topbar-menu__item.is-active {
-            background: rgba(14, 165, 233, 0.15) !important;
-        }
-        body.dark-mode .curr-text {
-            color: #f1f5f9;
-        }
-        body.dark-mode .curr-code-sym {
-            color: #94a3b8;
-        }
-        {{-- Professional Styling migrated to Tailwind CSS Library as per USER requirement --}}
-        .stayl-topbar-menu__check {
-            margin-left: auto;
-            color: #0ea5e9;
-        }
-        .stayl-btn-flag {
-            width: 18px;
-            height: 14px;
-            object-fit: cover;
-            border-radius: 1px;
-            vertical-align: middle;
-            margin-right: 4px;
-        }
-        #staylCurrentCurrencyLabel, #staylCurrentLanguageLabel {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-    </style>
-@endpush
+{{-- Language & currency switchers: Tailwind-only components (see resources/views/components/*-switcher.blade.php) --}}
 @php
     $customButtonsAll = \App\Models\Frontend::where('data_keys', 'custom_buttons.element')->orderBy('id', 'asc')->get();
     $customHeaderButtons = $customButtonsAll->filter(function ($row) {
@@ -145,6 +44,8 @@
     $supportCenter = $footerData['footer_support_center'] ?? null;
     $appPromotion = $footerData['footer_app_promotion'] ?? null;
     $appPromotionItems = $footerData['footer_app_promotion_items'] ?? collect();
+    $footerContent = $footerData['footer_content'] ?? null;
+    $sellerAccountEnabled = (int) ($footerContent->data_values->seller_account_enabled ?? 0) === 1;
     $contactContent = $footerData['contact'] ?? null;
 
     $headerLanguages = $general->multi_language ? \App\Models\Language::query()->orderBy('name')->get() : collect();
@@ -204,54 +105,64 @@
         return $html;
     };
 
-    $currentLangCode = strtoupper((string) (session('lang') ?: optional($headerLanguages->first())->code ?: 'EN'));
-    $currentLangRow = $headerLanguages->firstWhere('code', $currentLangCode);
+    $currentLangCode = strtoupper((string) (app()->getLocale() ?: session('lang') ?: optional($headerLanguages->first())->code ?: 'en'));
+    $currentLangRow = $headerLanguages->first(function ($row) use ($currentLangCode) {
+        return strtoupper(trim((string) ($row->code ?? ''))) === $currentLangCode;
+    });
     $currentLangName = trim((string) (optional($currentLangRow)->name ?: $currentLangCode));
 
-    $langFlags = ['EN' => '🇺🇸', 'BN' => '🇧🇩', 'HI' => '🇮🇳'];
+    $langFlags = [
+        'EN' => '🇺🇸',
+        'BN' => '🇧🇩',
+        'HI' => '🇮🇳',
+        'ZH' => '🇨🇳',
+        'UR' => '🇵🇰',
+        'AR' => '🇸🇦',
+        'RU' => '🇷🇺',
+        'FR' => '🇫🇷',
+        'DE' => '🇩🇪',
+        'ES' => '🇪🇸',
+        'TR' => '🇹🇷',
+    ];
     $currentLangFlag = $langFlags[$currentLangCode] ?? '🌐';
 
     $languageButtonLabel = $currentLangFlag . ' ' . (($headerTopCfg['language_mode'] ?? 'code') === 'name' ? __($currentLangName) : __($currentLangCode));
 
     $headerCurrencies = [
-        ['code' => 'USD', 'symbol' => '$', 'country' => 'United States', 'flag' => asset('assets/images/flags/us.svg')],
-        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Italy', 'flag' => asset('assets/images/flags/it.svg')],
-        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Netherlands', 'flag' => asset('assets/images/flags/nl.svg')],
-        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Spain', 'flag' => asset('assets/images/flags/es.svg')],
-        ['code' => 'GBP', 'symbol' => '£', 'country' => 'United Kingdom', 'flag' => asset('assets/images/flags/gb.svg')],
-        ['code' => 'BDT', 'symbol' => '৳', 'country' => 'Bangladesh', 'flag' => asset('assets/images/flags/bd.svg')],
-        ['code' => 'INR', 'symbol' => '₹', 'country' => 'India', 'flag' => asset('assets/images/flags/in.svg')],
-        ['code' => 'SAR', 'symbol' => 'SR', 'country' => 'Saudi Arabia', 'flag' => asset('assets/images/flags/sa.svg')],
-        ['code' => 'AED', 'symbol' => 'د.إ', 'country' => 'UAE', 'flag' => asset('assets/images/flags/ae.svg')],
-        ['code' => 'MYR', 'symbol' => 'RM', 'country' => 'Malaysia', 'flag' => asset('assets/images/flags/my.svg')],
+        ['code' => 'USD', 'symbol' => '$', 'country' => 'United States', 'flag' => 'https://flagcdn.com/w20/us.png'],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Italy', 'flag' => 'https://flagcdn.com/w20/it.png'],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Netherlands', 'flag' => 'https://flagcdn.com/w20/nl.png'],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Spain', 'flag' => 'https://flagcdn.com/w20/es.png'],
+        ['code' => 'GBP', 'symbol' => '£', 'country' => 'United Kingdom', 'flag' => 'https://flagcdn.com/w20/gb.png'],
+        ['code' => 'BDT', 'symbol' => '৳', 'country' => 'Bangladesh', 'flag' => 'https://flagcdn.com/w20/bd.png'],
+        ['code' => 'INR', 'symbol' => '₹', 'country' => 'India', 'flag' => 'https://flagcdn.com/w20/in.png'],
+        ['code' => 'SAR', 'symbol' => 'SR', 'country' => 'Saudi Arabia', 'flag' => 'https://flagcdn.com/w20/sa.png'],
+        ['code' => 'AED', 'symbol' => 'د.إ', 'country' => 'UAE', 'flag' => 'https://flagcdn.com/w20/ae.png'],
+        ['code' => 'MYR', 'symbol' => 'RM', 'country' => 'Malaysia', 'flag' => 'https://flagcdn.com/w20/my.png'],
         // South Asia
-        ['code' => 'PKR', 'symbol' => '₨', 'country' => 'Pakistan', 'flag' => asset('assets/images/flags/pk.svg')],
-        ['code' => 'LKR', 'symbol' => 'Rs', 'country' => 'Sri Lanka', 'flag' => asset('assets/images/flags/lk.svg')],
-        ['code' => 'NPR', 'symbol' => 'रु', 'country' => 'Nepal', 'flag' => asset('assets/images/flags/np.svg')],
-        ['code' => 'BTN', 'symbol' => 'Nu.', 'country' => 'Bhutan', 'flag' => asset('assets/images/flags/bt.svg')],
-        ['code' => 'MVR', 'symbol' => 'Rf', 'country' => 'Maldives', 'flag' => asset('assets/images/flags/mv.svg')],
-        ['code' => 'AFN', 'symbol' => '؋', 'country' => 'Afghanistan', 'flag' => asset('assets/images/flags/af.svg')],
+        ['code' => 'PKR', 'symbol' => '₨', 'country' => 'Pakistan', 'flag' => 'https://flagcdn.com/w20/pk.png'],
+        ['code' => 'LKR', 'symbol' => 'Rs', 'country' => 'Sri Lanka', 'flag' => 'https://flagcdn.com/w20/lk.png'],
+        ['code' => 'NPR', 'symbol' => 'रु', 'country' => 'Nepal', 'flag' => 'https://flagcdn.com/w20/np.png'],
+        ['code' => 'BTN', 'symbol' => 'Nu.', 'country' => 'Bhutan', 'flag' => 'https://flagcdn.com/w20/bt.png'],
+        ['code' => 'MVR', 'symbol' => 'Rf', 'country' => 'Maldives', 'flag' => 'https://flagcdn.com/w20/mv.png'],
+        ['code' => 'AFN', 'symbol' => '؋', 'country' => 'Afghanistan', 'flag' => 'https://flagcdn.com/w20/af.png'],
         // Popular / Others
-        ['code' => 'RUB', 'symbol' => '₽', 'country' => 'Russia', 'flag' => asset('assets/images/flags/ru.svg')],
-        ['code' => 'CNY', 'symbol' => '¥', 'country' => 'China', 'flag' => asset('assets/images/flags/cn.svg')],
-        ['code' => 'JPY', 'symbol' => '¥', 'country' => 'Japan', 'flag' => asset('assets/images/flags/jp.svg')],
-        ['code' => 'KRW', 'symbol' => '₩', 'country' => 'South Korea', 'flag' => asset('assets/images/flags/kr.svg')],
-        ['code' => 'AUD', 'symbol' => '$', 'country' => 'Australia', 'flag' => asset('assets/images/flags/au.svg')],
-        ['code' => 'CAD', 'symbol' => '$', 'country' => 'Canada', 'flag' => asset('assets/images/flags/ca.svg')],
-        ['code' => 'SGD', 'symbol' => '$', 'country' => 'Singapore', 'flag' => asset('assets/images/flags/sg.svg')],
-        ['code' => 'BRL', 'symbol' => 'R$', 'country' => 'Brazil', 'flag' => asset('assets/images/flags/br.svg')],
-        ['code' => 'ZAR', 'symbol' => 'R', 'country' => 'South Africa', 'flag' => asset('assets/images/flags/za.svg')],
-        ['code' => 'TRY', 'symbol' => '₺', 'country' => 'Turkey', 'flag' => asset('assets/images/flags/tr.svg')],
-        ['code' => 'QAR', 'symbol' => 'ر.ق', 'country' => 'Qatar', 'flag' => asset('assets/images/flags/qa.svg')],
-        ['code' => 'KWD', 'symbol' => 'د.ك', 'country' => 'Kuwait', 'flag' => asset('assets/images/flags/kw.svg')],
-        ['code' => 'UAH', 'symbol' => '₴', 'country' => 'Ukraine', 'flag' => asset('assets/images/flags/ua.svg')],
+        ['code' => 'RUB', 'symbol' => '₽', 'country' => 'Russia', 'flag' => 'https://flagcdn.com/w20/ru.png'],
+        ['code' => 'CNY', 'symbol' => '¥', 'country' => 'China', 'flag' => 'https://flagcdn.com/w20/cn.png'],
+        ['code' => 'JPY', 'symbol' => '¥', 'country' => 'Japan', 'flag' => 'https://flagcdn.com/w20/jp.png'],
+        ['code' => 'KRW', 'symbol' => '₩', 'country' => 'South Korea', 'flag' => 'https://flagcdn.com/w20/kr.png'],
+        ['code' => 'AUD', 'symbol' => '$', 'country' => 'Australia', 'flag' => 'https://flagcdn.com/w20/au.png'],
+        ['code' => 'CAD', 'symbol' => '$', 'country' => 'Canada', 'flag' => 'https://flagcdn.com/w20/ca.png'],
+        ['code' => 'SGD', 'symbol' => '$', 'country' => 'Singapore', 'flag' => 'https://flagcdn.com/w20/sg.png'],
+        ['code' => 'BRL', 'symbol' => 'R$', 'country' => 'Brazil', 'flag' => 'https://flagcdn.com/w20/br.png'],
+        ['code' => 'ZAR', 'symbol' => 'R', 'country' => 'South Africa', 'flag' => 'https://flagcdn.com/w20/za.png'],
+        ['code' => 'TRY', 'symbol' => '₺', 'country' => 'Turkey', 'flag' => 'https://flagcdn.com/w20/tr.png'],
+        ['code' => 'QAR', 'symbol' => 'ر.ق', 'country' => 'Qatar', 'flag' => 'https://flagcdn.com/w20/qa.png'],
+        ['code' => 'KWD', 'symbol' => 'د.ক', 'country' => 'Kuwait', 'flag' => 'https://flagcdn.com/w20/kw.png'],
+        ['code' => 'UAH', 'symbol' => '₴', 'country' => 'Ukraine', 'flag' => 'https://flagcdn.com/w20/ua.png'],
     ];
 
     $currentCurrencyCode = strtoupper((string) (session('stayl_display_currency_code') ?: request()->cookie('stayl_display_currency_code') ?: $general->cur_text ?: 'BDT'));
-    $currentCurrencyRow = collect($headerCurrencies)->firstWhere('code', $currentCurrencyCode) ?: $headerCurrencies[0];
-    
-    $currencyButtonLabel = '<img src="'.($currentCurrencyRow['flag'] ?? '').'" class="stayl-btn-flag" alt=""> ' . $currentCurrencyCode . ' ' . ($currentCurrencyRow['symbol'] ?? '');
-
 
     // Keep header hotline in sync with Footer > Company Info fields.
     $headerContactPhone = trim((string) (optional($companyInfo)->data_values->contact_phone ?? ''));
@@ -283,12 +194,500 @@
     }
 
     // Phase 5.4: Professional Localization Hard-Fix
-    $currentLocale = strtolower((string) (session('lang') ?: app()->getLocale() ?: 'en'));
-    $isBN = str_starts_with($currentLocale, 'bn') || str_starts_with($currentLocale, 'bd');
+    $currentLocale = app()->getLocale();
+    $isBN = $currentLocale === 'bn';
+
+    // Flag mapping for flagcdn.com
+    $isoFlagMap = [
+        'en' => 'us', 'bn' => 'bd', 'hi' => 'in', 'ar' => 'sa', 'ur' => 'pk',
+        'ru' => 'ru', 'zh' => 'cn', 'es' => 'es', 'fr' => 'fr', 'de' => 'de',
+        'pt' => 'pt', 'ja' => 'jp', 'tr' => 'tr', 'sa' => 'sa'
+    ];
+    $currentLangFlagCode = $isoFlagMap[strtolower($currentLangCode)] ?? 'us';
+@endphp
+
+<style>
+    .stayl-fixed-master, 
+    .stayl-announcement-bar {
+        overflow: visible !important;
+    }
+    /* Robust Hover Trigger Fix */
+    .group:hover #langMenu, 
+    .group:hover #currencyMenu {
+        display: block !important;
+    }
+    #langMenu, #currencyMenu {
+        z-index: 10000 !important;
+    }
+    
+    /* Premium Header Updates */
+    .stayl-search-pill-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+    .stayl-search-pill-wrapper {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+    .stayl-search-container--desktop {
+        display: flex;
+        flex: 0 1 750px;
+        margin: 0;
+        position: relative;
+        justify-content: center;
+    }
+    .stayl-header-side {
+        flex: 1;
+        display: flex;
+    }
+    .stayl-header-side--left { justify-content: flex-start; }
+    .stayl-header-side--right { justify-content: flex-end; }
+
+    @media (max-width: 1023px) {
+        .stayl-search-container--desktop {
+            display: none !important;
+        }
+    }
+    .stayl-search-inner-wrap {
+        width: 100%;
+        position: relative;
+    }
+    .stayl-search-pill-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex: 1;
+        width: 100%;
+    }
+    .stayl-search-pill--premium {
+        height: 48px;
+        width: 100% !important;
+        padding-left: 20px;
+        padding-right: 90px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 9999px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--stayl-search-bg, #f8fafc);
+        border: 1px solid var(--stayl-search-border, #e2e8f0);
+        color: var(--stayl-search-text, #1e293b);
+    }
+    body.dark-mode .stayl-search-pill--premium {
+        --stayl-search-bg: rgba(255, 255, 255, 0.05);
+        --stayl-search-border: rgba(255, 255, 255, 0.1);
+        --stayl-search-text: #f8fafc;
+        backdrop-filter: blur(12px);
+    }
+    .stayl-search-pill--premium:focus {
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        border-color: #0ea5e9;
+    }
+    body.dark-mode .stayl-search-pill--premium:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #38bdf8;
+    }
+    .stayl-search-icons-inner {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0;
+        z-index: 10;
+    }
+    .stayl-search-icon-btn {
+        height: 40px;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--stayl-search-icon-color, #64748b);
+        border-radius: 50%;
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+    body.dark-mode .stayl-search-icon-btn {
+        --stayl-search-icon-color: #cbd5e1;
+    }
+    .stayl-search-icon-btn:hover {
+        background: rgba(14, 165, 233, 0.08);
+        color: #0ea5e9;
+    }
+    .stayl-search-icon-btn.listening {
+        color: #ef4444 !important;
+        background: rgba(239, 68, 68, 0.1) !important;
+        animation: staylPulseRed 1.5s infinite;
+    }
+    @keyframes staylPulseRed {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .stayl-scan-btn {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--stayl-scan-bg, transparent);
+        border: 2px solid var(--stayl-scan-border, #e2e8f0);
+        border-radius: 12px;
+        color: var(--stayl-scan-icon-color, #475569);
+        transition: all 0.3s ease;
+    }
+    body.dark-mode .stayl-scan-btn {
+        --stayl-scan-border: rgba(255,255,255,0.15);
+        --stayl-scan-icon-color: #f1f5f9;
+        --stayl-scan-bg: rgba(255,255,255,0.03);
+    }
+    .stayl-scan-btn:hover {
+        background: var(--stayl-color-primary, #0ea5e9);
+        color: #ffffff;
+        border-color: var(--stayl-color-primary, #0ea5e9);
+        transform: translateY(-1px);
+    }
+    
+    /* Lens Popover Card */
+    .stayl-lens-card {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        width: 260px;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.05);
+        padding: 16px;
+        z-index: 10001;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .stayl-lens-card.is-active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .dark-mode .stayl-lens-card {
+        background: rgba(15, 23, 42, 0.98);
+        border-color: rgba(51, 65, 85, 0.9);
+    }
+
+    /* Premium Camera Modal */
+    .stayl-camera-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 100050;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    .stayl-camera-modal.is-active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .stayl-camera-modal__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+    }
+    .stayl-camera-modal__dialog {
+        position: relative;
+        width: 90%;
+        max-width: 600px;
+        background: #000;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255,255,255,0.1);
+        transform: scale(0.95);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .stayl-camera-modal.is-active .stayl-camera-modal__dialog {
+        transform: scale(1);
+    }
+    .stayl-camera-modal__video {
+        width: 100%;
+        aspect-ratio: 4/3;
+        object-fit: cover;
+        background: #111;
+    }
+    .stayl-camera-modal__actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 24px;
+        background: #111;
+    }
+    .stayl-camera-modal__btn {
+        padding: 12px 28px;
+        border-radius: 99px;
+        font-weight: 700;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    .stayl-camera-modal__btn--primary {
+        background: #0ea5e9;
+        color: white;
+    }
+    .stayl-camera-modal__btn--primary:hover {
+        background: #0284c7;
+        transform: scale(1.05);
+    }
+    #staylCameraCloseBtn {
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    /* Advanced Search Results Cards */
+    .glass-search-results {
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 12px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0,0,0,0.1) transparent;
+    }
+    .glass-search-result-group-title {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #94a3b8;
+        padding: 16px 12px 8px;
+    }
+    .glass-search-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px;
+        border-radius: 16px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 4px;
+        border: 1px solid transparent;
+        background: transparent;
+    }
+    .glass-search-card:hover, .glass-search-result-focused {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        transform: translateX(4px);
+    }
+    .dark-mode .glass-search-card:hover, .dark-mode .glass-search-result-focused {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,0.1);
+    }
+    .glass-search-card-img {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #f1f5f9;
+        flex-shrink: 0;
+    }
+    .glass-search-card-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .glass-search-card-name {
+        font-weight: 700;
+        font-size: 14px;
+        color: #1e293b;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .dark-mode .glass-search-card-name { color: #f1f5f9; }
+    .glass-search-card-meta {
+        font-size: 12px;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .glass-search-card-price {
+        font-weight: 800;
+        color: #0ea5e9;
+        font-size: 14px;
+        margin-top: 2px;
+    }
+    .glass-search-tag {
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+    .dark-mode .glass-search-tag { background: rgba(255,255,255,0.1); color: #94a3b8; }
+    .dark-mode .stayl-lens-card {
+        background: rgba(15, 23, 42, 0.95);
+        border-color: rgba(51, 65, 85, 0.8);
+    }
+    .stayl-lens-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        background: transparent;
+    }
+    .dark-mode .stayl-lens-option {
+        color: #e2e8f0;
+    }
+    .stayl-lens-option:hover {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: var(--stayl-color-primary, #0ea5e9);
+    }
+    .dark-mode .stayl-lens-option:hover {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    .stayl-lens-option svg {
+        flex-shrink: 0;
+        color: #94a3b8;
+    }
+    .stayl-lens-option:hover svg {
+        color: var(--stayl-color-primary, #0ea5e9);
+    }
+
+    .voice-pulse {
+        animation: stayl-pulse 1.5s infinite;
+    }
+    @keyframes stayl-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+    }
+    .stayl-action-grid {
+        display: flex;
+        align-items: center;
+        gap: clamp(12px, 2vw, 28px);
+        flex-shrink: 0;
+    }
+    .stayl-action-item {
+        position: relative;
+        color: var(--stayl-header-icon-color, #334155);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+    body.dark-mode .stayl-action-item {
+        --stayl-header-icon-color: #f1f5f9;
+    }
+    .stayl-action-item:hover {
+        color: var(--stayl-color-primary, #0ea5e9);
+        transform: translateY(-2px);
+    }
+    .stayl-badge-premium {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #ef4444;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        height: 18px;
+        width: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    body.dark-mode .stayl-badge-premium {
+        border-color: #030712;
+    }
+    .stayl-action-item:hover {
+        color: var(--stayl-color-primary, #38bdf8);
+        transform: translateY(-2px);
+    }
+    
+    /* Voice Status Indicator */
+    .stayl-voice-status-indicator {
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--stayl-color-primary, #0ea5e9);
+        background: white;
+        padding: 2px 10px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        z-index: 50;
+        white-space: nowrap;
+    }
+    .stayl-voice-status-indicator.is-visible {
+        opacity: 1;
+        bottom: -32px;
+    }
+    body.dark-mode .stayl-voice-status-indicator {
+        background: #1e293b;
+        border: 1px solid #334155;
+    }
+
+    .stayl-nav-link-premium {
+        color: var(--stayl-text-main, #334155);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+    body.dark-mode .stayl-nav-link-premium {
+        color: #cbd5e1;
+    }
+    .stayl-nav-link-premium:hover {
+        color: var(--stayl-color-primary, #0ea5e9);
+    }
+
+    /* 
+       STRICT DIRECTIVE: HEADER STICKY-ANIMATION 
+       Logic is now centralized in stayl-elite-core.css and simplified JS.
+       This prevents conflicts and ensures premium performance.
+    */
+    body {
+        transition: padding-top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+</style>
+
+@php
+    // Admin Control & Database Sync: Each bar wrapped in visibility check
+    $isTopVisible = !$isUserProfileHome && !empty($headerTopCfg['enabled']) && !empty($headerTopCfg['is_public']);
+    $isMainVisible = !empty($headerMainCfg['enabled']) && !empty($headerMainCfg['is_public']);
+    $isMenuVisible = !$isUserProfileHome && !empty($headerMenuCfg['enabled']) && !empty($headerMenuCfg['is_public']);
 @endphp
 
 <header class="stayl-fixed-master">
-    @if(!$isUserProfileHome && !empty($headerTopCfg['enabled']))
+    @if($isTopVisible)
         <div class="stayl-announcement-bar stayl-dynamic-order" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_top_notice'] ?? 1 }};">
             <div class="stayl-wrap">
                 <div class="d-flex align-items-center gap-3">
@@ -359,68 +758,85 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-2 lg:gap-3">
-                    @if(!empty($headerTopCfg['show_language']) && $headerLanguages->isNotEmpty())
-                        <div class="stayl-topbar-menu">
-                            <button type="button" class="stayl-topbar-menu__btn">
-                                <span id="staylCurrentLanguageLabel">{{ $languageButtonLabel }}</span>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="m6 9 6 6 6-6"></path>
-                                </svg>
+                    @if(!empty($headerTopCfg['show_language']))
+                        <!-- Language Dropdown -->
+                        <div class="relative inline-block text-left z-[9999] group" 
+                             onmouseenter="const m=document.getElementById('langMenu'); if(m) m.classList.remove('hidden')" 
+                             onmouseleave="const m=document.getElementById('langMenu'); if(m) m.classList.add('hidden')">
+                            <button id="langBtn" class="flex items-center gap-2 px-3 py-1.5 bg-transparent rounded-md text-white border-0 transition-colors hover:text-sky-400 text-sm font-semibold shadow-none outline-none focus:ring-0">
+                                <img src="https://flagcdn.com/w20/{{ $currentLangFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                <span class="uppercase">{{ $currentLangCode }}</span>
+                                <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
-                            <div class="stayl-topbar-menu__panel">
-                                @foreach($headerLanguages as $lng)
-                                    @php
-                                        $lngCode = strtoupper($lng->code);
-                                        $isLangActive = ($currentLangCode === $lngCode);
-                                    @endphp
-                                    <a href="{{ route('lang', $lng->code) }}" class="stayl-topbar-menu__item {{ $isLangActive ? 'is-active' : '' }}"
-                                        data-stayl-lang-option="{{ $lngCode }}">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="fs-5">{{ $langFlags[$lngCode] ?? '🌐' }}</span>
-                                            <span>{{ __($lng->name) }}</span>
-                                        </div>
-                                        <span class="stayl-topbar-menu__check">✓</span>
-                                    </a>
-                                @endforeach
+                            <div id="langMenu" class="hidden group-hover:!block absolute right-0 mt-0 w-48 pt-2 bg-transparent z-[9999]">
+                                <div class="bg-white border border-slate-200 rounded-lg shadow-xl text-slate-800 overflow-hidden ring-1 ring-black/5">
+                                    <div class="bg-slate-50 px-3 py-1.5 border-b border-slate-100">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">@lang('Language')</span>
+                                    </div>
+                                    <div class="max-h-64 overflow-y-auto py-1">
+                                        @foreach($headerLanguages as $lang)
+                                            @php
+                                                $lCode = strtolower($lang->code);
+                                                $lFlagCode = $isoFlagMap[$lCode] ?? 'us';
+                                                // Build target URL
+                                                $path = request()->path();
+                                                // Remove current locale prefix if exists
+                                                $cleanPath = preg_replace('/^[a-z]{2}(\/|$)/', '', $path);
+                                                $targetUrl = url($lCode . ($cleanPath ? '/' . $cleanPath : ''));
+                                                if (request()->getQueryString()) $targetUrl .= '?' . request()->getQueryString();
+                                            @endphp
+                                            <a href="{{ $targetUrl }}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-lang-option="{{ $lCode }}">
+                                                <img src="https://flagcdn.com/w20/{{ $lFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                                <span>{{ $lang->name }}</span>
+                                                @if(strtolower($currentLangCode) === $lCode)
+                                                    <svg class="ms-auto size-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                @endif
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endif
 
-                    @if(!empty($headerTopCfg['show_currency']))
-                        <div class="stayl-topbar-menu">
-                            <button type="button" class="stayl-topbar-menu__btn">
-                                <span id="staylCurrentCurrencyLabel">{!! $currencyButtonLabel !!}</span>
-
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="m6 9 6 6 6-6"></path>
-                                </svg>
+                        @if(!empty($headerTopCfg['show_currency']))
+                        <!-- Currency Dropdown -->
+                        <div class="relative inline-block text-left z-[9999] group"
+                             onmouseenter="const m=document.getElementById('currencyMenu'); if(m) m.classList.remove('hidden')" 
+                             onmouseleave="const m=document.getElementById('currencyMenu'); if(m) m.classList.add('hidden')">
+                            <button id="currencyBtn" class="flex items-center gap-2 px-3 py-1.5 bg-transparent rounded-md text-white border-0 transition-colors hover:text-sky-400 text-sm font-semibold shadow-none outline-none focus:ring-0">
+                                @php
+                                    $currData = collect($headerCurrencies)->first(fn($c) => strtoupper($c['code']) === strtoupper($currentCurrencyCode));
+                                @endphp
+                                @if($currData && !empty($currData['flag']))
+                                    <img src="{{ $currData['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                @endif
+                                <span>{{ $currentCurrencyCode }}</span>
+                                <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
-                            <div class="stayl-topbar-menu__panel professional-currency-card">
-                                @foreach($headerCurrencies as $curr)
-                                    @php
-                                        $isActive = ($currentCurrencyCode === $curr['code']);
-                                    @endphp
-                                    <a href="#"
-                                        class="stayl-topbar-menu__item {{ $isActive ? 'is-active' : '' }}"
-                                        data-stayl-currency-option="{{ $curr['code'] }}">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="curr-flag-box">
-                                                <img src="{{ $curr['flag'] }}" alt="{{ $curr['country'] }}" loading="lazy" width="28" height="20">
-                                            </div>
-                                            <span class="curr-text">
-                                                <span class="curr-country">{{ __($curr['country']) }}</span>
-                                                <span class="curr-divider">|</span>
-                                                <span class="curr-code-sym">{{ $curr['code'] }} {{ $curr['symbol'] }}</span>
-                                            </span>
-                                        </div>
-                                        <span class="stayl-topbar-menu__check">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        </span>
-                                    </a>
-
-                                @endforeach
+                            <div id="currencyMenu" class="hidden group-hover:!block absolute right-0 mt-0 w-48 pt-2 bg-transparent z-[9999]">
+                                <div class="bg-white border border-slate-200 rounded-lg shadow-xl text-slate-800 overflow-hidden ring-1 ring-black/5">
+                                    <div class="bg-slate-50 px-3 py-1.5 border-b border-slate-100">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">@lang('Currency')</span>
+                                    </div>
+                                    <div class="max-h-64 overflow-y-auto py-1">
+                                        @foreach($headerCurrencies as $curr)
+                                            @php
+                                                $cCode = strtoupper($curr['code']);
+                                                $isActive = strtoupper($currentCurrencyCode) === $cCode;
+                                            @endphp
+                                            <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-currency-option="{{ $cCode }}">
+                                                @if(!empty($curr['flag']))
+                                                    <img src="{{ $curr['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                                @endif
+                                                <span>{{ $cCode }}</span>
+                                                @if($isActive)
+                                                    <svg class="ms-auto size-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                @endif
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -524,7 +940,8 @@
                     @endif
 
                     @if(!empty($headerTopCfg['show_seller_button']))
-                        <a href="{{ url($headerTopCfg['seller_url'] ?? '/seller/apply') }}"
+                        <a href="{{ $sellerAccountEnabled ? route('seller.apply') : 'javascript:void(0)' }}"
+                            @if(!$sellerAccountEnabled) onclick="openSellerModal()" @endif
                             class="stayl-seller-btn stayl-seller-btn--top border-0 bg-transparent text-white font-bold opacity-90 hover:opacity-100">
                             {{ __($headerTopCfg['seller_text'] ?? 'BECOME A SELLER') }}
                         </a>
@@ -571,117 +988,236 @@
     @endif
 
     {{-- Row 1: The Main Action Bar --}}
-    @if(!empty($headerMainCfg['enabled']))
-        <div class="stayl-top-bar stayl-dynamic-order" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
-            <div class="stayl-wrap">
-                {{-- Logo --}}
-                <div class="d-flex align-items-center">
-                    <a href="{{ route('home') }}">
+    @if($isMainVisible)
+        <div class="stayl-top-bar stayl-dynamic-order bg-white dark:bg-slate-950" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
+            <div class="stayl-wrap flex items-center justify-between gap-4 py-3 lg:py-5">
+                {{-- Logo (Left) --}}
+                <div class="stayl-header-side stayl-header-side--left">
+                    <a href="{{ route('home') }}" class="block">
                         @php $logo = getLogo('logo'); @endphp
                         @if($logo)
-                                <img src="{{ $logo }}" alt="Staylbd" class="stayl-logo-img"
-                                    style="--stayl-logo-h: {{ (int) ($headerMainCfg['logo_max_height'] ?? 48) }}px;">
+                            <img src="{{ $logo }}" alt="Staylbd" class="stayl-logo-img max-h-[40px] md:max-h-[48px] w-auto"
+                                style="--stayl-logo-h: {{ (int) ($headerMainCfg['logo_max_height'] ?? 48) }}px;">
                         @else
-                                <span class="stayl-logo-text">{{ strtoupper(gs('site_name')) }}</span>
+                            <span class="stayl-logo-text text-xl font-black tracking-tighter text-slate-900 dark:text-white uppercase">{{ gs('site_name') }}</span>
                         @endif
                     </a>
                 </div>
 
-                {{-- Search Pill & External Lens --}}
-                <div class="stayl-search-container max-w-[520px] mx-auto flex-1 pl-4 pr-4 lg:pl-10 lg:pr-10">
-                    <div class="stayl-search-inner-wrap">
-                        <form action="{{ route('products') }}" method="GET" class="stayl-search-pill stayl-search-form-layout rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm focus-within:shadow-md transition-shadow">
-                            <input type="text" id="staylHeaderSearchInput" name="search" class="stayl-search-input bg-transparent"
-                                placeholder="@lang('Search for products, brands and more')..."
-                                value="{{ request()->search ?? null }}" autocomplete="off">
-                            <button type="submit" class="stayl-search-icon-btn transition-colors" title="{{ __('Search') }}">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                {{-- Search Pill (Center) --}}
+                <div class="stayl-search-container--desktop">
+                    <div class="stayl-search-inner-wrap w-full">
+                        <div class="stayl-search-pill-container flex items-center gap-3 w-full">
+                            <div class="stayl-search-pill-wrapper flex-1">
+                                <form action="{{ route('products') }}" method="GET" class="w-full" id="universalSearchForm"
+                                    data-universal-url="{{ route('search.universal') }}"
+                                    data-trending-url="{{ route('search.trending') }}"
+                                    data-image-search-url="{{ route('search.image') }}"
+                                    data-voice-search-url="{{ route('search.voice') }}">
+                                    <input type="text" id="universalSearchInput" name="search" 
+                                        class="stayl-search-pill--premium"
+                                        placeholder="@lang('Search for products, brands and more')..."
+                                        value="{{ request()->search ?? null }}" autocomplete="off">
+                                    <input type="file" id="staylCameraInput" accept="image/*" class="hidden">
+                                </form>
+                                <div id="staylVoiceStatus" class="stayl-voice-status-indicator"></div>
+                                <div class="stayl-search-icons-inner">
+                                    <button type="button" id="voiceSearchBtn" title="@lang('Voice Search')" class="stayl-search-icon-btn p-2">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                                        </svg>
+                                    </button>
+                                    <button type="submit" form="universalSearchForm" class="stayl-search-icon-btn p-2">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <button type="button" id="cameraSearchBtn" class="stayl-search-icon-btn" title="{{ __('Camera Search') }}">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                                        <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                                        <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 9v1"></path>
+                                        <path d="M12 14v1"></path>
+                                        <path d="M9 12h1"></path>
+                                        <path d="M14 12h1"></path>
+                                    </svg>
+                                </button>
+                                
+                                {{-- Lens Hover Card --}}
+                                <div id="staylLensCard" class="stayl-lens-card">
+                                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">@lang('Search by Image')</div>
+                                    <button type="button" id="lensOptionCamera" class="stayl-lens-option">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                        @lang('Take Photo')
+                                    </button>
+                                    <button type="button" id="lensOptionFile" class="stayl-lens-option mt-1">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                        @lang('Upload from Gallery')
+                                    </button>
+                                    <input type="file" id="staylCameraFileDirect" accept="image/*" capture="environment" class="hidden">
+                                    <input type="file" id="staylGalleryFileDirect" accept="image/*" class="hidden">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- AJAX Search Results Container (Desktop) --}}
+                        <div id="searchResults" class="glass-search-results absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[9999] overflow-hidden max-h-[80vh] overflow-y-auto">
+                            <div class="stayl-search-results-inner p-4">
+                                {{-- Recent/Trending section (visible initially) --}}
+                                <div id="staylSearchDiscovery" class="stayl-search-section">
+                                    <div class="mb-4">
+                                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">@lang('Trending Now')</h4>
+                                        <div id="staylTrendingKeywords" class="flex flex-wrap gap-2">
+                                            <span class="animate-pulse bg-slate-100 dark:bg-slate-800 h-6 w-20 rounded-full"></span>
+                                            <span class="animate-pulse bg-slate-100 dark:bg-slate-800 h-6 w-24 rounded-full"></span>
+                                        </div>
+                                    </div>
+                                    <div id="staylRecentSearchWrap" class="hidden">
+                                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">@lang('Recent Searches')</h4>
+                                        <div id="staylRecentSearches" class="flex flex-wrap gap-2"></div>
+                                    </div>
+                                </div>
+                                
+                                {{-- Results section (visible when typing) --}}
+                                <div id="staylSearchResults" class="hidden">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="stayl-search-products-col">
+                                            <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">@lang('Products')</h4>
+                                            <div id="staylSearchProductList" class="flex flex-col gap-3"></div>
+                                        </div>
+                                        <div class="stayl-search-meta-col">
+                                            <div class="mb-5">
+                                                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">@lang('Categories & Brands')</h4>
+                                                <div id="staylSearchMetaList" class="flex flex-wrap gap-2"></div>
+                                            </div>
+                                            <div id="staylSearchDidYouMeanWrap" class="hidden">
+                                                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">@lang('Did you mean?')</h4>
+                                                <div id="staylSearchDidYouMean" class="flex flex-wrap gap-2"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stayl-search-results-footer bg-slate-50 dark:bg-slate-800/50 p-3 text-center border-t border-slate-100 dark:border-slate-800">
+                                <a href="javascript:void(0)" id="staylViewAllSearch" class="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline">@lang('View All Results')</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Mobile Search Trigger (Visible on small screens) --}}
+                <div class="lg:hidden flex items-center gap-3">
+                    <button type="button" id="staylMobileSearchToggle" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="{{ __('Search') }}">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+
+
+                <div class="stayl-header-side stayl-header-side--right">
+                    <div class="stayl-action-grid">
+                        {{-- Bag Icon (Saved/Collections) --}}
+                        <a href="#" class="stayl-action-item group relative" title="{{ __('Saved Items') }}">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                <path d="M3 6h18"></path>
+                                <path d="M16 10a4 4 0 0 1-8 0"></path>
+                            </svg>
+                            <span class="stayl-hover-label">@lang('Saved')</span>
+                        </a>
+
+                        {{-- Track Order --}}
+                        <a href="{{ route('track.order') }}" class="stayl-action-item group relative" title="{{ __('Track Order') }}">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                                <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
+                                <path d="M15 18H9"></path>
+                                <path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10Z"></path>
+                                <circle cx="7" cy="18" r="2"></circle>
+                                <circle cx="17" cy="18" r="2"></circle>
+                            </svg>
+                            <span class="stayl-hover-label">@lang('Track')</span>
+                        </a>
+
+                        {{-- Wishlist --}}
+                        <a href="{{ route('user.wishlist') }}" class="stayl-action-item group relative" title="{{ __('Wishlist') }}" data-dashboard-nav="1">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                            </svg>
+                            <span class="stayl-badge show-wishlist-count absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold shadow-sm ring-2 ring-white dark:ring-slate-900 transition-all group-hover:scale-110">0</span>
+                            <span class="stayl-hover-label">@lang('Wishlist')</span>
+                        </a>
+
+                        {{-- Cart --}}
+                        <a href="{{ route('user.cart') }}" class="stayl-action-item group relative" title="{{ __('Cart') }}" data-dashboard-nav="1">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                                <circle cx="8" cy="21" r="1"></circle>
+                                <circle cx="19" cy="21" r="1"></circle>
+                                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+                            </svg>
+                            <span class="stayl-badge show-cart-count absolute -top-1 -right-1 bg-sky-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold shadow-sm ring-2 ring-white dark:ring-slate-900 transition-all group-hover:scale-110">0</span>
+                            <span class="stayl-hover-label">@lang('Cart')</span>
+                        </a>
+
+                        {{-- Account --}}
+                        <a href="{{ route('user.home') }}" class="stayl-action-item group flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" title="{{ __('Account') }}" data-dashboard-nav="1">
+                            <div class="relative">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-105">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="hidden xl:flex flex-col items-start leading-none gap-0.5">
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                                    @auth @lang('Profile') @else @lang('Hello, Sign in') @endauth
+                                </span>
+                                <span class="text-[12px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[90px]">
+                                    @auth {{ auth()->user()->username }} @else @lang('My Account') @endauth
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {{-- Mobile Full-Screen Search Overlay --}}
+                <div id="staylMobileSearchOverlay" class="fixed inset-0 bg-white dark:bg-slate-950 z-[10000] hidden flex-col transition-all duration-300">
+                    <div class="flex items-center gap-3 p-4 border-b border-slate-100 dark:border-slate-800">
+                        <button type="button" id="staylMobileSearchClose" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                        <form action="{{ route('products') }}" method="GET" class="flex-1 flex items-center bg-slate-50 dark:bg-slate-900 rounded-full px-4 py-2 border border-slate-200 dark:border-slate-700">
+                            <input type="text" id="staylMobileSearchInput" name="search" class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-1" placeholder="@lang('Search')..." autocomplete="off">
+                            <button type="submit" class="text-slate-400">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                 </svg>
                             </button>
-                            <button type="button" id="voiceSearchBtn" title="Voice Search" class="stayl-search-action-trigger stayl-voice-btn">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="stayl-mic-icon-premium transition-all duration-300">
-                                    <path d="M12 1a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V6a5 5 0 0 0-5-5Z"/>
-                                    <path d="M19 10v1a7 7 0 0 1-7 7 7 7 0 0 1-7-7v-1H3v1c0 4.53 3.39 8.27 7.75 8.87V23h2.5v-4.13C17.61 18.87 21 15.13 21 11v-1h-2Z"/>
-                                </svg>
-                            </button>
-
                         </form>
-                        <button type="button" id="cameraSearchBtn" title="Camera Search" class="stayl-camera-btn ml-2">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                        </button>
                     </div>
-                </div>
-
-
-                {{-- Action Icons (Dynamic Interactive Set) --}}
-                <div class="stayl-action-grid">
-                    <a href="{{ route('user.order.index') }}" class="stayl-action-item group" title="{{ __('Orders') }}" data-dashboard-nav="1">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                            <path d="M3 6h18"></path>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                        <span class="stayl-hover-label stayl-label-order">
-                            {{ $isBN ? 'অর্ডার' : __('Order') }}
-                        </span>
-                    </a>
-
-                    <a href="{{ url('/user/ordertrack') }}" class="stayl-action-item group" title="{{ __('Track Order') }}" data-dashboard-nav="1">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                            <rect x="1" y="3" width="15" height="13"></rect>
-                            <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
-                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                        </svg>
-                        <span class="stayl-hover-label stayl-label-track">
-                            {{ $isBN ? 'ট্র্যাকিং' : __('Track') }}
-                        </span>
-                    </a>
-                    <a href="{{ route('user.wishlist') }}" class="stayl-action-item group relative" title="{{ __('Wishlist') }}" data-dashboard-nav="1">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                        </svg>
-                        <span class="stayl-badge show-wishlist-count absolute -top-2.5 -right-2 bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-sm ring-2 ring-white">0</span>
-                        <span class="stayl-hover-label stayl-label-wish">
-                            {{ $isBN ? 'পছন্দ' : __('Wish') }}
-                        </span>
-                    </a>
-
-                    <a href="{{ route('user.cart') }}" class="stayl-action-item group relative" title="{{ __('Cart') }}" data-dashboard-nav="1">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                            <circle cx="8" cy="21" r="1"></circle>
-                            <circle cx="19" cy="21" r="1"></circle>
-                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-                        </svg>
-                        <span class="stayl-badge show-cart-count absolute -top-2.5 -right-2 bg-sky-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-sm ring-2 ring-white">0</span>
-                        <span class="stayl-hover-label stayl-label-cart">
-                            {{ $isBN ? 'কার্ট' : __('Cart') }}
-                        </span>
-                    </a>
-                    <a href="{{ route('user.home') }}" class="stayl-action-item group" title="{{ __('Account') }}" data-dashboard-nav="1">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"/></svg>
-                        </svg>
-                        <span class="stayl-acc-label stayl-label-acc">
-                            {{ $isBN ? 'লগইন' : __('Login') }}
-                        </span>
-                    </a>
-                </div>
-                </div>
+                    <div class="flex-1 overflow-y-auto p-4" id="staylMobileSearchResults">
+                        {{-- Mobile Search Suggestions injected here --}}
+                    </div>
                 </div>
             </div>
         </div>
     @endif
 
     {{-- Row 2: Secondary Nav Bar --}}
-    @if(!$isUserProfileHome && !empty($headerMenuCfg['enabled']))
+    @if($isMenuVisible)
         <div class="stayl-yellow-bar stayl-dynamic-order bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_menu'] ?? 3 }};">
             <div class="stayl-wrap">
                 <nav class="stayl-nav-flex" style="--stayl-nav-gap: clamp(12px, 1.5vw, 24px);">
@@ -707,46 +1243,59 @@
                                 </svg>
                             </button>
                             @if(!empty($menuCategoryItems) || $__staylHeaderCategories->isNotEmpty())
-                                <div class="stayl-cat-dropdown" id="staylCatDropdown">
-                                    <ul>
-                                        @if(!empty($menuCategoryItems))
-                                            @foreach($menuCategoryItems as $catItem)
-                                                @php
-                                                    $catItemLabel = trim((string) ($catItem['label'] ?? ''));
-                                                    $catItemUrl = trim((string) ($catItem['url'] ?? '#')) ?: '#';
-                                                @endphp
-                                                @continue($catItemLabel === '')
-                                                <li>
-                                                    <a href="{{ $catItemUrl }}" class="font-medium text-slate-700 hover:text-sky-500 hover:bg-slate-50 transition-colors">
-                                                        {{ __($catItemLabel) }}
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="1.5">
-                                                            <path d="m9 18 6-6-6-6"></path>
-                                                        </svg>
-                                                    </a>
-                                                </li>
-                                            @endforeach
-                                        @else
-                                            @foreach($__staylHeaderCategories->take(12) as $hc)
-                                                <li>
-                                                    <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="font-medium text-slate-700 hover:text-sky-500 hover:bg-slate-50 transition-colors">
-                                                        {{ __($hc->name) }}
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="1.5">
-                                                            <path d="m9 18 6-6-6-6"></path>
-                                                        </svg>
-                                                    </a>
-                                                </li>
-                                            @endforeach
-                                        @endif
-                                    </ul>
+                                <div class="stayl-cat-dropdown stayl-mega-menu-panel" id="staylCatDropdown">
+                                    <div class="stayl-mega-menu-inner p-6">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                            @if(!empty($menuCategoryItems))
+                                                {{-- Manual Menu Items --}}
+                                                @foreach($menuCategoryItems as $catItem)
+                                                    <div class="stayl-mega-col">
+                                                        <a href="{{ trim((string) ($catItem['url'] ?? '#')) ?: '#' }}" class="stayl-mega-title block text-sm font-bold text-slate-800 dark:text-slate-100 mb-3 hover:text-sky-500">
+                                                            {{ __(trim((string) ($catItem['label'] ?? ''))) }}
+                                                        </a>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                {{-- Dynamic Categories with Subcategories --}}
+                                                @foreach($__staylHeaderCategories->take(12) as $hc)
+                                                    <div class="stayl-mega-col">
+                                                        <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="stayl-mega-title block text-[13px] font-bold text-slate-800 dark:text-slate-100 mb-3 hover:text-sky-500 transition-colors uppercase tracking-tight">
+                                                            {{ __($hc->name) }}
+                                                        </a>
+                                                        @if($hc->subcategories->isNotEmpty())
+                                                            <ul class="stayl-mega-list flex flex-col gap-2">
+                                                                @foreach($hc->subcategories->take(6) as $hsub)
+                                                                    <li>
+                                                                        <a href="{{ route('subcategory.products', [slug($hsub->name), $hsub->id]) }}" class="text-[12px] text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                                                                            {{ __($hsub->name) }}
+                                                                        </a>
+                                                                    </li>
+                                                                @endforeach
+                                                                @if($hc->subcategories->count() > 6)
+                                                                    <li>
+                                                                        <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="text-[11px] font-semibold text-sky-500 hover:underline">
+                                                                            @lang('View All') +
+                                                                        </a>
+                                                                    </li>
+                                                                @endif
+                                                            </ul>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="stayl-mega-footer bg-slate-50 dark:bg-slate-800/50 p-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                                        <span class="text-[11px] font-medium text-slate-400">@lang('Find what you love across all categories')</span>
+                                        <a href="{{ route('category.all') }}" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline">@lang('Browse All Categories') &rarr;</a>
+                                    </div>
                                 </div>
                             @endif
                         </div>
                     @endif
 
                     <ul class="stayl-nav-ul flex items-center h-full">
-                        @foreach($menuNavLinks as $mbtn)
+                        @forelse($menuNavLinks as $mbtn)
                             @php
                                 $mbtnLabel = trim((string) ($mbtn['label'] ?? ''));
                                 $mbtnUrl = trim((string) ($mbtn['url'] ?? '#')) ?: '#';
@@ -762,7 +1311,7 @@
                             @continue($mbtnLabel === '' || !$mbtnActive)
                             @if($mbtnType === 'dropdown' && !empty($mbtnItems))
                                 <li class="stayl-pages-item">
-                                    <a href="{{ trim((string)($mbtnUrl ?? '#')) ?: '#' }}" class="stayl-flex-center font-semibold text-slate-700 hover:text-sky-500 transition-colors uppercase tracking-wide text-[12px] h-full"
+                                    <a href="{{ trim((string)($mbtnUrl ?? '#')) ?: '#' }}" class="stayl-flex-center stayl-nav-link-premium h-full"
                                         data-header-track="{{ $mbtnTrack }}">
                                         {{ __($mbtnLabel) }} 
                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ml-1 opacity-70">
@@ -774,14 +1323,21 @@
                                     </div>
                                 </li>
                             @else
-                                <li class="h-full flex items-center"><a href="{{ $mbtnUrl }}" data-header-track="{{ $mbtnTrack }}" class="font-semibold text-slate-700 hover:text-sky-500 transition-colors uppercase tracking-wide text-[12px] h-full flex items-center">{{ __($mbtnLabel) }}</a></li>
+                                <li class="h-full flex items-center"><a href="{{ $mbtnUrl }}" data-header-track="{{ $mbtnTrack }}" class="stayl-nav-link-premium h-full flex items-center">{{ __($mbtnLabel) }}</a></li>
                             @endif
-                        @endforeach
+                        @empty
+                            {{-- Fallback Links to match design if admin config is empty --}}
+                            <li class="h-full flex items-center"><a href="{{ route('home') }}" class="stayl-nav-link-premium px-3">@lang('About Us')</a></li>
+                            <li class="h-full flex items-center"><a href="{{ route('home') }}" class="stayl-nav-link-premium px-3">@lang('Latest Blog')</a></li>
+                            <li class="h-full flex items-center"><a href="{{ route('contact') }}" class="stayl-nav-link-premium px-3">@lang('Contact Us')</a></li>
+                        @endforelse
                     </ul>
                 </nav>
 
                 @if(!empty($headerMenuCfg['show_seller_button']))
-                    <a href="{{ url($headerMenuCfg['seller_url'] ?? '/seller/apply') }}" class="stayl-seller-btn text-[12px] font-bold tracking-wide uppercase bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white transition-colors duration-300 rounded-md px-4 py-2 flex items-center gap-2">
+                    <a href="{{ $sellerAccountEnabled ? route('seller.apply') : 'javascript:void(0)' }}" 
+                        @if(!$sellerAccountEnabled) onclick="openSellerModal()" @endif
+                        class="stayl-seller-btn text-[12px] font-bold tracking-wide uppercase bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white transition-colors duration-300 rounded-md px-4 py-2 flex items-center gap-2">
                         {{ __($headerMenuCfg['seller_text'] ?? 'BECOME A SELLER') }}
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -930,83 +1486,170 @@
         </div>
     </div>
 </div>
+
 <script>
-    (function () {
+    (function() {
+        "use strict";
+
+        // 1. Critical Constants & Helpers
+        const master = document.querySelector('.stayl-fixed-master');
+        if (!master) return;
+
+        /**
+         * Dynamic Header Height Synchronization
+         */
         function syncHeaderHeightVar() {
-            const header = document.querySelector('.stayl-fixed-master');
-            if (!header) return;
-            const h = Math.max(0, Math.ceil(header.offsetHeight || 0));
-            if (h > 0) {
+            requestAnimationFrame(() => {
+                const masterEl = document.querySelector('.stayl-fixed-master');
+                if (!masterEl) return;
+                
+                let h;
+                if (masterEl.classList.contains('is-scrolled-down')) {
+                    h = 72;
+                } else {
+                    h = masterEl.offsetHeight || 166;
+                }
                 document.documentElement.style.setProperty('--stayl-dynamic-header-height', h + 'px');
-            }
-        }
-        function setupHeaderScrollCollapse() {
-            const header = document.querySelector('.stayl-fixed-master');
-            if (!header) return;
-            let lastY = window.scrollY || 0;
-            let hidden = false;
-            let ticking = false;
-            let lockUntil = 0;
-            const SHOW_AT = 70;
-            const HIDE_AT = 180;
-            const DELTA = 8;
-            const LOCK_MS = 1300;
-            const onScroll = function () {
-                if (ticking) return;
-                ticking = true;
-                window.requestAnimationFrame(function () {
-                    const y = window.scrollY || window.pageYOffset || 0;
-                    const movingDown = y > lastY + DELTA;
-                    const movingUp = y < lastY - DELTA;
-                    const now = Date.now();
-
-                    if (now >= lockUntil && !hidden && movingDown && y > HIDE_AT) {
-                        hidden = true;
-                        header.classList.add('is-scrolled-down');
-                        lockUntil = now + LOCK_MS;
-                    } else if (now >= lockUntil && hidden && (movingUp || y < SHOW_AT)) {
-                        hidden = false;
-                        header.classList.remove('is-scrolled-down');
-                        lockUntil = now + LOCK_MS;
-                    }
-
-                    lastY = y;
-                    syncHeaderHeightVar();
-                    ticking = false;
-                });
-            };
-            onScroll();
-            window.addEventListener('scroll', onScroll, { passive: true });
+            });
         }
 
-        // Vanilla JS Toggle to avoid dependency issues
-        function setupStaylSidebar() {
-            const triggers = document.querySelectorAll('.stayl-sidebar-trigger');
-            const sidebar = document.getElementById('glassSidebar');
-            const closeBtn = document.getElementById('glassSidebarClose');
-            const overlay = document.querySelector('.glass-sidebar-overlay');
+        // --- Bulletproof Scroll Detection System ---
+        (function() {
+            const masterEl = document.querySelector('.stayl-fixed-master');
+            if (!masterEl) return;
 
-            if (!sidebar) return;
+            // Create a sentinel element at the threshold point
+            const sentinel = document.createElement('div');
+            sentinel.id = 'stayl-header-sentinel';
+            sentinel.style.cssText = 'position:absolute; top:20px; left:0; width:1px; height:1px; pointer-events:none; visibility:hidden; z-index:-1;';
+            document.body.prepend(sentinel);
 
-            triggers.forEach(trigger => {
-                trigger.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    sidebar.classList.add('active');
-                    document.body.style.overflow = 'hidden'; // Prevent scroll
-                });
+            const observer = new IntersectionObserver((entries) => {
+                const isAtTop = entries[0].isIntersecting;
+                if (isAtTop) {
+                    masterEl.classList.remove('is-scrolled-down');
+                    console.log('[Stayl] State: At Top');
+                } else {
+                    masterEl.classList.add('is-scrolled-down');
+                    console.log('[Stayl] State: Scrolled Down');
+                }
+                syncHeaderHeightVar();
+            }, { 
+                root: null, // viewport
+                threshold: 0 
             });
 
-            const closeAction = function () {
-                sidebar.classList.remove('active');
+            observer.observe(sentinel);
+
+            // Fallback for manual height syncs
+            window.addEventListener('resize', syncHeaderHeightVar, { passive: true });
+            window.addEventListener('load', syncHeaderHeightVar);
+            setTimeout(syncHeaderHeightVar, 500);
+        })();
+
+        // 2. Sub-Modules Area
+        function setupMegaMenu() {
+            const container = document.getElementById('staylCatContainer');
+            const dropdown = document.getElementById('staylCatDropdown');
+            if (!container || !dropdown) return;
+
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isTouch) {
+                const btn = document.getElementById('staylCatBtn');
+                if (btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropdown.classList.toggle('is-active');
+                    });
+                }
+                document.addEventListener('click', (e) => {
+                    if (!container.contains(e.target)) dropdown.classList.remove('is-active');
+                });
+            }
+        }
+
+        /** Sub-Module: Mobile Search Overlay */
+        function setupMobileSearch() {
+            const toggle = document.getElementById('staylMobileSearchToggle');
+            const overlay = document.getElementById('staylMobileSearchOverlay');
+            const close = document.getElementById('staylMobileSearchClose');
+            const input = document.getElementById('staylMobileSearchInput');
+            const results = document.getElementById('staylMobileSearchResults');
+
+            if (!toggle || !overlay || !close) return;
+
+            toggle.addEventListener('click', () => {
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => input && input.focus(), 300);
+            });
+
+            const hideOverlay = () => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
                 document.body.style.overflow = '';
             };
 
-            if (closeBtn) closeBtn.addEventListener('click', closeAction);
-            if (overlay) overlay.addEventListener('click', closeAction);
+            close.addEventListener('click', hideOverlay);
+
+            if (input && results) {
+                input.addEventListener('input', debounce((e) => {
+                    const q = e.target.value.trim();
+                    if (q.length < 1) { results.innerHTML = ''; return; }
+                    fetchSearch(q, results);
+                }, 300));
+            }
         }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        }
+
+        async function fetchSearch(query, container) {
+            try {
+                const response = await fetch(`{{ route('search.universal') }}?search=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                if (data.success) renderMobileResults(data.results, container);
+            } catch (err) { console.error('Search failed', err); }
+        }
+
+        function renderMobileResults(results, container) {
+            let html = '';
+            if (results.products && results.products.length > 0) {
+                html += `<div class="mb-6"><h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">@lang('Products')</h4><div class="flex flex-col gap-4">`;
+                results.products.slice(0, 8).forEach(p => {
+                    html += `
+                        <a href="${p.url}" class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100 overflow-hidden">
+                                <img src="${p.image}" class="w-10 h-10 object-contain" alt="">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">${p.name}</p>
+                                <p class="text-xs text-red-500 font-bold">${p.price_formated || p.price}</p>
+                            </div>
+                        </a>`;
+                });
+                html += `</div></div>`;
+            }
+            if (results.categories && results.categories.length > 0) {
+                html += `<div class="mb-4"><h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">@lang('Discovery')</h4><div class="flex flex-wrap gap-2">`;
+                results.categories.forEach(c => {
+                    html += `<a href="${c.url}" class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[11px] font-medium text-slate-700 dark:text-slate-300">${c.name}</a>`;
+                });
+                html += `</div></div>`;
+            }
+            container.innerHTML = html || `<div class="text-center py-10"><p class="text-sm text-slate-400">@lang('No results found')</p></div>`;
+        }
+
         function setupVoiceSearch() {
             const voiceBtn = document.getElementById('voiceSearchBtn');
-            const searchInput = document.getElementById('staylHeaderSearchInput');
+            const searchInput = document.getElementById('universalSearchInput');
             const voiceStatus = document.getElementById('staylVoiceStatus');
             if (!voiceBtn || !searchInput) return;
             const SpeechRecognitionApi = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1042,7 +1685,7 @@
             const recognition = SpeechRecognitionApi ? new SpeechRecognitionApi() : null;
             if (recognition) {
                 recognition.lang = 'bn-BD';
-                recognition.interimResults = false;
+                recognition.interimResults = true; // Show text as you speak
                 recognition.maxAlternatives = 1;
                 recognition.continuous = false;
             }
@@ -1070,117 +1713,63 @@
                 micStreamRef.getTracks().forEach(function (track) { track.stop(); });
                 micStreamRef = null;
             };
-            voiceBtn.addEventListener('click', async function () {
-                if (!canRequestMic) {
-                    startRecognition();
+            voiceBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (voiceBtn.classList.contains('is-listening')) {
+                    if (recognition) recognition.stop();
                     return;
                 }
-                try {
-                    // Force permission prompt on click.
-                    micStreamRef = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                    voiceBtn.classList.add('is-listening');
-                    setVoiceStatus('Microphone active. You can speak now.', true);
-                    startRecognition();
-                } catch (err) {
-                    alert('Microphone permission blocked. Please allow microphone in browser site settings.');
-                    setVoiceStatus('Microphone permission blocked.', false);
-                }
+
+                setVoiceStatus('', true);
+                startRecognition();
             });
+            
             if (recognition) {
-                recognition.addEventListener('start', function () {
-                    voiceBtn.classList.add('is-listening');
-                    setVoiceStatus('Microphone active. You can speak now.', true);
-                });
-                recognition.addEventListener('end', function () {
-                    voiceBtn.classList.remove('is-listening');
-                    stopMicStream();
+                recognition.onstart = function() {
+                    voiceBtn.classList.add('is-listening', 'voice-pulse');
+                    setVoiceStatus('', true);
+                };
+                
+                recognition.onend = function() {
+                    voiceBtn.classList.remove('is-listening', 'voice-pulse');
                     setVoiceStatus('', false);
-                });
-                recognition.addEventListener('result', function (event) {
-                    const text = (((event.results || [])[0] || [])[0] || {}).transcript || '';
-                    if (!text) return;
-                    searchInput.value = text.trim();
-                    searchInput.focus();
-                    setVoiceStatus('Voice captured successfully.', false);
-                });
-                recognition.addEventListener('error', function (event) {
-                    voiceBtn.classList.remove('is-listening');
-                    stopMicStream();
-                    const errorCode = (event && event.error) ? String(event.error) : 'unknown';
-                    if (errorCode === 'not-allowed') {
-                        alert('Microphone permission blocked. Please allow it in browser settings.');
-                        setVoiceStatus('Microphone permission blocked.', false);
-                    } else if (errorCode === 'no-speech') {
-                        alert('No speech detected. Please try again.');
-                        setVoiceStatus('No speech detected.', false);
-                    } else {
-                        alert('Voice search error: ' + errorCode);
-                        setVoiceStatus('Voice error: ' + errorCode, false);
+                };
+                
+                recognition.onresult = function(event) {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            finalTranscript += event.results[i][0].transcript;
+                        } else {
+                            interimTranscript += event.results[i][0].transcript;
+                        }
                     }
-                });
+
+                    const result = finalTranscript || interimTranscript;
+                    if (result) {
+                        searchInput.value = result.trim();
+                        searchInput.focus();
+                    }
+                    
+                    if (finalTranscript) {
+                        setVoiceStatus('Success', false);
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    voiceBtn.classList.remove('is-listening', 'voice-pulse');
+                    console.error("Speech Error:", event.error);
+                    const err = event.error || 'unknown';
+                    if (err === 'not-allowed') alert("Microphone permission denied.");
+                    setVoiceStatus('Error: ' + err, false);
+                };
             }
         }
-        function setupCameraSearch() {
-            const cameraBtn = document.getElementById('cameraSearchBtn');
-            const modal = document.getElementById('staylCameraModal');
-            const video = document.getElementById('staylCameraVideo');
-            const canvas = document.getElementById('staylCameraCanvas');
-            const closeBtn = document.getElementById('staylCameraCloseBtn');
-            const captureBtn = document.getElementById('staylCameraCaptureBtn');
-            if (!cameraBtn || !modal || !video || !closeBtn || !captureBtn) return;
-            let streamRef = null;
-            const stopStream = function () {
-                if (!streamRef) return;
-                streamRef.getTracks().forEach(function (track) { track.stop(); });
-                streamRef = null;
-            };
-            const closeModal = function () {
-                modal.classList.remove('is-open');
-                modal.setAttribute('aria-hidden', 'true');
-                video.srcObject = null;
-                stopStream();
-            };
-            cameraBtn.addEventListener('click', async function () {
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    alert('Camera is not supported in this browser.');
-                    return;
-                }
-                try {
-                    streamRef = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-                    if (!streamRef) {
-                        throw new Error('empty-stream');
-                    }
-                    video.srcObject = streamRef;
-                    modal.classList.add('is-open');
-                    modal.setAttribute('aria-hidden', 'false');
-                } catch (error) {
-                    try {
-                        // Desktop/laptop fallback
-                        streamRef = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                        video.srcObject = streamRef;
-                        modal.classList.add('is-open');
-                        modal.setAttribute('aria-hidden', 'false');
-                    } catch (fallbackError) {
-                        alert('Camera permission denied or unavailable.');
-                    }
-                }
-            });
-            captureBtn.addEventListener('click', function () {
-                if (!video.videoWidth || !video.videoHeight || !canvas) return;
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) return;
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                closeModal();
-            });
-            closeBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', function (event) {
-                if (event.target && event.target.getAttribute('data-camera-close') === '1') {
-                    closeModal();
-                }
-            });
-        }
+
 
         function setupLiveLocationAndWeather() {
             const locWrapper = document.getElementById('stayl-live-location');
@@ -1286,8 +1875,10 @@
                 let city = ipData.city || 'Dhaka';
                 let country = ipData.country_name || 'Bangladesh';
 
-                // Phase 2: Granular Reverse Geocoding (Country -> City -> Area Tooltip)
-                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`)
+                // Phase 2: Granular Reverse Geocoding
+                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`, {
+                    headers: {} // CSRF fix for external fetch
+                })
                     .then(res => res.json())
                     .then(geoData => {
                         let area = geoData.address.suburb || geoData.address.neighbourhood || geoData.address.residential || geoData.address.city_district || '';
@@ -1306,7 +1897,9 @@
                         locWrapper.title = `${country}, ${city}`;
                     });
                 
-                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,precipitation_probability,weathercode,apparent_temperature,uv_index&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`)
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,precipitation_probability,weathercode,apparent_temperature,uv_index&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`, {
+                    headers: {} // CSRF fix for external fetch
+                })
                     .then(res => res.json())
                     .then(weatherData => {
                         if (weatherData && weatherData.current_weather) {
@@ -1381,23 +1974,19 @@
                 .catch(() => processWeather({error: true}));
         }
 
-        // Initialize
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function () {
-                try { setupStaylSidebar(); } catch(e){}
-                try { setupVoiceSearch(); } catch(e){}
-                try { setupCameraSearch(); } catch(e){}
-                try { syncHeaderHeightVar(); } catch(e){}
-                try { setupHeaderScrollCollapse(); } catch(e){}
+        // Initialize with Performance Optimizations
+        const initHeavyFeatures = () => {
+            try { syncHeaderHeightVar(); handleHeaderScroll(); } catch(e){}
+            // Defer weather fetching to keep the initial load extremely light
+            setTimeout(() => {
                 try { setupLiveLocationAndWeather(); } catch(e){ console.error("Weather init err:", e); }
-            });
+            }, 1500);
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initHeavyFeatures);
         } else {
-            try { setupStaylSidebar(); } catch(e){}
-            try { setupVoiceSearch(); } catch(e){}
-            try { setupCameraSearch(); } catch(e){}
-            try { syncHeaderHeightVar(); } catch(e){}
-            try { setupHeaderScrollCollapse(); } catch(e){}
-            try { setupLiveLocationAndWeather(); } catch(e){ console.error("Weather init err:", e); }
+            initHeavyFeatures();
         }
         window.addEventListener('resize', syncHeaderHeightVar, { passive: true });
         window.addEventListener('load', syncHeaderHeightVar, { once: true });
@@ -1521,17 +2110,21 @@
             function markCurrencyOption(code) {
                 currencyOptions.forEach(function (el) {
                     const itemCode = (el.getAttribute('data-stayl-currency-option') || '').toUpperCase();
-                    if (itemCode === code) {
-                        el.classList.add('is-active');
-                    } else {
-                        el.classList.remove('is-active');
+                    const on = itemCode === code;
+                    el.setAttribute('aria-selected', on ? 'true' : 'false');
+                    el.classList.toggle('bg-sky-50', on);
+                    el.classList.toggle('text-sky-700', on);
+                    el.classList.toggle('dark:bg-sky-950/40', on);
+                    el.classList.toggle('dark:text-sky-400', on);
+                    el.classList.toggle('text-slate-800', !on);
+                    el.classList.toggle('dark:text-slate-200', !on);
+                    const check = el.querySelector('[data-stayl-currency-check]');
+                    if (check) {
+                        check.classList.toggle('hidden', !on);
                     }
                 });
             }
             const headerCurrencyLabel = document.getElementById('staylCurrentCurrencyLabel');
-            if (headerCurrencyLabel && headerCurrencyLabel.parentElement) {
-                headerCurrencyLabel.parentElement.classList.add('stayl-currency-label-wrap');
-            }
 
             function applyNow(code) {
                 if (isApplyingCurrency) return;
@@ -1551,8 +2144,15 @@
                 const cNameMap = activeLangCode === 'BN' ? currencyNativeNames : currencyNamesEN;
 
                 if (headerCurrencyLabel) {
-                    const cData = @json($headerCurrencies).find(c => c.code === activeCurrencyCode) || { flag: '', symbol: '$' };
-                    headerCurrencyLabel.innerHTML = '<img src="'+cData.flag+'" class="stayl-btn-flag" alt=""> <span class="notranslate">' + activeCurrencyCode + ' ' + cData.symbol + '</span>';
+                    const cData = @json($headerCurrencies).find(c => String(c.code).toUpperCase() === activeCurrencyCode) || { flag: '' };
+                    headerCurrencyLabel.textContent = activeCurrencyCode;
+                    const triggerBtn = headerCurrencyLabel.closest('button');
+                    if (triggerBtn) {
+                        const img = triggerBtn.querySelector('img');
+                        if (img && cData.flag) {
+                            img.src = cData.flag;
+                        }
+                    }
                 }
 
 
@@ -1636,34 +2236,10 @@
             }
             applyNow(saved || baseCurrency.code);
             window.__staylApplyDisplayCurrency = applyNow;
-            const observer = new MutationObserver(function (mutations) {
-                if (isApplyingCurrency) return;
-                let hasAddedNodes = false;
-                for (let i = 0; i < mutations.length; i++) {
-                    if (mutations[i].addedNodes && mutations[i].addedNodes.length > 0) {
-                        hasAddedNodes = true;
-                        break;
-                    }
-                }
-                if (!hasAddedNodes) return;
-
-                // Only process once per frame/cycle to prevent jitter
-                if (mutationDebounce) window.clearTimeout(mutationDebounce);
-                mutationDebounce = window.setTimeout(function () {
-                    if (document.body.classList.contains('stayl-rt-processing')) return;
-                    document.body.classList.add('stayl-rt-processing');
-                    
-                    // Ensure the applied code is always valid from cookie or base
-                    const currentStored = getStaylCookie('stayl_display_currency_code') || baseCurrency.code;
-                    
-                    // Safety check: if target currency is BDT and we are already BDT, avoid excessive cycles
-                    // unless we are specifically fixing something that changed
-                    applyNow(currentStored);
-                    
-                    document.body.classList.remove('stayl-rt-processing');
-                }, 250); // Increased delay slightly to allow multiple mutations to batch
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
+            
+            // MutationObserver removed for performance optimization. 
+            // Dynamic elements should now trigger: window.dispatchEvent(new CustomEvent('staylbd:product-updated'))
+            
             currencyOptions.forEach(function (optionEl) {
                 optionEl.addEventListener('click', function (event) {
                     event.preventDefault();
@@ -1684,7 +2260,8 @@
             if (!headerLanguageLabel) return;
             const savedLang = (getStaylCookie('stayl_display_language_code') || '').toUpperCase();
             if (savedLang) {
-                headerLanguageLabel.textContent = langNativeNames[savedLang] || savedLang;
+                // Keep header button label consistent with UI (code only)
+                headerLanguageLabel.textContent = savedLang;
             }
             document.querySelectorAll('[data-stayl-lang-option]').forEach(function (el) {
                 el.addEventListener('click', function (event) {
@@ -1693,97 +2270,70 @@
                     if (code) {
                         setStaylCookie('stayl_display_language_code', code);
                         
-                        // Briefly update label for instant feedback before reload
+                        // Briefly update label for instant feedback before reload (code only)
                         if (headerLanguageLabel) {
-                            const flag = (code === 'BN' ? '🇧🇩' : (code === 'EN' ? '🇺🇸' : '🌐'));
-                            headerLanguageLabel.textContent = flag + ' ' + (langNativeNames[code] || code);
+                            headerLanguageLabel.textContent = code;
                         }
                         window.location.href = this.href;
                     }
                 });
             });
         }
-        initDisplayLanguageLabel();
-        initDisplayCurrency();
-    })();
-</script>
-
-@push('script')
-<script>
-    (function() {
-        const themeBtn = document.getElementById('staylThemeToggle');
-        const sunIcon = document.getElementById('themeIconSun');
-        const moonIcon = document.getElementById('themeIconMoon');
-        const body = document.body;
-
-        // Apply theme on load
-        const currentTheme = localStorage.getItem('stayl-theme') || 'light';
-        if (currentTheme === 'dark') {
-            body.classList.add('dark-mode');
-            if (sunIcon) sunIcon.classList.remove('hidden');
-            if (moonIcon) moonIcon.classList.add('hidden');
+        // Execution Phase (Wrapped in try-catch for robustness)
+        try { setupMegaMenu(); } catch(e) { console.warn('MegaMenu init failed', e); }
+        try { setupMobileSearch(); } catch(e) { console.warn('MobileSearch init failed', e); }
+        try { setupLiveLocationAndWeather(); } catch(e) { console.warn('Weather init failed', e); }
+        try { initDisplayLanguageLabel(); } catch(e) { console.warn('Lang init failed', e); }
+        try { initDisplayCurrency(); } catch(e) { console.warn('Currency init failed', e); }
+        
+        // Lucide fallback fix for missing icons
+        if (typeof lucide !== 'undefined') {
+            try { lucide.createIcons(); } catch(e) {}
         }
 
-        if (themeBtn) {
-            themeBtn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                const isDark = body.classList.contains('dark-mode');
-
-                if (isDark) {
-                    localStorage.setItem('stayl-theme', 'dark');
-                    if (sunIcon) sunIcon.classList.remove('hidden');
-                    if (moonIcon) moonIcon.classList.add('hidden');
-                } else {
-                    localStorage.setItem('stayl-theme', 'light');
-                    if (sunIcon) sunIcon.classList.add('hidden');
-                    if (moonIcon) moonIcon.classList.remove('hidden');
-                }
-            });
-        }
-    })();
-
-    /**
-     * Smart Scroll Header Animation
-     * - Hides Bar 1 and Bar 3 on scroll down.
-     * - Keeps Bar 2 (Main) sticky at the very top.
-     * - Smooth restores everything on scroll up.
-     */
-    (function() {
-        const headerMaster = document.querySelector('.stayl-fixed-master');
-        if (!headerMaster) {
-            console.error('Header Scroll: .stayl-fixed-master not found');
-            return;
-        }
-
-        const scrollThreshold = 40;
-
-        const updateHeader = () => {
-            const scrollTop = window.pageYOffset || 
-                              document.documentElement.scrollTop || 
-                              (document.scrollingElement ? document.scrollingElement.scrollTop : 0) || 
-                              document.body.scrollTop || 0;
-            
-            if (scrollTop > scrollThreshold) {
-                if (!headerMaster.classList.contains('is-scrolled-down')) {
-                    headerMaster.classList.add('is-scrolled-down');
-                }
-            } else {
-                if (headerMaster.classList.contains('is-scrolled-down')) {
-                    headerMaster.classList.remove('is-scrolled-down');
-                }
+        // Seller Modal Functions
+        window.openSellerModal = function() {
+            const modal = document.getElementById('sellerDisabledModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.add('is-active'), 10);
+                document.body.style.overflow = 'hidden';
             }
         };
 
-        // Aggressive scroll listening
-        window.addEventListener('scroll', updateHeader, { passive: true, capture: true });
-        document.addEventListener('scroll', updateHeader, { passive: true, capture: true });
-        
-        // Initial check
-        updateHeader();
-        
-        // Periodic check to ensure state is correct
-        setInterval(updateHeader, 300);
+        window.closeSellerModal = function() {
+            const modal = document.getElementById('sellerDisabledModal');
+            if (modal) {
+                modal.classList.remove('is-active');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+        };
     })();
 </script>
 
-@endpush
+{{-- Seller Disabled Modal HTML --}}
+<div id="sellerDisabledModal" class="stayl-modal-overlay hidden">
+    <div class="stayl-modal-card">
+        <button class="stayl-modal-close" onclick="closeSellerModal()">&times;</button>
+        <div class="stayl-modal-body text-center p-5 pt-5 mt-4">
+            <div class="seller-disabled-icon mb-4">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
+            </div>
+            <h3 class="h4 mb-3 font-bold text-slate-800 dark:text-white">@lang('Onboarding Paused')</h3>
+            <p class="text-muted dark:text-slate-400 mb-4 px-3" style="line-height: 1.6;">
+                @lang('We are currently updating our seller portal and not accepting new applications at this moment. Please check back later or contact support for further information.')
+            </p>
+            <div class="flex justify-center gap-3 mb-2">
+                <button onclick="closeSellerModal()" class="btn-elite-secondary cursor-pointer">@lang('Close')</button>
+                <button onclick="closeSellerModal()" class="btn-elite-primary js-contact-panel-open cursor-pointer">@lang('Contact Support')</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ @push('script')
+ <script src="{{ asset('assets/templates/basic/js/banner-slider.js') }}"></script>
+ @endpush

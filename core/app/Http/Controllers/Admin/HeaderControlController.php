@@ -43,23 +43,30 @@ class HeaderControlController extends Controller
     private function validatedMenuBar(Request $request): array
     {
         $validated = $request->validate([
-            'menu_bar.enabled' => ['nullable', 'boolean'],
-            'menu_bar.is_public' => ['nullable', 'boolean'],
-            'menu_bar.show_sidebar_trigger' => ['nullable', 'boolean'],
-            'menu_bar.show_category_button' => ['nullable', 'boolean'],
+            'menu_bar.enabled' => ['nullable'],
+            'menu_bar.is_public' => ['nullable'],
+            'menu_bar.show_sidebar_trigger' => ['nullable'],
+            'menu_bar.show_category_button' => ['nullable'],
             'menu_bar.category_button_label' => ['required', 'string', 'max:60'],
-            'menu_bar.show_seller_button' => ['nullable', 'boolean'],
+            'menu_bar.show_seller_button' => ['nullable'],
             'menu_bar.seller_text' => ['required', 'string', 'max:60'],
             'menu_bar.seller_url' => ['required', 'string', 'max:255'],
         ]);
 
-        $validated['menu_bar']['category_items'] = $this->parseSimpleItems($request->input('menu_bar.category_items_text'));
-        $validated['menu_bar']['nav_links'] = $this->parseButtons($request->input('menu_bar.nav_links', []));
-        $validated['menu_bar']['custom_buttons'] = $this->parseButtons($request->input('menu_bar.custom_buttons', []));
-        $validated['menu_bar']['seller_url'] = $this->sanitizeUrl((string) ($validated['menu_bar']['seller_url'] ?? '/seller/apply'));
-        $validated['menu_bar'] = $this->applyGlobalDisplayOrder($validated['menu_bar'] ?? []);
+        $menuBar = (array) ($validated['menu_bar'] ?? []);
+        $menuBar['enabled'] = $request->has('menu_bar.enabled');
+        $menuBar['is_public'] = $request->has('menu_bar.is_public');
+        $menuBar['show_sidebar_trigger'] = $request->has('menu_bar.show_sidebar_trigger');
+        $menuBar['show_category_button'] = $request->has('menu_bar.show_category_button');
+        $menuBar['show_seller_button'] = $request->has('menu_bar.show_seller_button');
 
-        return $validated['menu_bar'] ?? [];
+        $menuBar['category_items'] = $this->parseSimpleItems($request->input('menu_bar.category_items_text'));
+        $menuBar['nav_links'] = $this->parseButtons($request->input('menu_bar.nav_links', []));
+        $menuBar['custom_buttons'] = $this->parseButtons($request->input('menu_bar.custom_buttons', []));
+        $menuBar['seller_url'] = $this->sanitizeUrl((string) ($menuBar['seller_url'] ?? '/seller/apply'));
+        $menuBar = $this->applyGlobalDisplayOrder($menuBar);
+
+        return $menuBar;
     }
 
     private function validatedAppearance(Request $request): array
@@ -92,12 +99,12 @@ class HeaderControlController extends Controller
     private function validatedTopBar(Request $request): array
     {
         $validated = $request->validate([
-            'top_bar.enabled' => ['nullable', 'boolean'],
-            'top_bar.is_public' => ['nullable', 'boolean'],
-            'top_bar.show_language' => ['nullable', 'boolean'],
-            'top_bar.show_currency' => ['nullable', 'boolean'],
-            'top_bar.show_apps' => ['nullable', 'boolean'],
-            'top_bar.show_seller_button' => ['nullable', 'boolean'],
+            'top_bar.enabled' => ['nullable'],
+            'top_bar.is_public' => ['nullable'],
+            'top_bar.show_language' => ['nullable'],
+            'top_bar.show_currency' => ['nullable'],
+            'top_bar.show_apps' => ['nullable'],
+            'top_bar.show_seller_button' => ['nullable'],
             'top_bar.language_mode' => ['required', 'in:code,name'],
             'top_bar.currency_mode' => ['required', 'in:code,name'],
             'top_bar.support_label' => ['required', 'string', 'max:60'],
@@ -108,6 +115,13 @@ class HeaderControlController extends Controller
         ]);
 
         $topBar = (array) ($validated['top_bar'] ?? []);
+        $topBar['enabled'] = $request->has('top_bar.enabled');
+        $topBar['is_public'] = $request->has('top_bar.is_public');
+        $topBar['show_language'] = $request->has('top_bar.show_language');
+        $topBar['show_currency'] = $request->has('top_bar.show_currency');
+        $topBar['show_apps'] = $request->has('top_bar.show_apps');
+        $topBar['show_seller_button'] = $request->has('top_bar.show_seller_button');
+
         $topBar['seller_url'] = $this->sanitizeUrl((string) ($topBar['seller_url'] ?? '/seller/apply'));
         $topBar['custom_buttons'] = $this->parseButtons($request->input('top_bar.custom_buttons', []));
 
@@ -117,14 +131,19 @@ class HeaderControlController extends Controller
     private function validatedMainBar(Request $request): array
     {
         $validated = $request->validate([
-            'main_bar.enabled' => ['nullable', 'boolean'],
-            'main_bar.is_public' => ['nullable', 'boolean'],
+            'main_bar.enabled' => ['nullable'],
+            'main_bar.is_public' => ['nullable'],
             'main_bar.logo_max_height' => ['required', 'integer', 'min:28', 'max:90'],
             'main_bar.icon_size' => ['required', 'integer', 'min:28', 'max:72'],
-            'main_bar.show_language_icon' => ['nullable', 'boolean'],
+            'main_bar.show_language_icon' => ['nullable'],
         ]);
 
-        return (array) ($validated['main_bar'] ?? []);
+        $mainBar = (array) ($validated['main_bar'] ?? []);
+        $mainBar['enabled'] = $request->has('main_bar.enabled');
+        $mainBar['is_public'] = $request->has('main_bar.is_public');
+        $mainBar['show_language_icon'] = $request->has('main_bar.show_language_icon');
+
+        return $mainBar;
     }
 
     private function parseSimpleItems($raw): array

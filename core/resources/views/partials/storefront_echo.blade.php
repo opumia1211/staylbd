@@ -8,7 +8,9 @@
     $port = (int) ($opts['port'] ?? ($useTls ? 443 : 80));
     $pusherReady = config('broadcasting.default') === 'pusher' && ! empty($conn['key']);
     $pollPlaceholderId = 999999999;
-    $pollUrlTemplate = str_replace((string) $pollPlaceholderId, '__ID__', route('storefront.realtime.product', ['id' => $pollPlaceholderId]));
+    $pollUrlTemplate = Route::has('storefront.realtime.product') 
+        ? str_replace((string) $pollPlaceholderId, '__ID__', route('storefront.realtime.product', ['id' => $pollPlaceholderId]))
+        : '';
 
     $staylbdRealtimePayload = [
         'pollUrlTemplate' => $pollUrlTemplate,

@@ -70,6 +70,59 @@
             </div>
         </div>
     </div>
+
+    {{-- Sticky Cart Floating Trigger --}}
+    <div id="stickyCartTrigger" class="fixed right-0 top-1/2 -translate-y-1/2 z-[9995] bg-white dark:bg-slate-900 shadow-[-5px_0_20px_rgba(0,0,0,0.1)] rounded-l-2xl border border-r-0 border-slate-200 dark:border-slate-800 p-3 flex flex-col items-center gap-2 cursor-pointer hover:pl-5 transition-all duration-300 group hidden md:flex">
+        <div class="relative">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+                <circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+            </svg>
+            <span class="show-cart-count absolute -top-2 -right-2 bg-sky-600 text-white text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center ring-2 ring-white">0</span>
+        </div>
+        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">@lang('Cart')</span>
+        <div class="text-sky-600 font-bold text-sm mt-1 staylbd-rt-price" data-base-price="0">0.00</div>
+    </div>
+
+    <script>
+        window.StaylGlobal = {
+            locale: '{{ app()->getLocale() }}',
+            currency: {
+                code: '{{ session('stayl_display_currency_code') ?: $general->cur_text }}',
+                symbol: '{{ session('stayl_display_currency_symbol') ?: $general->cur_sym }}',
+                rate: {{ session('stayl_display_currency_rate') ?: 1 }},
+                position: '{{ $general->currency_position ?? 'left' }}'
+            },
+            formatPrice: function(amount) {
+                let val = amount * this.currency.rate;
+                let formatted = val.toLocaleString(this.locale === 'bn' ? 'bn-BD' : 'en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                return this.currency.position === 'left' 
+                    ? this.currency.symbol + formatted 
+                    : formatted + this.currency.symbol;
+            }
+        };
+
+        // Sticky Cart Toggle Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const trigger = document.getElementById('stickyCartTrigger');
+            if (trigger) {
+                trigger.addEventListener('click', function() {
+                    window.location.href = "{{ route('user.cart') }}";
+                });
+                
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 300) {
+                        trigger.classList.remove('hidden');
+                    } else {
+                        trigger.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
 @endsection
 
 @push('style')

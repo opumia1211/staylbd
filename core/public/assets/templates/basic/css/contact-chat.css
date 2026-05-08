@@ -198,28 +198,40 @@
 /* Variables – override these to theme without breaking layout (flexible, future-proof) */
 .contact-live-chat-module,
 .contact-panel-glass {
-    --cp-radius: 16px;
-    --cp-radius-inner: 16px;
-    --cp-gap: clamp(6px, 1.5vw, 10px);
-    --cp-pad: clamp(8px, 2vw, 12px);
-    --cp-body-bg: #faf9f8;
-    --cp-msg-bg: #e5ddd5;
-    --cp-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-    --cp-border: 1px solid rgba(0, 0, 0, 0.04);
-    --cp-transition: 0.2s ease-out;
+    --cp-radius: 1.25rem;
+    --cp-radius-inner: 1.25rem;
+    --cp-gap: 1rem;
+    --cp-pad: 1.25rem;
+    --cp-body-bg: rgba(255, 255, 255, 0.95);
+    --cp-msg-bg: #f8fafc;
+    --cp-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --cp-border: 1px solid rgba(255, 255, 255, 0.6);
+    --cp-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Inter', system-ui, sans-serif !important;
 }
 
-/* Backdrop – lightweight blur */
+@keyframes cp-pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.animate-pulse-green {
+    animation: cp-pulse-green 2s infinite;
+}
+
+/* Backdrop – Elegant modal backdrop */
 .contact-panel-backdrop {
+    display: block;
     position: fixed;
     inset: 0;
     z-index: 2147483644;
-    background: rgba(0, 0, 0, 0.32);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(15, 23, 42, 0.5); /* Deep slate semi-transparent */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--cp-transition, 0.2s), visibility var(--cp-transition, 0.2s);
+    transition: all 0.4s ease;
 }
 
 .contact-panel-backdrop.is-open {
@@ -232,32 +244,51 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(400px, calc(100vw - var(--cp-gap, 24px) * 2));
-    min-width: min(280px, 100vw);
-    max-width: calc(100vw - var(--cp-gap, 24px) * 2);
-    height: min(85vh, 720px);
-    min-height: min(360px, 85vh);
-    max-height: calc(100vh - var(--cp-gap, 24px) * 2);
+    transform: translate(-50%, -50%) scale(0.95);
+    width: min(380px, calc(100vw - 20px));
+    height: min(600px, 85vh);
+    height: min(600px, 85dvh);
     z-index: 2147483645;
-    border-radius: var(--cp-radius);
+    border-radius: 1.25rem;
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--cp-transition), visibility var(--cp-transition), transform var(--cp-transition);
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     pointer-events: none;
-    box-shadow: var(--cp-shadow), var(--cp-border);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
-    isolation: isolate;
-    contain: layout style paint;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .contact-panel-glass.is-open {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+@media (max-width: 575.98px) {
+    .contact-panel-glass {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        height: 100dvh;
+        max-height: none;
+        border-radius: 0;
+        transform: translateY(100%) scale(1);
+        transform-origin: bottom center;
+        transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s ease;
+    }
+    
+    .contact-panel-glass.is-open {
+        transform: translateY(0) scale(1);
+    }
 }
 
 .contact-panel-glass-inner {
@@ -854,11 +885,12 @@
 
 /* চ্যাট পেজ ঠিক স্ক্রিনশটের মতো – নিচে খালি জায়গা নেই, টাইপিং এরিয়াই শেষ */
 #contactPanelGlass .contact-panel-body {
-    padding: var(--cp-pad) calc(var(--cp-pad) + 4px) 0;
-    background: var(--cp-body-bg);
+    padding: 1.5rem 1.5rem 2.5rem !important; /* Increased bottom padding to prevent cutoff */
+    background: #ffffff;
     display: flex !important;
     flex-direction: column !important;
-    overflow: hidden !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch;
     flex: 1 1 0;
     min-height: 0;

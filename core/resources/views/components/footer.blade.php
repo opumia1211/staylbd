@@ -30,7 +30,7 @@
 
             <!-- Categories -->
             <div class="lg:col-span-2">
-                <h4 class="text-gray-800 font-black uppercase tracking-widest text-sm mb-8">Categories</h4>
+                <h4 class="text-gray-800 font-black uppercase tracking-widest text-sm mb-8">{{ __('Categories') }}</h4>
                 <ul class="space-y-4">
                     @foreach ($categories as $cat)
                         <li>
@@ -45,22 +45,22 @@
 
             <!-- Shop Links -->
             <div class="lg:col-span-2">
-                <h4 class="text-gray-800 font-black uppercase tracking-widest text-sm mb-8">Company</h4>
+                <h4 class="text-gray-800 font-black uppercase tracking-widest text-sm mb-8">{{ __('Company') }}</h4>
                 <ul class="space-y-4">
                     @foreach ($policyPages as $policy)
                         <li><a href="{{ route('policy.pages.short', $policy->id) }}" class="text-gray-500 font-bold hover:text-zenis-primary transition-colors">{{ __($policy->data_values->title) }}</a></li>
                     @endforeach
-                    <li><a href="{{ route('contact') }}" class="text-gray-500 font-bold hover:text-zenis-primary transition-colors">Contact Us</a></li>
+                    <li><a href="{{ route('contact') }}" class="text-gray-500 font-bold hover:text-zenis-primary transition-colors">{{ __('Contact Us') }}</a></li>
                 </ul>
             </div>
 
             <!-- Newsletter Area -->
             <div class="lg:col-span-4">
-                <h4 class="text-gray-800 font-black uppercase tracking-widest text-sm mb-8">Newsletter</h4>
-                <p class="text-gray-500 font-medium mb-6">Get updates on new products and special offers.</p>
+                <h4 class="text-gray-800 font-black uppercase tracking-widest text-sm mb-8">{{ __('Newsletter') }}</h4>
+                <p class="text-gray-500 font-medium mb-6">{{ __('Get updates on new products and special offers.') }}</p>
                 <form action="{{ route('subscribe') }}" method="POST" class="relative">
                     @csrf
-                    <input type="email" name="email" placeholder="Your email address" class="w-full bg-white border border-gray-100 rounded-xl px-6 py-4 text-sm focus:outline-none focus:border-zenis-primary transition-all shadow-sm">
+                    <input type="email" name="email" placeholder="{{ __('Your email address') }}" class="w-full bg-white border border-gray-100 rounded-xl px-6 py-4 text-sm focus:outline-none focus:border-zenis-primary transition-all shadow-sm">
                     <button type="submit" class="absolute right-2 top-2 bg-zenis-primary text-white p-2.5 rounded-lg hover:bg-opacity-90 transition-all">
                         <i class="hgi hgi-stroke hgi-send-01 text-xl"></i>
                     </button>
@@ -72,7 +72,7 @@
                         <i class="hgi hgi-stroke hgi-call text-2xl"></i>
                     </div>
                     <div>
-                        <span class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Questions? Call us</span>
+                        <span class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ __('Questions? Call us') }}</span>
                         <span class="text-lg font-black text-gray-800">{{ $companyInfo->data_values->contact_phone }}</span>
                     </div>
                 </div>

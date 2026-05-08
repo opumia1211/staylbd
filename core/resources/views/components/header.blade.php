@@ -1,6 +1,14 @@
 @php
     $languages = \App\Models\Language::all();
-    $currentLang = $languages->where('code', session('lang'))->first() ?? $languages->first();
+    $currentLocale = app()->getLocale();
+    $currentLang = $languages->firstWhere('code', $currentLocale) ?? $languages->first();
+    $segments = request()->segments();
+    $localeCodes = $languages->pluck('code')->map(fn ($code) => strtolower(trim((string) $code)))->all();
+    if (!empty($segments) && in_array(strtolower((string) $segments[0]), $localeCodes, true)) {
+        array_shift($segments);
+    }
+    $basePath = implode('/', $segments);
+    $queryString = request()->getQueryString();
 
     $customButtonsAll = \App\Models\Frontend::where('data_keys', 'custom_buttons.element')->orderBy('id', 'asc')->get();
     $customHeaderButtons = $customButtonsAll->filter(function ($row) {
@@ -27,7 +35,7 @@
             <div class="flex items-center gap-6">
                 <a href="tel:{{ $general->whatsapp_number }}" class="text-[13px] text-gray-600 hover:text-zenis-primary flex items-center gap-2 transition-colors">
                     <i class="hgi hgi-stroke hgi-customer-support"></i>
-                    <span>Support: {{ $general->whatsapp_number }}</span>
+                    <span>{{ __('Support') }}: {{ $general->whatsapp_number }}</span>
                 </a>
             </div>
             <div class="flex items-center gap-6 divide-x divide-gray-200">
@@ -40,17 +48,27 @@
                         </button>
                         <div class="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-100 shadow-xl rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[1100]">
                             @foreach($languages as $lang)
-                                <a href="{{ route('lang', $lang->code) }}" class="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 hover:text-zenis-primary">{{ __($lang->name) }}</a>
+                                @php
+                                    $langCode = strtolower(trim((string) $lang->code));
+                                    $targetUrl = url($langCode . ($basePath ? '/' . $basePath : ''));
+                                    if ($queryString) {
+                                        $targetUrl .= '?' . $queryString;
+                                    }
+                                    $isActiveLang = $currentLocale === $langCode;
+                                @endphp
+                                <a href="{{ $targetUrl }}" class="block px-4 py-2 text-xs hover:bg-gray-50 hover:text-zenis-primary {{ $isActiveLang ? 'bg-gray-100 font-semibold text-zenis-primary' : 'text-gray-700' }}">
+                                    {{ __($lang->name) }} @if($isActiveLang) <span class="float-right">✔</span> @endif
+                                </a>
                             @endforeach
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-4 pl-4">
                     @auth
-                        <a href="{{ route('user.home') }}" class="text-[13px] text-gray-600 hover:text-zenis-primary transition-colors">My Account</a>
-                        <a href="{{ route('user.logout') }}" class="text-[13px] text-gray-600 hover:text-zenis-primary transition-colors">Logout</a>
+                        <a href="{{ route('user.home') }}" class="text-[13px] text-gray-600 hover:text-zenis-primary transition-colors">{{ __('My Account') }}</a>
+                        <a href="{{ route('user.logout') }}" class="text-[13px] text-gray-600 hover:text-zenis-primary transition-colors">{{ __('Logout') }}</a>
                     @else
-                        <a href="{{ route('user.login') }}" class="text-[13px] text-gray-600 hover:text-zenis-primary transition-colors">Sign In / Register</a>
+                        <a href="{{ route('user.login') }}" class="text-[13px] text-gray-600 hover:text-zenis-primary transition-colors">{{ __('Sign In / Register') }}</a>
                     @endauth
                 </div>
             </div>
@@ -70,13 +88,13 @@
                 <form action="{{ route('products') }}" method="GET" class="relative flex items-center w-full bg-[#f1f5f9] rounded-xl border border-transparent focus-within:border-zenis-primary focus-within:bg-white transition-all duration-300">
                     <div class="hidden lg:flex items-center px-4 border-r border-gray-200">
                         <select name="category" class="bg-transparent text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer">
-                            <option value="">All Categories</option>
+                            <option value="">{{ __('All Categories') }}</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}">{{ __($cat->name) }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <input type="text" name="search" placeholder="Search for items..." value="{{ request()->search }}" class="flex-1 bg-transparent px-6 py-3.5 text-sm text-gray-700 focus:outline-none placeholder:text-gray-400">
+                    <input type="text" name="search" placeholder="{{ __('Search for items...') }}" value="{{ request()->search }}" class="flex-1 bg-transparent px-6 py-3.5 text-sm text-gray-700 focus:outline-none placeholder:text-gray-400">
                     <button type="submit" class="p-3 mr-1 bg-zenis-primary text-white rounded-lg hover:bg-opacity-90 transition-all">
                         <i class="hgi hgi-stroke hgi-search-01 text-xl"></i>
                     </button>
@@ -92,7 +110,7 @@
                         <i class="hgi hgi-stroke hgi-call text-xl"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Hotline</span>
+                        <span class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">{{ __('Hotline') }}</span>
                         <span class="text-sm font-black text-gray-800">{{ $general->whatsapp_number }}</span>
                     </div>
                 </div>
@@ -137,8 +155,8 @@
                                 <img src="{{ getImage(getFilePath('userProfile') . '/' . (auth()->user() ? auth()->user()->image : 'default.png')) }}" class="size-full object-cover">
                             </div>
                             <div class="flex flex-col overflow-hidden max-w-[100px]">
-                                <span class="text-[11px] text-gray-400 font-bold uppercase truncate">@auth {{ auth()->user()->username }} @else Account @endauth</span>
-                                <span class="text-sm font-black text-gray-800 truncate">@auth Profile @else Login @endauth</span>
+                                <span class="text-[11px] text-gray-400 font-bold uppercase truncate">@auth {{ auth()->user()->username }} @else {{ __('Account') }} @endauth</span>
+                                <span class="text-sm font-black text-gray-800 truncate">@auth {{ __('Profile') }} @else {{ __('Login') }} @endauth</span>
                             </div>
                         </a>
                     </div>

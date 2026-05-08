@@ -17,43 +17,42 @@
     </div>
 
     @if($hasCategories)
-        @foreach($lines as $lineNum => $lineCategories)
-            @if($lineCategories->isNotEmpty())
-                <div class="stayl-grid-responsive mb-4">
-                    @foreach($lineCategories as $category)
-                        <a href="{{ route('category.products', [slug($category->name), $category->id]) }}" class="stayl-category-card" title="{{ __($category->name) }}">
-                            <div class="stayl-category-media">
-                                @if(!empty($category->image))
-                                    <img src="{{ getImageWebP(getFilePath('category') . '/' . $category->image, getFileSize('category')) }}"
-                                         alt="{{ __($category->name) }}"
-                                         loading="lazy"
-                                         decoding="async"
-                                         width="256"
-                                         height="256"
-                                         class="stayl-category-img"
-                                         onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
-                                @else
-                                    <div class="stayl-category-fallback">
-                                        @include($activeTemplate . 'partials.icon', ['name' => 'layout-grid', 'class' => 'text-slate-300', 'sizePx' => 56])
-                                    </div>
-                                @endif
-                            </div>
-                            <span class="stayl-category-name">
-                                {{ __($category->name) }}
-                            </span>
-                        </a>
-                    @endforeach
-                </div>
-            @endif
-        @endforeach
-    @else
-        <div class="stayl-grid-responsive" aria-hidden="true">
-            @for($s = 0; $s < 6; $s++)
-                <div class="stayl-category-card">
-                    <div class="stayl-category-media animate-pulse bg-slate-200"></div>
-                    <div class="p-3">
-                        <div class="mx-auto h-3 w-3/4 animate-pulse rounded bg-slate-200"></div>
+        <div class="home-category-section__viewport">
+            @foreach($lines as $lineNum => $lineCategories)
+                @if($lineCategories->isNotEmpty())
+                    <div class="home-category-section__grid mb-4" data-auto-scroll="1" data-interval-sec="{{ $categoryScrollIntervalSec ?? 4 }}" data-scroll-direction="left">
+                        @foreach($lineCategories as $category)
+                            <a href="{{ route('category.products', [slug($category->name), $category->id]) }}" class="home-category-section__card" title="{{ __($category->name) }}">
+                                <div class="home-category-section__card-media">
+                                    @if(!empty($category->image))
+                                        <img src="{{ getImageWebP(getFilePath('category') . '/' . $category->image, getFileSize('category')) }}"
+                                             alt="{{ __($category->name) }}"
+                                             loading="lazy"
+                                             decoding="async"
+                                             width="148"
+                                             height="148"
+                                             class="stayl-category-img"
+                                             onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
+                                    @else
+                                        <div class="home-category-section__card-icon">
+                                            @include($activeTemplate . 'partials.icon', ['name' => 'layout-grid', 'sizePx' => 48])
+                                        </div>
+                                    @endif
+                                </div>
+                                <span class="home-category-section__card-label">
+                                    {{ __($category->name) }}
+                                </span>
+                            </a>
+                        @endforeach
                     </div>
+                @endif
+            @endforeach
+        </div>
+    @else
+        <div class="home-category-section__grid" aria-hidden="true">
+            @for($s = 0; $s < 8; $s++)
+                <div class="home-category-section__card">
+                    <div class="home-category-section__card-media animate-pulse bg-slate-200"></div>
                 </div>
             @endfor
         </div>

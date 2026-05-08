@@ -17,19 +17,7 @@
             </ul>
 
             @if($general->multi_language)
-                @php
-                    $language = App\Models\Language::all();
-                @endphp
-
-                <div class="change-language">
-                    <select class="language langSel">
-                        @foreach ($language as $item)
-                            <option value="{{ $item->code }}" @if (session('lang') == $item->code) selected @endif>
-                                {{ __($item->name) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                <x-language-switcher />
             @endif
         </div>
     </div>

@@ -62,12 +62,15 @@ class RouteServiceProvider extends ServiceProvider
                     ->name('admin.')
                     ->group(base_path('routes/admin.php'));
 
-                Route::middleware(['web', 'maintenance', 'no-cache'])
-                    ->prefix('user')
-                    ->group(base_path('routes/user.php'));
 
-                Route::middleware(['web','maintenance'])
-                    ->group(base_path('routes/web.php'));
+
+                // Simplified registration: individual route files (web.php, user.php) 
+                // now handle their own {locale?} prefixing for maximum control.
+                Route::middleware(['web', 'maintenance', 'localization'])
+                    ->group(function() {
+                        Route::prefix('user')->group(base_path('routes/user.php'));
+                        Route::group([], base_path('routes/web.php'));
+                    });
             });
 
         });

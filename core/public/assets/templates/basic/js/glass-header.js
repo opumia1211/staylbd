@@ -8,18 +8,30 @@
 (function() {
     'use strict';
 
+    // Core Elements & State
+    const headerMaster = document.querySelector('.stayl-fixed-master');
+    const searchWrapper = document.querySelector('.stayl-search-pill-wrapper');
+    const searchInputField = document.querySelector('#universalSearchInput');
+    const searchForm = document.querySelector('#universalSearchForm');
+    const resultsContainer = document.querySelector('#searchResults');
+    const cameraBtn = document.querySelector('#cameraSearchBtn');
+    const voiceBtn = document.querySelector('#voiceSearchBtn');
+    const mobileSearchToggle = document.querySelector('#staylMobileSearchToggle');
+    const themeToggle = document.querySelector('#staylThemeToggle');
+
     function iconSvg(name, extraClass) {
         var cls = 'ui-icon ui-icon--runtime' + (extraClass ? (' ' + extraClass) : '');
         var icons = {
-            spinner: '<svg class="' + cls + ' ui-icon--spin" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"></path></svg>',
+            spinner: '<svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>',
             search: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>',
-            image: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>',
-            scan: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10V6a2 2 0 0 1 2-2h3.5M16 4H18a2 2 0 0 1 2 2v3.5M20 14v4a2 2 0 0 1-2 2h-3.5M8 20H6a2 2 0 0 1-2-2v-3.5"></path><rect x="8.5" y="8.5" width="7" height="7" rx="1.2"></rect></svg>',
+            image: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+            scan: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>',
             folder: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>',
             folderOpen: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v1H3z"></path><path d="M3 11h18l-2 8H5z"></path></svg>',
             tag: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 13l-7 7-9-9V4h7z"></path><circle cx="7.5" cy="7.5" r="1.2"></circle></svg>',
             link: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 0 1 7 7L17 13"></path><path d="M14 11a5 5 0 0 1 0 7L12.5 19.5a5 5 0 0 1-7-7L7 11"></path></svg>',
-            file: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path></svg>'
+            file: '<svg class="' + cls + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path></svg>',
+            mic: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>'
         };
         return icons[name] || icons.file;
     }
@@ -288,7 +300,8 @@
                 e.preventDefault();
                 const query = sidebarSearchInput.value.trim();
                 if (query) {
-                    window.location.href = `{{ route('products') }}?search=${encodeURIComponent(query)}`;
+                    const productsUrl = (sidebarSearchForm && sidebarSearchForm.getAttribute('action')) || '/products';
+                    window.location.href = `${productsUrl}?search=${encodeURIComponent(query)}`;
                 }
             });
         }
@@ -361,40 +374,96 @@
             if (maxPrice) params.append('max_price', maxPrice);
 
             // Navigate to products page with filters
-            window.location.href = `{{ route('products') }}?${params.toString()}`;
+            const productsUrl = (document.querySelector('#universalSearchForm') && document.querySelector('#universalSearchForm').getAttribute('action')) || '/products';
+            window.location.href = `${productsUrl}?${params.toString()}`;
         });
     }
 
-    // Header Scroll Effect
-    const header = document.querySelector('.glass-header');
-    let lastScroll = 0;
+    function setupHeaderScroll() {
+        const header = document.querySelector('.glass-header');
+        const headerMaster = document.querySelector('.stayl-fixed-master');
+        if (!header && !headerMaster) return;
 
-    if (header) {
+        let lastScroll = window.pageYOffset;
+        const scrollThreshold = 40;
+
         window.addEventListener('scroll', function() {
             const currentScroll = window.pageYOffset;
+            
+            // Basic sticky/scrolled classes
+            if (header) {
+                if (currentScroll > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
 
-            if (currentScroll > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
+                if (currentScroll > 140) {
+                    header.classList.add('is-sticky');
+                } else {
+                    header.classList.remove('is-sticky');
+                }
             }
 
-            // Hide/show header on scroll (optional - can be removed if not needed)
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down - hide header
-                // header.style.transform = 'translateY(-100%)';
-            } else {
-                // Scrolling up - show header
-                header.style.transform = 'translateY(0)';
+            // Advanced "Stayl Fixed Master" collapse logic
+            if (headerMaster) {
+                if (currentScroll > scrollThreshold) {
+                    headerMaster.classList.add('is-scrolled-down');
+                } else {
+                    headerMaster.classList.remove('is-scrolled-down');
+                }
             }
 
             lastScroll = currentScroll;
+        }, { passive: true });
+    }
+
+    function setupThemeToggle() {
+        const themeBtn = document.getElementById('staylThemeToggle');
+        const sunIcon = document.getElementById('themeIconSun');
+        const moonIcon = document.getElementById('themeIconMoon');
+        const body = document.body;
+        if (!themeBtn) return;
+
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('stayl-theme', isDark ? 'dark' : 'light');
+            
+            if (sunIcon) sunIcon.classList.toggle('hidden', !isDark);
+            if (moonIcon) moonIcon.classList.toggle('hidden', isDark);
+        });
+    }
+
+    function setupDropdownFallbacks() {
+        const langBtn = document.getElementById('langBtn');
+        const langMenu = document.getElementById('langMenu');
+        const currencyBtn = document.getElementById('currencyBtn');
+        const currencyMenu = document.getElementById('currencyMenu');
+
+        if (langBtn && langMenu) {
+            langBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (currencyMenu) currencyMenu.classList.add('hidden');
+                langMenu.classList.toggle('hidden');
+            });
+        }
+
+        if (currencyBtn && currencyMenu) {
+            currencyBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (langMenu) langMenu.classList.add('hidden');
+                currencyMenu.classList.toggle('hidden');
+            });
+        }
+
+        document.addEventListener('click', function () {
+            if (langMenu) langMenu.classList.add('hidden');
+            if (currencyMenu) currencyMenu.classList.add('hidden');
         });
     }
 
     // Mobile search remains permanently integrated in header.
-    const searchInputField = document.querySelector('#universalSearchInput');
-    const searchWrapper = document.querySelector('.glass-search-wrapper');
     const searchCenter = document.querySelector('.glass-header-center');
     const glassHeader = document.querySelector('.glass-header');
     const glassHeaderNav = document.querySelector('.glass-header-nav');
@@ -403,8 +472,12 @@
         if (!searchInputField || !searchWrapper) return;
         searchInputField.addEventListener('focus', function() {
             searchWrapper.style.transform = 'scale(1.01)';
+            if (window.innerWidth < 1200 && glassHeader) {
+                glassHeader.classList.add('mobile-search-focused');
+            }
         });
         searchInputField.addEventListener('blur', function() {
+            if (glassHeader) glassHeader.classList.remove('mobile-search-focused');
             setTimeout(function() {
                 searchWrapper.style.transform = 'scale(1)';
             }, 120);
@@ -414,8 +487,7 @@
     else setupMobileSearch();
 
     // Professional Voice Search
-    const voiceBtn = document.querySelector('#voiceSearchBtn');
-    const searchResultsEl = document.querySelector('#searchResults');
+    let searchResultsEl = resultsContainer;
     let recognition = null;
     let isListening = false;
     var defaultSearchPlaceholder = (searchInputField && searchInputField.getAttribute('placeholder')) || '';
@@ -471,9 +543,8 @@
 
                 recognition.onstart = function() {
                     isListening = true;
-                    voiceBtn.classList.add('listening');
+                    if (voiceBtn) voiceBtn.classList.add('listening');
                     if (searchInputField) searchInputField.placeholder = listeningPlaceholder;
-                    showVoiceSearchAlert('Microphone active. You can speak now.', 'success');
                 };
 
                 recognition.onresult = function(event) {
@@ -541,29 +612,27 @@
                         e.preventDefault();
                         e.stopPropagation();
                     }
+                    
                     if (isListening) {
                         try { recognition.stop(); } catch (err) {}
-                        isListening = false;
-                        voiceBtn.classList.remove('listening');
-                        restoreSearchPlaceholder();
-                        voiceBtn.setAttribute('aria-pressed', 'false');
                         return;
                     }
                     
                     if (voiceSearchNeedsHttps()) {
-                        voiceBtn.setAttribute('aria-pressed', 'false');
-                        showVoiceSearchAlert('Voice search needs a secure site (HTTPS) or localhost.', 'error');
+                        showVoiceSearchAlert('Voice search needs HTTPS or localhost.', 'error');
                         return;
                     }
 
-                    voiceBtn.setAttribute('aria-pressed', 'true');
                     try {
                         recognition.start();
                     } catch (err) {
                         console.error('Failed to start recognition', err);
+                        // If it's already started, just ignore or stop it
+                        if (err.name === 'InvalidStateError') {
+                            try { recognition.stop(); } catch(stopErr) {}
+                        }
                         isListening = false;
                         voiceBtn.classList.remove('listening');
-                        restoreSearchPlaceholder();
                     }
                 }
 
@@ -598,52 +667,119 @@
         }
     }
 
-    // Image search via camera / gallery (button outside search card)
-    const cameraBtn = document.querySelector('#cameraSearchBtn');
-    const imageInput = document.querySelector('#imageSearchInput');
+    if (cameraBtn) {
+        const lensCard = document.querySelector('#staylLensCard');
+        const cameraOpt = document.querySelector('#lensOptionCamera');
+        const fileOpt = document.querySelector('#lensOptionFile');
+        const cameraInput = document.querySelector('#staylCameraFileDirect');
+        const galleryInput = document.querySelector('#staylGalleryFileDirect');
 
-    if (cameraBtn && imageInput) {
+        // Camera Modal Elements
+        const cameraModal = document.querySelector('#staylCameraModal');
+        const cameraVideo = document.querySelector('#staylCameraVideo');
+        const cameraCanvas = document.querySelector('#staylCameraCanvas');
+        const captureBtn = document.querySelector('#staylCameraCaptureBtn');
+        const closeCameraBtn = document.querySelector('#staylCameraCloseBtn');
+        let cameraStream = null;
+
         cameraBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            try {
-                imageInput.click();
-            } catch (err) {
-                console.error('Error opening file picker:', err);
-                alert('Unable to open image picker. Please try again.');
+            const currentLensCard = document.querySelector('#staylLensCard');
+            if (currentLensCard) {
+                currentLensCard.classList.toggle('is-active');
+            } else {
+                console.error("Lens card not found in DOM.");
             }
         });
 
-        imageInput.addEventListener('change', function(e) {
-            var file = e.target.files && e.target.files[0];
-            if (file) {
-                var validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-                if (validTypes.indexOf(file.type) === -1) {
-                    alert('Please select a valid image file (JPEG, PNG, GIF, or WebP).');
-                    this.value = '';
-                    return;
+        document.addEventListener('click', function(e) {
+            const currentLensCard = document.querySelector('#staylLensCard');
+            if (currentLensCard && currentLensCard.classList.contains('is-active') && !cameraBtn.contains(e.target) && !currentLensCard.contains(e.target)) {
+                currentLensCard.classList.remove('is-active');
+            }
+        });
+
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' }, 
+                    audio: false 
+                });
+                if (cameraVideo) {
+                    cameraVideo.srcObject = cameraStream;
+                    if (cameraModal) cameraModal.classList.add('is-active');
                 }
-                var maxSize = 5 * 1024 * 1024;
-                if (file.size > maxSize) {
-                    alert('Image size should be less than 5MB.');
-                    this.value = '';
-                    return;
-                }
+            } catch (err) {
+                console.error("Camera access failed:", err);
+                alert("Camera access denied or not available.");
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            if (cameraModal) cameraModal.classList.remove('is-active');
+        }
+
+        if (cameraOpt) {
+            cameraOpt.addEventListener('click', function() {
+                startCamera();
+                if (lensCard) lensCard.classList.remove('is-active');
+            });
+        }
+
+        if (closeCameraBtn) closeCameraBtn.addEventListener('click', stopCamera);
+        if (cameraModal) {
+            cameraModal.querySelector('.stayl-camera-modal__backdrop')?.addEventListener('click', stopCamera);
+        }
+
+        if (captureBtn && cameraVideo && cameraCanvas) {
+            captureBtn.addEventListener('click', function() {
+                const context = cameraCanvas.getContext('2d');
+                cameraCanvas.width = cameraVideo.videoWidth;
+                cameraCanvas.height = cameraVideo.videoHeight;
+                context.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+                
+                cameraCanvas.toBlob(function(blob) {
+                    const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
+                    stopCamera();
+                    cameraBtn.classList.add('uploading');
+                    cameraBtn.innerHTML = iconSvg('spinner');
+                    performImageSearch(file, null);
+                }, 'image/jpeg', 0.85);
+            });
+        }
+
+        if (fileOpt && galleryInput) {
+            fileOpt.addEventListener('click', function() {
+                galleryInput.click();
+                if (lensCard) lensCard.classList.remove('is-active');
+            });
+        }
+
+        const handleImageSelect = function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
                 cameraBtn.classList.add('uploading');
                 cameraBtn.innerHTML = iconSvg('spinner');
-                performImageSearch(file);
+                performImageSearch(file, e.target);
             }
-        });
+        };
+
+        if (cameraInput) cameraInput.addEventListener('change', handleImageSelect);
+        if (galleryInput) galleryInput.addEventListener('change', handleImageSelect);
     }
 
-    // Universal Search - AbortController to cancel previous request (light optimization)
+    // Universal Search State
     let searchAbortController = null;
     let searchTimeout = null;
     let searchResultsFocusedIndex = -1;
-    const searchForm = document.querySelector('#universalSearchForm');
     const SEARCH_CACHE_KEY = 'staylbd_recent_search_terms_v1';
     const SEARCH_CACHE_LIMIT = 8;
-    const SEARCH_DEBOUNCE_MS = 300;
+    const SEARCH_DEBOUNCE_MS = 150;
     var trendingKeywordsCache = null;
     var trendingLoadPromise = null;
 
@@ -728,6 +864,12 @@
         });
     }
 
+    function hideSearchResults() {
+        var resultsContainer = document.querySelector('#searchResults');
+        if (resultsContainer) resultsContainer.classList.remove('active');
+        searchResultsFocusedIndex = -1;
+    }
+
     function showDiscoveryPanel(query) {
         var resultsContainer = document.querySelector('#searchResults');
         if (!resultsContainer || !searchForm) return;
@@ -793,7 +935,7 @@
             var q = this.value.trim();
             clearTimeout(searchTimeout);
             if (!q) {
-                showDiscoveryPanel('');
+                hideSearchResults();
                 return;
             }
             searchTimeout = setTimeout(function() { performUniversalSearch(q); }, SEARCH_DEBOUNCE_MS);
@@ -801,12 +943,10 @@
 
         searchInputField.addEventListener('focus', function() {
             var q = this.value.trim();
-            clearTimeout(searchTimeout);
-            if (!q) {
-                showDiscoveryPanel('');
-                return;
+            if (q.length > 0) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() { performUniversalSearch(q); }, SEARCH_DEBOUNCE_MS);
             }
-            searchTimeout = setTimeout(function() { performUniversalSearch(q); }, SEARCH_DEBOUNCE_MS);
         });
 
         var resultsEl = document.querySelector('#searchResults');
@@ -827,8 +967,10 @@
     function performUniversalSearch(query) {
         if (searchAbortController) searchAbortController.abort();
         searchAbortController = new AbortController();
-        var url = (searchInputField && searchInputField.getAttribute('data-search-url')) || '/search/universal';
+        var url = (searchForm && searchForm.getAttribute('data-universal-url')) || (window.location.origin + '/search/universal');
         var resEl = document.querySelector('#searchResults');
+        if (!resEl) return;
+        
         fetch(url, {
             method: 'POST',
             headers: {
@@ -858,8 +1000,7 @@
         const resultsContainer = document.querySelector('#searchResults');
         if (!resultsContainer) return;
         searchResultsFocusedIndex = -1;
-        if (window.innerWidth <= 991 && searchWrapper) searchWrapper.style.transform = 'scale(1.01)';
-
+        
         var hasAny = results && (
             (results.products && results.products.length > 0) ||
             (results.categories && results.categories.length > 0) ||
@@ -869,66 +1010,59 @@
         );
 
         if (!hasAny && (!results || results.total === 0)) {
-            var msg = (query && query.length > 0) ? 'No results for "' + escapeHtml(query) + '". Try different keywords or check spelling.' : 'Type to search products, categories, brands, pages...';
-            var didYouMean = (results && results.did_you_mean && results.did_you_mean.length > 0);
-            if (didYouMean) {
-                var productsUrl = productsSearchBaseUrl();
-                msg += '<div class="glass-search-did-you-mean mt-2 pt-2" style="border-top:1px solid rgba(0,0,0,0.06);"><strong>Did you mean?</strong> ';
-                results.did_you_mean.forEach(function(s) {
-                    msg += '<a href="' + productsUrl + '?search=' + encodeURIComponent(s) + '" class="d-inline-block me-2 mt-1" style="color:var(--theme-color,#4fc4f7);">' + escapeHtml(s) + '</a>';
-                });
-                msg += '</div>';
-            }
+            var msg = (query && query.length > 0) ? 'No results for "' + escapeHtml(query) + '".' : 'Type to search everything...';
             finalizeSearchPanel('<div class="glass-search-no-results">' + msg + '</div>');
             return;
         }
 
         var html = '';
 
+        // Products Section (Cards)
         if (results.products && results.products.length > 0) {
+            html += '<div class="glass-search-result-group-title">Products</div>';
             results.products.forEach(function(item) {
-                var priceText = '';
-                if (typeof item.price_text === 'string' && item.price_text.trim() !== '') {
-                    priceText = item.price_text.trim();
-                } else if (typeof item.price_formatted === 'string' && item.price_formatted.trim() !== '') {
-                    priceText = item.price_formatted.trim();
-                } else if (typeof item.price !== 'undefined' && item.price !== null && String(item.price).trim() !== '') {
-                    priceText = String(item.price).trim();
-                }
-                html += '<a href="' + item.url + '" class="glass-search-result-item text-decoration-none d-block">' +
-                    '<img src="' + (item.image || '/assets/images/default.png') + '" alt="" onerror="this.src=\'/assets/images/default.png\'">' +
-                    '<div class="glass-search-result-item-content">' +
-                    '<div class="glass-search-result-item-title">' + escapeHtml(item.name) + '</div>' +
-                    '<div class="glass-search-result-item-meta">' + (item.category ? escapeHtml(item.category) + ' • ' : '') + (item.brand ? escapeHtml(item.brand) + ' • ' : '') + '<span class="glass-search-result-item-type">Product</span></div>' +
-                    (priceText ? '<div class="glass-search-result-item-price" style="font-weight:700;color:#0f766e;margin-top:2px;">' + escapeHtml(priceText) + '</div>' : '') +
-                    '</div></a>';
+                var priceText = item.price_text || item.price || '';
+                html += '<a href="' + item.url + '" class="glass-search-card glass-search-result-item text-decoration-none">' +
+                    '<img src="' + (item.image || '/assets/images/default.png') + '" class="glass-search-card-img" alt="" onerror="this.src=\'/assets/images/default.png\'">' +
+                    '<div class="glass-search-card-info">' +
+                    '<div class="glass-search-card-name">' + escapeHtml(item.name) + '</div>' +
+                    '<div class="glass-search-card-meta">' + (item.brand ? '<span>' + escapeHtml(item.brand) + '</span> • ' : '') + '<span>' + (item.category || 'Product') + '</span></div>' +
+                    (priceText ? '<div class="glass-search-card-price">' + escapeHtml(priceText) + '</div>' : '') +
+                    '</div><div class="glass-search-tag">View</div></a>';
             });
         }
+
+        // Categories & Brands (Simplified)
         if (results.categories && results.categories.length > 0) {
+            html += '<div class="glass-search-result-group-title">Categories</div>';
             results.categories.forEach(function(item) {
-                html += '<a href="' + item.url + '" class="glass-search-result-item text-decoration-none d-block"><div class="glass-search-result-item-content">' +
-                    '<div class="glass-search-result-item-title">' + iconSvg('folder', 'me-2') + escapeHtml(item.name) + ' <span class="glass-search-result-item-type">Category</span></div></div></a>';
+                html += '<a href="' + item.url + '" class="glass-search-card glass-search-result-item text-decoration-none">' +
+                    '<div class="glass-search-card-info">' +
+                    '<div class="glass-search-card-name">' + escapeHtml(item.name) + '</div>' +
+                    '</div><div class="glass-search-tag">Category</div></a>';
             });
         }
-        if (results.subcategories && results.subcategories.length > 0) {
-            results.subcategories.forEach(function(item) {
-                html += '<a href="' + item.url + '" class="glass-search-result-item text-decoration-none d-block"><div class="glass-search-result-item-content">' +
-                    '<div class="glass-search-result-item-title">' + iconSvg('folderOpen', 'me-2') + escapeHtml(item.name) + (item.category ? ' <span class="glass-search-result-item-meta">(' + escapeHtml(item.category) + ')</span>' : '') + ' <span class="glass-search-result-item-type">Subcategory</span></div></div></a>';
-            });
-        }
+
+        // Brands Section
         if (results.brands && results.brands.length > 0) {
+            html += '<div class="glass-search-result-group-title">Brands</div>';
             results.brands.forEach(function(item) {
-                html += '<a href="' + item.url + '" class="glass-search-result-item text-decoration-none d-block"><div class="glass-search-result-item-content">' +
-                    '<div class="glass-search-result-item-title">' + iconSvg('tag', 'me-2') + escapeHtml(item.name) + ' <span class="glass-search-result-item-type">Brand</span></div></div></a>';
+                html += '<a href="' + item.url + '" class="glass-search-card glass-search-result-item text-decoration-none">' +
+                    '<div class="glass-search-card-info">' +
+                    '<div class="glass-search-card-name">' + escapeHtml(item.name) + '</div>' +
+                    '</div><div class="glass-search-tag">Brand</div></a>';
             });
         }
+
+        // Pages Section
         if (results.pages && results.pages.length > 0) {
+            html += '<div class="glass-search-result-group-title">Pages</div>';
             results.pages.forEach(function(item) {
                 var icon = item.type === 'route' ? 'link' : 'file';
-                var typeLabel = item.type === 'route' ? 'Page' : (item.type || 'Page');
-                var desc = item.description ? '<div class="glass-search-result-item-meta" style="font-size:11px;color:#888;">' + escapeHtml(item.description) + '</div>' : '';
-                html += '<a href="' + item.url + '" class="glass-search-result-item text-decoration-none d-block"><div class="glass-search-result-item-content">' +
-                    '<div class="glass-search-result-item-title">' + iconSvg(icon, 'me-2') + escapeHtml(item.name) + ' <span class="glass-search-result-item-type">' + typeLabel + '</span></div>' + desc + '</div></a>';
+                html += '<a href="' + item.url + '" class="glass-search-card glass-search-result-item text-decoration-none">' +
+                    '<div class="glass-search-card-info">' +
+                    '<div class="glass-search-card-name">' + escapeHtml(item.name) + '</div>' +
+                    '</div><div class="glass-search-tag">Page</div></a>';
             });
         }
 
@@ -940,16 +1074,8 @@
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Hide Search Results
-    function hideSearchResults() {
-        const resultsContainer = document.querySelector('#searchResults');
-        if (resultsContainer) {
-            resultsContainer.classList.remove('active');
-        }
-    }
-
     // Perform Image Search - Enhanced & Fixed
-    function performImageSearch(file) {
+    function performImageSearch(file, inputEl) {
         const formData = new FormData();
         formData.append('image', file);
         formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
@@ -1005,8 +1131,8 @@
             }
             
             // Clear file input
-            if (imageInput) {
-                imageInput.value = '';
+            if (inputEl) {
+                inputEl.value = '';
             }
         })
         .catch(error => {
@@ -1024,8 +1150,8 @@
             }
             
             // Clear file input
-            if (imageInput) {
-                imageInput.value = '';
+            if (inputEl) {
+                inputEl.value = '';
             }
         });
     }
@@ -1038,7 +1164,7 @@
                 e.preventDefault();
                 const target = document.querySelector(href);
                 if (target) {
-                    const headerHeight = header ? header.offsetHeight : 72;
+                    const headerHeight = glassHeader ? glassHeader.offsetHeight : 72;
                     const targetPosition = target.offsetTop - headerHeight;
                     window.scrollTo({
                         top: targetPosition,
@@ -1058,7 +1184,10 @@
 
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialization (no console.log in production to avoid noise/errors)
+        // Final Initialization
+        setupHeaderScroll();
+        setupThemeToggle();
+        setupDropdownFallbacks();
         
         // Show filter sidebar when search is performed
         const searchForm = document.querySelector('#universalSearchForm');

@@ -1,5 +1,4 @@
-{{-- Floating live chat (authenticated users only) --}}
-@auth
+{{-- Floating live chat (available for all users) --}}
 @php
     $chatLogo = getLogo('logo');
     $siteName = gs('site_name');
@@ -25,7 +24,7 @@
 
 <div class="contact-panel-backdrop" id="contactPanelBackdrop" aria-hidden="true"></div>
 
-<div class="contact-panel-glass contact-live-chat-module" id="contactPanelGlass" role="dialog" aria-labelledby="contactPanelTitle" aria-modal="true" aria-hidden="true"
+<div class="contact-panel-glass contact-live-chat-module shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-2xl border border-white/40 backdrop-blur-md" id="contactPanelGlass" role="dialog" aria-labelledby="contactPanelTitle" aria-modal="true" aria-hidden="true"
      data-channel-redirect-url="{{ route('contact.channel.redirect') }}"
      data-whatsapp-url="{{ $whatsappUrl }}"
      data-telegram-url="{{ $telegramUrl }}"
@@ -33,41 +32,45 @@
      data-channel-config="{{ e($channelConfigEncoded) }}">
     <div class="contact-panel-glass-inner">
         <div class="contact-panel-glow"></div>
-        <div class="contact-panel-header contact-panel-header--branded contact-panel-header--centered">
+        <div class="contact-panel-header contact-panel-header--branded contact-panel-header--centered py-3 px-4 border-b border-gray-100">
             <div class="contact-panel-header-center">
                 @if($chatLogo)
-                    <img src="{{ $chatLogo }}" alt="{{ $siteName }}" class="contact-panel-logo stayl-contact-logo" style="--contact-logo-max-w: {{ getLogoMaxWidth() }}px; --contact-logo-max-h: {{ getLogoMaxHeight() }}px; {{ getLogoStyle() }}">
+                    <img src="{{ $chatLogo }}" alt="{{ $siteName }}" class="contact-panel-logo stayl-contact-logo h-8" style="--contact-logo-max-w: 120px; --contact-logo-max-h: 32px; {{ getLogoStyle() }}">
                 @else
-                    <div class="contact-panel-logo contact-panel-logo-placeholder">
+                    <div class="contact-panel-logo contact-panel-logo-placeholder w-10 h-10">
                         @include($activeTemplate . 'partials.icon', ['name' => 'comments'])
                     </div>
                 @endif
-                <div class="contact-panel-header-text d-flex align-items-center gap-2">
-                    <span class="contact-admin-status-dot contact-admin-status-dot--{{ (gs('admin_online_status') ?? 0) ? 'online' : 'offline' }}" title="{{ (gs('admin_online_status') ?? 0) ? __('Admin is online') : __('Admin is offline') }}" aria-label="{{ (gs('admin_online_status') ?? 0) ? __('Admin is online') : __('Admin is offline') }}"></span>
-                    <div>
-                        <h5 class="contact-panel-title contact-panel-brand-name mb-0" id="contactPanelTitle">
+                <div class="contact-panel-header-text d-flex align-items-center justify-center gap-2 mt-1">
+                    <div class="relative flex h-2 w-2">
+                        <span class="animate-pulse-green absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 {{ (gs('admin_online_status') ?? 0) ? 'bg-green-500' : 'bg-gray-400' }}"></span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h5 class="contact-panel-title contact-panel-brand-name mb-0 text-sm font-extrabold text-slate-900 tracking-tight" id="contactPanelTitle">
                             @if($isStyleBd)
                                 <span class="brand-style">STYLE</span> <span class="brand-b">B</span><span class="brand-d">D</span>
                             @else
                                 {{ $siteName }}
                             @endif
                         </h5>
-                        <small class="contact-panel-subtitle">@lang('Live Chat')</small>
+                        <span class="text-[9px] font-bold uppercase tracking-[0.1em] text-slate-400 leading-none">@lang('Live Support')</span>
                     </div>
                 </div>
             </div>
-            <button type="button" class="contact-panel-close" id="contactPanelClose" aria-label="@lang('Close')">
+            <button type="button" class="contact-panel-close hover:bg-gray-100 p-1.5 rounded-lg transition-colors" id="contactPanelClose" aria-label="@lang('Close')">
                 @include($activeTemplate . 'partials.icon', ['name' => 'times'])
             </button>
         </div>
 
-        <div class="contact-panel-body">
+        <div class="contact-panel-body p-3 pb-6 overflow-y-auto">
             {{-- MODULAR COMPONENT: Channel Selection --}}
             @include('templates.basic.partials.live_chat.channel_selection')
 
-            <div class="contact-panel-form-title">@lang('Get in Touch')</div>
+            <div class="contact-panel-form-title mt-4 mb-3 font-bold text-slate-800 text-[10px] uppercase tracking-wider px-1">@lang('Get in Touch')</div>
             <form id="contactPanelForm" class="contact-panel-form verify-gcaptcha" method="post" action="{{ route('contact.panel.submit') }}" enctype="multipart/form-data"
-                @auth data-user-name="{{ e(optional(auth()->user())->fullname ?? '') }}" data-user-email="{{ e(optional(auth()->user())->email ?? '') }}" data-chat-messages-url="{{ route('contact.chat.messages') }}" data-chat-unread-url="{{ route('contact.chat.unread') }}" @endauth>
+                data-chat-messages-url="{{ route('contact.chat.messages') }}" data-chat-unread-url="{{ route('contact.chat.unread') }}"
+                @auth data-user-name="{{ e(optional(auth()->user())->fullname ?? '') }}" data-user-email="{{ e(optional(auth()->user())->email ?? '') }}" @endauth>
                 @csrf
                 <input type="hidden" name="channel" id="contactPanelChannelInput" value="livechat">
                 @auth
@@ -94,4 +97,3 @@
     <span class="contact-float-btn-icon" data-icon="email"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
     <span class="contact-float-btn-badge d-none" id="contactFloatBadge">0</span>
 </button>
-@endauth

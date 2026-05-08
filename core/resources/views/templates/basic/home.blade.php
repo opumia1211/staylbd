@@ -378,7 +378,8 @@
   // Category + product rows: every data-interval-sec, smooth-scroll one card width (right→left); at end smooth back to start; no visible scrollbar
   function initHomeHorizontalAutoScroll() {
     var rows = [
-      { sel: ".product-line-flex-row[data-auto-scroll=\"1\"]", card: ".product-card-col" }
+      { sel: ".product-line-flex-row[data-auto-scroll=\"1\"]", card: ".product-card-col" },
+      { sel: ".home-category-section__grid[data-auto-scroll=\"1\"]", card: ".home-category-section__card" }
     ];
 
     function gapPx(el) {
@@ -422,11 +423,17 @@
           if (mx <= 4) return;
           var step = stepForGrid(grid, cfg.card);
           if (step < 48) step = Math.min(200, mx);
-          if (grid.scrollLeft >= mx - 6) {
+          
+          // Current position
+          var cur = grid.scrollLeft;
+          
+          if (cur >= mx - 10) {
+            // Reached the end: scroll back to start smoothly
             grid.scrollTo({ left: 0, behavior: "smooth" });
           } else {
-            var next = Math.min(grid.scrollLeft + step, mx);
-            grid.scrollTo({ left: next, behavior: "smooth" });
+            // Scroll to next step
+            var target = Math.min(cur + step, mx);
+            grid.scrollTo({ left: target, behavior: "smooth" });
           }
         }
 
@@ -442,7 +449,7 @@
         grid.addEventListener("mouseleave", start);
         grid.addEventListener("touchstart", stop, { passive: true });
         grid.addEventListener("touchend", function() {
-          window.setTimeout(start, 1800);
+          window.setTimeout(start, 2500);
         }, { passive: true });
 
         grid._staylScrollTimer = setInterval(tick, intervalMs);

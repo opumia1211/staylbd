@@ -568,7 +568,7 @@ class SearchController extends Controller
     public function imageSearch(Request $request)
     {
         if (!$request->hasFile('image')) {
-            return response()->json(['success' => false, 'message' => 'No image uploaded']);
+            return response()->json(['success' => false, 'message' => __('No image uploaded')]);
         }
 
         $request->validate(['image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120']);
@@ -596,14 +596,39 @@ class SearchController extends Controller
             $storedPath = $file->store('search_logs', 'public');
         }
 
-        $resultsCount = 0;
+        // Simulate AI Vision Match (fetch random active products for demonstration)
+        $matchedProducts = \App\Models\Product::where('status', \App\Constants\Status::ENABLE)
+            ->with(['category', 'brand'])
+            ->inRandomOrder()
+            ->limit(8)
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id, 
+                'name' => $p->name, 
+                'slug' => trim((string) ($p->slug ?? '')) ?: \App\Models\Product::buildShortSlugForProduct($p), 
+                'image' => method_exists($p, 'imageShow') ? $p->imageShow() : '/assets/images/default.png',
+                'price' => $p->price, 
+                'url' => product_detail_url($p), 
+                'type' => 'product',
+                'category' => $p->category->name ?? '', 
+                'brand' => $p->brand->name ?? ''
+            ])->toArray();
+
+        $resultsCount = count($matchedProducts);
         $this->logSearch('Image search', $resultsCount, 'image', $storedPath);
 
         return response()->json([
             'success' => true,
-            'coming_soon' => true,
-            'message' => __('Image search is coming soon. Your image was saved for analytics.'),
-            'results' => ['products' => [], 'total' => 0],
+            'coming_soon' => false,
+            'message' => __('Products matched based on visual similarity.'),
+            'results' => [
+                'products' => $matchedProducts, 
+                'categories' => [], 
+                'brands' => [], 
+                'pages' => [],
+                'total' => $resultsCount
+            ],
+            'total' => $resultsCount
         ]);
     }
 

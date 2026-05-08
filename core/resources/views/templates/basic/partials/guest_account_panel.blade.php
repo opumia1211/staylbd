@@ -1,6 +1,14 @@
 @php
     $guestLangs = $guestLangs ?? \App\Models\Language::all();
     $guestAccountHideHeading = !empty($guestAccountHideHeading);
+    $currentLocale = app()->getLocale();
+    $segments = request()->segments();
+    $guestLocaleCodes = $guestLangs->pluck('code')->map(fn ($code) => strtolower(trim((string) $code)))->all();
+    if (!empty($segments) && in_array(strtolower((string) $segments[0]), $guestLocaleCodes, true)) {
+        array_shift($segments);
+    }
+    $basePath = implode('/', $segments);
+    $queryString = request()->getQueryString();
 @endphp
 <div class="guest-account-ui">
     @unless($guestAccountHideHeading)
@@ -86,7 +94,16 @@
         <p class="guest-account-ui__kicker">@lang('Language')</p>
         <div class="guest-account-ui__chips">
             @foreach($guestLangs as $lng)
-                <a href="{{ route('lang', $lng->code) }}" class="guest-account-ui__chip" data-no-ajax>{{ __($lng->name) }}</a>
+                @php
+                    $langCode = strtolower(trim((string) $lng->code));
+                    $targetUrl = url($langCode . ($basePath ? '/' . $basePath : ''));
+                    if ($queryString) {
+                        $targetUrl .= '?' . $queryString;
+                    }
+                @endphp
+                <a href="{{ $targetUrl }}" class="guest-account-ui__chip {{ $currentLocale === $langCode ? 'is-active' : '' }}" data-no-ajax>
+                    {{ __($lng->name) }} @if($currentLocale === $langCode) ✔ @endif
+                </a>
             @endforeach
         </div>
     @endif

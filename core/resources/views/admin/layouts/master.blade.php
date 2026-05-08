@@ -9,6 +9,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            corePlugins: {
+                preflight: false,
+            },
             theme: {
                 extend: {
                     colors: {
