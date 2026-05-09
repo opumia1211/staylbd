@@ -29,7 +29,7 @@ class Localization
             $locale = $sessionLocale;
             
             // Redirect to prefixed URL for public GET requests if not already prefixed correctly
-            $excludedPrefixes = ['admin', 'sajaladminopu', 'api', 'assets', 'webhooks', 'serve-js', 'serve-css', 'placeholder-image'];
+            $excludedPrefixes = ['admin', 'user', 'sajaladminopu', 'api', 'assets', 'webhooks', 'serve-js', 'serve-css', 'placeholder-image'];
             if ($request->method() === 'GET' && !$request->expectsJson() && !in_array($request->segment(1), $excludedPrefixes, true)) {
                 $path = trim($request->path(), '/');
                 $targetUrl = url($locale . ($path !== '' ? '/' . $path : ''));

@@ -13,7 +13,7 @@
 
     if (!isset($__staylHeaderCategories)) {
         $__staylHeaderCategories = \Illuminate\Support\Facades\Cache::remember(
-            'storefront.header_nav_categories_v1',
+            'storefront.header_nav_categories_v2',
             300,
             static fn() => \App\Models\Category::active()
                 ->with(['subcategories' => static fn($q) => $q->active()])
@@ -303,7 +303,7 @@
                              onmouseenter="const m=document.getElementById('langMenu'); if(m) m.classList.remove('hidden')" 
                              onmouseleave="const m=document.getElementById('langMenu'); if(m) m.classList.add('hidden')">
                             <button id="langBtn" class="flex items-center gap-2 px-3 py-1.5 bg-transparent rounded-md text-white border-0 transition-colors hover:text-sky-400 text-sm font-semibold shadow-none outline-none focus:ring-0">
-                                <img src="https://flagcdn.com/w20/{{ $currentLangFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                <img src="https://flagcdn.com/w20/{{ $currentLangFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
                                 <span class="uppercase">{{ $currentLangCode }}</span>
                                 <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -325,7 +325,7 @@
                                                 if (request()->getQueryString()) $targetUrl .= '?' . request()->getQueryString();
                                             @endphp
                                             <a href="{{ $targetUrl }}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-lang-option="{{ $lCode }}">
-                                                <img src="https://flagcdn.com/w20/{{ $lFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                                <img src="https://flagcdn.com/w20/{{ $lFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
                                                 <span>{{ $lang->name }}</span>
                                                 @if(strtolower($currentLangCode) === $lCode)
                                                     <svg class="ms-auto size-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -348,7 +348,7 @@
                                     $currData = collect($headerCurrencies)->first(fn($c) => strtoupper($c['code']) === strtoupper($currentCurrencyCode));
                                 @endphp
                                 @if($currData && !empty($currData['flag']))
-                                    <img src="{{ $currData['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                    <img src="{{ $currData['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
                                 @endif
                                 <span>{{ $currentCurrencyCode }}</span>
                                 <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -366,7 +366,7 @@
                                             @endphp
                                             <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-currency-option="{{ $cCode }}">
                                                 @if(!empty($curr['flag']))
-                                                    <img src="{{ $curr['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover">
+                                                    <img src="{{ $curr['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
                                                 @endif
                                                 <span>{{ $cCode }}</span>
                                                 @if($isActive)
@@ -388,9 +388,15 @@
                         </a>
                     </div>
 
-                    <a href="{{ route('user.register') }}" class="stayl-topbar-menu__btn text-decoration-none">
-                        @lang('Registration')
-                    </a>
+                    @guest
+                        <a href="{{ route('user.login') }}" class="stayl-topbar-menu__btn stayl-auth-btn-top">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="opacity-80">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span class="font-bold">@lang('Sign In') / @lang('Register')</span>
+                        </a>
+                    @endguest
 
                     @if(!empty($headerTopCfg['show_apps']))
                         <div class="stayl-topbar-menu">
@@ -424,7 +430,7 @@
                                             target="_blank" rel="noopener">
                                             <span class="stayl-app-item__icon">
                                                 @if($itemIcon !== '')
-                                                    <img src="{{ $itemIcon }}" alt="{{ $itemPlatform }}">
+                                                    <img src="{{ $itemIcon }}" alt="{{ $itemPlatform }}" loading="lazy">
                                                 @else
                                                     <span class="stayl-app-item__icon-svg" aria-hidden="true">
                                                         @if($itemBrandIcon === 'android')
@@ -669,18 +675,17 @@
 
                 <div class="stayl-header-side stayl-header-side--right">
                     <div class="stayl-action-grid">
-                        {{-- Bag Icon (Saved/Collections) --}}
-                        <a href="#" class="stayl-action-item group relative" title="{{ __('Saved Items') }}">
+                        {{-- Orders Icon --}}
+                        <a href="{{ route('user.order.index') }}" class="stayl-action-item group relative" title="{{ __('Orders') }}" data-dashboard-nav="1">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
                                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
                                 <path d="M3 6h18"></path>
                                 <path d="M16 10a4 4 0 0 1-8 0"></path>
                             </svg>
-                            <span class="stayl-hover-label">@lang('Saved')</span>
                         </a>
 
                         {{-- Track Order --}}
-                        <a href="{{ route('track.order') }}" class="stayl-action-item group relative" title="{{ __('Track Order') }}">
+                        <a href="{{ route('user.track.order') }}" class="stayl-action-item group relative" title="{{ __('Track Order') }}">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
                                 <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
                                 <path d="M15 18H9"></path>
@@ -688,7 +693,6 @@
                                 <circle cx="7" cy="18" r="2"></circle>
                                 <circle cx="17" cy="18" r="2"></circle>
                             </svg>
-                            <span class="stayl-hover-label">@lang('Track')</span>
                         </a>
 
                         {{-- Wishlist --}}
@@ -697,7 +701,6 @@
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                             </svg>
                             <span class="stayl-badge show-wishlist-count absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold shadow-sm ring-2 ring-white dark:ring-slate-900 transition-all group-hover:scale-110">0</span>
-                            <span class="stayl-hover-label">@lang('Wishlist')</span>
                         </a>
 
                         {{-- Cart --}}
@@ -708,11 +711,10 @@
                                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
                             </svg>
                             <span class="stayl-badge show-cart-count absolute -top-1 -right-1 bg-sky-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold shadow-sm ring-2 ring-white dark:ring-slate-900 transition-all group-hover:scale-110">0</span>
-                            <span class="stayl-hover-label">@lang('Cart')</span>
                         </a>
 
                         {{-- Account --}}
-                        <a href="{{ route('user.home') }}" class="stayl-action-item group flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" title="{{ __('Account') }}" data-dashboard-nav="1">
+                        <a href="{{ auth()->check() ? route('user.home') : route('user.login') }}" class="stayl-action-item group flex items-center gap-2" title="{{ __('Account') }}" data-dashboard-nav="1">
                             <div class="relative">
                                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-105">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -785,45 +787,19 @@
                             </button>
                             @if(!empty($menuCategoryItems) || $__staylHeaderCategories->isNotEmpty())
                                 <div class="stayl-cat-dropdown stayl-mega-menu-panel" id="staylCatDropdown">
-                                    <div class="stayl-mega-menu-inner p-6">
-                                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                                            @if(!empty($menuCategoryItems))
-                                                {{-- Manual Menu Items --}}
-                                                @foreach($menuCategoryItems as $catItem)
-                                                    <div class="stayl-mega-col">
-                                                        <a href="{{ trim((string) ($catItem['url'] ?? '#')) ?: '#' }}" class="stayl-mega-title block text-sm font-bold text-slate-800 dark:text-slate-100 mb-3 hover:text-sky-500">
-                                                            {{ __(trim((string) ($catItem['label'] ?? ''))) }}
-                                                        </a>
+                                    <div class="stayl-mega-menu-inner p-4 md:p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                            {{-- Dynamic Categories with Professional Cards (Always used for quality) --}}
+                                            @foreach($__staylHeaderCategories->take(24) as $hc)
+                                                <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="group block p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+                                                    <div class="aspect-square rounded-lg overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 mb-2 group-hover:border-sky-500 group-hover:shadow-md transition-all">
+                                                        <img src="{{ $hc->imageShow() }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ __($hc->name) }}" loading="lazy">
                                                     </div>
-                                                @endforeach
-                                            @else
-                                                {{-- Dynamic Categories with Subcategories --}}
-                                                @foreach($__staylHeaderCategories->take(12) as $hc)
-                                                    <div class="stayl-mega-col">
-                                                        <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="stayl-mega-title block text-[13px] font-bold text-slate-800 dark:text-slate-100 mb-3 hover:text-sky-500 transition-colors uppercase tracking-tight">
-                                                            {{ __($hc->name) }}
-                                                        </a>
-                                                        @if($hc->subcategories->isNotEmpty())
-                                                            <ul class="stayl-mega-list flex flex-col gap-2">
-                                                                @foreach($hc->subcategories->take(6) as $hsub)
-                                                                    <li>
-                                                                        <a href="{{ route('subcategory.products', [slug($hsub->name), $hsub->id]) }}" class="text-[12px] text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
-                                                                            {{ __($hsub->name) }}
-                                                                        </a>
-                                                                    </li>
-                                                                @endforeach
-                                                                @if($hc->subcategories->count() > 6)
-                                                                    <li>
-                                                                        <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="text-[11px] font-semibold text-sky-500 hover:underline">
-                                                                            @lang('View All') +
-                                                                        </a>
-                                                                    </li>
-                                                                @endif
-                                                            </ul>
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-                                            @endif
+                                                    <p class="text-[11px] font-bold text-center text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate group-hover:text-sky-500">
+                                                        {{ __($hc->name) }}
+                                                    </p>
+                                                </a>
+                                            @endforeach
                                         </div>
                                     </div>
                                     <div class="stayl-mega-footer bg-slate-50 dark:bg-slate-800/50 p-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -1048,9 +1024,9 @@
                 if (masterEl.classList.contains('is-scrolled-down')) {
                     h = 72;
                 } else {
-                    h = masterEl.offsetHeight || 166;
+                    h = masterEl.getBoundingClientRect().height || 166;
                 }
-                document.documentElement.style.setProperty('--stayl-dynamic-header-height', h + 'px');
+                document.documentElement.style.setProperty('--stayl-dynamic-header-height', Math.round(h) + 'px');
             });
         }
 

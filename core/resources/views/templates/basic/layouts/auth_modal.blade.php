@@ -75,9 +75,9 @@
                 try { u = new URL(href, window.location.origin); } catch (err) { return; }
                 if (u.origin !== window.location.origin) return;
                 var p = u.pathname.replace(/\/+$/, '') || '/';
-                var shell = /\/user\/login$/.test(p) || /\/user\/register$/.test(p)
-                    || /\/user\/password\/reset$/.test(p) || /\/user\/password\/code-verify$/.test(p)
-                    || /\/user\/password\/reset\/.+/.test(p);
+                var shell = /\/user\/(?:[a-z]{2}\/)?(?:login|register)$/.test(p)
+                    || /\/user\/(?:[a-z]{2}\/)?password\/(?:reset|code-verify)$/.test(p)
+                    || /\/user\/(?:[a-z]{2}\/)?password\/reset\/.+/.test(p);
                 if (!shell) return;
                 e.preventDefault();
                 if (e.stopImmediatePropagation) e.stopImmediatePropagation();

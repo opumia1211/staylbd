@@ -447,10 +447,6 @@
             }, 50);
         });
     }
-
-    function setupThemeToggle() {
-        // ... (unchanged content handled automatically if I just replace after)
-    }
     
     // =========================================================================
     // Elite Live Environment System (Location & Weather)

@@ -46,6 +46,8 @@ Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'en|bn|hi|ar|ur|r
         })->name('cart.quickorder');
         Route::get('wishlist', [\App\Http\Controllers\WishController::class, 'wishListProduct'])->name('wishlist');
         Route::get('compare', [\App\Http\Controllers\ProductComparisonController::class, 'index'])->name('compare');
+        Route::get('track-order', [\App\Http\Controllers\SiteController::class, 'trackOrderDashboard'])->name('track.order');
+        Route::get('order', [App\Http\Controllers\User\OrderController::class, 'order'])->name('order.index');
     });
 
     Route::middleware('auth')->name('user.')->group(function () {
@@ -75,7 +77,6 @@ Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'en|bn|hi|ar|ur|r
                     Route::get('attachment-download/{fil_hash}', 'attachmentDownload')->name('attachment.download');
                 });
 
-                Route::get('track-order', [\App\Http\Controllers\SiteController::class, 'trackOrderDashboard'])->name('track.order');
 
                 //Profile setting
                 Route::controller('ProfileController')->group(function () {
@@ -96,7 +97,6 @@ Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'en|bn|hi|ar|ur|r
                 });
 
                 Route::controller('OrderController')->prefix('order')->name('order.')->group(function () {
-                    Route::get('/', 'order')->name('index');
                     Route::get('details/{id}', 'details')->name('detail');
                 });
 

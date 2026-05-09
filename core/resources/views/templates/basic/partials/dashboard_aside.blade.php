@@ -50,18 +50,8 @@
                     </a>
                 </li>
                 <li>
-                    <a class="{{ menuActive('user.track.order') }}" href="{{ route('user.track.order') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Track Order')</span>
-                    </a>
-                </li>
-                <li>
                     <a class="{{ menuActive('user.notifications') }}" href="{{ route('user.notifications') }}" data-dashboard-link="1">
                         @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'notification_icon', 'fallback' => 'bell', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Notifications')</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ menuActive('user.order.index') }}" href="{{ route('user.order.index') }}" data-dashboard-link="1">
-                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'shopping-bag', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('My Orders')</span>
                     </a>
                 </li>
                 <li>
@@ -78,6 +68,16 @@
 
                 {{-- Shopping – গেস্ট ও লগইন দুজনেরই দেখা যাবে --}}
                 <li class="side__menu-title mt-2">@lang('Shopping')</li>
+                <li>
+                    <a class="{{ menuActive('user.order.index') }}" href="{{ route('user.order.index') }}" data-dashboard-link="1">
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'orders_icon', 'fallback' => 'shopping-bag', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('My Orders')</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{{ menuActive('user.track.order') }}" href="{{ route('user.track.order') }}" data-dashboard-link="1">
+                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'track_order_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Track Order')</span>
+                    </a>
+                </li>
                 <li>
                     <a class="{{ menuActive('user.cart') }}" href="{{ route('user.cart') }}" data-dashboard-link="1">
                         @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'width' => 18, 'height' => 18, 'alt' => '']) <span class="cont">@lang('Cart')</span>

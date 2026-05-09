@@ -68,11 +68,11 @@
     /** URLs that load the same minimal auth_modal shell in the iframe */
     function isAuthIframeShellPath(path) {
         var p = normalizePath(path);
-        if (/\/user\/login$/.test(p) || /\/user\/register$/.test(p)) return true;
-        if (/\/user\/password\/reset$/.test(p)) return true;
-        if (/\/user\/password\/code-verify$/.test(p)) return true;
-        if (/\/user\/password\/reset\/.+/.test(p)) return true;
-        return false;
+        // Supports both /user/login and /user/en/login style paths
+        var isAuth = /\/user\/(?:[a-z]{2}\/)?(?:login|register)$/.test(p)
+            || /\/user\/(?:[a-z]{2}\/)?password\/(?:reset|code-verify)$/.test(p)
+            || /\/user\/(?:[a-z]{2}\/)?password\/reset\/.+/.test(p);
+        return isAuth;
     }
 
     function openAuthModalWithHistory(cleanUrl) {
