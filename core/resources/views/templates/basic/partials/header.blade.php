@@ -13,7 +13,7 @@
 
     if (!isset($__staylHeaderCategories)) {
         $__staylHeaderCategories = \Illuminate\Support\Facades\Cache::remember(
-            'storefront.header_nav_categories_v2',
+            'storefront.header_nav_categories_v3',
             300,
             static fn() => \App\Models\Category::active()
                 ->with(['subcategories' => static fn($q) => $q->active()])
@@ -223,6 +223,25 @@
     $isMainVisible = !empty($headerMainCfg['enabled']) && !empty($headerMainCfg['is_public']);
     $isMenuVisible = !$isUserProfileHome && !empty($headerMenuCfg['enabled']) && !empty($headerMenuCfg['is_public']);
 @endphp
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(148, 163, 184, 0.5);
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(51, 65, 85, 0.5);
+    }
+</style>
 
 <header class="stayl-fixed-master">
     @if($isTopVisible)
@@ -787,26 +806,32 @@
                             </button>
                             @if(!empty($menuCategoryItems) || $__staylHeaderCategories->isNotEmpty())
                                 <div class="stayl-cat-dropdown stayl-mega-menu-panel" id="staylCatDropdown">
-                                    <div class="stayl-mega-menu-inner p-4 md:p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                            {{-- Dynamic Categories with Professional Cards (Always used for quality) --}}
+                                    <div class="stayl-mega-menu-inner p-4 md:p-6 max-h-[520px] overflow-y-auto custom-scrollbar">
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                                            {{-- Dynamic Categories with Perfectly Square Cards (Full Bleed Image) --}}
                                             @foreach($__staylHeaderCategories->take(24) as $hc)
-                                                <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" class="group block p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
-                                                    <div class="aspect-square rounded-lg overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 mb-2 group-hover:border-sky-500 group-hover:shadow-md transition-all">
-                                                        <img src="{{ $hc->imageShow() }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ __($hc->name) }}" loading="lazy">
-                                                    </div>
-                                                    <p class="text-[11px] font-bold text-center text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate group-hover:text-sky-500">
-                                                        {{ __($hc->name) }}
-                                                    </p>
-                                                </a>
+                                                <div class="w-full">
+                                                    <a href="{{ route('category.products', [slug($hc->name), $hc->id]) }}" 
+                                                       class="group relative block w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 hover:border-sky-500 hover:shadow-xl transition-all duration-300"
+                                                       style="padding-bottom: 100%; height: 0;">
+                                                        @php $hcImage = $hc->imageShow(); @endphp
+                                                        <img src="{{ $hcImage }}" 
+                                                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                                             alt="{{ __($hc->name) }}" 
+                                                             loading="lazy"
+                                                             onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
+                                                        
+                                                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent p-3 pt-8 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+                                                            <p class="text-[10px] font-bold text-center text-white uppercase tracking-wider truncate drop-shadow-md">
+                                                                {{ __($hc->name) }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="absolute inset-0 bg-sky-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                    </a>
+                                                </div>
                                             @endforeach
                                         </div>
                                     </div>
-                                    <div class="stayl-mega-footer bg-slate-50 dark:bg-slate-800/50 p-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                                        <span class="text-[11px] font-medium text-slate-400">@lang('Find what you love across all categories')</span>
-                                        <a href="{{ route('category.all') }}" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline">@lang('Browse All Categories') &rarr;</a>
-                                    </div>
-                                </div>
                             @endif
                         </div>
                     @endif

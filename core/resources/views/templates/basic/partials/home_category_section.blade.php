@@ -22,26 +22,28 @@
                 @if($lineCategories->isNotEmpty())
                     <div class="home-category-section__grid mb-4" data-auto-scroll="1" data-interval-sec="{{ $categoryScrollIntervalSec ?? 4 }}" data-scroll-direction="left">
                         @foreach($lineCategories as $category)
-                            <a href="{{ route('category.products', [slug($category->name), $category->id]) }}" class="home-category-section__card" title="{{ __($category->name) }}">
-                                <div class="home-category-section__card-media">
-                                    @if(!empty($category->image))
-                                        <img src="{{ getImageWebP(getFilePath('category') . '/' . $category->image, getFileSize('category')) }}"
-                                             alt="{{ __($category->name) }}"
-                                             loading="lazy"
-                                             decoding="async"
-                                             width="148"
-                                             height="148"
-                                             class="stayl-category-img"
-                                             onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
-                                    @else
-                                        <div class="home-category-section__card-icon">
-                                            @include($activeTemplate . 'partials.icon', ['name' => 'layout-grid', 'sizePx' => 48])
-                                        </div>
-                                    @endif
+                            <a href="{{ route('category.products', [slug($category->name), $category->id]) }}" 
+                               class="group relative block w-[148px] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-sky-500 hover:shadow-xl transition-all duration-300" 
+                               style="aspect-ratio: 1 / 1; min-height: 148px;"
+                               title="{{ __($category->name) }}">
+                                @if(!empty($category->image))
+                                    <img src="{{ getImageWebP(getFilePath('category') . '/' . $category->image, getFileSize('category')) }}"
+                                         alt="{{ __($category->name) }}"
+                                         loading="lazy"
+                                         decoding="async"
+                                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                         onerror="this.onerror=null;this.src='{{ stayl_placeholder_icon_data_url() }}';">
+                                @else
+                                    <div class="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-slate-800">
+                                        @include($activeTemplate . 'partials.icon', ['name' => 'layout-grid', 'sizePx' => 48, 'class' => 'opacity-20'])
+                                    </div>
+                                @endif
+                                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent p-3 pt-8 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+                                    <span class="block text-[11px] font-bold text-center text-white uppercase tracking-wider truncate drop-shadow-md">
+                                        {{ __($category->name) }}
+                                    </span>
                                 </div>
-                                <span class="home-category-section__card-label">
-                                    {{ __($category->name) }}
-                                </span>
+                                <div class="absolute inset-0 bg-sky-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             </a>
                         @endforeach
                     </div>

@@ -12,7 +12,7 @@ class HeaderControlService
 
     public static function getLiveConfig(): array
     {
-        $cacheKey = 'header_control_live_v2';
+        $cacheKey = 'header_control_live_v3';
         $live = \Illuminate\Support\Facades\Cache::get($cacheKey);
         
         if (!$live) {
@@ -47,7 +47,7 @@ class HeaderControlService
     public static function saveLive(array $config): void
     {
         self::upsert(self::LIVE_KEY, self::hydrateMissingFromLegacy(self::normalize($config)));
-        \Illuminate\Support\Facades\Cache::forget('header_control_live_v2');
+        \Illuminate\Support\Facades\Cache::forget('header_control_live_v3');
     }
 
     public static function publishDraft(): array
