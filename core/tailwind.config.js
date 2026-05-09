@@ -2,6 +2,7 @@
 /* New storefront Blade sections: prefer Tailwind grid/flex + theme max-width utilities;
    avoid introducing Bootstrap .row/.col-* in the same component as dense utility layout. */
 module.exports = {
+    darkMode: 'class',
     safelist: require('./tailwind.safelist.storefront.cjs'),
     content: [
         "./resources/**/*.blade.php",

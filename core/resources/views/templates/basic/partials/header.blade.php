@@ -1,6 +1,8 @@
 {{-- Language & currency switchers: Tailwind-only components (see resources/views/components/*-switcher.blade.php) --}}
 @php
-    $customButtonsAll = \App\Models\Frontend::where('data_keys', 'custom_buttons.element')->orderBy('id', 'asc')->get();
+    $customButtonsAll = \Illuminate\Support\Facades\Cache::remember('header_custom_buttons_v1', 1800, function() {
+        return \App\Models\Frontend::where('data_keys', 'custom_buttons.element')->orderBy('id', 'asc')->get();
+    });
     $customHeaderButtons = $customButtonsAll->filter(function ($row) {
         $dv = (array) ($row->data_values ?? []);
         return (($dv['target'] ?? '') === 'header') && ((int) ($dv['is_active'] ?? 1) === 1);
@@ -29,7 +31,9 @@
     $headerBarOrderIndex = [];
     $headerBarVisible = $headerBarDefaults;
     $isUserProfileHome = request()->routeIs('user.home') || request()->is('user');
-    $headerLayout = \App\Services\HomepageLayoutService::getOrderedSections();
+    $headerLayout = \Illuminate\Support\Facades\Cache::remember('homepage_layout_sections_v1', 1800, function() {
+        return \App\Services\HomepageLayoutService::getOrderedSections();
+    });
     foreach ($headerLayout as $layoutIndex => $layoutSlot) {
         $layoutId = (string) ($layoutSlot['id'] ?? '');
         if (!array_key_exists($layoutId, $headerBarDefaults)) {
@@ -206,478 +210,12 @@
     $currentLangFlagCode = $isoFlagMap[strtolower($currentLangCode)] ?? 'us';
 @endphp
 
-<style>
-    .stayl-fixed-master, 
-    .stayl-announcement-bar {
-        overflow: visible !important;
-    }
-    /* Robust Hover Trigger Fix */
-    .group:hover #langMenu, 
-    .group:hover #currencyMenu {
-        display: block !important;
-    }
-    #langMenu, #currencyMenu {
-        z-index: 10000 !important;
-    }
-    
-    /* Premium Header Updates */
-    .stayl-search-pill-container {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-    }
-    .stayl-search-pill-wrapper {
-        position: relative;
-        flex: 1;
-        display: flex;
-        align-items: center;
-    }
-    .stayl-search-container--desktop {
-        display: flex;
-        flex: 0 1 750px;
-        margin: 0;
-        position: relative;
-        justify-content: center;
-    }
-    .stayl-header-side {
-        flex: 1;
-        display: flex;
-    }
-    .stayl-header-side--left { justify-content: flex-start; }
-    .stayl-header-side--right { justify-content: flex-end; }
-
-    @media (max-width: 1023px) {
-        .stayl-search-container--desktop {
-            display: none !important;
-        }
-    }
-    .stayl-search-inner-wrap {
-        width: 100%;
-        position: relative;
-    }
-    .stayl-search-pill-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-        flex: 1;
-        width: 100%;
-    }
-    .stayl-search-pill--premium {
-        height: 48px;
-        width: 100% !important;
-        padding-left: 20px;
-        padding-right: 90px;
-        font-size: 14px;
-        font-weight: 500;
-        border-radius: 9999px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: var(--stayl-search-bg, #f8fafc);
-        border: 1px solid var(--stayl-search-border, #e2e8f0);
-        color: var(--stayl-search-text, #1e293b);
-    }
-    body.dark-mode .stayl-search-pill--premium {
-        --stayl-search-bg: rgba(255, 255, 255, 0.05);
-        --stayl-search-border: rgba(255, 255, 255, 0.1);
-        --stayl-search-text: #f8fafc;
-        backdrop-filter: blur(12px);
-    }
-    .stayl-search-pill--premium:focus {
-        background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
-        border-color: #0ea5e9;
-    }
-    body.dark-mode .stayl-search-pill--premium:focus {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: #38bdf8;
-    }
-    .stayl-search-icons-inner {
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        gap: 0;
-        z-index: 10;
-    }
-    .stayl-search-icon-btn {
-        height: 40px;
-        width: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--stayl-search-icon-color, #64748b);
-        border-radius: 50%;
-        background: transparent;
-        transition: all 0.2s ease;
-    }
-    body.dark-mode .stayl-search-icon-btn {
-        --stayl-search-icon-color: #cbd5e1;
-    }
-    .stayl-search-icon-btn:hover {
-        background: rgba(14, 165, 233, 0.08);
-        color: #0ea5e9;
-    }
-    .stayl-search-icon-btn.listening {
-        color: #ef4444 !important;
-        background: rgba(239, 68, 68, 0.1) !important;
-        animation: staylPulseRed 1.5s infinite;
-    }
-    @keyframes staylPulseRed {
-        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-    .stayl-scan-btn {
-        width: 48px;
-        height: 48px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--stayl-scan-bg, transparent);
-        border: 2px solid var(--stayl-scan-border, #e2e8f0);
-        border-radius: 12px;
-        color: var(--stayl-scan-icon-color, #475569);
-        transition: all 0.3s ease;
-    }
-    body.dark-mode .stayl-scan-btn {
-        --stayl-scan-border: rgba(255,255,255,0.15);
-        --stayl-scan-icon-color: #f1f5f9;
-        --stayl-scan-bg: rgba(255,255,255,0.03);
-    }
-    .stayl-scan-btn:hover {
-        background: var(--stayl-color-primary, #0ea5e9);
-        color: #ffffff;
-        border-color: var(--stayl-color-primary, #0ea5e9);
-        transform: translateY(-1px);
-    }
-    
-    /* Lens Popover Card */
-    .stayl-lens-card {
-        position: absolute;
-        top: calc(100% + 12px);
-        right: 0;
-        width: 260px;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(226, 232, 240, 0.9);
-        border-radius: 20px;
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.05);
-        padding: 16px;
-        z-index: 10001;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .stayl-lens-card.is-active {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-    .dark-mode .stayl-lens-card {
-        background: rgba(15, 23, 42, 0.98);
-        border-color: rgba(51, 65, 85, 0.9);
-    }
-
-    /* Premium Camera Modal */
-    .stayl-camera-modal {
-        position: fixed;
-        inset: 0;
-        z-index: 100050;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-    }
-    .stayl-camera-modal.is-active {
-        opacity: 1;
-        visibility: visible;
-    }
-    .stayl-camera-modal__backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(8px);
-    }
-    .stayl-camera-modal__dialog {
-        position: relative;
-        width: 90%;
-        max-width: 600px;
-        background: #000;
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255,255,255,0.1);
-        transform: scale(0.95);
-        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .stayl-camera-modal.is-active .stayl-camera-modal__dialog {
-        transform: scale(1);
-    }
-    .stayl-camera-modal__video {
-        width: 100%;
-        aspect-ratio: 4/3;
-        object-fit: cover;
-        background: #111;
-    }
-    .stayl-camera-modal__actions {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        padding: 24px;
-        background: #111;
-    }
-    .stayl-camera-modal__btn {
-        padding: 12px 28px;
-        border-radius: 99px;
-        font-weight: 700;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-    .stayl-camera-modal__btn--primary {
-        background: #0ea5e9;
-        color: white;
-    }
-    .stayl-camera-modal__btn--primary:hover {
-        background: #0284c7;
-        transform: scale(1.05);
-    }
-    #staylCameraCloseBtn {
-        background: rgba(255,255,255,0.1);
-        color: white;
-    }
-
-    /* Advanced Search Results Cards */
-    .glass-search-results {
-        max-height: 80vh;
-        overflow-y: auto;
-        padding: 12px;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(0,0,0,0.1) transparent;
-    }
-    .glass-search-result-group-title {
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: #94a3b8;
-        padding: 16px 12px 8px;
-    }
-    .glass-search-card {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 12px;
-        border-radius: 16px;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        margin-bottom: 4px;
-        border: 1px solid transparent;
-        background: transparent;
-    }
-    .glass-search-card:hover, .glass-search-result-focused {
-        background: #f8fafc;
-        border-color: #e2e8f0;
-        transform: translateX(4px);
-    }
-    .dark-mode .glass-search-card:hover, .dark-mode .glass-search-result-focused {
-        background: rgba(255,255,255,0.05);
-        border-color: rgba(255,255,255,0.1);
-    }
-    .glass-search-card-img {
-        width: 56px;
-        height: 56px;
-        border-radius: 12px;
-        object-fit: cover;
-        background: #f1f5f9;
-        flex-shrink: 0;
-    }
-    .glass-search-card-info {
-        flex: 1;
-        min-width: 0;
-    }
-    .glass-search-card-name {
-        font-weight: 700;
-        font-size: 14px;
-        color: #1e293b;
-        margin-bottom: 2px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .dark-mode .glass-search-card-name { color: #f1f5f9; }
-    .glass-search-card-meta {
-        font-size: 12px;
-        color: #64748b;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .glass-search-card-price {
-        font-weight: 800;
-        color: #0ea5e9;
-        font-size: 14px;
-        margin-top: 2px;
-    }
-    .glass-search-tag {
-        font-size: 10px;
-        font-weight: 800;
-        padding: 2px 8px;
-        border-radius: 6px;
-        background: #f1f5f9;
-        color: #64748b;
-        text-transform: uppercase;
-    }
-    .dark-mode .glass-search-tag { background: rgba(255,255,255,0.1); color: #94a3b8; }
-    .dark-mode .stayl-lens-card {
-        background: rgba(15, 23, 42, 0.95);
-        border-color: rgba(51, 65, 85, 0.8);
-    }
-    .stayl-lens-option {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-        padding: 10px 14px;
-        border-radius: 12px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #334155;
-        transition: all 0.2s;
-        border: 1px solid transparent;
-        background: transparent;
-    }
-    .dark-mode .stayl-lens-option {
-        color: #e2e8f0;
-    }
-    .stayl-lens-option:hover {
-        background: #f8fafc;
-        border-color: #e2e8f0;
-        color: var(--stayl-color-primary, #0ea5e9);
-    }
-    .dark-mode .stayl-lens-option:hover {
-        background: #1e293b;
-        border-color: #334155;
-    }
-    .stayl-lens-option svg {
-        flex-shrink: 0;
-        color: #94a3b8;
-    }
-    .stayl-lens-option:hover svg {
-        color: var(--stayl-color-primary, #0ea5e9);
-    }
-
-    .voice-pulse {
-        animation: stayl-pulse 1.5s infinite;
-    }
-    @keyframes stayl-pulse {
-        0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
-    }
-    .stayl-action-grid {
-        display: flex;
-        align-items: center;
-        gap: clamp(12px, 2vw, 28px);
-        flex-shrink: 0;
-    }
-    .stayl-action-item {
-        position: relative;
-        color: var(--stayl-header-icon-color, #334155);
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-    }
-    body.dark-mode .stayl-action-item {
-        --stayl-header-icon-color: #f1f5f9;
-    }
-    .stayl-action-item:hover {
-        color: var(--stayl-color-primary, #0ea5e9);
-        transform: translateY(-2px);
-    }
-    .stayl-badge-premium {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        background: #ef4444;
-        color: white;
-        font-size: 10px;
-        font-weight: 700;
-        height: 18px;
-        width: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    body.dark-mode .stayl-badge-premium {
-        border-color: #030712;
-    }
-    .stayl-action-item:hover {
-        color: var(--stayl-color-primary, #38bdf8);
-        transform: translateY(-2px);
-    }
-    
-    /* Voice Status Indicator */
-    .stayl-voice-status-indicator {
-        position: absolute;
-        bottom: -25px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--stayl-color-primary, #0ea5e9);
-        background: white;
-        padding: 2px 10px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        opacity: 0;
-        pointer-events: none;
-        transition: all 0.3s ease;
-        z-index: 50;
-        white-space: nowrap;
-    }
-    .stayl-voice-status-indicator.is-visible {
-        opacity: 1;
-        bottom: -32px;
-    }
-    body.dark-mode .stayl-voice-status-indicator {
-        background: #1e293b;
-        border: 1px solid #334155;
-    }
-
-    .stayl-nav-link-premium {
-        color: var(--stayl-text-main, #334155);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-size: 12px;
-        transition: all 0.3s ease;
-    }
-    body.dark-mode .stayl-nav-link-premium {
-        color: #cbd5e1;
-    }
-    .stayl-nav-link-premium:hover {
-        color: var(--stayl-color-primary, #0ea5e9);
-    }
-
-    /* 
-       STRICT DIRECTIVE: HEADER STICKY-ANIMATION 
-       Logic is now centralized in stayl-elite-core.css and simplified JS.
-       This prevents conflicts and ensures premium performance.
-    */
-    body {
-        transition: padding-top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-</style>
+@php
+    // Caching Header Appearance for high performance
+    $headerAppearanceSync = \Illuminate\Support\Facades\Cache::remember('header_appearance_cfg', 1800, function() use ($headerControl) {
+        return (array) ($headerControl['appearance'] ?? []);
+    });
+@endphp
 
 @php
     // Admin Control & Database Sync: Each bar wrapped in visibility check
@@ -718,6 +256,7 @@
                         </svg>
                         <span class="stayl-cod-text">{{ __($headerCodNoticeText) }}</span>
                     </span>
+                    
                 </div>
 
                 <!-- Middle Section: Comprehensive High-Fidelity Weather (Stability First) -->
@@ -878,8 +417,10 @@
                                                 : (str_contains($platformLower, 'ios') || str_contains($platformLower, 'iphone') || str_contains($platformLower, 'apple') || str_contains($platformLower, 'mac') ? 'apple'
                                                     : ((str_contains($platformLower, 'windows') || str_contains($platformLower, 'desktop') || str_contains($platformLower, 'pc') || str_contains($platformLower, 'web')) ? 'desktop'
                                                         : (str_contains($platformLower, 'linux') ? 'linux' : 'mobile')));
+                                            $appExt = $itemFile !== '' ? pathinfo($itemFile, PATHINFO_EXTENSION) : 'apk';
+                                            $downloadName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $itemPlatform) . '_StayLBD.' . $appExt;
                                         @endphp
-                                        <a href="{{ $itemHref }}" class="stayl-app-item" @if($itemFile !== '') download @endif
+                                        <a href="{{ $itemHref }}" class="stayl-app-item" @if($itemFile !== '') download="{{ $downloadName }}" @endif
                                             target="_blank" rel="noopener">
                                             <span class="stayl-app-item__icon">
                                                 @if($itemIcon !== '')
@@ -943,7 +484,7 @@
                         <a href="{{ $sellerAccountEnabled ? route('seller.apply') : 'javascript:void(0)' }}"
                             @if(!$sellerAccountEnabled) onclick="openSellerModal()" @endif
                             class="stayl-seller-btn stayl-seller-btn--top border-0 bg-transparent text-white font-bold opacity-90 hover:opacity-100">
-                            {{ __($headerTopCfg['seller_text'] ?? 'BECOME A SELLER') }}
+                            {{ __('SELLER') }}
                         </a>
                     @endif
                     @foreach($topCustomButtons as $tbtn)
@@ -989,8 +530,8 @@
 
     {{-- Row 1: The Main Action Bar --}}
     @if($isMainVisible)
-        <div class="stayl-top-bar stayl-dynamic-order bg-white dark:bg-slate-950" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
-            <div class="stayl-wrap flex items-center justify-between gap-4 py-3 lg:py-5">
+        <div class="stayl-top-bar stayl-dynamic-order" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
+            <div class="stayl-wrap flex items-center justify-between gap-4 py-2 lg:py-3">
                 {{-- Logo (Left) --}}
                 <div class="stayl-header-side stayl-header-side--left">
                     <a href="{{ route('home') }}" class="block">
@@ -1071,7 +612,7 @@
                         </div>
                         
                         {{-- AJAX Search Results Container (Desktop) --}}
-                        <div id="searchResults" class="glass-search-results absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[9999] overflow-hidden max-h-[80vh] overflow-y-auto">
+                        <div id="searchResults" class="glass-search-results absolute top-full left-0 right-0 mt-2 rounded-2xl shadow-2xl z-[9999] overflow-hidden max-h-[80vh] overflow-y-auto">
                             <div class="stayl-search-results-inner p-4">
                                 {{-- Recent/Trending section (visible initially) --}}
                                 <div id="staylSearchDiscovery" class="stayl-search-section">
@@ -1108,7 +649,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="stayl-search-results-footer bg-slate-50 dark:bg-slate-800/50 p-3 text-center border-t border-slate-100 dark:border-slate-800">
+                            <div class="stayl-search-results-footer p-3 text-center border-t">
                                 <a href="javascript:void(0)" id="staylViewAllSearch" class="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline">@lang('View All Results')</a>
                             </div>
                         </div>
@@ -1218,7 +759,7 @@
 
     {{-- Row 2: Secondary Nav Bar --}}
     @if($isMenuVisible)
-        <div class="stayl-yellow-bar stayl-dynamic-order bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_menu'] ?? 3 }};">
+        <div class="stayl-yellow-bar stayl-dynamic-order border-b border-slate-200 dark:border-slate-800" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_menu'] ?? 3 }};">
             <div class="stayl-wrap">
                 <nav class="stayl-nav-flex" style="--stayl-nav-gap: clamp(12px, 1.5vw, 24px);">
                     @if(!empty($headerMenuCfg['show_sidebar_trigger']))
@@ -1338,7 +879,7 @@
                     <a href="{{ $sellerAccountEnabled ? route('seller.apply') : 'javascript:void(0)' }}" 
                         @if(!$sellerAccountEnabled) onclick="openSellerModal()" @endif
                         class="stayl-seller-btn text-[12px] font-bold tracking-wide uppercase bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white transition-colors duration-300 rounded-md px-4 py-2 flex items-center gap-2">
-                        {{ __($headerMenuCfg['seller_text'] ?? 'BECOME A SELLER') }}
+                        {{ __('SELLER') }}
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                             <polyline points="12 5 19 12 12 19"></polyline>

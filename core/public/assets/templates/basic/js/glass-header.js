@@ -423,16 +423,123 @@
         const sunIcon = document.getElementById('themeIconSun');
         const moonIcon = document.getElementById('themeIconMoon');
         const body = document.body;
+        const html = document.documentElement;
         if (!themeBtn) return;
 
         themeBtn.addEventListener('click', () => {
+            // Lock transitions globally for an instant switch
+            html.classList.add('theme-switching-fast');
+            
             body.classList.toggle('dark-mode');
+            html.classList.toggle('dark'); // Sync with Tailwind
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('stayl-theme', isDark ? 'dark' : 'light');
             
             if (sunIcon) sunIcon.classList.toggle('hidden', !isDark);
             if (moonIcon) moonIcon.classList.toggle('hidden', isDark);
+            
+            // Unlock transitions immediately after render
+            setTimeout(() => {
+                html.classList.remove('theme-switching-fast');
+            }, 50);
         });
+    }
+
+    function setupThemeToggle() {
+        // ... (unchanged content handled automatically if I just replace after)
+    }
+    
+    // =========================================================================
+    // Elite Live Environment System (Location & Weather)
+    // =========================================================================
+    async function initLiveEnvironment() {
+        const locationContainer = document.getElementById('stayl-live-location');
+        const weatherContainer = document.getElementById('stayl-live-weather');
+        
+        if (!locationContainer || !weatherContainer) return;
+        
+        const locText = locationContainer.querySelector('.stayl-location-text');
+        const weatherSvg = document.getElementById('stayl-weather-svg');
+        const weatherText = weatherContainer.querySelector('.stayl-weather-text');
+        
+        // Cache data for 30 minutes to ensure instant load on navigation
+        const cachedEnv = sessionStorage.getItem('stayl_live_env_v2');
+        const now = new Date().getTime();
+        
+        if (cachedEnv) {
+            const data = JSON.parse(cachedEnv);
+            if (now - data.timestamp < 1800000) { // 30 mins
+                renderEnvironment(data.city, data.temp, data.weatherCode);
+                return;
+            }
+        }
+        
+        try {
+            // Step 1: Fast IP Geolocation
+            const geoRes = await fetch('https://ipapi.co/json/');
+            if (!geoRes.ok) throw new Error('Geo failed');
+            const geoData = await geoRes.json();
+            
+            const city = geoData.city || geoData.region || 'Unknown Location';
+            const lat = geoData.latitude;
+            const lon = geoData.longitude;
+            
+            // Step 2: Open-Meteo Weather (No API Key Required, Fast, Accurate)
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            if (!weatherRes.ok) throw new Error('Weather failed');
+            const weatherData = await weatherRes.json();
+            
+            const temp = Math.round(weatherData.current_weather.temperature);
+            const weatherCode = weatherData.current_weather.weathercode;
+            
+            const finalData = {
+                city, temp, weatherCode, timestamp: now
+            };
+            
+            sessionStorage.setItem('stayl_live_env_v2', JSON.stringify(finalData));
+            renderEnvironment(city, temp, weatherCode);
+            
+        } catch (error) {
+            console.error('Stayl Live Env Error:', error);
+            if (locText) locText.textContent = 'Location Unavailable';
+            if (weatherText) weatherText.textContent = '--°C';
+        }
+        
+        function renderEnvironment(city, temp, code) {
+            if (locText) {
+                locText.textContent = city;
+                locText.parentElement.title = `Current location: ${city}`;
+            }
+            if (weatherText) {
+                // WMO Weather interpretation codes (WW)
+                // 0: Clear sky
+                // 1, 2, 3: Mainly clear, partly cloudy, and overcast
+                // 45, 48: Fog
+                // 51-67: Drizzle / Rain
+                // 71-77: Snow
+                // 95-99: Thunderstorm
+                
+                let desc = 'Clear';
+                let icon = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+                
+                if (code >= 1 && code <= 3) {
+                    desc = 'Cloudy';
+                    icon = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`;
+                } else if (code >= 51 && code <= 67) {
+                    desc = 'Rainy';
+                    icon = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-400"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="M16 23v-2"/><path d="M8 23v-2"/><path d="M12 23v-2"/></svg>`;
+                } else if (code >= 71 && code <= 77) {
+                    desc = 'Snowy';
+                    icon = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m8 15 4 4 4-4"/><path d="M12 15v8"/></svg>`;
+                } else if (code >= 95) {
+                    desc = 'Stormy';
+                    icon = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m13 13-3 5h4l-3 5"/></svg>`;
+                }
+                
+                weatherText.innerHTML = `<span class="font-bold text-white text-[13px] mr-1">${temp}°C</span> <span class="opacity-80">${desc}</span>`;
+                if (weatherSvg) weatherSvg.innerHTML = icon;
+            }
+        }
     }
 
     function setupDropdownFallbacks() {
@@ -1188,6 +1295,7 @@
         setupHeaderScroll();
         setupThemeToggle();
         setupDropdownFallbacks();
+        if (typeof initLiveEnvironment === 'function') initLiveEnvironment();
         
         // Show filter sidebar when search is performed
         const searchForm = document.querySelector('#universalSearchForm');

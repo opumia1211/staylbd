@@ -410,7 +410,7 @@ class FooterBuilderController extends Controller
             $values['image'] = fileUploader($request->file('image'), $path, null, $values['image'] ?? null);
         }
         if ($request->hasFile('app_file')) {
-            $values['app_file'] = fileUploader($request->file('app_file'), $appFilePath, null, $values['app_file'] ?? null);
+            $values['app_file'] = fileUploader($request->file('app_file'), fileManager()->appPromotionFile()->path, null, $values['app_file'] ?? null);
         }
         $values['platform'] = trim((string) $request->input('platform', ''));
         $values['name'] = trim((string) $request->input('name', ''));

@@ -230,7 +230,7 @@ class FileManager
     {
         if (!$location) $location = $this->path;
         if (file_exists($location)) return true;
-        return mkdir($location, 0755, true);
+        \Illuminate\Support\Facades\Log::error("MKDIR FAILED ON: " . $location); return mkdir($location, 0755, true);
     }
 
     /**
