@@ -471,28 +471,47 @@ body.dark-mode .stayl-yellow-bar {`n    height: var(--stayl-h2);`n    min-height
 .stayl-top-bar,
 .stayl-yellow-bar,
 .stayl-fixed-master {
-    will-change: height, min-height, max-height, opacity, transform;
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.4s ease, 
+                box-shadow 0.4s ease,
+                background 0.4s ease;
+    will-change: transform, opacity;
 }
 
-.stayl-fixed-master.is-scrolled-down .stayl-announcement-bar,
+.stayl-top-bar {
+    position: relative;
+    z-index: 20;
+}
+
+.stayl-yellow-bar {
+    position: relative;
+    z-index: 10;
+}
+
+.stayl-fixed-master.is-scrolled-down {
+    transform: translateY(calc(-1 * var(--stayl-h0)));
+}
+
+.stayl-fixed-master.is-scrolled-down .stayl-announcement-bar {
+    opacity: 0;
+    visibility: hidden;
+}
+
 .stayl-fixed-master.is-scrolled-down .stayl-yellow-bar {
-    max-height: 0 !important;
-    min-height: 0 !important;
-    height: 0 !important;
-    opacity: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .stayl-fixed-master.is-scrolled-down .stayl-top-bar {
-    opacity: 1 !important;
-    visibility: visible !important;
-    box-shadow: 0 12px 48px rgba(15, 23, 42, 0.18);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    background: #ffffff !important;
+}
+
+body.dark-mode .stayl-fixed-master.is-scrolled-down .stayl-top-bar {
+    background: #0f172a !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .stayl-announcement-bar .stayl-wrap {

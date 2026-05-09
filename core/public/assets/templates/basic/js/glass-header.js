@@ -384,37 +384,40 @@
         const headerMaster = document.querySelector('.stayl-fixed-master');
         if (!header && !headerMaster) return;
 
-        let lastScroll = window.pageYOffset;
-        const scrollThreshold = 40;
+        let lastScroll = window.scrollY || document.documentElement.scrollTop;
+        const scrollThreshold = 10;
+        let isTicking = false;
 
         window.addEventListener('scroll', function() {
-            const currentScroll = window.pageYOffset;
-            
-            // Basic sticky/scrolled classes
-            if (header) {
-                if (currentScroll > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
+            if (!isTicking) {
+                window.requestAnimationFrame(function() {
+                    const currentScroll = window.scrollY || document.documentElement.scrollTop;
+                    
+                    // Basic sticky/scrolled classes for the simple header if it exists
+                    if (header) {
+                        if (currentScroll > 50) header.classList.add('scrolled');
+                        else header.classList.remove('scrolled');
 
-                if (currentScroll > 140) {
-                    header.classList.add('is-sticky');
-                } else {
-                    header.classList.remove('is-sticky');
-                }
+                        if (currentScroll > 140) header.classList.add('is-sticky');
+                        else header.classList.remove('is-sticky');
+                    }
+
+                    // Advanced "Stayl Fixed Master" smart-sticky logic
+                    if (headerMaster) {
+                        if (currentScroll > lastScroll && currentScroll > 80) {
+                            // Scrolling DOWN: Hide non-essential bars
+                            headerMaster.classList.add('is-scrolled-down');
+                        } else if (currentScroll < lastScroll || currentScroll <= 20) {
+                            // Scrolling UP: Reveal all bars
+                            headerMaster.classList.remove('is-scrolled-down');
+                        }
+                    }
+
+                    lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+                    isTicking = false;
+                });
+                isTicking = true;
             }
-
-            // Advanced "Stayl Fixed Master" collapse logic
-            if (headerMaster) {
-                if (currentScroll > scrollThreshold) {
-                    headerMaster.classList.add('is-scrolled-down');
-                } else {
-                    headerMaster.classList.remove('is-scrolled-down');
-                }
-            }
-
-            lastScroll = currentScroll;
         }, { passive: true });
     }
 
