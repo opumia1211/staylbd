@@ -1,7 +1,7 @@
-<div class="d-flex mb-30 flex-wrap gap-3 justify-content-between align-items-center">
+<div class="d-flex mb-4 flex-wrap gap-3 justify-content-between align-items-center">
     <div class="d-flex flex-column gap-1 min-w-0">
         @if(!empty($breadcrumb) && is_array($breadcrumb))
-            <nav aria-label="breadcrumb" class="admin-breadcrumb-nav">
+            <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 flex-wrap">
                     @foreach($breadcrumb as $i => $item)
                         @php
@@ -13,15 +13,15 @@
                             @if($active || !$url)
                                 <span class="{{ $active ? 'fw-semibold' : 'text-muted' }}">{{ __($label) }}</span>
                             @else
-                                <a href="{{ $url }}" class="text-decoration-none">{{ __($label) }}</a>
+                                <a href="{{ $url }}" class="text-decoration-none text-muted">{{ __($label) }}</a>
                             @endif
                         </li>
                     @endforeach
                 </ol>
             </nav>
-            <h6 class="page-title mb-0 mt-1">{{ __($pageTitle ?? 'Admin') }}</h6>
+            <h5 class="fw-bold mb-0 mt-1">{{ __($pageTitle ?? 'Admin') }}</h5>
         @else
-            <h6 class="page-title mb-0">{{ __($pageTitle ?? 'Admin') }}</h6>
+            <h5 class="fw-bold mb-0">{{ __($pageTitle ?? 'Admin') }}</h5>
         @endif
     </div>
     <div class="d-flex flex-wrap justify-content-end gap-2 align-items-center breadcrumb-plugins">

@@ -19,7 +19,7 @@ class FinancialService
     {
         $revenue = Order::whereBetween('created_at', [$start, $end])
             ->where('payment_status', 1)
-            ->sum('total_amount');
+            ->sum('total');
             
         // Expenses: Payment gateway charges + known operating costs
         $gatewayCharges = Deposit::whereBetween('created_at', [$start, $end])

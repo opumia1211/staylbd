@@ -11,135 +11,156 @@
     $isOwner = $currentAdmin && method_exists($currentAdmin, 'isOwner') && $currentAdmin->isOwner();
     $canResetPassword = $isOwner && ($admin->role ?? 'admin') !== 'owner' && $admin->id != ($currentAdmin->id ?? null);
 @endphp
+
 @section('panel')
-    <div class="row mb-2">
+<div class="container-xxl flex-grow-1 container-p-y p-0">
+    {{-- Breadcrumbs & Header --}}
+    <div class="row align-items-center mb-4">
         <div class="col">
-            <nav aria-label="breadcrumb" class="small"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="{{ route('admin.setting.admin.index') }}">@lang('Admin Management')</a></li><li class="breadcrumb-item active">@lang('Edit')</li></ol></nav>
-            <h5 class="mb-0 mt-1">@lang('Edit') — {{ $admin->name ?? $admin->username }}</h5>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-style1 mb-1">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.setting.admin.index') }}">@lang('Admin Management')</a></li>
+                    <li class="breadcrumb-item active">@lang('Edit Administrator')</li>
+                </ol>
+            </nav>
+            <h4 class="mb-0 fw-bold text-dark">@lang('Update Details') — {{ $admin->name ?? $admin->username }}</h4>
         </div>
-        <div class="col-auto"><a href="{{ route('admin.setting.admin.index') }}" class="btn btn-outline-secondary btn-sm"><i class="las la-arrow-left me-1"></i>@lang('Back')</a></div>
+        <div class="col-auto">
+            <a href="{{ route('admin.setting.admin.index') }}" class="btn btn-label-secondary btn-sm"><i class="las la-arrow-left me-1"></i>@lang('Back to List')</a>
+        </div>
     </div>
 
     @if(session('reset_admin_credentials'))
     @php $cred = session('reset_admin_credentials'); @endphp
-    <div class="alert alert-info py-2 mb-2 small">
-        <strong>@lang('New password'):</strong> <code id="editResetPassword">{{ $cred['password'] ?? '—' }}</code>
-        <button type="button" class="btn btn-sm btn-outline-secondary py-0 ms-1" onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('editResetPassword').innerText)">@lang('Copy')</button>
+    <div class="alert alert-info border-0 shadow-sm mb-4 d-flex align-items-center" role="alert">
+        <div class="avatar bg-info text-white me-3 rounded-circle p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="las la-key"></i>
+        </div>
+        <div>
+            <h6 class="alert-heading mb-1 text-info fw-bold">@lang('Password Reset Successful')</h6>
+            <p class="mb-0 small">
+                <strong>@lang('New Password'):</strong> <code class="bg-white px-2 py-0 rounded" id="editResetPass">{{ $cred['password'] }}</code>
+                <button type="button" class="btn btn-sm btn-link py-0 text-info fw-bold" onclick="navigator.clipboard.writeText('{{ $cred['password'] }}')">@lang('Copy')</button>
+            </p>
+        </div>
     </div>
     @endif
 
-    <div class="card border shadow-sm mb-2">
-        <div class="card-header py-2 px-3 bg-light"><strong class="small">@lang('Update Admin')</strong></div>
-        <div class="card-body p-3">
-            @if(!$hasSections && $showSectionsUI)
-            <div class="alert alert-info py-2 mb-2 small">@lang('Run') <code>php artisan migrate</code> @lang('to save section access.')</div>
-            @endif
-            <form method="POST" action="{{ route('admin.setting.admin.update', $admin->id) }}" id="adminEditForm">
-                @csrf
-                <div class="row g-2 mb-2">
-                    <div class="col-6 col-md-3"><input type="text" class="form-control form-control-sm" name="name" value="{{ old('name', $admin->name) }}" required placeholder="@lang('Name') *"></div>
-                    <div class="col-6 col-md-3"><input type="text" class="form-control form-control-sm" name="username" value="{{ old('username', $admin->username) }}" required placeholder="@lang('Username') *"></div>
-                    <div class="col-6 col-md-3"><input type="email" class="form-control form-control-sm" name="email" value="{{ old('email', $admin->email) }}" required placeholder="@lang('Email') *"></div>
-                    @if($hasMobile)<div class="col-6 col-md-3"><input type="text" class="form-control form-control-sm" name="mobile" value="{{ old('mobile', $admin->mobile) }}" placeholder="@lang('Phone')"></div>@endif
+    <div class="row g-4">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header border-bottom py-3 px-4 bg-white">
+                    <h6 class="mb-0 fw-bold"><i class="las la-user-edit me-2 text-primary"></i>@lang('Account Information')</h6>
                 </div>
-                @if(\Illuminate\Support\Facades\Schema::hasColumn('admins', 'admin_notes'))
-                <div class="mb-2"><textarea class="form-control form-control-sm" name="admin_notes" rows="1" maxlength="500" placeholder="@lang('Notes')">{{ old('admin_notes', $admin->admin_notes ?? '') }}</textarea></div>
-                @endif
-                <div class="row g-2 mb-2">
-                    <div class="col-6 col-md-2"><input type="password" class="form-control form-control-sm" name="password" id="editPassword" placeholder="@lang('New password')"></div>
-                    <div class="col-6 col-md-2"><input type="password" class="form-control form-control-sm" name="password_confirmation" id="editPasswordConfirm" placeholder="@lang('Confirm')"></div>
-                    <div class="col-auto"><label class="form-check-label small"><input type="checkbox" id="showPasswordToggle" class="form-check-input"> @lang('Show')</label></div>
-                    @if($canChangeRole ?? false)
-                    <div class="col-6 col-md-2"><select class="form-select form-select-sm" name="role"><option value="admin" @selected(($admin->role ?? 'admin') === 'admin')>Admin</option><option value="super_admin" @selected(($admin->role ?? '') === 'super_admin')>Super Admin</option></select></div>
-                    @endif
-                </div>
-                @error('password')<span class="text-danger small">{{ $message }}</span>@enderror
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ route('admin.setting.admin.update', $admin->id) }}" id="adminEditForm">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">@lang('Full Name')</label>
+                                <input type="text" class="form-control" name="name" value="{{ old('name', $admin->name) }}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">@lang('Username')</label>
+                                <input type="text" class="form-control" name="username" value="{{ old('username', $admin->username) }}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">@lang('Email Address')</label>
+                                <input type="email" class="form-control" name="email" value="{{ old('email', $admin->email) }}" required>
+                            </div>
+                            @if($hasMobile)
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">@lang('Phone Number')</label>
+                                <input type="text" class="form-control" name="mobile" value="{{ old('mobile', $admin->mobile) }}">
+                            </div>
+                            @endif
 
-                {{-- Access sections: same as Add Admin — 3 columns, selectable checkboxes --}}
-                @if($showSectionsUI)
-                <div class="mt-3 pt-3 border-top">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-                        <label class="fw-semibold text-dark mb-0">@lang('Which sections can this admin access?') <span class="text-muted fw-normal small">(@lang('নতুন ফিচার যোগ করলে এখানে অটো যুক্ত হবে — নিচে লিংক দিয়ে সরাসরি যেতে পারবেন')</span></label>
-                        <span class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-edit-sections="all">@lang('All')</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-edit-sections="none">@lang('None')</button>
-                        </span>
-                    </div>
-                    @if(($admin->role ?? '') === 'owner')
-                    <p class="small text-muted mb-2">@lang('Owner has full access to all sections.')</p>
-                    @elseif(!($canEditSections ?? true))
-                    <p class="small text-warning mb-2">@lang('Only the project Owner can change section access.')</p>
-                    @endif
-                    <div class="admin-sections-edit-box border rounded p-3 bg-white">
-                        <div class="row g-2">
-                            @foreach($adminSections as $key => $label)
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="form-check d-flex align-items-center gap-2">
-                                    @if(($admin->role ?? '') === 'owner')
-                                    <input type="checkbox" class="form-check-input mt-0" checked disabled title="@lang('Owner has all')">
-                                    <span class="form-check-label text-dark fw-semibold">{{ __($label) }}</span>
-                                    @else
-                                    <input type="checkbox" class="form-check-input mt-0 edit-section-cb" name="allowed_sections[]" value="{{ $key }}" id="edit_sec_{{ $key }}" {{ in_array($key, is_array(old('allowed_sections')) ? old('allowed_sections') : $allowed) ? 'checked' : '' }} @if(!($canEditSections ?? true)) disabled @endif>
-                                    <label class="form-check-label text-dark fw-semibold flex-grow-1" for="edit_sec_{{ $key }}">{{ __($label) }}</label>
-                                    @if(!empty($sectionRoutes[$key]) && \Illuminate\Support\Facades\Route::has($sectionRoutes[$key]))
-                                    <a href="{{ route($sectionRoutes[$key]) }}" class="text-primary text-decoration-none small" target="_blank" title="@lang('Open')">→</a>
-                                    @endif
-                                    @endif
+                            @if($showSectionsUI)
+                            <div class="col-12 mt-4">
+                                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                                    <div>
+                                        <h6 class="mb-0 text-dark fw-bold">@lang('Module Access Control')</h6>
+                                        <small class="text-muted">@lang('Grant or revoke access to specific administrative sections.')</small>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-label-secondary" data-edit-sections="all">@lang('Select All')</button>
+                                        <button type="button" class="btn btn-label-secondary" data-edit-sections="none">@lang('Clear All')</button>
+                                    </div>
+                                </div>
+                                
+                                @if(($admin->role ?? '') === 'owner')
+                                <div class="alert alert-label-primary border-0 mb-3">
+                                    <i class="las la-info-circle me-2"></i> @lang('Owner account has unrestricted access to all modules.')
+                                </div>
+                                @endif
+
+                                <div class="row g-3">
+                                    @foreach($adminSections as $key => $label)
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="form-check p-3 border rounded h-100 hover-bg-light transition-all">
+                                            @if(($admin->role ?? '') === 'owner')
+                                            <input type="checkbox" class="form-check-input ms-0" checked disabled>
+                                            <label class="form-check-label ms-2 fw-medium text-primary">{{ __($label) }}</label>
+                                            @else
+                                            <input class="form-check-input ms-0 edit-section-cb" type="checkbox" name="allowed_sections[]" value="{{ $key }}" id="edit_sec_{{ $key }}" {{ in_array($key, is_array(old('allowed_sections')) ? old('allowed_sections') : $allowed) ? 'checked' : '' }}>
+                                            <label class="form-check-label ms-2 fw-medium text-dark" for="edit_sec_{{ $key }}">{{ __($label) }}</label>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
-                            @endforeach
+                            @endif
+
+                            <div class="col-12 mt-4 pt-2 border-top d-flex gap-2 justify-content-end">
+                                <a href="{{ route('admin.setting.admin.index') }}" class="btn btn-label-secondary px-4">@lang('Cancel')</a>
+                                <button type="submit" class="btn btn-primary px-5 shadow-sm"><i class="las la-save me-2"></i> @lang('Update Profile')</button>
+                            </div>
                         </div>
+                    </form>
+                </div>
+            </div>
+
+            @if($canResetPassword)
+            <div class="card border-0 shadow-sm border-start border-warning border-3" id="forgotPasswordSection">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <h6 class="mb-1 fw-bold text-dark"><i class="las la-key me-2 text-warning"></i>@lang('Security: Remote Password Reset')</h6>
+                        <p class="mb-0 text-muted small">@lang('As an Owner, you can force a password reset for this administrator.')</p>
                     </div>
+                    <form method="POST" action="{{ route('admin.setting.admin.reset.password', $admin->id) }}" class="d-flex gap-2">
+                        @csrf
+                        <input type="password" class="form-control form-control-sm" name="new_password" required placeholder="@lang('New Password')" style="width: 160px;">
+                        <input type="password" class="form-control form-control-sm" name="new_password_confirmation" required placeholder="@lang('Confirm')" style="width: 160px;">
+                        <button type="submit" class="btn btn-warning btn-sm fw-bold">@lang('Reset Now')</button>
+                    </form>
                 </div>
-                @endif
-
-                <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
-                    <button type="submit" class="btn btn--primary btn-sm"><i class="las la-save me-1"></i>@lang('Update')</button>
-                    <a href="{{ route('admin.setting.admin.index') }}" class="btn btn-outline-secondary btn-sm">@lang('Cancel')</a>
-                    @if($canResetPassword)
-                    <a href="#forgotPasswordSection" class="btn btn-outline-warning btn-sm">@lang('Forgot Password')</a>
-                    @endif
-                    <a href="{{ url('/contact') }}" class="btn btn-outline-info btn-sm ms-auto" target="_blank">@lang('যোগাযোগ করুন')</a>
-                </div>
-            </form>
+            </div>
+            @endif
         </div>
     </div>
+</div>
 
-    @if($canResetPassword)
-    <div class="card border shadow-sm mb-2 border-warning" id="forgotPasswordSection">
-        <div class="card-header py-2 px-3 bg-warning bg-opacity-25"><strong class="small">@lang('Forgot Password?') (@lang('Owner only'))</strong></div>
-        <div class="card-body p-2">
-            <form method="POST" action="{{ route('admin.setting.admin.reset.password', $admin->id) }}" class="d-flex flex-wrap align-items-end gap-2">
-                @csrf
-                <input type="password" class="form-control form-control-sm" name="new_password" required placeholder="@lang('New password')" style="width:140px">
-                <input type="password" class="form-control form-control-sm" name="new_password_confirmation" required placeholder="@lang('Confirm')" style="width:140px">
-                <button type="submit" class="btn btn-warning btn-sm">@lang('Reset')</button>
-            </form>
-        </div>
-    </div>
-    @endif
+<style>
+    .breadcrumb-style1 .breadcrumb-item a { color: #8592a3; font-weight: 500; }
+    .breadcrumb-style1 .breadcrumb-item.active { color: #696cff; font-weight: 600; }
+    .bg-label-primary { background-color: #e7e7ff !important; color: #696cff !important; }
+    .bg-label-info { background-color: #d7f5fc !important; color: #03c3ec !important; }
+    .alert-label-primary { background-color: #f0f7ff; color: #696cff; }
+    .hover-bg-light:hover { background-color: #f0f7ff !important; cursor: pointer; }
+    .transition-all { transition: all 0.2s ease-in-out; }
+</style>
 @endsection
-
-@push('style')
-
-{{-- inline style moved to critical-admin.css --}}
-
-@endpush
 
 @push('script')
 <script>
-(function() {
-    var t = document.getElementById('showPasswordToggle');
-    if (t) t.addEventListener('change', function() {
-        var type = t.checked ? 'text' : 'password';
-        var p = document.getElementById('editPassword'), c = document.getElementById('editPasswordConfirm');
-        if (p) p.type = type; if (c) c.type = type;
+    $(function() {
+        $('[data-edit-sections="all"]').click(function() { $('.edit-section-cb:not([disabled])').prop('checked', true); });
+        $('[data-edit-sections="none"]').click(function() { $('.edit-section-cb:not([disabled])').prop('checked', false); });
     });
-    document.querySelectorAll('[data-edit-sections="all"]').forEach(function(btn) {
-        btn.addEventListener('click', function() { document.querySelectorAll('#adminEditForm .edit-section-cb:not([disabled])').forEach(function(c) { c.checked = true; }); });
-    });
-    document.querySelectorAll('[data-edit-sections="none"]').forEach(function(btn) {
-        btn.addEventListener('click', function() { document.querySelectorAll('#adminEditForm .edit-section-cb:not([disabled])').forEach(function(c) { c.checked = false; }); });
+</script>
+@endpush
+ent.querySelectorAll('#adminEditForm .edit-section-cb:not([disabled])').forEach(function(c) { c.checked = false; }); });
     });
 })();
 </script>

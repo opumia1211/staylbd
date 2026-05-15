@@ -1,430 +1,233 @@
 @extends('admin.layouts.app')
+
 @section('panel')
     @isset($listType)
-    @if($listType === 'active' && isset($stats))
-    {{-- Stats cards: Active Users page --}}
-    <div class="row mb-4">
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-3 bg--primary bg-opacity-10 p-2">
-                            <i class="las la-users text--primary fs-4"></i>
+    {{-- Modernized Stats Cards with Standard Sneat Alignment --}}
+    <div class="row g-6 mb-6">
+        @php
+            $stats_data = [];
+            if ($listType === 'active' && isset($stats)) {
+                $stats_data = [
+                    ['label' => __('Total Active'), 'value' => number_format($stats['total']), 'icon' => 'bx-group', 'color' => 'primary'],
+                    ['label' => __('New This Week'), 'value' => number_format($stats['new_week']), 'icon' => 'bx-user-plus', 'color' => 'success'],
+                    ['label' => __('New This Month'), 'value' => number_format($stats['new_month']), 'icon' => 'bx-calendar-plus', 'color' => 'info'],
+                    ['label' => __('With Orders'), 'value' => number_format($stats['with_orders']), 'icon' => 'bx-shopping-bag', 'color' => 'warning'],
+                ];
+            } elseif ($listType === 'banned' && isset($stats)) {
+                $stats_data = [
+                    ['label' => __('Total Banned'), 'value' => number_format($stats['total']), 'icon' => 'bx-user-x', 'color' => 'danger'],
+                    ['label' => __('Banned This Week'), 'value' => number_format($stats['recent_week']), 'icon' => 'bx-block', 'color' => 'warning'],
+                    ['label' => __('Banned This Month'), 'value' => number_format($stats['recent_month']), 'icon' => 'bx-time-five', 'color' => 'secondary'],
+                ];
+            } elseif (in_array($listType, ['emailUnverified', 'mobileUnverified']) && isset($stats)) {
+                $icon = $listType === 'emailUnverified' ? 'bx-envelope-open' : 'bx-mobile-vibration';
+                $stats_data = [
+                    ['label' => __('Total Unverified'), 'value' => number_format($stats['total']), 'icon' => $icon, 'color' => 'warning'],
+                    ['label' => __('New This Week'), 'value' => number_format($stats['new_week']), 'icon' => 'bx-user-plus', 'color' => 'info'],
+                    ['label' => __('New This Month'), 'value' => number_format($stats['new_month']), 'icon' => 'bx-calendar-plus', 'color' => 'primary'],
+                ];
+            }
+        @endphp
+
+        @foreach($stats_data as $s)
+            <div class="{{ count($stats_data) == 4 ? 'col-sm-6 col-xl-3' : 'col-sm-6 col-xl-4' }}">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div class="content-left">
+                                <span class="small fw-medium text-muted mb-1 d-block">{{ $s['label'] }}</span>
+                                <div class="d-flex align-items-end mt-1">
+                                    <h4 class="mb-0 me-2 fw-bold text-heading">{{ $s['value'] }}</h4>
+                                </div>
+                            </div>
+                            <div class="avatar avatar-md">
+                                <span class="avatar-initial rounded bg-label-{{ $s['color'] }} d-flex align-items-center justify-content-center">
+                                    <i class="icon-base bx {{ $s['icon'] }} fs-4"></i>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('Total Active')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['total']) }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-3 bg-success bg-opacity-10 p-2">
-                            <i class="las la-user-plus text-success fs-4"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('New This Week')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['new_week']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-3 bg-info bg-opacity-10 p-2">
-                            <i class="las la-calendar-plus text-info fs-4"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('New This Month')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['new_month']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-3 bg-warning bg-opacity-10 p-2">
-                            <i class="las la-shopping-cart text-warning fs-4"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('With Orders')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['with_orders']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @endforeach
     </div>
-    @endif
-    @if($listType === 'banned' && isset($stats))
-    {{-- Stats cards: Banned Users page --}}
-    <div class="row mb-4">
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-3 bg-danger bg-opacity-10 p-2">
-                            <i class="las la-user-slash text-danger fs-4"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('Total Banned')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['total']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-3 bg-warning bg-opacity-10 p-2">
-                            <i class="las la-ban text-warning fs-4"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('Banned This Week')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['recent_week']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-3 bg-secondary bg-opacity-10 p-2">
-                            <i class="las la-clock text-secondary fs-4"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('Banned This Month')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['recent_month']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
-    @if($listType === 'emailUnverified' && isset($stats))
-    {{-- Stats: Email Unverified --}}
-    <div class="row mb-4 admin-users-stats">
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3 admin-users-stats__icon-wrap admin-users-stats__icon-wrap--warning">
-                        <i class="las la-envelope-open-text fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('Total')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['total']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3 admin-users-stats__icon-wrap admin-users-stats__icon-wrap--info">
-                        <i class="las la-user-clock fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('New This Week')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['new_week']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3 admin-users-stats__icon-wrap admin-users-stats__icon-wrap--primary">
-                        <i class="las la-calendar-plus fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('New This Month')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['new_month']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
-    @if($listType === 'mobileUnverified' && isset($stats))
-    {{-- Stats: Mobile Unverified --}}
-    <div class="row mb-4 admin-users-stats">
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3 admin-users-stats__icon-wrap admin-users-stats__icon-wrap--warning">
-                        <i class="las la-mobile-alt fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('Total')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['total']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3 admin-users-stats__icon-wrap admin-users-stats__icon-wrap--info">
-                        <i class="las la-user-clock fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('New This Week')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['new_week']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body py-3 d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3 admin-users-stats__icon-wrap admin-users-stats__icon-wrap--primary">
-                        <i class="las la-calendar-plus fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">@lang('New This Month')</div>
-                        <div class="fw-bold fs-5">{{ number_format($stats['new_month']) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
     @endisset
 
-    <div class="card border-0 shadow-sm rounded-3 admin-users-card">
-        @if(isset($listType) && $listType === 'active')
-        <div class="card-header bg-transparent border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <h6 class="mb-0 fw-bold">@lang('Active Users')</h6>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <form method="get" action="{{ route('admin.users.active') }}" class="d-inline-flex flex-wrap gap-2 align-items-center admin-users-active-form">
-                    <input type="hidden" name="search" value="{{ request('search') }}">
-                    <div class="d-flex flex-wrap align-items-center gap-1 me-2">
-                        <span class="small text-muted">@lang('Quick date'):</span>
-                        <a href="{{ route('admin.users.active', array_merge(request()->only(['search', 'sort', 'per_page', 'has_orders']), ['date' => now()->subDays(7)->format('Y-m-d') . ' - ' . now()->format('Y-m-d')])) }}" class="btn btn-sm btn-outline-secondary py-0 px-2">@lang('Last 7 days')</a>
-                        <a href="{{ route('admin.users.active', array_merge(request()->only(['search', 'sort', 'per_page', 'has_orders']), ['date' => now()->subDays(30)->format('Y-m-d') . ' - ' . now()->format('Y-m-d')])) }}" class="btn btn-sm btn-outline-secondary py-0 px-2">@lang('Last 30 days')</a>
-                        <a href="{{ route('admin.users.active', array_merge(request()->only(['search', 'sort', 'per_page', 'has_orders']), ['date' => now()->startOfMonth()->format('Y-m-d') . ' - ' . now()->format('Y-m-d')])) }}" class="btn btn-sm btn-outline-secondary py-0 px-2">@lang('This month')</a>
-                        @if(request('date'))
-                        <a href="{{ route('admin.users.active', request()->only(['search', 'sort', 'per_page', 'has_orders'])) }}" class="btn btn-sm btn-outline-danger py-0 px-2">@lang('Clear date')</a>
-                        @endif
+    {{-- Users List Card --}}
+    <div class="card border-0 shadow-sm">
+        @if(isset($listType))
+        <div class="card-header border-bottom py-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-3">
+                        <span class="avatar-initial rounded bg-label-primary d-flex align-items-center justify-content-center">
+                            <i class="icon-base bx bx-user fs-4"></i>
+                        </span>
                     </div>
-                    <label class="mb-0 small text-muted">@lang('Sort'):</label>
-                    <select name="sort" class="form-select form-select-sm admin-users-filter-select" onchange="this.form.submit()">
-                        <option value="newest" {{ request('sort', 'newest') === 'newest' ? 'selected' : '' }}>@lang('Newest first')</option>
-                        <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>@lang('Oldest first')</option>
-                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>@lang('Name A-Z')</option>
-                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>@lang('Name Z-A')</option>
-                    </select>
-                    <label class="mb-0 small text-muted ms-2">@lang('Per page'):</label>
-                    <select name="per_page" class="form-select form-select-sm admin-users-filter-select" onchange="this.form.submit()" style="min-width: 4rem;">
-                        @foreach([10, 25, 50, 100] as $n)
-                        <option value="{{ $n }}" {{ (int)request('per_page', getPaginate()) === $n ? 'selected' : '' }}>{{ $n }}</option>
-                        @endforeach
-                    </select>
-                    <label class="mb-0 small text-muted ms-2">@lang('Joined'):</label>
-                    <input type="text" name="date" class="form-control form-control-sm admin-users-filter-date" placeholder="@lang('e.g. 2024-01-01 - 2024-12-31')" value="{{ request('date') }}" title="@lang('Format: YYYY-MM-DD - YYYY-MM-DD')">
-                    <label class="mb-0 small text-muted ms-2 d-flex align-items-center gap-1">
-                        <input type="checkbox" name="has_orders" value="1" {{ request('has_orders') === '1' ? 'checked' : '' }} onchange="this.form.submit()" class="form-check-input">
-                        @lang('With orders')
-                    </label>
-                    <button type="submit" class="btn btn-sm btn-outline--primary">@lang('Apply')</button>
-                </form>
-                <a href="{{ route('admin.users.active.export', request()->only(['search', 'date'])) }}" class="btn btn-sm btn-outline--success"><i class="las la-file-csv me-1"></i>@lang('Export CSV')</a>
+                    <h6 class="m-0">
+                        @if($listType === 'active') @lang('Active Customer Directory')
+                        @elseif($listType === 'banned') @lang('Banned Users List')
+                        @elseif($listType === 'emailUnverified') @lang('Email Verification Pending')
+                        @elseif($listType === 'mobileUnverified') @lang('Mobile Verification Pending')
+                        @else {{ $pageTitle }} @endif
+                    </h6>
+                </div>
+                
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <form method="get" action="{{ url()->current() }}" class="d-flex flex-wrap align-items-center gap-2">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        
+                        <div class="input-group input-group-sm w-auto">
+                            <span class="input-group-text bg-label-secondary border-end-0 d-flex align-items-center justify-content-center" style="width: 40px;"><i class="icon-base bx bx-sort-alt-2"></i></span>
+                            <select name="sort" class="form-select border-start-0 ps-1" onchange="this.form.submit()" style="min-width: 140px;">
+                                <option value="newest" {{ request('sort', 'newest') === 'newest' ? 'selected' : '' }}>@lang('Newest first')</option>
+                                <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>@lang('Oldest first')</option>
+                                <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>@lang('Name A-Z')</option>
+                                <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>@lang('Name Z-A')</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group input-group-sm w-auto">
+                            <span class="input-group-text bg-label-secondary border-end-0"><i class="icon-base bx bx-calendar"></i></span>
+                            <input type="text" name="date" class="form-control form-control-sm border-start-0 ps-1 date-range" placeholder="@lang('Join Date')" value="{{ request('date') }}" style="max-width: 180px;">
+                        </div>
+
+                        @if($listType === 'active')
+                            <div class="form-check form-check-sm mb-0">
+                                <input type="checkbox" name="has_orders" value="1" {{ request('has_orders') === '1' ? 'checked' : '' }} onchange="this.form.submit()" class="form-check-input" id="hasOrdersCheck">
+                                <label class="form-check-label small text-muted" for="hasOrdersCheck">@lang('Has Orders')</label>
+                            </div>
+                        @endif
+
+                        <button type="submit" class="btn btn-sm btn-label-primary px-3">@lang('Filter')</button>
+                        @if(request()->anyFilled(['sort', 'date', 'has_orders']))
+                            <a href="{{ url()->current() }}" class="btn btn-sm btn-label-secondary btn-icon" title="@lang('Reset')"><i class="icon-base bx bx-refresh"></i></a>
+                        @endif
+                    </form>
+                    
+                    @php
+                        $exportRoute = 'admin.users.' . $listType . '.export';
+                        if ($listType === 'emailUnverified') $exportRoute = 'admin.users.email.unverified.export';
+                        elseif ($listType === 'mobileUnverified') $exportRoute = 'admin.users.mobile.unverified.export';
+                    @endphp
+                    <a href="{{ route($exportRoute, request()->only(['search', 'date'])) }}" class="btn btn-sm btn-label-success shadow-none"><i class="icon-base bx bx-export me-1"></i>@lang('Export')</a>
+                </div>
             </div>
-        </div>
-        @endif
-        @if(isset($listType) && $listType === 'banned')
-        <div class="card-header bg-transparent border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <h6 class="mb-0 fw-bold">@lang('Banned Users')</h6>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <form method="get" action="{{ route('admin.users.banned') }}" class="d-inline-flex flex-wrap gap-2 align-items-center">
-                    <input type="hidden" name="search" value="{{ request('search') }}">
-                    <label class="mb-0 small text-muted">@lang('Sort'):</label>
-                    <select name="sort" class="form-select form-select-sm admin-users-filter-select" onchange="this.form.submit()">
-                        <option value="newest" {{ request('sort', 'newest') === 'newest' ? 'selected' : '' }}>@lang('Newest first')</option>
-                        <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>@lang('Oldest first')</option>
-                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>@lang('Name A-Z')</option>
-                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>@lang('Name Z-A')</option>
-                    </select>
-                    <label class="mb-0 small text-muted ms-2">@lang('Updated'):</label>
-                    <input type="text" name="date" class="form-control form-control-sm admin-users-filter-date" placeholder="@lang('e.g. 2024-01-01 - 2024-12-31')" value="{{ request('date') }}" title="@lang('Format: YYYY-MM-DD - YYYY-MM-DD')">
-                    <button type="submit" class="btn btn-sm btn-outline--primary">@lang('Apply')</button>
-                </form>
-                <a href="{{ route('admin.users.banned.export', request()->only(['search', 'date'])) }}" class="btn btn-sm btn-outline--success"><i class="las la-file-csv me-1"></i>@lang('Export CSV')</a>
-            </div>
-        </div>
-        @endif
-        @if(isset($listType) && $listType === 'emailUnverified')
-        <div class="card-header bg-transparent border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <h6 class="mb-0 fw-bold">@lang('Email Unverified Users')</h6>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <form method="get" action="{{ route('admin.users.email.unverified') }}" class="d-inline-flex flex-wrap gap-2 align-items-center">
-                    <input type="hidden" name="search" value="{{ request('search') }}">
-                    <label class="mb-0 small text-muted">@lang('Sort'):</label>
-                    <select name="sort" class="form-select form-select-sm admin-users-filter-select" onchange="this.form.submit()">
-                        <option value="newest" {{ request('sort', 'newest') === 'newest' ? 'selected' : '' }}>@lang('Newest first')</option>
-                        <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>@lang('Oldest first')</option>
-                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>@lang('Name A-Z')</option>
-                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>@lang('Name Z-A')</option>
-                    </select>
-                    <label class="mb-0 small text-muted ms-2">@lang('Joined'):</label>
-                    <input type="text" name="date" class="form-control form-control-sm admin-users-filter-date" placeholder="@lang('e.g. 2024-01-01 - 2024-12-31')" value="{{ request('date') }}" title="@lang('Format: YYYY-MM-DD - YYYY-MM-DD')">
-                    <button type="submit" class="btn btn-sm btn-outline--primary">@lang('Apply')</button>
-                </form>
-                <a href="{{ route('admin.users.email.unverified.export', request()->only(['search', 'date'])) }}" class="btn btn-sm btn-outline--success"><i class="las la-file-csv me-1"></i>@lang('Export CSV')</a>
-            </div>
-        </div>
-        @endif
-        @if(isset($listType) && $listType === 'mobileUnverified')
-        <div class="card-header bg-transparent border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <h6 class="mb-0 fw-bold">@lang('Mobile Unverified Users')</h6>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <form method="get" action="{{ route('admin.users.mobile.unverified') }}" class="d-inline-flex flex-wrap gap-2 align-items-center">
-                    <input type="hidden" name="search" value="{{ request('search') }}">
-                    <label class="mb-0 small text-muted">@lang('Sort'):</label>
-                    <select name="sort" class="form-select form-select-sm admin-users-filter-select" onchange="this.form.submit()">
-                        <option value="newest" {{ request('sort', 'newest') === 'newest' ? 'selected' : '' }}>@lang('Newest first')</option>
-                        <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>@lang('Oldest first')</option>
-                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>@lang('Name A-Z')</option>
-                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>@lang('Name Z-A')</option>
-                    </select>
-                    <label class="mb-0 small text-muted ms-2">@lang('Joined'):</label>
-                    <input type="text" name="date" class="form-control form-control-sm admin-users-filter-date" placeholder="@lang('e.g. 2024-01-01 - 2024-12-31')" value="{{ request('date') }}" title="@lang('Format: YYYY-MM-DD - YYYY-MM-DD')">
-                    <button type="submit" class="btn btn-sm btn-outline--primary">@lang('Apply')</button>
-                </form>
-                <a href="{{ route('admin.users.mobile.unverified.export', request()->only(['search', 'date'])) }}" class="btn btn-sm btn-outline--success"><i class="las la-file-csv me-1"></i>@lang('Export CSV')</a>
-            </div>
-        </div>
-        @endif
-        @if(!isset($listType) || !in_array($listType, ['active', 'banned', 'emailUnverified', 'mobileUnverified']))
-        <div class="card-header bg-transparent border-bottom py-3">
-            <h6 class="mb-0 fw-bold">{{ $pageTitle ?? __('Users') }}</h6>
         </div>
         @endif
 
         <div class="card-body p-0">
-            @if(isset($listType) && $listType === 'active' && $users->total() > 0)
-            <div class="px-3 py-2 bg-light border-bottom small text-muted d-flex flex-wrap align-items-center justify-content-between gap-2">
-                <span>@lang('Showing') {{ $users->firstItem() }} @lang('to') {{ $users->lastItem() }} @lang('of') {{ number_format($users->total()) }} @lang('results')</span>
-                @if(request('has_orders') === '1')
-                <span class="badge bg--primary">{{ __("Filter: With orders") }}</span>
-                @endif
-            </div>
-            @endif
-            <div class="table-responsive--md table-responsive">
-                <table class="table table--light style--two table-align-middle users-list-table">
-                    <thead class="table-light">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-label-secondary border-top-0">
                         <tr>
-                            <th style="width: 52px;">@lang('User')</th>
-                            <th>@lang('Contact')</th>
-                            @if(isset($listType) && $listType === 'active')
-                            <th class="d-none d-md-table-cell">@lang('Country')</th>
-                            <th class="d-none d-lg-table-cell">@lang('Last Login')</th>
-                            @elseif(isset($listType) && $listType === 'banned')
-                            <th class="d-none d-lg-table-cell">@lang('Country')</th>
-                            <th class="d-none d-md-table-cell">@lang('Ban Reason')</th>
-                            @else
-                            <th>@lang('Country')</th>
-                            @endif
-                            <th>{{ isset($listType) && $listType === 'banned' ? __('Updated At') : __('Joined At') }}</th>
-                            <th style="width: 160px;" class="text-end">@lang('Action')</th>
+                            <th class="ps-5 py-3">@lang('User Info')</th>
+                            <th>@lang('Contact Details')</th>
+                            <th class="d-none d-lg-table-cell">@lang('Location')</th>
+                            <th class="d-none d-md-table-cell">{{ isset($listType) && $listType === 'banned' ? __('Updated') : __('Joined') }}</th>
+                            <th class="text-center">@lang('Status')</th>
+                            <th class="text-end pe-5">@lang('Actions')</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="table-border-bottom-0">
                         @forelse($users as $user)
                             <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        @if($user->image)
-                                            <img src="{{ getImage(getFilePath('userProfile') . '/' . $user->image, getFileSize('userProfile')) }}" alt="" class="rounded-circle object-fit-cover user-list-avatar">
-                                        @else
-                                            <div class="user-list-avatar user-list-avatar--initials rounded-circle d-flex align-items-center justify-content-center bg--primary text-white fw-bold">
-                                                {{ strtoupper(substr($user->firstname ?? 'U', 0, 1) . substr($user->lastname ?? '', 0, 1)) ?: strtoupper(substr($user->username ?? 'U', 0, 2)) }}
-                                            </div>
-                                        @endif
+                                <td class="ps-5 py-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-md me-3">
+                                            @if($user->image)
+                                                <img src="{{ getImage(getFilePath('userProfile') . '/' . $user->image, getFileSize('userProfile')) }}" alt="" class="rounded-circle object-fit-cover shadow-xs border">
+                                            @else
+                                                <span class="avatar-initial rounded-circle bg-label-{{ str_contains('aeiou', strtolower($user->firstname[0] ?? 'b')) ? 'primary' : 'info' }} shadow-xs border fw-bold text-uppercase d-flex align-items-center justify-content-center">
+                                                    {{ substr($user->firstname ?? 'U', 0, 1) }}{{ substr($user->lastname ?? '', 0, 1) }}
+                                                </span>
+                                            @endif
+                                        </div>
                                         <div class="min-w-0">
-                                            <span class="fw-bold d-block text-truncate">{{ trim($user->fullname) ?: $user->username }}</span>
-                                            <a href="{{ route('admin.users.detail', $user->id) }}" class="small text-muted text-truncate d-block">{{ '@' . ($user->username ?? '') }}</a>
+                                            <a href="{{ route('admin.users.detail', $user->id) }}" class="fw-bold text-heading d-block line-height-1 mb-1 text-truncate" style="max-width: 200px;">{{ $user->fullname }}</a>
+                                            <span class="small text-muted">{{ '@' . $user->username }}</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="small">
-                                        <a href="mailto:{{ $user->email }}" class="text-dark d-block text-truncate" title="{{ $user->email }}">{{ $user->email }}</a>
-                                        @if($user->mobile)
-                                            <a href="tel:{{ $user->mobile }}" class="text-muted d-block">{{ $user->mobile }}</a>
-                                        @else
-                                            <span class="text-muted">—</span>
+                                    <div class="d-flex flex-column small">
+                                        <a href="mailto:{{ $user->email }}" class="text-body fw-medium mb-1"><i class="icon-base bx bx-envelope me-1 opacity-50"></i>{{ $user->email }}</a>
+                                        <span class="text-muted"><i class="icon-base bx bx-phone me-1 opacity-50"></i>{{ $user->mobile ?: __('No mobile') }}</span>
+                                    </div>
+                                </td>
+                                <td class="d-none d-lg-table-cell">
+                                    <div class="d-flex flex-column">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <span class="badge bg-label-secondary border text-body fw-medium me-2">{{ $user->country_code ?? '—' }}</span>
+                                            <small class="text-muted text-truncate" style="max-width: 120px;">{{ @$user->address->country }}</small>
+                                        </div>
+                                        @if(isset($listType) && $listType === 'banned' && $user->ban_reason)
+                                            <small class="text-danger text-truncate d-block" style="max-width: 180px;" title="{{ $user->ban_reason }}">
+                                                <i class="icon-base bx bx-error-circle me-1"></i>{{ $user->ban_reason }}
+                                            </small>
                                         @endif
                                     </div>
                                 </td>
-                                @if(isset($listType) && $listType === 'banned')
-                                <td class="d-none d-lg-table-cell">
-                                    <span class="badge bg-light text-dark" title="{{ @$user->address->country ?? '' }}">{{ $user->country_code ?? '—' }}</span>
-                                </td>
                                 <td class="d-none d-md-table-cell">
-                                    <span class="small text-muted ban-reason-cell" title="{{ $user->ban_reason ?? '' }}">{{ Str::limit($user->ban_reason ?? '—', 40) }}</span>
+                                    <div class="small">
+                                        <span class="d-block text-heading fw-medium">{{ showDateTime($user->created_at, 'd M, Y') }}</span>
+                                        <span class="text-muted">{{ diffForHumans($user->created_at) }}</span>
+                                    </div>
                                 </td>
-                                @else
-                                <td class="d-none d-md-table-cell">
-                                    <span class="badge bg-light text-dark" title="{{ @$user->address->country ?? '' }}">{{ $user->country_code ?? '—' }}</span>
-                                </td>
-                                @if(isset($listType) && $listType === 'active')
-                                <td class="d-none d-lg-table-cell small text-muted">
-                                    @if(!empty($user->login_logs_max_created_at))
-                                        <span title="{{ showDateTime($user->login_logs_max_created_at, 'd M Y H:i') }}">{{ diffForHumans($user->login_logs_max_created_at) }}</span>
+                                <td class="text-center">
+                                    @if($user->status == \App\Constants\Status::USER_ACTIVE)
+                                        <span class="badge bg-label-success rounded-pill px-3">@lang('Active')</span>
                                     @else
-                                        <span>—</span>
+                                        <span class="badge bg-label-danger rounded-pill px-3" title="{{ $user->ban_reason }}">@lang('Banned')</span>
                                     @endif
                                 </td>
-                                @endif
-                                @endif
-                                <td>
-                                    @if(isset($listType) && $listType === 'banned')
-                                    <span class="d-block">{{ showDateTime($user->updated_at, 'd M Y') }}</span>
-                                    <span class="small text-muted">{{ diffForHumans($user->updated_at) }}</span>
-                                    @else
-                                    <span class="d-block">{{ showDateTime($user->created_at, 'd M Y') }}</span>
-                                    <span class="small text-muted">{{ diffForHumans($user->created_at) }}</span>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('admin.users.detail', $user->id) }}" class="btn btn-outline--primary" title="@lang('View details')" data-bs-toggle="tooltip"><i class="las la-desktop"></i></a>
-                                        <a href="{{ route('admin.users.notification.single', $user->id) }}" class="btn btn-outline--info" title="@lang('Send notification')" data-bs-toggle="tooltip"><i class="las la-paper-plane"></i></a>
-                                        @if($user->status == \App\Constants\Status::USER_ACTIVE)
-                                        <a href="{{ route('admin.users.login', $user->id) }}" class="btn btn-outline--success" target="_blank" title="@lang('Login as user')" data-bs-toggle="tooltip"><i class="las la-sign-in-alt"></i></a>
-                                        @endif
-                                        @if($user->status == \App\Constants\Status::USER_BAN)
-                                        <form action="{{ route('admin.users.status', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('Unban this user?') }}');">
-                                            @csrf
-                                            <button type="submit" class="btn btn-outline--success" title="@lang('Unban')"><i class="las la-user-check"></i></button>
-                                        </form>
-                                        @endif
+                                <td class="text-end pe-5">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{{ route('admin.users.detail', $user->id) }}" class="btn btn-sm btn-icon btn-label-primary shadow-none d-flex align-items-center justify-content-center" title="@lang('Settings')">
+                                            <i class="icon-base bx bx-cog"></i>
+                                        </a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-icon btn-label-secondary shadow-none d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown">
+                                                <i class="icon-base bx bx-dots-vertical-rounded"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item d-flex align-items-center" href="{{ route('admin.users.notification.single', $user->id) }}"><i class="icon-base bx bx-send me-2"></i>@lang('Send Message')</a></li>
+                                                @if($user->status == \App\Constants\Status::USER_ACTIVE)
+                                                    <li><a class="dropdown-item d-flex align-items-center" href="{{ route('admin.users.login', $user->id) }}" target="_blank"><i class="icon-base bx bx-log-in-circle me-2 text-success"></i>@lang('Login As User')</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <button class="dropdown-item d-flex align-items-center text-danger cuModalBtn" data-modal_title="@lang('Ban User:') {{ $user->username }}" data-action="{{ route('admin.users.status', $user->id) }}">
+                                                            <i class="icon-base bx bx-user-x me-2"></i>@lang('Ban User')
+                                                        </button>
+                                                    </li>
+                                                @else
+                                                    <li>
+                                                        <form action="{{ route('admin.users.status', $user->id) }}" method="POST">
+                                                            @csrf
+                                                            <button type="submit" class="dropdown-item d-flex align-items-center text-success btn-confirm" 
+                                                                data-confirm-title="@lang('Unban User?')"
+                                                                data-confirm-text="@lang('Are you sure you want to restore access for this user?')"
+                                                                data-confirm-btn="@lang('Yes, Unban')"
+                                                                data-confirm-icon="question">
+                                                                <i class="icon-base bx bx-user-check me-2"></i>@lang('Unban User')
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td class="text-center py-5" colspan="100%">
-                                    <div class="empty-state-icon mb-3">
-                                        <i class="las la-users fs-1 text-muted opacity-50"></i>
+                                <td class="text-center py-12" colspan="100%">
+                                    <div class="avatar avatar-xl bg-label-secondary mx-auto mb-4">
+                                        <span class="avatar-initial rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="icon-base bx bx-group fs-1"></i>
+                                        </span>
                                     </div>
-                                    <p class="text-muted mb-0">{{ __($emptyMessage ?? 'No users found.') }}</p>
+                                    <h5 class="text-muted">{{ __($emptyMessage ?? 'No users found.') }}</h5>
                                 </td>
                             </tr>
                         @endforelse
@@ -433,7 +236,7 @@
             </div>
         </div>
         @if ($users->hasPages())
-            <div class="card-footer py-3 border-top">
+            <div class="card-footer py-4 border-top">
                 {{ paginateLinks($users) }}
             </div>
         @endif
@@ -450,26 +253,12 @@
             elseif ($listType === 'mobileUnverified') $listFormAction = route('admin.users.mobile.unverified');
         }
     @endphp
-    <form method="get" class="d-flex flex-wrap gap-2 align-items-center" action="{{ $listFormAction }}">
-        @if(isset($listType) && in_array($listType, ['active', 'banned', 'emailUnverified', 'mobileUnverified']))
-            <input type="hidden" name="sort" value="{{ request('sort') }}">
-            <input type="hidden" name="date" value="{{ request('date') }}">
-            @if($listType === 'active')
-            <input type="hidden" name="per_page" value="{{ request('per_page', getPaginate()) }}">
-            @if(request('has_orders') === '1')<input type="hidden" name="has_orders" value="1">@endif
-            @endif
-        @endif
-        <x-search-form placeholder="@lang('Username / Email / Name / Mobile')" />
-    </form>
+    <div class="d-flex align-items-center gap-2">
+        <form method="get" action="{{ $listFormAction }}">
+            @foreach(request()->except(['search', 'page']) as $k => $v)
+                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+            @endforeach
+            <x-search-form placeholder="@lang('Username, Email...')" />
+        </form>
+    </div>
 @endpush
-
-@push('style')
-{{--
-  Admin Users List - Flexible CSS. To adjust without breaking layout, override these variables on .admin-users-card or body:
-  --admin-users-radius, --admin-users-icon-size, --admin-users-th-color, --admin-users-avatar-size, --primary-rgb
---}}
-
-{{-- inline style moved to critical-admin.css --}}
-
-@endpush
-

@@ -4,7 +4,7 @@
         <div class="col-12 {{ $key == 'policy_pages' ? 'mb-3' : 'mb-30' }}">
             <div class="card {{ $key == 'policy_pages' ? 'border-0 shadow-sm' : '' }}">
                 <div class="card-body {{ $key == 'policy_pages' ? 'py-3 px-3' : '' }}">
-                    <form action="{{ route(getFrontendSectionRoute($key, 'content')) }}" method="POST" enctype="multipart/form-data" class="{{ $key == 'policy_pages' ? 'policy-element-form' : '' }}">
+                    <form action="{{ route(getFrontendSectionRoute($key, 'content'), $key) }}" method="POST" enctype="multipart/form-data" class="{{ $key == 'policy_pages' ? 'policy-element-form' : '' }}">
                         @csrf
                         <input type="hidden" name="type" value="element">
                         @if(@$data)

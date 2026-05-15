@@ -1,18 +1,17 @@
 @php
-    $onLabel = $onLabel ?? 'ON (চালু)';
-    $offLabel = $offLabel ?? 'OFF (বন্ধ)';
+    $onLabel = $onLabel ?? trans('Enabled');
+    $offLabel = $offLabel ?? trans('Disabled');
     $isOn = (int)($value ?? 0) === 1;
 @endphp
-<div class="config-item">
-    <div class="config-info">
-        <div class="config-title">{!! lang_en_bn($title) !!}</div>
-        <div class="config-desc">{{ $desc }}</div>
+<div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom">
+    <div class="me-3">
+        <h6 class="mb-0 fw-bold text-dark">@lang($title)</h6>
+        <small class="text-muted d-block mt-1" style="max-width: 80%;">@lang($desc)</small>
     </div>
-    <div class="config-control">
-        <div class="switch-wrap" data-on="{{ $onLabel }}" data-off="{{ $offLabel }}">
-            <input type="hidden" name="{{ $name }}" value="0">
-            <input type="checkbox" class="form-check-input config-toggle-input" name="{{ $name }}" value="1" id="cfg_{{ $name }}" {{ $isOn ? 'checked' : '' }}>
-            <span class="switch-status {{ $isOn ? 'status-on' : 'status-off' }}" id="status_{{ $name }}">{{ $isOn ? $onLabel : $offLabel }}</span>
-        </div>
+    <div class="form-check form-switch mb-0">
+        <input type="hidden" name="{{ $name }}" value="0">
+        <input class="form-check-input config-toggle-input" type="checkbox" name="{{ $name }}" value="1" 
+               id="cfg_{{ $name }}" {{ $isOn ? 'checked' : '' }} role="switch" style="width: 3rem; height: 1.5rem; cursor: pointer;">
+        <label class="form-check-label d-none" for="cfg_{{ $name }}">@lang($title)</label>
     </div>
 </div>

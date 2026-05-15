@@ -105,20 +105,41 @@
                             <div class="banner-upload-cell border rounded-4 position-relative overflow-hidden group shadow-none hover-shadow-sm transition-all bg-white" 
                                  data-banner-id="{{ $bannerId }}"
                                  id="bannerCell{{ $bannerId ?? $i }}">
-                                @if($hasImage && $imageUrl && $bannerId)
+                                 @if($bannerId)
                                     <div class="banner-cell-content uploaded h-100 d-flex flex-column">
                                         <div class="banner-cell-image-container position-relative bg-light overflow-hidden" style="height: 120px;">
-                                            <img src="{{ $imageUrl }}" alt="Banner {{ $displayOrder }}" class="w-100 h-100 object-fit-cover shadow-sm">
-                                            <div class="position-absolute top-0 start-0 p-2">
+                                            @if($hasImage)
+                                                <img src="{{ $imageUrl }}" alt="Banner {{ $displayOrder }}" class="w-100 h-100 object-fit-cover shadow-sm">
+                                            @else
+                                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary">
+                                                    <i class="las la-image fs-1"></i>
+                                                </div>
+                                            @endif
+                                            <div class="position-absolute top-0 start-0 p-2 d-flex flex-column gap-1">
                                                 <span class="badge bg-dark opacity-75">#{{ $displayOrder }}</span>
+                                                @if(!$hasImage)
+                                                    <span class="badge bg-danger">@lang('FILE MISSING')</span>
+                                                @endif
                                             </div>
-                                            <div class="banner-cell-overlay d-flex align-items-center justify-content-center bg-dark bg-opacity-60 position-absolute top-0 start-0 w-100 h-100">
-                                                <div class="d-flex gap-1 p-2 flex-wrap justify-content-center">
-                                                    <a href="{{ route('admin.frontend.sections.banner') }}?edit={{ $bannerId }}" class="btn btn-xs btn--primary p-1 rounded-circle" style="width: 28px; height: 28px;"><i class="las la-pen fs-6"></i></a>
-                                                    <button type="button" class="btn btn-xs {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'btn--warning' : 'btn--success' }} p-1 rounded-circle banner-toggle-status" style="width: 28px; height: 28px;" data-banner-id="{{ $bannerId }}" data-current="{{ (int)(@$banner->data_values->is_active ?? 1) }}"><i class="las {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'la-eye-slash' : 'la-eye' }} fs-6"></i></button>
+                                            <div class="banner-cell-overlay d-flex align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index: 5;">
+                                                <div class="d-flex gap-2 p-2 flex-wrap justify-content-center">
+                                                    <a href="{{ route('admin.frontend.sections.banner') }}?edit={{ $bannerId }}" class="btn btn-sm btn--primary shadow-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 8px;" title="@lang('Edit Content')">
+                                                        <i class="las la-pen fs-5"></i>
+                                                    </a>
+                                                    
+                                                    <button type="button" class="btn btn-sm {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'btn--warning' : 'btn--success' }} shadow-sm d-flex align-items-center justify-content-center banner-toggle-status" 
+                                                            style="width: 35px; height: 35px; border-radius: 8px;" 
+                                                            data-banner-id="{{ $bannerId }}" 
+                                                            data-current="{{ (int)(@$banner->data_values->is_active ?? 1) }}"
+                                                            title="{{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? __('Make Private') : __('Make Public') }}">
+                                                        <i class="las {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'la-eye-slash' : 'la-eye' }} fs-5"></i>
+                                                    </button>
+                                                    
                                                     <form method="POST" action="{{ route('admin.frontend.remove', $bannerId) }}" class="d-inline banner-delete-form">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-xs btn--danger p-1 rounded-circle" style="width: 28px; height: 28px;"><i class="las la-trash fs-6"></i></button>
+                                                        <button type="submit" class="btn btn-sm btn--danger shadow-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 8px;" title="@lang('Delete')">
+                                                            <i class="las la-trash fs-5"></i>
+                                                        </button>
                                                     </form>
                                                 </div>
                                             </div>
@@ -127,7 +148,7 @@
                                             <span class="text-muted fw-bold" style="font-size: 10px;">@lang('SLIDE') {{ $displayOrder }}</span>
                                             <div class="d-flex align-items-center gap-1">
                                                 <div class="dot {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'bg-success' : 'bg-secondary' }}" style="width: 8px; height: 8px; border-radius: 50%;"></div>
-                                                <span class="text-muted" style="font-size: 9px;">{{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? __('LIVE') : __('OFF') }}</span>
+                                                <span class="text-muted fw-bold" style="font-size: 10px;">{{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? __('PUBLIC') : __('PRIVATE') }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -500,29 +521,34 @@
             }
         });
         // Quick toggle Enable/Disable (is_active)
-        $(document).on('click', '.banner-toggle-status', function() {
+        $(document).on('click', '.banner-toggle-status', function(e) {
+            e.preventDefault();
             var btn = $(this);
             var bannerId = btn.data('banner-id');
             var current = parseInt(btn.data('current'), 10);
             var newVal = current === 1 ? 0 : 1;
+            
             if (!bannerId) return;
-            btn.prop('disabled', true);
+            
+            btn.prop('disabled', true).html('<i class="las la-spinner la-spin fs-5"></i>');
+            
             $.ajax({
                 url: '{{ route("admin.frontend.sections.banner.updateField") }}',
                 method: 'POST',
                 data: { _token: '{{ csrf_token() }}', id: bannerId, field: 'is_active', value: newVal },
                 success: function(response) {
                     if (response.success) {
-                        btn.data('current', newVal);
-                        btn.removeClass('btn--warning btn--success').addClass(newVal === 1 ? 'btn--warning' : 'btn--success');
-                        btn.find('i').removeClass('la-eye la-eye-slash').addClass(newVal === 1 ? 'la-eye-slash' : 'la-eye');
-                        notify('success', newVal === 1 ? 'Banner enabled.' : 'Banner disabled.');
+                        notify('success', newVal === 1 ? 'Banner is now PUBLIC' : 'Banner is now PRIVATE');
+                        setTimeout(function() { location.reload(); }, 800);
                     } else {
                         notify('error', response.message || 'Failed');
+                        btn.prop('disabled', false).html('<i class="las ' + (current === 1 ? 'la-eye-slash' : 'la-eye') + ' fs-5"></i>');
                     }
                 },
-                error: function() { notify('error', 'Failed to update status.'); },
-                complete: function() { btn.prop('disabled', false); }
+                error: function() { 
+                    notify('error', 'Failed to update status.'); 
+                    btn.prop('disabled', false).html('<i class="las ' + (current === 1 ? 'la-eye-slash' : 'la-eye') + ' fs-5"></i>');
+                }
             });
         });
         
@@ -602,12 +628,23 @@
 <style>
     .banner-upload-cell .banner-cell-overlay {
         opacity: 0;
+        visibility: hidden;
         transition: all 0.3s ease-in-out;
-        pointer-events: none;
+        backdrop-filter: blur(2px);
     }
     .banner-upload-cell:hover .banner-cell-overlay {
         opacity: 1;
-        pointer-events: auto;
+        visibility: visible;
+    }
+    .banner-cell-overlay .btn {
+        transform: scale(0.8);
+        transition: all 0.2s ease;
+    }
+    .banner-upload-cell:hover .banner-cell-overlay .btn {
+        transform: scale(1);
+    }
+    .banner-cell-overlay .btn:hover {
+        transform: scale(1.1) !important;
     }
 </style>
 @endpush

@@ -30,7 +30,7 @@ class LoyaltyPointsService
 
             // Calculate points based on order total
             $pointsPerCurrency = $general->loyalty_points_per_currency ?? 1;
-            $pointsToAward = floor($order->total_amount * $pointsPerCurrency);
+            $pointsToAward = floor($order->total * $pointsPerCurrency);
 
             if ($pointsToAward <= 0) {
                 return false;

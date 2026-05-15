@@ -358,6 +358,13 @@ class ManageUsersController extends Controller
         return view('admin.users.list', compact('pageTitle', 'users'));
     }
 
+    public function withBalance()
+    {
+        $pageTitle = 'Users with Balance';
+        $users     = $this->userData('withBalance');
+        return view('admin.users.list', compact('pageTitle', 'users'));
+    }
+
     protected function userData($scope = null)
     {
         if ($scope) {

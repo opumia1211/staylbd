@@ -1,198 +1,199 @@
 @extends('admin.layouts.app')
+
 @section('panel')
-<form action="" method="post" id="maintenanceForm">
-@csrf
-<div class="row mb-none-30">
-    <div class="col-lg-12">
-        <div class="card mb-4">
-            <div class="card-header bg--primary">
-                <h5 class="text-white mb-0"><i class="las la-cog me-2"></i>@lang('Maintenance Mode Control')</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Status')</label>
-                            <div class="mt-2">
-                                <input type="checkbox" data-width="100%" data-height="50" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Enable')" data-off="@lang('Disabled')" @if(@$general->maintenance_mode) checked @endif name="status">
+<div class="container-xxl flex-grow-1 container-p-y p-0">
+    <form action="" method="post" id="maintenanceForm">
+        @csrf
+        <div class="row g-4">
+            {{-- ── 1. Strategic Control Center ── --}}
+            <div class="col-12">
+                <div class="card border-0 shadow-none bg-label-danger overflow-hidden">
+                    <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-danger text-white p-2 rounded-circle shadow-sm" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                                <i class="las la-tools fs-3"></i>
                             </div>
-                            <small class="text-muted">@lang('Enable to show maintenance page to visitors')</small>
+                            <div>
+                                <h5 class="mb-0 fw-bold text-danger">@lang('Maintenance Mode Architecture')</h5>
+                                <p class="text-muted small mb-0">@lang('Safely disconnect public access for system upgrades, security patches, or architecture changes.')</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="form-check form-switch mb-0 bg-white px-3 py-1 rounded-pill border shadow-sm">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" id="maintenanceStatusSwitch" name="status" @if(@$general->maintenance_mode) checked @endif>
+                                <label class="form-check-label small fw-bold text-dark" for="maintenanceStatusSwitch">@lang('Live Status')</label>
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-sm shadow-sm px-4">
+                                <i class="las la-save me-1"></i> @lang('Synchronize System')
+                            </button>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Current IP')</label>
-                            <input type="text" class="form-control" value="{{ request()->ip() }}" readonly>
-                            <small class="text-muted">@lang('Add this to whitelist to bypass maintenance')</small>
+                </div>
+            </div>
+
+            {{-- ── 2. Access Intelligence (Whitelist) ── --}}
+            <div class="col-xl-4 col-lg-5">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header border-bottom bg-white py-3 px-4">
+                        <h6 class="mb-0 fw-bold"><i class="las la-shield-alt me-2 text-primary"></i>@lang('Bypass Intelligence')</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small">@lang('Detected Node IP')</label>
+                            <div class="input-group input-group-merge border rounded">
+                                <span class="input-group-text bg-lighter border-0"><i class="las la-network-wired"></i></span>
+                                <input type="text" class="form-control border-0 bg-lighter" value="{{ request()->ip() }}" readonly>
+                            </div>
+                            <div class="form-text tiny">@lang('This is your current connection ID.')</div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-bold small">@lang('Secure IP Whitelist')</label>
+                            <div class="input-group input-group-merge mb-2">
+                                <span class="input-group-text"><i class="las la-lock"></i></span>
+                                <textarea class="form-control" name="ip_whitelist" id="ipWhitelist" rows="4" placeholder="127.0.0.1, 192.168.1.1">{{ @$maintenance->data_values->ip_whitelist }}</textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-2" id="addCurrentIp">
+                                <i class="las la-plus-circle me-1"></i> @lang('Authorize My Current IP')
+                            </button>
+                            <div class="bg-label-info p-2 rounded small">
+                                <i class="las la-info-circle me-1"></i> @lang('Authorized nodes can bypass maintenance to verify changes live.')
+                            </div>
                         </div>
                     </div>
-                        <div class="col-md-4 col-sm-6 mb-3">
-                            <div class="form-group">
-                                <label class="fw-bold">@lang('IP Whitelist')</label>
+                </div>
+            </div>
+
+            {{-- ── 3. Brand Continuity & Message ── --}}
+            <div class="col-xl-8 col-lg-7">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header border-bottom bg-white py-3 px-4">
+                        <h6 class="mb-0 fw-bold"><i class="las la-palette me-2 text-primary"></i>@lang('Public Narrative & Visuals')</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">@lang('Primary Headline')</label>
+                                <input type="text" class="form-control" name="title" value="{{ @$maintenance->data_values->title }}" placeholder="@lang('e.g. System Evolution in Progress')">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">@lang('Sub-Headline')</label>
+                                <input type="text" class="form-control" name="short_description" value="{{ @$maintenance->data_values->short_description }}" placeholder="@lang('e.g. We are optimizing our clusters for you.')">
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-bold small">@lang('Detailed Communication (HTML Support)')</label>
+                            <div class="border rounded bg-light p-1">
+                                <textarea class="form-control nicEdit" rows="8" name="description" id="descriptionEditor">@php echo @$maintenance->data_values->description @endphp</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ── 4. Temporal Management (Countdown) ── --}}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header border-bottom bg-white py-3 px-4">
+                        <h6 class="mb-0 fw-bold"><i class="las la-hourglass-half me-2 text-primary"></i>@lang('Temporal Tracking')</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small">@lang('Live Countdown')</label>
+                                <select class="form-select" name="show_countdown">
+                                    <option value="1" @selected((@$maintenance->data_values->show_countdown ?? 1) == 1)>@lang('Display Timer')</option>
+                                    <option value="0" @selected(@$maintenance->data_values->show_countdown == 0)>@lang('Hide Timer')</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">@lang('Target Restoration Time')</label>
+                                <input type="datetime-local" class="form-control" name="countdown_datetime" value="{{ @$maintenance->data_values->countdown_datetime }}">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold small">@lang('Status Progress Bar')</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="ip_whitelist" id="ipWhitelist" value="{{ @$maintenance->data_values->ip_whitelist }}" placeholder="127.0.0.1, ::1, 192.168.1.1">
-                                    <button type="button" class="btn btn--primary" id="addCurrentIp" title="@lang('Add current IP')"><i class="las la-plus"></i></button>
+                                    <input type="number" class="form-control" name="progress_percentage" min="0" max="100" value="{{ @$maintenance->data_values->progress_percentage ?? 50 }}" placeholder="50">
+                                    <span class="input-group-text">%</span>
+                                    <select class="form-select" name="show_progress_bar" style="max-width: 120px;">
+                                        <option value="1" @selected((@$maintenance->data_values->show_progress_bar ?? 1) != 0)>@lang('Show')</option>
+                                        <option value="0" @selected(@$maintenance->data_values->show_progress_bar == 0)>@lang('Hide')</option>
+                                    </select>
                                 </div>
-                                <small class="text-muted">@lang('Comma separated IPs - these can access site during maintenance')</small>
                             </div>
                         </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="las la-palette me-2"></i>@lang('Page Content & Appearance')</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Page Title')</label>
-                            <input type="text" class="form-control" name="title" value="{{ @$maintenance->data_values->title }}" placeholder="@lang('e.g. We\'ll Be Back Soon!')">
-                        </div>
+                {{-- ── 5. Social & Contact Synergy ── --}}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header border-bottom bg-white py-3 px-4">
+                        <h6 class="mb-0 fw-bold"><i class="las la-share-alt me-2 text-primary"></i>@lang('Community Synergy')</h6>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Short Description')</label>
-                            <input type="text" class="form-control" name="short_description" value="{{ @$maintenance->data_values->short_description }}" placeholder="@lang('e.g. We are upgrading our system for better experience')">
+                    <div class="card-body p-4">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Facebook</label>
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text"><i class="lab la-facebook-f"></i></span>
+                                    <input type="url" class="form-control" name="social_facebook" value="{{ @$maintenance->data_values->social_facebook }}" placeholder="https://facebook.com/staylbd">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Instagram</label>
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text"><i class="lab la-instagram"></i></span>
+                                    <input type="url" class="form-control" name="social_instagram" value="{{ @$maintenance->data_values->social_instagram }}" placeholder="https://instagram.com/staylbd">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">@lang('Emergency Email')</label>
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text"><i class="las la-envelope"></i></span>
+                                    <input type="email" class="form-control" name="contact_email" value="{{ @$maintenance->data_values->contact_email }}" placeholder="ops@staylbd.com">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">@lang('Support Hotline')</label>
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text"><i class="las la-phone"></i></span>
+                                    <input type="text" class="form-control" name="contact_phone" value="{{ @$maintenance->data_values->contact_phone }}" placeholder="+880 1XXX XXXXXX">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    <label class="fw-bold">@lang('Full Description')</label>
-                    <textarea class="form-control nicEdit" rows="8" name="description" id="descriptionEditor">@php echo @$maintenance->data_values->description @endphp</textarea>
-                </div>
-            </div>
-        </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="las la-clock me-2"></i>@lang('Countdown & Progress')</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Show Countdown')</label>
-                            <select class="form-select" name="show_countdown">
-                                <option value="1" @selected((@$maintenance->data_values->show_countdown ?? 1) == 1)>@lang('Yes')</option>
-                                <option value="0" @selected(@$maintenance->data_values->show_countdown == 0)>@lang('No')</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Estimated Completion Time')</label>
-                            <input type="datetime-local" class="form-control" name="countdown_datetime" value="{{ @$maintenance->data_values->countdown_datetime }}">
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Progress Percentage')</label>
-                            <input type="number" class="form-control" name="progress_percentage" min="0" max="100" value="{{ @$maintenance->data_values->progress_percentage ?? 50 }}" placeholder="50">
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Show Progress Bar')</label>
-                            <select class="form-select" name="show_progress_bar">
-                                <option value="1" @selected((@$maintenance->data_values->show_progress_bar ?? 1) != 0)>@lang('Yes')</option>
-                                <option value="0" @selected(@$maintenance->data_values->show_progress_bar == 0)>@lang('No')</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Estimated Duration Text')</label>
-                            <input type="text" class="form-control" name="estimated_duration" value="{{ @$maintenance->data_values->estimated_duration }}" placeholder="@lang('e.g. Approximately 2-3 hours')">
+                        <div class="bg-label-secondary p-3 rounded border-start border-4 border-secondary">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small mb-0">@lang('Visitor Notifications')</label>
+                                    <select class="form-select form-select-sm mt-1" name="allow_email_signup">
+                                        <option value="1" @selected((@$maintenance->data_values->allow_email_signup ?? 1) != 0)>@lang('Allow Email Signup')</option>
+                                        <option value="0" @selected(@$maintenance->data_values->allow_email_signup == 0)>@lang('Disable Signup')</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label fw-bold small mb-0">@lang('Notification Prompt')</label>
+                                    <input type="text" class="form-control form-control-sm mt-1" name="email_signup_message" value="{{ @$maintenance->data_values->email_signup_message ?? __('Get notified when we\'re back!') }}">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="las la-share-alt me-2"></i>@lang('Social Links & Contact')</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">Facebook</label>
-                            <input type="url" class="form-control" name="social_facebook" value="{{ @$maintenance->data_values->social_facebook }}" placeholder="https://facebook.com/yourpage">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">Twitter/X</label>
-                            <input type="url" class="form-control" name="social_twitter" value="{{ @$maintenance->data_values->social_twitter }}" placeholder="https://twitter.com/yourpage">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">Instagram</label>
-                            <input type="url" class="form-control" name="social_instagram" value="{{ @$maintenance->data_values->social_instagram }}" placeholder="https://instagram.com/yourpage">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">LinkedIn</label>
-                            <input type="url" class="form-control" name="social_linkedin" value="{{ @$maintenance->data_values->social_linkedin }}" placeholder="https://linkedin.com/company/yourpage">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Contact Email')</label>
-                            <input type="email" class="form-control" name="contact_email" value="{{ @$maintenance->data_values->contact_email }}" placeholder="support@example.com">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Contact Phone')</label>
-                            <input type="text" class="form-control" name="contact_phone" value="{{ @$maintenance->data_values->contact_phone }}" placeholder="+880 1XXX-XXXXXX">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="las la-bell me-2"></i>@lang('Email Notification')</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Allow Email Signup')</label>
-                            <select class="form-select" name="allow_email_signup">
-                                <option value="1" @selected((@$maintenance->data_values->allow_email_signup ?? 1) != 0)>@lang('Yes')</option>
-                                <option value="0" @selected(@$maintenance->data_values->allow_email_signup == 0)>@lang('No')</option>
-                            </select>
-                            <small class="text-muted">@lang('Let visitors submit email for updates')</small>
-                        </div>
-                    </div>
-                    <div class="col-md-8 col-sm-6 mb-3">
-                        <div class="form-group">
-                            <label class="fw-bold">@lang('Email Signup Message')</label>
-                            <input type="text" class="form-control" name="email_signup_message" value="{{ @$maintenance->data_values->email_signup_message ?? __('Get notified when we\'re back!') }}" placeholder="@lang('e.g. Get notified when we\'re back!')">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-body">
-                <button type="submit" class="btn btn--primary w-100 h-45 btn-lg"><i class="las la-save me-2"></i>@lang('Save All Settings')</button>
-            </div>
-        </div>
-    </div>
+    </form>
 </div>
-</form>
 @endsection
+
+@push('style')
+<style>
+    .bg-label-danger { background-color: #ffe0db !important; color: #ff3e1d !important; }
+    .bg-label-primary { background-color: #e7e7ff !important; color: #696cff !important; }
+    .bg-label-info { background-color: #d7f5fc !important; color: #03c3ec !important; }
+    .bg-label-secondary { background-color: #ebeef0 !important; color: #8592a3 !important; }
+    .bg-lighter { background-color: #f8fafc !important; }
+    .tiny { font-size: 0.75rem !important; }
+</style>
+@endpush
 
 @push('script')
 <script>
@@ -213,3 +214,4 @@
 })();
 </script>
 @endpush
+

@@ -38,7 +38,7 @@ class MonetizationService
      */
     public function getEstimatedProfit(\DateTime $date): float
     {
-        $revenue = Order::whereDate('created_at', $date)->sum('total_amount');
+        $revenue = Order::whereDate('created_at', $date)->sum('total');
         // Assuming 60% COGS + OpEx for estimation
         return $revenue * 0.40; 
     }

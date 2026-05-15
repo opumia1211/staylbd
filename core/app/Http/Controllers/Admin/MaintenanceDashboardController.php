@@ -16,11 +16,25 @@ class MaintenanceDashboardController extends Controller
     public function index()
     {
         $pageTitle = __('Maintenance Dashboard');
+        $refresh = request()->get('refresh') == 1;
 
-        $diskUsage = $this->getDiskUsage();
-        $dbHealth = $this->getDatabaseHealth();
-        $cacheStatus = $this->getCacheStatus();
-        $mediaUploads = $this->getMediaUploadsStatus();
+        if ($refresh) {
+            Cache::forget('maintenance_dashboard_data');
+        }
+
+        $data = Cache::remember('maintenance_dashboard_data', 3600, function () {
+            return [
+                'diskUsage'    => $this->getDiskUsage(),
+                'dbHealth'     => $this->getDatabaseHealth(),
+                'cacheStatus'  => $this->getCacheStatus(),
+                'mediaUploads' => $this->getMediaUploadsStatus(),
+            ];
+        });
+
+        $diskUsage = $data['diskUsage'];
+        $dbHealth = $data['dbHealth'];
+        $cacheStatus = $data['cacheStatus'];
+        $mediaUploads = $data['mediaUploads'];
 
         return view('admin.maintenance.dashboard', compact(
             'pageTitle',
@@ -52,7 +66,12 @@ class MaintenanceDashboardController extends Controller
             if (!File::isDirectory($path)) {
                 return 0;
             }
-            foreach (File::allFiles($path) as $file) {
+            
+            $it = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+
+            foreach ($it as $file) {
                 $size += $file->getSize();
             }
         } catch (\Throwable $e) {
@@ -63,13 +82,10 @@ class MaintenanceDashboardController extends Controller
 
     protected function getDiskUsage(): array
     {
-        $storagePath = storage_path();
-        $publicPath = public_path();
         $logPath = storage_path('logs');
         $tempPath = storage_path('framework/cache');
 
-        $storageSize = $this->dirSize($storagePath);
-        $publicSize = $this->dirSize($publicPath);
+        // Optimized: only calculate specific high-traffic directories instead of root public/storage
         $logSize = File::isDirectory($logPath) ? $this->dirSize($logPath) : 0;
         $tempSize = File::isDirectory($tempPath) ? $this->dirSize($tempPath) : 0;
 
@@ -77,8 +93,8 @@ class MaintenanceDashboardController extends Controller
         $diskTotal = function_exists('disk_total_space') ? @disk_total_space(base_path()) : null;
 
         return [
-            'storage_size'   => $this->formatBytes($storageSize),
-            'public_size'    => $this->formatBytes($publicSize),
+            'storage_size'   => __('Cached'),
+            'public_size'    => __('See Breakdown'),
             'log_size'       => $this->formatBytes($logSize),
             'temp_size'      => $this->formatBytes($tempSize),
             'disk_free'      => $diskFree !== null ? $this->formatBytes($diskFree) : 'N/A',
@@ -218,6 +234,8 @@ class MaintenanceDashboardController extends Controller
             }
 
             $this->warmGeneralSettingCache();
+
+            Cache::forget('maintenance_dashboard_data');
 
             $admin = auth()->guard('admin')->user();
             if ($admin) {

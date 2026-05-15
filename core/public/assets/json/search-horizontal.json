@@ -1,0 +1,217 @@
+{
+    "navigation": {
+        "Dashboards": [
+            {
+                "name": "Analytics",
+                "url": "http://localhost/staylbd/sajaladminopu/dashboard",
+                "icon": "bx bx-pie-chart-alt"
+            },
+            {
+                "name": "Security",
+                "url": "http://localhost/staylbd/sajaladminopu/security",
+                "icon": "bx bx-shield-alt"
+            }
+        ],
+        "Home Layout": [
+            {
+                "name": "Scroll Bar",
+                "url": "http://localhost/staylbd/sajaladminopu/frontend/scrollbar",
+                "icon": "las la-arrows-alt-h"
+            },
+            {
+                "name": "Quick deals",
+                "url": "http://localhost/staylbd/sajaladminopu/product/today-deal",
+                "icon": "las la-bolt"
+            },
+            {
+                "name": "Hot deals",
+                "url": "http://localhost/staylbd/sajaladminopu/product/hot",
+                "icon": "las la-fire"
+            },
+            {
+                "name": "Featured",
+                "url": "http://localhost/staylbd/sajaladminopu/product/featured",
+                "icon": "las la-star"
+            },
+            {
+                "name": "Trending",
+                "url": "http://localhost/staylbd/sajaladminopu/product/trending",
+                "icon": "las la-chart-line"
+            },
+            {
+                "name": "Best sellers",
+                "url": "http://localhost/staylbd/sajaladminopu/product/best-selling",
+                "icon": "las la-trophy"
+            },
+            {
+                "name": "Homepage hub",
+                "url": "http://localhost/staylbd/sajaladminopu/frontend/homepage-sections",
+                "icon": "las la-sliders-h"
+            },
+            {
+                "name": "Layout & rows",
+                "url": "http://localhost/staylbd/sajaladminopu/frontend/homepage-custom-rows",
+                "icon": "las la-stream"
+            },
+            {
+                "name": "Homepage ads",
+                "url": "http://localhost/staylbd/sajaladminopu/frontend/homepage-ads",
+                "icon": "las la-ad"
+            }
+        ],
+        "Customers": [
+            {
+                "name": "Active",
+                "url": "http://localhost/staylbd/sajaladminopu/users/active",
+                "icon": "las la-user-check"
+            },
+            {
+                "name": "Banned",
+                "url": "http://localhost/staylbd/sajaladminopu/users/banned",
+                "icon": "las la-user-slash"
+            },
+            {
+                "name": "Email Unverified",
+                "url": "http://localhost/staylbd/sajaladminopu/users/email-unverified",
+                "icon": "las la-envelope"
+            },
+            {
+                "name": "Mobile Unverified",
+                "url": "http://localhost/staylbd/sajaladminopu/users/mobile-unverified",
+                "icon": "las la-mobile-alt"
+            },
+            {
+                "name": "All Customers",
+                "url": "http://localhost/staylbd/sajaladminopu/users",
+                "icon": "las la-users"
+            },
+            {
+                "name": "Notification to All",
+                "url": "http://localhost/staylbd/sajaladminopu/users/send-notification",
+                "icon": "las la-bell"
+            }
+        ],
+        "Catalog": [
+            {
+                "name": "All Products",
+                "url": "http://localhost/staylbd/sajaladminopu/product",
+                "icon": "las la-boxes"
+            },
+            {
+                "name": "Add Product",
+                "url": "http://localhost/staylbd/sajaladminopu/product/create",
+                "icon": "las la-plus-circle"
+            },
+            {
+                "name": "Product Reviews",
+                "url": "http://localhost/staylbd/sajaladminopu/product/reviews",
+                "icon": "las la-comment-dots"
+            },
+            {
+                "name": "Low Stock",
+                "url": "http://localhost/staylbd/sajaladminopu/product?low_stock=1",
+                "icon": "las la-exclamation-triangle"
+            },
+            {
+                "name": "Stock Alerts",
+                "url": "http://localhost/staylbd/sajaladminopu/product/stock-alerts",
+                "icon": "las la-bell"
+            },
+            {
+                "name": "Categories",
+                "url": "http://localhost/staylbd/sajaladminopu/category",
+                "icon": "las la-align-left"
+            },
+            {
+                "name": "Subcategories",
+                "url": "http://localhost/staylbd/sajaladminopu/sub-category",
+                "icon": "las la-align-center"
+            },
+            {
+                "name": "Brands",
+                "url": "http://localhost/staylbd/sajaladminopu/brand",
+                "icon": "las la-tags"
+            },
+            {
+                "name": "Coupons",
+                "url": "http://localhost/staylbd/sajaladminopu/coupon",
+                "icon": "las la-bullhorn"
+            }
+        ],
+        "Operations": [
+            {
+                "name": "All Orders",
+                "url": "http://localhost/staylbd/sajaladminopu/order",
+                "icon": "las la-list"
+            },
+            {
+                "name": "Pending Orders",
+                "url": "http://localhost/staylbd/sajaladminopu/order/pending",
+                "icon": "las la-clock"
+            },
+            {
+                "name": "Canceled Orders",
+                "url": "http://localhost/staylbd/sajaladminopu/order/cancel",
+                "icon": "las la-times-circle"
+            },
+            {
+                "name": "Abandoned Carts",
+                "url": "http://localhost/staylbd/sajaladminopu/abandoned-orders",
+                "icon": "las la-shopping-cart"
+            },
+            {
+                "name": "Shipping Hub",
+                "url": "http://localhost/staylbd/sajaladminopu/shipping-method",
+                "icon": "las la-truck-moving"
+            },
+            {
+                "name": "Courier Settings",
+                "url": "http://localhost/staylbd/sajaladminopu/api-integration/courier",
+                "icon": "las la-cog"
+            },
+            {
+                "name": "Courier Logs",
+                "url": "http://localhost/staylbd/sajaladminopu/api-integration/courier/logs",
+                "icon": "las la-list-alt"
+            }
+        ],
+        "Finance": [
+            {
+                "name": "Gateways Hub",
+                "url": "http://localhost/staylbd/sajaladminopu/payment-gateways",
+                "icon": "las la-th-large"
+            },
+            {
+                "name": "Automatic",
+                "url": "http://localhost/staylbd/sajaladminopu/gateway/automatic",
+                "icon": "las la-robot"
+            },
+            {
+                "name": "Manual",
+                "url": "http://localhost/staylbd/sajaladminopu/gateway/manual",
+                "icon": "las la-hand-holding-usd"
+            }
+        ],
+        "files": [],
+        "members": []
+    },
+    "suggestions": {
+        "Popular Searches": [
+            {
+                "name": "Analytics",
+                "url": "http://localhost/staylbd/sajaladminopu/dashboard",
+                "icon": "bx bx-pie-chart-alt-2"
+            },
+            {
+                "name": "Users",
+                "url": "http://localhost/staylbd/sajaladminopu/users",
+                "icon": "bx bx-group"
+            },
+            {
+                "name": "Products",
+                "url": "http://localhost/staylbd/sajaladminopu/product",
+                "icon": "bx bx-cart-alt"
+            }
+        ]
+    }
+}

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -48,8 +49,8 @@ class AdminAiAssistantService
      */
     public function getSalesInsights(): string
     {
-        $today = Order::whereDate('created_at', today())->sum('total_amount');
-        $yesterday = Order::whereDate('created_at', today()->subDay())->sum('total_amount');
+        $today = Order::whereDate('created_at', today())->sum('total');
+        $yesterday = Order::whereDate('created_at', today()->subDay())->sum('total');
         
         $growth = 0;
         if ($yesterday > 0) {

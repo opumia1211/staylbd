@@ -27,7 +27,7 @@ class FraudDetectionService
         }
 
         // 2. High total amount for first order
-        if ($order->total_amount > 500 && $user && $user->orders()->count() === 1) {
+        if ($order->total > 500 && $user && $user->orders()->count() === 1) {
             $score += 30;
         }
 

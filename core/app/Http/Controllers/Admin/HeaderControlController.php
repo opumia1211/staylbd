@@ -19,6 +19,13 @@ class HeaderControlController extends Controller
         ]);
     }
 
+    public function preview(): View
+    {
+        return view('admin.frontend.header_control.preview', [
+            'headerControl' => HeaderControlService::getDraftConfig(),
+        ]);
+    }
+
     public function saveDraft(Request $request): RedirectResponse
     {
         $draft = HeaderControlService::getDraftConfig();

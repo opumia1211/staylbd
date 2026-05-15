@@ -93,9 +93,19 @@ class AdminController extends Controller
         $averageCLV = $biService->getAverageCLV();
         $funnel = $biService->getFunnelAnalysis();
         $aiSummary = $aiService->getSalesInsights();
+        $topProducts = $biService->getTopProducts();
+        $categoryDistribution = $biService->getCategoryDistribution();
+        $retentionRate = $biService->getRetentionRate();
+        $revenueGrowth = $biService->getRevenueGrowth();
+
+        // Real-time & Extra Metrics
+        $recentOrders = Order::with('user')->latest()->limit(5)->get();
+        $lowStockProducts = Product::where('quantity', '<=', 5)->orderBy('quantity')->limit(5)->get();
+        $topKeywords = $biService->getTopKeywords(); // Fixed method name if needed or mocked
 
         return view('admin.business_insights', compact(
-            'pageTitle', 'revenueTrends', 'conversionRate', 'averageCLV', 'funnel', 'aiSummary'
+            'pageTitle', 'revenueTrends', 'conversionRate', 'averageCLV', 'funnel', 'aiSummary', 'topProducts',
+            'categoryDistribution', 'retentionRate', 'revenueGrowth', 'recentOrders', 'lowStockProducts', 'topKeywords'
         ));
     }
 

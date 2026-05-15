@@ -156,6 +156,8 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
         Route::get('mobile-unverified', 'mobileUnverifiedUsers')->name('mobile.unverified');
         Route::get('mobile-unverified/export', 'mobileUnverifiedExport')->name('mobile.unverified.export');
         Route::get('mobile-verified', 'mobileVerifiedUsers')->name('mobile.verified');
+        Route::get('with-balance', 'withBalance')->name('with.balance');
+
 
         Route::get('detail/{id}', 'detail')->name('detail');
         Route::post('update/{id}', 'update')->name('update');
@@ -780,6 +782,7 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             })->name('sections.headericon');
             Route::get('headericons', [FrontendController::class, 'headerIcons'])->name('sections.headericons');
             Route::get('header', [HeaderControlController::class, 'index'])->name('sections.header.index');
+            Route::get('header/preview', [HeaderControlController::class, 'preview'])->name('sections.header.preview');
             Route::post('header/draft', [HeaderControlController::class, 'saveDraft'])->name('sections.header.saveDraft');
             Route::post('header/publish', [HeaderControlController::class, 'publish'])->name('sections.header.publish');
             Route::post('headericons/buttons', [FrontendController::class, 'headerButtonStore'])->name('sections.headericons.buttons.store');

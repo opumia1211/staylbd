@@ -240,7 +240,7 @@
                             <textarea name="summary" class="form-control" cols="2" rows="5" required>{{ $product->summary }}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>@lang('Key Features') <span class="text-muted small">(প্রোডাক্ট ভিউ পেজে দেখাবে)</span></label>
+                            <label>@lang('Key Features')</label>
                             <textarea name="key_features" class="form-control" cols="2" rows="5" placeholder="@lang('Product key features')">{{ $product->key_features ?? '' }}</textarea>
                         </div>
                         <div class="form-group">

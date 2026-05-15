@@ -54,7 +54,7 @@
                 </div>
                 <div class="card mb-3 border--primary section-card" id="section-basic" data-section="section-basic">
                     <div class="card-header product-create-card-header d-flex align-items-center justify-content-between">
-                        <span><i class="las la-box me-2"></i> @lang('Product Information') <span class="ms-2 opacity-90">(প্রোডাক্ট তথ্য)</span></span>
+                        <span><i class="las la-box me-2"></i> @lang('Product Information')</span>
                         <button type="button" class="btn btn-sm btn-outline-danger check-section-btn" data-section="section-basic" title="@lang('Show which fields to fill')"><i class="las la-exclamation-circle me-1"></i> @lang('Check required')</button>
                     </div>
                     <div class="card-body">
@@ -63,14 +63,14 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-3 @error('name') product-group-error @enderror">
-                                <label>@lang('Name') <span class="text-danger">*</span> <span class="text-muted small">(নাম)</span></label>
+                                <label>@lang('Name') <span class="text-danger">*</span></label>
                                 <input type="text" name="name" class="form-control @error('name') is-invalid product-field-error @enderror" value="{{ old('name') }}" required placeholder="@lang('Product name')">
                                 @error('name') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group col-md-3 @error('brand_id') product-group-error @enderror">
-                                <label>@lang('Brands') <span class="text-danger">*</span> <span class="text-muted small">(ব্র্যান্ড)</span></label>
+                                <label>@lang('Brands') <span class="text-danger">*</span></label>
                                 <select class="form-control @error('brand_id') is-invalid product-field-error @enderror" name="brand_id" required>
-                                    <option value="" selected disabled>@lang('Select One') (বাছুন)</option>
+                                    <option value="" selected disabled>@lang('Select One')</option>
                                     @foreach ($brands as $brand)
                                         <option value="{{ $brand->id }}" @selected(old('brand_id') == $brand->id)>
                                             {{ __($brand->name) }}
@@ -80,15 +80,15 @@
                                 @error('brand_id') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group col-md-3 @error('category_id') product-group-error @enderror">
-                                <label>@lang('Category') <span class="text-danger">*</span> <span class="text-muted small">(ক্যাটাগরি)</span></label>
+                                <label>@lang('Category') <span class="text-danger">*</span></label>
                                 <select name="category_id" class="form-control select2-category @error('category_id') is-invalid product-field-error @enderror" id="productCategory" required>
-                                    <option value="" selected disabled>@lang('Select Category') (বাছুন)</option>
+                                    <option value="" selected disabled>@lang('Select Category')</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ __($category->name) }}</option>
                                     @endforeach
                                 </select>
                                 @error('category_id') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
-                                <small class="form-text text-muted">@lang('Select the main category') (জামা/ইলেকট্রিক/মোবাইল ইত্যাদি)</small>
+                                <small class="form-text text-muted">@lang('Select the main category')</small>
                             </div>
                             <div class="form-group col-md-3 @error('subcategory_id') product-group-error @enderror">
                                 <label>@lang('Subcategory') <span class="text-danger">*</span> <span class="text-muted small">(সাবক্যাটাগরি)</span></label>
@@ -98,19 +98,19 @@
                                 @error('subcategory_id') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group col-md-3 @error('product_sku') product-group-error @enderror">
-                                <label>@lang('Product SKU') <span class="text-danger">*</span> <span class="text-muted small">(শর্ট কোড)</span></label>
+                                <label>@lang('Product SKU') <span class="text-danger">*</span></label>
                                 <input type="text" name="product_sku" class="form-control @error('product_sku') is-invalid product-field-error @enderror" value="{{ old('product_sku') }}" required placeholder="e.g. P001" />
                                 @error('product_sku') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
-                                <small class="form-text text-muted">@lang('Short unique code') (সংক্ষিপ্ত ও অনন্য)</small>
+                                <small class="form-text text-muted">@lang('Short unique code')</small>
                             </div>
                             <div class="form-group col-md-3" id="singleQuantityWrap">
-                                <label>@lang('Stock Quantity') <span class="text-muted small">(স্টক)</span></label>
+                                <label>@lang('Stock Quantity')</label>
                                 <input type="number" name="quantity" id="quantityInput" class="form-control" value="{{ old('quantity', 1) }}" min="0" />
-                                <small class="form-text text-muted">@lang('Leave 0 if using sizes below') (সাইজ ব্যবহার করলে ০ রাখুন)</small>
+                                <small class="form-text text-muted">@lang('Leave 0 if using sizes below')</small>
                                 <div class="alert alert-warning py-2 small mt-2 d-none" id="createStockWarning" role="alert"><i class="las la-exclamation-triangle me-1"></i> @lang('Low stock: quantity at or below alert threshold.')</div>
                             </div>
                             <div class="form-group col-md-3 @error('price') product-group-error @enderror">
-                                <label>@lang('Price') <span class="text-danger">*</span> <span class="text-muted small">(দাম)</span></label>
+                                <label>@lang('Price') <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" step="any" name="price" min="0" class="form-control @error('price') is-invalid product-field-error @enderror" value="{{ old('price') }}" required />
                                     <span class="input-group-text"> {{ __($general->cur_text) }} </span>
@@ -128,7 +128,7 @@
                                 </div>
                             </div>
                             <div class="form-group col-md-3">
-                                <label>@lang('Original Price') <span class="text-muted small">(কস্ট প্রাইস)</span></label>
+                                <label>@lang('Original Price')</label>
                                 <div class="input-group">
                                     <input type="number" step="any" name="original_price" class="form-control" value="{{ old('original_price') }}" min="0" placeholder="0">
                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
@@ -166,7 +166,7 @@
 
                 <div class="card mb-3 border--primary section-card" id="section-clothing" data-section="section-clothing">
                     <div class="card-header product-create-card-header d-flex align-items-center justify-content-between">
-                        <span><i class="las la-tshirt me-2"></i> @lang('Clothing Details') <span class="ms-2 opacity-90">(ফ্যাব্রিক, ম্যাটেরিয়াল, সিজন, কালার)</span></span>
+                        <span><i class="las la-tshirt me-2"></i> @lang('Clothing Details')</span>
                         <button type="button" class="btn btn-sm btn-outline-secondary check-section-btn" data-section="section-clothing" data-optional="1" title="@lang('View section info')"><i class="las la-info-circle me-1"></i> @lang('Check section')</button>
                     </div>
                     <div class="card-body">
@@ -200,7 +200,7 @@
 
                 <div class="card mb-3 border--primary section-card" id="section-size" data-section="section-size">
                     <div class="card-header product-create-card-header d-flex align-items-center justify-content-between">
-                        <span><i class="las la-ruler me-2"></i> @lang('Size & Stock (for Clothing)') <span class="ms-2 opacity-90">(সাইজ ও স্টক – জামাকাপড়ের জন্য)</span></span>
+                        <span><i class="las la-ruler me-2"></i> @lang('Size & Stock (for Clothing)')</span>
                         <button type="button" class="btn btn-sm btn-outline-warning check-section-btn" data-section="section-size" title="@lang('Show which fields to fill')"><i class="las la-exclamation-circle me-1"></i> @lang('Check required')</button>
                     </div>
                     <div class="card-body">
@@ -210,26 +210,26 @@
                         <div class="form-group">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="has_sizes" id="hasSizes" value="1" {{ old('has_sizes') ? 'checked' : '' }}>
-                                <label class="form-check-label" for="hasSizes">@lang('This product has sizes (e.g. jersey, clothing) – set stock per size') <span class="text-muted">(জামা/জার্সি হলে টিক দিন – প্রতি সাইজে স্টক দিন)</span></label>
+                                <label class="form-check-label" for="hasSizes">@lang('This product has sizes (e.g. jersey, clothing) – set stock per size')</label>
                             </div>
                         </div>
                         <div id="sizeStockWrap" class="row g-1 mt-2 size-stock-grid" style="display: {{ old('has_sizes') ? 'flex' : 'none' }};">
-                            <div class="col-12"><p class="small text-muted mb-1">@lang('Enter quantity in stock for each size. Only sizes with quantity &gt; 0 will be selectable; customer must select a size before ordering.') <span class="text-dark">(প্রতি সাইজে স্টক দিন – অর্ডার করতে সাইজ সিলেক্ট বাধ্যতামূলক)</span></p></div>
+                            <div class="col-12"><p class="small text-muted mb-1">@lang('Enter quantity in stock for each size. Only sizes with quantity > 0 will be selectable; customer must select a size before ordering.')</p></div>
                             @php $clothingSizes = ['NO','XXS','XS','S','M','L','XL','XXL','XXXL','4XL','5XL']; @endphp
                             @foreach($clothingSizes as $size)
                                 <div class="col-4 col-sm-3 col-md-2">
-                                    <label class="form-label small mb-0 size-stock-label">{{ $size == 'NO' ? __('Custom Size') : __('Size') . ' ' . $size }} <span class="text-muted d-none d-sm-inline">(সাইজ)</span></label>
+                                    <label class="form-label small mb-0 size-stock-label">{{ $size == 'NO' ? __('Custom Size') : __('Size') . ' ' . $size }}</label>
                                     <input type="number" name="size_qty[{{ $size }}]" class="form-control form-control-sm size-stock-input" value="{{ old('size_qty.'.$size, 0) }}" min="0" placeholder="0">
                                 </div>
                             @endforeach
                         </div>
-                        <p class="small text-muted mt-2 mb-0">@lang('Customer must select a size before Add to Cart / Buy Now. Order will show selected size.') <span class="text-success fw-semibold">(সাইজ সিলেক্ট না করলে অর্ডার করা যাবে না – অ্যাডমিনে অর্ডারে সাইজ দেখা যাবে)</span></p>
+                        <p class="small text-muted mt-2 mb-0">@lang('Customer must select a size before Add to Cart / Buy Now. Order will show selected size.')</p>
                     </div>
                 </div>
 
                 <div class="card mb-3">
                     <div class="card-header d-flex align-items-center">
-                        <i class="las la-users me-2"></i> @lang('Target Audience (optional – for personalized display)') <span class="text-muted small ms-2">(লক্ষ্য গ্রাহক – ঐচ্ছিক)</span>
+                        <i class="las la-users me-2"></i> @lang('Target Audience (optional – for personalized display)')
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -358,7 +358,7 @@
 
                 <div class="card mb-3 section-card" id="section-details" data-section="section-details">
                     <div class="card-header d-flex align-items-center justify-content-between">
-                        <span><i class="las la-align-left me-2"></i> @lang('Product Details') <span class="text-muted small ms-2">(বিবরণ)</span></span>
+                        <span><i class="las la-align-left me-2"></i> @lang('Product Details')</span>
                         <button type="button" class="btn btn-sm btn-outline-danger check-section-btn" data-section="section-details" title="@lang('Show which fields to fill')"><i class="las la-exclamation-circle me-1"></i> @lang('Check required')</button>
                     </div>
                     <div class="card-body">
@@ -369,16 +369,16 @@
                             <strong><i class="las la-pen me-1"></i> @lang('Description tips')</strong>: @lang('Include material, care instructions, size guide. Short summary for listing; full description for product page.')
                         </div>
                         <div class="form-group">
-                            <label>@lang('Summary') <span class="text-danger">*</span> <span class="text-muted small">(সংক্ষিপ্ত বিবরণ)</span></label>
+                            <label>@lang('Summary') <span class="text-danger">*</span></label>
                             <textarea name="summary" id="summaryField" class="form-control" cols="2" rows="4" required placeholder="@lang('Brief product summary')" maxlength="1000">{{ old('summary') }}</textarea>
                             <small class="text-muted"><span id="summaryCharCount">0</span>/1000 @lang('characters')</small>
                         </div>
                         <div class="form-group">
-                            <label>@lang('Key Features') <span class="text-muted small">(প্রোডাক্টের মূল বৈশিষ্ট্য)</span></label>
+                            <label>@lang('Key Features')</label>
                             <textarea name="key_features" class="form-control" cols="2" rows="3" placeholder="@lang('Bullet points or short list')">{{ old('key_features') }}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>@lang('Full Description') <span class="text-danger">*</span> <span class="text-muted small">(বিস্তারিত বিবরণ – রিচ টেক্সট)</span></label>
+                            <label>@lang('Full Description') <span class="text-danger">*</span></label>
                             <textarea rows="6" class="form-control nicEdit" name="description" id="descriptionField" placeholder="@lang('Full product description')">{{ old('description') }}</textarea>
                             <small class="text-muted"><span id="descriptionWordCount">0</span> @lang('words')</small>
                         </div>
@@ -387,7 +387,7 @@
                 <div class="col-lg-12">
                     <div class="card border--primary mt-3">
                         <div class="card-header product-create-card-header d-flex justify-content-between">
-                            <h5 class="mb-0">@lang('Product Specification') <span class="opacity-90 small">(স্পেসিফিকেশন)</span></h5>
+                            <h5 class="mb-0">@lang('Product Specification')</h5>
                             <button type="button" class="btn btn-sm btn-outline-light addFeatureData"> <i class="la la-fw la-plus"></i>@lang('Add New')</button>
                         </div>
                         <div class="card-body">
@@ -420,7 +420,7 @@
                 {{-- SEO for Clothing Product --}}
                 <div class="card mb-3 border--success section-card" id="section-seo" data-section="section-seo">
                     <div class="card-header bg-success bg-opacity-10 d-flex align-items-center justify-content-between">
-                        <span><i class="las la-search me-2 text-success"></i> <strong>@lang('Product SEO')</strong> <span class="text-muted small ms-1">(গুগল ও সার্চে ভালো র‌্যাংক)</span></span>
+                        <span><i class="las la-search me-2 text-success"></i> <strong>@lang('Product SEO')</strong></span>
                         <button type="button" class="btn btn-sm btn-outline-success check-section-btn" data-section="section-seo" data-optional="1" title="@lang('View section info')"><i class="las la-info-circle me-1"></i> @lang('Check section')</button>
                     </div>
                     <div class="card-body">
@@ -454,7 +454,7 @@
 
                 <div class="card mt-3 border--primary section-card" id="section-media" data-section="section-media">
                     <div class="card-header product-create-card-header d-flex align-items-center justify-content-between">
-                        <span><i class="las la-images me-2"></i> @lang('Image & Video') <span class="ms-2 opacity-90">(ছবি ও ভিডিও)</span></span>
+                        <span><i class="las la-images me-2"></i> @lang('Image & Video')</span>
                         <button type="button" class="btn btn-sm btn-outline-danger check-section-btn" data-section="section-media" title="@lang('Show which fields to fill')"><i class="las la-exclamation-circle me-1"></i> @lang('Check required')</button>
                     </div>
                     <div class="card-body">

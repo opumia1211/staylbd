@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){const loadingScreen=document.getElementById('loading-screen');const loginForm=document.getElementById('login-form');if(loadingScreen)loadingScreen.style.display='none';if(loginForm)loginForm.style.display='block'},3000)})

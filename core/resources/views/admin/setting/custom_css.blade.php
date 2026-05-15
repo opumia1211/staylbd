@@ -1,158 +1,177 @@
 @extends('admin.layouts.app')
+
 @section('panel')
-<div class="row mb-none-30">
-    <div class="col-12">
-        {{-- Quick Actions & Info --}}
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('admin.system.optimize') }}" class="btn btn-outline--primary btn-sm"><i class="las la-broom me-1"></i>@lang('Clear Cache')</a>
-                        <button type="button" class="btn btn-outline--danger btn-sm" data-bs-toggle="modal" data-bs-target="#resetCssModal"><i class="las la-undo me-1"></i>@lang('Reset to Empty')</button>
-                        <button type="button" class="btn btn-outline--info btn-sm" data-bs-toggle="collapse" data-bs-target="#snippetsPanel"><i class="las la-puzzle-piece me-1"></i>@lang('CSS Snippets')</button>
+<div class="container-xxl flex-grow-1 container-p-y p-0">
+    {{-- ── Tactical IDE Header ── --}}
+    <div class="row mb-3 g-3 align-items-center">
+        <div class="col-md-6">
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-label-primary p-2 rounded">
+                    <i class="las la-terminal fs-4 text-primary"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">@lang('Custom CSS IDE')</h5>
+                    <div class="d-flex align-items-center gap-2 small text-muted">
+                        <span class="badge bg-label-info rounded-pill tiny">@lang('v3.0 Stable')</span>
+                        <span class="mx-1">|</span>
+                        <code class="tiny text-primary">{{ $displayPath }}</code>
                     </div>
-                    @if($lastModified)
-                        <small class="text-muted"><i class="las la-clock me-1"></i>@lang('Last modified'): {{ $lastModified }}</small>
-                    @endif
-                </div>
-                <div class="small">
-                    <strong>@lang('Template'):</strong> <span class="badge bg-info">{{ $templateName }}</span>
-                    <span class="mx-2">|</span>
-                    <strong>@lang('File'):</strong> <code class="small">{{ $displayPath }}</code>
                 </div>
             </div>
         </div>
-
-        {{-- Info Alert --}}
-        <div class="card mb-4 bl--5-primary">
-            <div class="card-body">
-                <h6 class="text--primary"><i class="las la-info-circle me-1"></i>@lang('About This Page')</h6>
-                <p class="mb-1 small">@lang('From this page, you can add/update CSS for the user interface. Changing content on this page required programming knowledge.')</p>
-                <p class="mb-0 small text--warning">@lang('Please do not change/edit/add anything without having proper knowledge of it. The website may misbehave due to any mistake you have made.')</p>
-                <p class="mb-0 mt-2 small text-muted">@lang('When you deploy to server: the custom.css file deploys with your project. You can edit it from this panel on the server—no extra setup needed.')</p>
+        <div class="col-md-6 text-md-end">
+            <div class="btn-group shadow-sm">
+                <button type="button" class="btn btn-primary" id="saveBtn">
+                    <i class="las la-save me-1"></i> @lang('Push to Production')
+                </button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"></button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="javascript:void(0)" id="beautifyBtn"><i class="las la-magic me-2"></i>@lang('Beautify Code')</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" id="searchBtn"><i class="las la-search me-2"></i>@lang('Search & Replace')</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#resetCssModal"><i class="las la-trash-alt me-2"></i>@lang('Wipe Infrastructure')</a></li>
+                </ul>
             </div>
+            <a href="{{ route('admin.system.optimize') }}" class="btn btn-outline-secondary ms-2 shadow-sm">
+                <i class="las la-broom"></i>
+            </a>
         </div>
+    </div>
 
-        {{-- CSS Snippets (Collapsible) --}}
-        <div class="collapse mb-4" id="snippetsPanel">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="las la-puzzle-piece me-2"></i>@lang('Quick Insert Snippets')</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-md-6 col-lg-4">
-                            <button type="button" class="btn btn-outline--primary btn-sm w-100 snippet-btn" data-snippet="/* Custom utility class */
-.my-custom-class {
-    color: var(--main);
-    font-weight: 600;
-}">
-                                <i class="las la-tag me-1"></i>@lang('Utility Class')
-                            </button>
+    <div class="row g-0 border rounded shadow-sm overflow-hidden bg-white" style="min-height: 700px;">
+        {{-- ── Sidebar: Strategic Intelligence ── --}}
+        <div class="col-xl-3 col-lg-4 border-end bg-lighter d-none d-lg-block overflow-auto" style="max-height: 700px;">
+            <div class="p-4">
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted ls-1 mb-3">@lang('Advanced Snippets')</label>
+                    <div class="accordion accordion-flush custom-snippets" id="snippetAccordion">
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-0 bg-transparent fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#accGlass">
+                                    <i class="las la-glass-martini me-2 text-primary"></i>@lang('Glassmorphism')
+                                </button>
+                            </h2>
+                            <div id="accGlass" class="accordion-collapse collapse" data-bs-parent="#snippetAccordion">
+                                <div class="accordion-body px-0 py-2">
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2 snippet-btn text-start" data-snippet=".glass-node { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; }">
+                                        <i class="las la-plus me-1"></i> @lang('Frosty Card')
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 col-lg-4">
-                            <button type="button" class="btn btn-outline--primary btn-sm w-100 snippet-btn" data-snippet="/* Button override */
-.btn-custom {
-    background: var(--main);
-    border-radius: 8px;
-    padding: 10px 20px;
-}">
-                                <i class="las la-mouse-pointer me-1"></i>@lang('Button Style')
-                            </button>
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-0 bg-transparent fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#accAnim">
+                                    <i class="las la-play-circle me-2 text-primary"></i>@lang('Micro-Animations')
+                                </button>
+                            </h2>
+                            <div id="accAnim" class="accordion-collapse collapse" data-bs-parent="#snippetAccordion">
+                                <div class="accordion-body px-0 py-2">
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2 snippet-btn text-start" data-snippet="@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } } .pulse { animation: pulse 2s infinite; }">
+                                        <i class="las la-plus me-1"></i> @lang('Pulse Engine')
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2 snippet-btn text-start" data-snippet=".hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); } .hover-lift:hover { transform: translateY(-5px); }">
+                                        <i class="las la-plus me-1"></i> @lang('Smooth Lift')
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 col-lg-4">
-                            <button type="button" class="btn btn-outline--primary btn-sm w-100 snippet-btn" data-snippet="/* Responsive breakpoint */
-@media (max-width: 768px) {
-    .target-element {
-        /* mobile styles */
-    }
-}">
-                                <i class="las la-mobile-alt me-1"></i>@lang('Mobile Breakpoint')
-                            </button>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <button type="button" class="btn btn-outline--primary btn-sm w-100 snippet-btn" data-snippet="/* Hide element */
-.hide-this {
-    display: none !important;
-}">
-                                <i class="las la-eye-slash me-1"></i>@lang('Hide Element')
-                            </button>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <button type="button" class="btn btn-outline--primary btn-sm w-100 snippet-btn" data-snippet="/* Spacing utility */
-.mt-custom { margin-top: 20px; }
-.mb-custom { margin-bottom: 20px; }
-.pt-custom { padding-top: 20px; }
-.pb-custom { padding-bottom: 20px; }">
-                                <i class="las la-arrows-alt me-1"></i>@lang('Spacing')
-                            </button>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <button type="button" class="btn btn-outline--primary btn-sm w-100 snippet-btn" data-snippet="/* Card/Box style */
-.card-custom {
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-}">
-                                <i class="las la-square me-1"></i>@lang('Card Style')
-                            </button>
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-0 bg-transparent fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#accLayout">
+                                    <i class="las la-th-large me-2 text-primary"></i>@lang('Layout Clusters')
+                                </button>
+                            </h2>
+                            <div id="accLayout" class="accordion-collapse collapse" data-bs-parent="#snippetAccordion">
+                                <div class="accordion-body px-0 py-2">
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2 snippet-btn text-start" data-snippet=".grid-center { display: grid; place-items: center; min-height: 200px; }">
+                                        <i class="las la-plus me-1"></i> @lang('Perfect Center')
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2 snippet-btn text-start" data-snippet=".flex-between { display: flex; align-items: center; justify-content: space-between; gap: 15px; }">
+                                        <i class="las la-plus me-1"></i> @lang('Strategic Flex')
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <p class="mb-0 mt-2 small text-muted">@lang('Click a snippet to insert at cursor. Position cursor in editor first.')</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted ls-1 mb-3">@lang('Color Intelligence')</label>
+                    <div class="p-3 bg-white border rounded shadow-sm">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="small fw-bold">@lang('Live Picker')</span>
+                            <input type="color" class="form-control form-control-sm p-0 border-0" id="colorPicker" value="#696cff" style="width: 30px; height: 30px; cursor: pointer;">
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control bg-lighter border-0" id="colorHex" value="#696cff" readonly>
+                            <button class="btn btn-outline-primary" type="button" id="copyColor"><i class="las la-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-label-info p-3 rounded small border-start border-4 border-info">
+                    <i class="las la-info-circle me-1"></i> @lang('Use CTRL+F for search, CTRL+S to save. Editor supports Sublime key-mapping.')
                 </div>
             </div>
         </div>
 
-        {{-- Editor --}}
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-                <h6 class="mb-0">@lang('Write Custom CSS')</h6>
-                <div class="d-flex gap-2 align-items-center">
-                    <span class="badge bg-secondary" id="lineCount">0 @lang('lines')</span>
-                    <span class="badge bg-secondary" id="charCount">0 @lang('chars')</span>
-                    <button type="button" class="btn btn-sm btn-outline--primary" id="fullscreenBtn" title="@lang('Fullscreen')"><i class="las la-expand"></i></button>
-                </div>
-            </div>
-            <form action="{{ route('admin.setting.custom.css') }}" method="post">
+        {{-- ── Main: The Code Matrix ── --}}
+        <div class="col-xl-9 col-lg-8 position-relative">
+            <form action="{{ route('admin.setting.custom.css') }}" method="post" id="cssForm">
                 @csrf
-                <div class="card-body">
-                    <div class="form-group custom-css">
-                        <textarea class="form-control customCss" rows="10" name="css">{{ $fileContent }}</textarea>
-                    </div>
+                <div class="editor-wrapper">
+                    <textarea class="form-control customCss" name="css">{{ $fileContent }}</textarea>
                 </div>
-                <div class="card-footer d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                    <div class="small text-muted">
-                        <i class="las la-save me-1"></i>@lang('Save to'): <code>assets/templates/{{ $templateName }}/css/custom.css</code>
+                {{-- Status Bar --}}
+                <div class="bg-dark text-white px-4 py-2 d-flex align-items-center justify-content-between small opacity-75">
+                    <div class="d-flex gap-4">
+                        <span><i class="las la-stream me-1 text-primary"></i> <span id="lineCount">0</span> @lang('Lines')</span>
+                        <span><i class="las la-font me-1 text-primary"></i> <span id="charCount">0</span> @lang('Chars')</span>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn--primary h-45"><i class="las la-save me-1"></i>@lang('Save CSS')</button>
+                    <div class="d-flex gap-3 align-items-center">
+                        <span id="saveStatus" class="tiny text-success d-none"><i class="las la-check-circle me-1"></i>@lang('Synced')</span>
+                        <span class="tiny text-muted">@lang('Mode'): CSS</span>
+                        <span class="tiny text-muted">@lang('Theme'): Monokai</span>
                     </div>
                 </div>
             </form>
-        </div>
-
-        {{-- After Save Note --}}
-        <div class="alert alert-info mt-4 mb-0">
-            <i class="las la-lightbulb me-2"></i>@lang('After saving, clear cache if changes do not appear:') <a href="{{ route('admin.system.optimize') }}" class="alert-link">@lang('Clear Cache')</a>
+            
+            {{-- Search Panel (Dynamic) --}}
+            <div id="customSearchBox" class="position-absolute top-0 end-0 m-3 p-3 bg-white border rounded shadow-lg d-none" style="z-index: 100; width: 300px;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 small fw-bold">@lang('Advanced Search')</h6>
+                    <button type="button" class="btn-close small" id="closeSearch"></button>
+                </div>
+                <div class="mb-2">
+                    <input type="text" class="form-control form-control-sm mb-2" id="searchInput" placeholder="@lang('Search query...')">
+                    <input type="text" class="form-control form-control-sm" id="replaceInput" placeholder="@lang('Replace with...')">
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary btn-sm w-100" id="findNext">@lang('Find')</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100" id="replaceAll">@lang('Replace All')</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-{{-- Reset Confirmation Modal --}}
+{{-- Reset Modal --}}
 <div class="modal fade" id="resetCssModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">@lang('Reset Custom CSS')</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold text-white"><i class="las la-skull-crossbones me-2"></i>@lang('Core Infrastructure Purge')</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <p class="mb-0">@lang('Are you sure you want to clear all custom CSS? This cannot be undone.')</p>
+            <div class="modal-body p-4">
+                <p class="mb-0 text-muted">@lang('Warning: This action will permanently erase all custom architectural overrides and restore the factory theme styling. There is no recovery after synchronization.')</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('Cancel')</button>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@lang('Abort')</button>
                 <form action="{{ route('admin.setting.custom.css.reset') }}" method="post" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn btn--danger">@lang('Reset to Empty')</button>
+                    <button type="submit" class="btn btn-danger px-4">@lang('Confirm Wipe')</button>
                 </form>
             </div>
         </div>
@@ -161,9 +180,26 @@
 @endsection
 
 @push('style')
-
-{{-- inline style moved to critical-admin.css --}}
-
+<style>
+    .bg-lighter { background-color: #f9fafb !important; }
+    .ls-1 { letter-spacing: 1px; }
+    .tiny { font-size: 0.7rem !important; }
+    
+    .CodeMirror {
+        height: calc(700px - 36px) !important;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    .custom-snippets .btn { border-color: rgba(105, 108, 255, 0.1); border-style: dashed; }
+    .custom-snippets .btn:hover { background: rgba(105, 108, 255, 0.05); border-style: solid; color: #696cff; }
+    
+    .accordion-button::after { background-size: 1rem; width: 1rem; height: 1rem; }
+    .accordion-button:not(.collapsed) { color: #696cff; }
+    
+    .CodeMirror-selected { background-color: rgba(105, 108, 255, 0.3) !important; }
+    .CodeMirror-focused .CodeMirror-selected { background-color: rgba(105, 108, 255, 0.4) !important; }
+</style>
 @endpush
 
 @push('script-lib')
@@ -184,33 +220,89 @@
         matchBrackets: true,
         showCursorWhenSelecting: true,
         indentUnit: 4,
-        indentWithTabs: false
+        tabSize: 4,
+        indentWithTabs: false,
+        lineWrapping: true,
+        extraKeys: {
+            "Ctrl-S": function(cm) { document.getElementById('cssForm').submit(); },
+            "Ctrl-F": function(cm) { toggleSearch(); },
+            "Ctrl-Space": "autocomplete"
+        }
     });
 
     function updateStats() {
         var doc = editor.getDoc();
-        var lines = doc.lineCount();
-        var chars = doc.getValue().length;
-        document.getElementById('lineCount').textContent = lines + ' {{ __("lines") }}';
-        document.getElementById('charCount').textContent = chars + ' {{ __("chars") }}';
+        document.getElementById('lineCount').textContent = doc.lineCount();
+        document.getElementById('charCount').textContent = doc.getValue().length;
     }
     editor.on('change', updateStats);
     updateStats();
 
-    document.getElementById('fullscreenBtn').addEventListener('click', function() {
-        var cm = document.querySelector('.CodeMirror');
-        cm.classList.toggle('CodeMirror-fullscreen');
-        this.querySelector('i').classList.toggle('la-expand');
-        this.querySelector('i').classList.toggle('la-compress');
-    });
+    // Strategic Actions
+    document.getElementById('saveBtn').onclick = () => document.getElementById('cssForm').submit();
+    
+    document.getElementById('beautifyBtn').onclick = () => {
+        let content = editor.getValue();
+        // Simple beautifier logic: Add newlines after semi-colons and braces if they don't exist
+        let beautified = content
+            .replace(/\{/g, " {\n    ")
+            .replace(/\}/g, "\n}\n")
+            .replace(/;/g, ";\n    ")
+            .replace(/\n\s*\n/g, "\n")
+            .replace(/^\s+/gm, (m) => m.replace(/    /g, "    "));
+        editor.setValue(beautified);
+        notify('success', '@lang("CSS structural normalization complete.")');
+    };
 
-    document.querySelectorAll('.snippet-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var snippet = this.getAttribute('data-snippet');
-            var doc = editor.getDoc();
-            var cursor = doc.getCursor();
-            doc.replaceRange(snippet, cursor);
-        });
+    // Search Logic
+    function toggleSearch() {
+        document.getElementById('customSearchBox').classList.toggle('d-none');
+        if(!document.getElementById('customSearchBox').classList.contains('d-none')) {
+            document.getElementById('searchInput').focus();
+        }
+    }
+    document.getElementById('searchBtn').onclick = toggleSearch;
+    document.getElementById('closeSearch').onclick = toggleSearch;
+
+    document.getElementById('findNext').onclick = () => {
+        let query = document.getElementById('searchInput').value;
+        if(query) {
+            let cursor = editor.getSearchCursor(query);
+            if(cursor.findNext()) {
+                editor.setSelection(cursor.from(), cursor.to());
+                editor.scrollIntoView({from: cursor.from(), to: cursor.to()}, 20);
+            }
+        }
+    };
+
+    document.getElementById('replaceAll').onclick = () => {
+        let query = document.getElementById('searchInput').value;
+        let replace = document.getElementById('replaceInput').value;
+        if(query) {
+            let content = editor.getValue();
+            let newContent = content.split(query).join(replace);
+            editor.setValue(newContent);
+            notify('success', '@lang("Global replacement complete.")');
+        }
+    };
+
+    // Color Intelligence
+    const picker = document.getElementById('colorPicker');
+    const hexInput = document.getElementById('colorHex');
+    picker.oninput = (e) => hexInput.value = e.target.value;
+    document.getElementById('copyColor').onclick = () => {
+        navigator.clipboard.writeText(hexInput.value);
+        notify('success', '@lang("Color token copied to matrix.")');
+    };
+
+    // Snippets
+    document.querySelectorAll('.snippet-btn').forEach(btn => {
+        btn.onclick = function() {
+            let snippet = this.getAttribute('data-snippet');
+            editor.replaceSelection(snippet);
+            editor.focus();
+        };
     });
 </script>
 @endpush
+

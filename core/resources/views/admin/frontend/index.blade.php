@@ -1,664 +1,436 @@
 @extends('admin.layouts.app')
 @section('panel')
-    @if($key == 'contact_us')
-        {{-- Compact: Channel info + Message Center in one bar --}}
-        <div class="card border-0 shadow-sm mb-3 contact-top-bar">
-            <div class="card-body py-2 px-3">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                    <div class="d-flex flex-wrap align-items-center gap-3 small text-muted">
-                        <span><i class="las la-shield-alt text-success"></i> @lang('Channel settings') (WhatsApp, Telegram, Email) – @lang('set below, used in background')</span>
+<div class="row g-4">
+    <!-- Frontend Intelligence: Primary Controls -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-2">
+                        <span class="avatar-initial rounded bg-label-primary"><i class="las la-broadcast-tower"></i></span>
                     </div>
-                    <div class="d-flex flex-wrap align-items-center gap-1">
-                        <a href="{{ route('admin.ticket.index') }}" class="btn btn--primary btn-sm py-1 px-2"><i class="las la-inbox"></i> @lang('Inbox')</a>
-                        <a href="{{ route('admin.ticket.pending') }}" class="btn btn--warning btn-sm py-1 px-2"><i class="las la-clock"></i> @lang('Pending')</a>
-                        <a href="{{ route('admin.ticket.answered') }}" class="btn btn--success btn-sm py-1 px-2"><i class="las la-check-circle"></i> @lang('Answered')</a>
-                        <a href="{{ route('admin.ticket.closed') }}" class="btn btn-outline--dark btn-sm py-1 px-2">@lang('Closed')</a>
+                    <div>
+                        <h5 class="mb-0 text-capitalize">{{ __(keyToTitle($key)) }} Intelligence</h5>
+                        <small class="text-muted">@lang('Manage public display parameters and dynamic elements')</small>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    @if($key == 'contact_us')
+                        <a href="{{ route('admin.ticket.index') }}" class="btn btn-label-success btn-sm"><i class="las la-inbox me-1"></i> @lang('Go to Inbox')</a>
+                    @endif
+                    <div class="badge bg-label-info rounded-pill px-3 py-2 d-flex align-items-center">
+                        <i class="las la-database me-1"></i> {{ count($elements ?? []) }} @lang('Elements')
                     </div>
                 </div>
             </div>
         </div>
-    @endif
-    @if($key == 'policy_pages')
-        {{-- Compact: Policy pages hint + short user URLs --}}
-        <div class="card border-0 shadow-sm mb-3 policy-top-bar" role="region" aria-label="@lang('Policy pages info')">
-            <div class="card-body py-2 px-3">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                    <span class="small text-muted"><i class="las la-file-contract text--primary" aria-hidden="true"></i> @lang('Policy Pages') — @lang('Privacy, Terms, Shipping, etc. User links') <code class="small">/policy/{id}</code> @lang('(short) or') <code class="small">/policy/slug/id</code></span>
+
+        @if($key == 'contact_us' || $key == 'policy_pages')
+            <div class="alert bg-label-secondary border-0 mb-4 d-flex align-items-center p-3">
+                <i class="las la-info-circle fs-4 me-2 text-primary"></i>
+                <div class="small">
+                    @if($key == 'contact_us')
+                        @lang('Channel settings (WhatsApp, Telegram, Email) – set below, used in background for various widgets.')
+                    @else
+                        @lang('Policy Pages — Privacy, Terms, Shipping, etc. Public links available at') <code class="small text-primary">/policy/{id}</code>
+                    @endif
                 </div>
             </div>
-        </div>
-    @endif
-    @if(@$section->content)
-        <div class="row">
-            <div class="col-12 {{ $key == 'contact_us' ? 'mb-3' : 'mb-30' }}">
-                <div class="card {{ $key == 'contact_us' ? 'border-0 shadow-sm' : '' }}">
-                    <div class="card-body {{ $key == 'contact_us' ? 'py-3 px-3' : '' }}">
-                        <form action="{{ route(getFrontendSectionRoute($key, 'content')) }}" method="POST" enctype="multipart/form-data" class="{{ $key == 'contact_us' ? 'contact-content-form' : '' }}" aria-label="@lang('Content settings form')">
-                            @csrf
-                            <input type="hidden" name="type" value="content">
-                            <div class="row {{ $key == 'contact_us' ? 'g-2' : '' }}">
-                                @php
-                                    $imgCount = 0;
-                                @endphp
-                                @foreach($section->content as $k => $item)
-                                    @if($k == 'images')
-                                        @php
-                                            $imgCount = collect($item)->count();
-                                        @endphp
-                                        @foreach($item as $imgKey => $image)
-                                            <div class="col-md-4">
-                                                <input type="hidden" name="has_image" value="1">
-                                                <div class="form-group">
-                                                    <label>{{__(keyToTitle(@$imgKey))}}</label>
-                                                    <div class="image-upload">
-                                                        <div class="thumb">
-                                                            <div class="avatar-preview">
-                                                                <div class="profilePicPreview" style="background-image: url({{getImage('assets/images/frontend/' . $key .'/'. @$content->data_values->$imgKey,@$section->content->images->$imgKey->size) }})">
-                                                                    <button type="button" class="remove-image"><i class="fa fa-times"></i></button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="avatar-edit">
-                                                                <input type="file" class="profilePicUpload" name="image_input[{{ @$imgKey }}]" id="fe_c_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg">
-                                                                <label for="fe_c_img_{{ $key }}_{{ $loop->index }}"
-                                                                       class="bg--primary">{{__(keyToTitle(@$imgKey))}}</label>
-                                                                <small class="mt-2  ">@lang('Supported files'): <b>@lang('jpeg'), @lang('jpg'), @lang('png')</b>.
-                                                                    @if(@$section->content->images->$imgKey->size)
-                                                                        | @lang('Will be resized to'):
-                                                                        <b>{{@$section->content->images->$imgKey->size}}</b>
-                                                                        @lang('px').
-                                                                    @endif
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+        @endif
+
+        {{-- Section Content (Single Items) --}}
+        @if(@$section->content)
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header border-bottom py-3 d-flex align-items-center">
+                <i class="las la-edit me-2 fs-4 text-primary"></i>
+                <h6 class="mb-0">@lang('Configuration Matrix')</h6>
+            </div>
+            <div class="card-body">
+                <form action="{{ route(getFrontendSectionRoute($key, 'content'), $key) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="type" value="content">
+                    <div class="row g-3">
+                        @foreach($section->content as $k => $item)
+                            @if($k == 'images')
+                                @foreach($item as $imgKey => $image)
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold small text-muted">{{__(keyToTitle(@$imgKey))}}</label>
+                                        <div class="fe-image-upload-wrapper border rounded p-3 text-center bg-light-soft position-relative">
+                                            <input type="hidden" name="has_image" value="1">
+                                            <div class="preview-container mb-3 mx-auto" style="width: 150px; height: 100px; overflow: hidden; border-radius: 8px; border: 1px dashed #d9dee3;">
+                                                <img src="{{getImage('assets/images/frontend/' . $key .'/'. @$content->data_values->$imgKey,@$section->content->images->$imgKey->size) }}" class="w-100 h-100 object-fit-cover preview-img-target">
                                             </div>
-                                        @endforeach
-                                        <div class="@if($imgCount > 1) col-md-12 @else col-md-8 @endif">
-                                            @push('divend')
+                                            <div class="upload-controls">
+                                                <input type="file" class="form-control form-control-sm d-none image-upload-input" name="image_input[{{ @$imgKey }}]" id="fe_c_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg">
+                                                <label for="fe_c_img_{{ $key }}_{{ $loop->index }}" class="btn btn-outline-primary btn-sm px-4">
+                                                    <i class="las la-cloud-upload-alt me-1"></i> @lang('Select File')
+                                                </label>
+                                            </div>
+                                            <small class="text-muted d-block mt-2 tiny">
+                                                @if(@$section->content->images->$imgKey->size) <b>{{@$section->content->images->$imgKey->size}}px</b> | @endif @lang('JPG, PNG, JPEG supported')
+                                            </small>
                                         </div>
-                                        @endpush
-                                    @else
-                                        @if($k != 'images')
-                                            @if($item == 'icon')
-                                                @php $feId = 'fe_c_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                                <div class="col-md-12">
-                                                    <div class="form-group ">
-                                                        <label for="{{ $feId }}">{{__(keyToTitle($k))}}</label>
-                                                        <div class="input-group">
-                                                            <input type="text" id="{{ $feId }}" class="form-control iconPicker icon" autocomplete="off" name="{{ $k }}" value="{{ @$content->data_values->$k }}" required>
-                                                            <span class="input-group-text  input-group-addon" data-icon="las la-home" role="iconpicker"></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @elseif($item == 'textarea')
-                                                @php $feId = 'fe_c_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label for="{{ $feId }}">{{__(keyToTitle($k))}}</label>
-                                                        <textarea id="{{ $feId }}" rows="10" class="form-control" name="{{$k}}" required>{{ @$content->data_values->$k}}</textarea>
-                                                    </div>
-                                                </div>
-
-                                            @elseif($item == 'textarea-nic')
-                                                @php $feId = 'fe_c_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label for="{{ $feId }}">{{__(keyToTitle($k))}}</label>
-                                                        <textarea id="{{ $feId }}" rows="10" class="form-control nicEdit" name="{{$k}}" >{{ @$content->data_values->$k}}</textarea>
-                                                    </div>
-                                                </div>
-                                            @elseif($k == 'select')
-                                                @php
-                                                    $selectName = $item->name;
-                                                    $feId = 'fe_c_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $selectName);
-                                                @endphp
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label for="{{ $feId }}">{{__(keyToTitle(@$selectName))}}</label>
-                                                        <select id="{{ $feId }}" class="form-control" name="{{ @$selectName }}">
-                                                            @foreach($item->options as $selectItemKey => $selectOption)
-                                                                <option value="{{ $selectItemKey }}" @if(@$content->data_values->$selectName == $selectItemKey) selected @endif>{{ $selectOption }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                @php $feId = 'fe_c_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label for="{{ $feId }}">{{__(keyToTitle($k))}}</label>
-                                                        <input type="text" id="{{ $feId }}" class="form-control" name="{{$k}}" value="{{@$content->data_values->$k }}" required/>
-                                                    </div>
-                                                </div>
-
-                                            @endif
-                                        @endif
-                                    @endif
+                                    </div>
                                 @endforeach
-                                @stack('divend')
-                            </div>
-
-                            <div class="form-group {{ $key == 'contact_us' ? 'mb-0 mt-2' : '' }}">
-                                <button type="submit" class="btn btn--primary {{ $key == 'contact_us' ? 'btn-sm' : 'w-100 h-45' }}">@lang('Submit')</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
-
-    @if(@$section->element)
-        @if($key == 'service')
-        <div class="card border-0 shadow-sm mb-3 font-sans">
-            <div class="card-body py-2 px-3 text-sm text-slate-600">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <div class="bg-primary-soft p-1.5 rounded-pill">
-                        <i class="las la-info-circle text-primary fs-5"></i>
-                    </div>
-                    <p class="mb-0 fw-bold text-slate-800">@lang('Homepage Feature Cards Design Guide')</p>
-                </div>
-                <ul class="mb-0 ps-3 small text-slate-500">
-                    <li>@lang('Each item becomes a premium card on the homepage (below banner).')</li>
-                    <li>@lang('Optimal Image Format'): <span class="badge badge-soft--success">SVG</span> or <span class="badge badge-soft--info">PNG (Transparent)</span> / <span class="badge badge-soft--warning">WebP</span>.</li>
-                    <li>@lang('Recommended Size'): <b>128x128 px</b> (@lang('for high-quality rendering')).</li>
-                    <li>@lang('Design Note'): @lang('Images will be placed inside the offset colorful icon box on the left.')</li>
-                </ul>
-            </div>
-        </div>
-        @endif
-
-        @if($key == 'social_icon')
-        <div class="card border-0 shadow-sm mb-3 font-sans">
-            <div class="card-body py-2 px-3 text-sm text-slate-600">
-                <p class="mb-1 fw-semibold text-slate-800">@lang('Social icon options')</p>
-                <ul class="mb-0 ps-3 small">
-                    <li>@lang('Pick a demo icon from the library (click the square next to the field), or type classes e.g.') <code class="small">fab fa-facebook-f</code> / <code class="small">lab la-instagram</code>.</li>
-                    <li>@lang('Optional: upload a custom logo (PNG, JPG, WebP, SVG). If uploaded, it is shown in the footer instead of the library icon.')</li>
-                    <li>@lang('Visibility: use the switch in the table for one-click Public / Private, or set it in Add / Edit.')</li>
-                </ul>
-            </div>
-        </div>
-        @endif
-
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
-            @if($key == 'contact_us')
-            <span class="small text-muted">@lang('Contact methods shown on site (e.g. WhatsApp, Phone, Email).')</span>
-            @endif
-            @if($key == 'policy_pages')
-            <span class="small text-muted">@lang('Each row is one policy page. Edit opens full editor.')</span>
-            @endif
-            <div class="input-group input-group-sm" style="{{ ($key == 'contact_us' || $key == 'policy_pages') ? 'width: 180px;' : '' }}">
-                <label for="fe_search_table_{{ $key }}" class="sr-only">@lang('Search table')</label>
-                <input type="text" id="fe_search_table_{{ $key }}" name="search_table" class="form-control form-control-sm bg--white" placeholder="@lang('Search')..." aria-label="@lang('Search')">
-                <button type="button" class="btn btn--primary btn-sm input-group-text" aria-label="@lang('Search')"><i class="fa fa-search" aria-hidden="true"></i></button>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                <div class="card {{ ($key == 'contact_us' || $key == 'policy_pages') ? 'border-0 shadow-sm' : '' }}">
-                    <div class="card-body {{ ($key == 'contact_us' || $key == 'policy_pages') ? 'p-2' : 'p-0' }}">
-                        <div class="table-responsive--sm table-responsive">
-                            <table class="table table--light style--two custom-data-table {{ ($key == 'contact_us' || $key == 'policy_pages') ? 'table-sm mb-0' : '' }}">
-                                <thead>
-                                <tr>
-                                    <th>@lang('SL')</th>
-                                    @if(@$section->element->images)
-                                        <th>@lang('Image')</th>
-                                    @endif
-                                    @foreach($section->element as $k => $type)
-                                        @if($k !='modal')
-                                            @if($type=='text' || $type=='icon')
-                                                <th>{{ __(keyToTitle($k)) }}</th>
-                                            @elseif($type == 'textarea')
-                                                <th>{{ __(keyToTitle($k)) }}</th>
-                                            @elseif($k == 'select')
-                                                <th>{{keyToTitle(@$section->element->$k->name)}}</th>
-                                            @endif
-                                        @endif
-                                    @endforeach
-                                    <th>@lang('Action')</th>
-                                </tr>
-                                </thead>
-                                <tbody class="list">
-                                @forelse($elements as $data)
-                                    <tr>
-                                        <td>{{$loop->iteration}}</td>
-                                        @if(@$section->element->images)
-                                        @php $firstKey = collect($section->element->images)->keys()[0]; @endphp
-                                            <td>
-                                                <div class="customer-details d-block">
-                                                    <a href="javascript:void(0)" class="thumb">
-                                                        <img src="{{ getImage('assets/images/frontend/' . $key .'/'. @$data->data_values->$firstKey,@$section->element->images->$firstKey->size) }}" alt="@lang('image')">
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        @endif
-                                        @foreach($section->element as $k => $type)
-                                            @if($k !='modal')
-                                                @if($type == 'text' || $type == 'icon')
-                                                    @if($type == 'icon')
-                                                        <td class="small">@if($key == 'social_icon'){{ \Illuminate\Support\Str::limit(strip_tags((string)(@$data->data_values->$k ?? '')), 42) }}@else @php echo @$data->data_values->$k; @endphp @endif</td>
-                                                    @else
-                                                        <td>{{__(@$data->data_values->$k)}}</td>
-                                                    @endif
-                                                @elseif($type == 'textarea')
-                                                    <td class="small text-muted">{{ \Illuminate\Support\Str::limit(strip_tags((string)(@$data->data_values->$k ?? '')), 32) }}</td>
-                                                @elseif($k == 'select')
-                                                    @php
-                                                        $dataVal = @$section->element->$k->name;
-                                                        $selRaw = @$data->data_values->$dataVal;
-                                                    @endphp
-                                                    <td class="align-middle">
-                                                        @if($key == 'social_icon' && $dataVal === 'show_on_public')
-                                                            @php $pub = ($selRaw === null || $selRaw === '' || (int) $selRaw === 1); @endphp
-                                                            <div class="form-check form-switch m-0 d-inline-flex align-items-center gap-2 social-icon-pub-cell">
-                                                                <input type="checkbox" class="form-check-input social-icon-pub-toggle" role="switch" id="soc_pub_{{ $data->id }}" data-id="{{ $data->id }}" @if($pub) checked @endif title="{{ __('Toggle: show or hide in site footer') }}" aria-label="{{ __('Show in footer') }}">
-                                                                <label class="form-check-label small mb-0 text-nowrap" for="soc_pub_{{ $data->id }}">{{ $pub ? __('Public') : __('Private') }}</label>
-                                                            </div>
-                                                        @else
-                                                            {{ $selRaw }}
-                                                        @endif
-                                                    </td>
-                                                @endif
-                                            @endif
-                                        @endforeach
-                                        <td>
-                                            <div class="button--group">
-                                                @if($section->element->modal)
-                                                @php
-                                                    $images = [];
-                                                    if(@$section->element->images){
-                                                        foreach($section->element->images as $imgKey => $imgs){
-                                                            $imgName = isset($data->data_values->$imgKey) ? $data->data_values->$imgKey : '';
-                                                            $imgName = is_scalar($imgName) ? (string) $imgName : '';
-                                                            $relPath = 'assets/images/frontend/' . $key . '/' . $imgName;
-                                                            $images[] = getImage($relPath, @$section->element->images->$imgKey->size);
-                                                        }
-                                                    }
-                                                    $__feRowDvJson = json_encode($data->data_values ?? new \stdClass(), JSON_UNESCAPED_UNICODE);
-                                                    if ($__feRowDvJson === false) {
-                                                        $__feRowDvJson = '{}';
-                                                    }
-                                                    $__feRowDvB64 = base64_encode($__feRowDvJson);
-                                                    $__feRowImgB64 = ! empty($images) ? base64_encode(json_encode($images, JSON_UNESCAPED_UNICODE)) : '';
-                                                @endphp
-                                                    <button type="button" class="btn btn-sm btn-outline--primary updateBtn"
-                                                        data-id="{{$data->id}}"
-                                                        data-fe-dv="{{ $__feRowDvB64 }}"
-                                                        @if($__feRowImgB64 !== '')
-                                                            data-fe-images="{{ $__feRowImgB64 }}"
-                                                        @endif>
-                                                        <i class="la la-pencil-alt"></i> @lang('Edit')
-                                                    </button>
-                                                @else
-                                                    <a href="{{ route(getFrontendSectionRoute($key, 'element'), $data->id) }}" class="btn btn-sm btn-outline--primary"><i class="la la-pencil-alt"></i> @lang('Edit')</a>
-                                                @endif
-                                                <button class="btn btn-sm btn-outline--danger confirmationBtn"
-                                                data-action="{{ route('admin.frontend.remove',$data->id) }}"
-                                                data-question="@lang('Are you sure to remove this item?')"><i class="la la-trash"></i> @lang('Remove')</button>
+                            @else
+                                @if($k != 'images')
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-bold small text-muted">{{__(keyToTitle($k))}}</label>
+                                        @if($item == 'icon')
+                                            <div class="input-group input-group-merge">
+                                                <input type="text" class="form-control iconPicker icon" autocomplete="off" name="{{ $k }}" value="{{ @$content->data_values->$k }}" required>
+                                                <span class="input-group-text border-start-0" data-icon="las la-home" role="iconpicker"></span>
                                             </div>
+                                        @elseif($item == 'textarea')
+                                            <textarea rows="4" class="form-control" name="{{$k}}" required>{{ @$content->data_values->$k}}</textarea>
+                                        @elseif($item == 'textarea-nic')
+                                            <textarea rows="8" class="form-control nicEdit" name="{{$k}}">{{ @$content->data_values->$k}}</textarea>
+                                        @elseif($k == 'select')
+                                            <select class="form-select" name="{{ @$item->name }}">
+                                                @foreach($item->options as $selectItemKey => $selectOption)
+                                                    <option value="{{ $selectItemKey }}" @if(@$content->data_values->{$item->name} == $selectItemKey) selected @endif>{{ $selectOption }}</option>
+                                                @endforeach
+                                            </select>
+                                        @else
+                                            <input type="text" class="form-control" name="{{$k}}" value="{{@$content->data_values->$k }}" required/>
+                                        @endif
+                                    </div>
+                                @endif
+                            @endif
+                        @endforeach
+                    </div>
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                            <i class="las la-save me-1"></i> @lang('Deploy Changes')
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endif
+
+        {{-- Section Elements (Table items) --}}
+        @if(@$section->element)
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center">
+                    <i class="las la-layer-group me-2 fs-4 text-success"></i>
+                    <h6 class="mb-0">@lang('Dynamic Element Hub')</h6>
+                </div>
+                <div class="d-flex gap-2 w-auto">
+                    <div class="input-group input-group-merge input-group-sm w-px-200">
+                        <span class="input-group-text"><i class="las la-search"></i></span>
+                        <input type="text" id="elementSearch" class="form-control" placeholder="@lang('Quick Filter...')">
+                    </div>
+                    @if($section->element->modal)
+                        <button type="button" class="btn btn-primary btn-sm addBtn shadow-sm px-3"><i class="las la-plus me-1"></i> @lang('Add New')</button>
+                    @else
+                        <a href="{{ route(getFrontendSectionRoute($key, 'element')) }}" class="btn btn-primary btn-sm shadow-sm px-3"><i class="las la-plus me-1"></i> @lang('Add New')</a>
+                    @endif
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-lighter">
+                        <tr>
+                            <th class="ps-4 py-2 small fw-bold">@lang('SL')</th>
+                            @if(@$section->element->images)
+                                <th class="py-2 small fw-bold">@lang('Visual')</th>
+                            @endif
+                            @foreach($section->element as $k => $type)
+                                @if($k !='modal')
+                                    @if($type=='text' || $type=='icon' || $type == 'textarea' || $k == 'select')
+                                        <th class="py-2 small fw-bold">{{ __(keyToTitle($k == 'select' ? @$section->element->$k->name : $k)) }}</th>
+                                    @endif
+                                @endif
+                            @endforeach
+                            <th class="text-end pe-4 py-2 small fw-bold">@lang('Action')</th>
+                        </tr>
+                    </thead>
+                    <tbody class="list" id="elementTableBody">
+                        @forelse($elements as $data)
+                        <tr class="element-row" data-search="{{ strtolower(json_encode($data->data_values)) }}">
+                            <td class="ps-4"><span class="text-muted small">#{{$loop->iteration}}</span></td>
+                            @if(@$section->element->images)
+                                @php $firstKey = collect($section->element->images)->keys()[0]; @endphp
+                                <td>
+                                    <img src="{{ getImage('assets/images/frontend/' . $key .'/'. @$data->data_values->$firstKey,@$section->element->images->$firstKey->size) }}" class="rounded shadow-xs border" width="45" height="30" style="object-fit: cover;">
+                                </td>
+                            @endif
+                            @foreach($section->element as $k => $type)
+                                @if($k !='modal')
+                                    @if($type == 'text' || $type == 'icon')
+                                        <td class="small fw-semibold">
+                                            @if($type == 'icon')
+                                                <i class="{{ @$data->data_values->$k }} fs-5 text-primary me-1"></i>
+                                                <span class="text-muted tiny d-block d-md-inline">{{ \Illuminate\Support\Str::limit(strip_tags((string)(@$data->data_values->$k ?? '')), 15) }}</span>
+                                            @else
+                                                {{__(@$data->data_values->$k)}}
+                                            @endif
                                         </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td class="text-muted text-center" colspan="100%">{{ __($emptyMessage) }}</td>
-                                    </tr>
-                                @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                    @elseif($type == 'textarea')
+                                        <td class="small text-muted tiny">{{ \Illuminate\Support\Str::limit(strip_tags((string)(@$data->data_values->$k ?? '')), 25) }}</td>
+                                    @elseif($k == 'select')
+                                        @php $dataVal = @$section->element->$k->name; $selRaw = @$data->data_values->$dataVal; @endphp
+                                        <td>
+                                            @if($key == 'social_icon' && $dataVal === 'show_on_public')
+                                                @php $pub = ($selRaw === null || $selRaw === '' || (int) $selRaw === 1); @endphp
+                                                <span class="badge {{ $pub ? 'bg-label-success' : 'bg-label-danger' }} tiny">
+                                                    {{ $pub ? __('Public') : __('Private') }}
+                                                </span>
+                                            @else
+                                                <span class="text-muted small">{{ $selRaw }}</span>
+                                            @endif
+                                        </td>
+                                    @endif
+                                @endif
+                            @endforeach
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    @if($section->element->modal)
+                                        @php
+                                            $images = [];
+                                            if(@$section->element->images){
+                                                foreach($section->element->images as $imgKey => $imgs){
+                                                    $imgName = @$data->data_values->$imgKey ?: '';
+                                                    $images[] = getImage('assets/images/frontend/' . $key . '/' . $imgName, @$section->element->images->$imgKey->size);
+                                                }
+                                            }
+                                            $dvJson = json_encode($data->data_values ?? new \stdClass());
+                                            $dvB64 = base64_encode($dvJson);
+                                            $imgB64 = !empty($images) ? base64_encode(json_encode($images)) : '';
+                                        @endphp
+                                        <button type="button" class="btn btn-sm btn-outline-primary updateBtn" data-id="{{$data->id}}" data-fe-dv="{{ $dvB64 }}" @if($imgB64) data-fe-images="{{ $imgB64 }}" @endif>
+                                            <i class="la la-pencil"></i>
+                                        </button>
+                                    @else
+                                        <a href="{{ route(getFrontendSectionRoute($key, 'element'), $data->id) }}" class="btn btn-sm btn-outline-primary"><i class="la la-pencil"></i></a>
+                                    @endif
+                                    <button class="btn btn-sm btn-outline-danger confirmationBtn" data-action="{{ route('admin.frontend.remove',$data->id) }}" data-question="@lang('Remove this element from public view?')">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td class="text-center py-5" colspan="100%">
+                                <i class="las la-folder-open fs-1 text-muted opacity-25"></i>
+                                <div class="text-muted small mt-2">@lang('No items found in this section matrix.')</div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    <!-- Tactical Visual Intelligence Sidebar -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="sticky-top" style="top: 130px; z-index: 1 !important;">
+            <div class="card border-0 shadow-sm mb-4 bg-dark text-white overflow-hidden">
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="las la-eye fs-4 text-success me-2"></i>
+                        <h6 class="mb-0 text-white ls-1">@lang('Tactical Preview')</h6>
+                    </div>
+                    <div class="preview-mockup rounded bg-lighter p-3 text-center border-dashed border-secondary mb-3">
+                        @if(in_array($key, ['banner', 'middle_banner', 'bottom_banner']))
+                            <div class="banner-mockup rounded bg-secondary position-relative overflow-hidden" style="height: 120px;">
+                                @php $firstImg = @$section->content->images ? collect(@$section->content->images)->keys()->first() : null; @endphp
+                                @if($firstImg)
+                                    <img src="{{ getImage('assets/images/frontend/' . $key .'/'. @$content->data_values->$firstImg) }}" class="w-100 h-100 object-fit-cover opacity-50">
+                                @endif
+                                <div class="position-absolute top-50 start-50 translate-middle w-75">
+                                    <div class="bg-white p-1 rounded-pill w-100 mb-1"></div>
+                                    <div class="bg-white p-1 rounded-pill w-50 mx-auto"></div>
+                                </div>
+                            </div>
+                        @elseif($key == 'service')
+                            <div class="row g-2">
+                                @for($i=0; $i<4; $i++)
+                                <div class="col-6">
+                                    <div class="bg-white rounded p-2 text-start border shadow-xs">
+                                        <div class="avatar avatar-xs bg-label-primary mb-1"></div>
+                                        <div class="bg-light p-1 rounded w-75"></div>
+                                    </div>
+                                </div>
+                                @endfor
+                            </div>
+                        @else
+                            <div class="text-muted py-5 px-3">
+                                <i class="las la-image fs-1 opacity-25"></i>
+                                <p class="small mb-0">@lang('Dynamic visualization for') <b>{{ $key }}</b></p>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="small text-white-50">
+                        <i class="las la-info-circle me-1"></i> @lang('Public rendering is optimized for all devices.')
                     </div>
                 </div>
             </div>
-        </div>
 
-        {{-- Add METHOD MODAL --}}
-        <div id="addModal" class="modal fade {{ $key == 'contact_us' ? 'contact-element-modal' : '' }} {{ $key == 'social_icon' ? 'social-icon-fe-modal' : '' }}" tabindex="-1" role="dialog">
-            <div class="modal-dialog {{ $key == 'contact_us' ? 'modal-dialog-centered' : '' }} {{ $key == 'social_icon' ? 'modal-dialog-centered' : '' }}" role="document">
-                <div class="modal-content {{ $key == 'social_icon' ? 'font-sans' : '' }}">
-                    <div class="modal-header {{ $key == 'contact_us' ? 'py-2' : '' }} {{ $key == 'social_icon' ? 'py-2 px-3 border-bottom' : '' }}">
-                        <h5 class="modal-title {{ $key == 'contact_us' ? 'small' : '' }} {{ $key == 'social_icon' ? 'h6 mb-0 font-weight-bold' : '' }}"> @lang('Add New') {{__(keyToTitle($key))}} @lang('Item')</h5>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                            <i class="las la-times"></i>
-                        </button>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-bottom py-3">
+                    <h6 class="mb-0">@lang('Intelligence Summary')</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush border-0">
+                        <div class="list-group-item d-flex align-items-center justify-content-between py-3 border-0">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-xs me-2">
+                                    <span class="avatar-initial rounded bg-label-success"><i class="las la-check"></i></span>
+                                </div>
+                                <span class="small fw-semibold">@lang('Status')</span>
+                            </div>
+                            <span class="badge bg-label-success px-3">@lang('Operational')</span>
+                        </div>
+                        <div class="list-group-item d-flex align-items-center justify-content-between py-3 border-0">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-xs me-2">
+                                    <span class="avatar-initial rounded bg-label-primary"><i class="las la-clock"></i></span>
+                                </div>
+                                <span class="small fw-semibold">@lang('Last Updated')</span>
+                            </div>
+                            <span class="text-muted tiny">{{ now()->format('d M, Y') }}</span>
+                        </div>
                     </div>
-                    <form action="{{ route(getFrontendSectionRoute($key, 'content')) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="type" value="element">
-                        <div class="modal-body {{ $key == 'contact_us' ? 'py-2' : '' }} {{ $key == 'social_icon' ? 'py-2 px-3' : '' }}">
-                            @foreach($section->element as $k => $type)
-                                @if($k != 'modal')
-                                    @if($k == 'title')
-                                        <div class="row g-2 mb-2">
-                                            <div class="col-sm-7">
-                                                @php $feAddId = 'fe_add_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                                <div class="form-group mb-0">
-                                                    <label for="{{ $feAddId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">{{__(keyToTitle($k))}}</label>
-                                                    <input type="text" id="{{ $feAddId }}" class="form-control form-control-sm" name="{{ $k }}" required/>
-                                                </div>
-                                            </div>
-                                            @php $iconK = array_search('icon', (array)$section->element); @endphp
-                                            @if($iconK)
-                                            <div class="col-sm-5">
-                                                @php $feAddIconId = 'fe_add_' . $key . '_icon'; @endphp
-                                                <div class="form-group mb-0">
-                                                    <label for="{{ $feAddIconId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">@lang('Icon Name')</label>
-                                                    <div class="input-group input-group-sm">
-                                                        <input type="text" id="{{ $feAddIconId }}" class="form-control iconPicker icon form-control-sm" autocomplete="off" name="icon" value="lab la-share-alt" placeholder="fa fa-facebook" required>
-                                                        <span class="input-group-text input-group-addon py-0 px-2" data-icon="lab la-share-alt" role="iconpicker"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endif
+                </div>
+                <div class="card-footer bg-light py-3 border-top-0 rounded-bottom">
+                    <button class="btn btn-outline-secondary btn-sm w-100" type="button" onclick="window.location.reload()">
+                        <i class="las la-sync-alt me-1"></i> @lang('Refresh Matrix')
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Standard Modals --}}
+<div id="addModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-bottom py-3">
+                <h5 class="modal-title h6">@lang('Add New Matrix Item')</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route(getFrontendSectionRoute($key, 'content'), $key) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="type" value="element">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        @foreach($section->element ?? [] as $k => $type)
+                            @if($k != 'modal')
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-muted">{{__(keyToTitle($k))}}</label>
+                                    @if($type == 'icon')
+                                        <div class="input-group input-group-merge input-group-sm">
+                                            <input type="text" class="form-control iconPicker icon" autocomplete="off" name="{{ $k }}" required>
+                                            <span class="input-group-text" data-icon="las la-home" role="iconpicker"></span>
                                         </div>
-                                    @elseif($k == 'icon')
-                                        {{-- Handled in title row above for better layout --}}
-                                    @elseif($type == 'icon')
-                                        @php $feAddId = 'fe_add_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group mb-2">
-                                            <label for="{{ $feAddId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">{{__(keyToTitle($k))}}</label>
-                                            <div class="input-group input-group-sm">
-                                                <input type="text" id="{{ $feAddId }}" class="form-control iconPicker icon form-control-sm" autocomplete="off" name="{{ $k }}" value="las la-home" required>
-                                                <span class="input-group-text input-group-addon py-0 px-2" data-icon="las la-home" role="iconpicker"></span>
+                                    @elseif($k == 'images')
+                                        @foreach($type as $imgKey => $image)
+                                            <div class="border rounded p-2 mb-2 bg-light-soft">
+                                                <input type="file" class="form-control form-control-sm" name="image_input[{{ $imgKey }}]" accept=".png,.jpg,.jpeg,.webp">
+                                                <small class="tiny text-muted mt-1 d-block">{{ @$image->size }}px @lang('suggested')</small>
                                             </div>
-                                        </div>
-                                    @elseif($k == 'custom_icon_svg')
-                                        @php $feAddId = 'fe_add_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group mb-2">
-                                            <label for="{{ $feAddId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">@lang('Custom Icon (SVG/HTML)')</label>
-                                            <textarea id="{{ $feAddId }}" rows="3" class="form-control form-control-sm font-monospace" style="font-size: 11px;" name="{{ $k }}" dir="ltr" spellcheck="false" placeholder="<svg>...</svg>"></textarea>
-                                            <small class="text-muted d-block mt-1" style="font-size: 10px;">@lang('Overrides library icon if provided.')</small>
-                                        </div>
+                                        @endforeach
+                                    @elseif($type == 'textarea' || $type == 'textarea-nic')
+                                        <textarea rows="3" class="form-control form-control-sm {{ $type == 'textarea-nic' ? 'nicEdit' : '' }}" name="{{ $k }}"></textarea>
                                     @elseif($k == 'select')
-                                        @php $feAddSelId = 'fe_add_' . $key . '_sel_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $section->element->$k->name ?? $k); @endphp
-                                    <div class="form-group {{ $key == 'social_icon' ? 'mb-2' : '' }}">
-                                        <label for="{{ $feAddSelId }}" class="{{ $key == 'social_icon' ? 'small mb-1 font-weight-bold text-uppercase text-muted' : '' }}" @if($key == 'social_icon') style="letter-spacing: 0.5px; font-size: 0.65rem;" @endif>{{keyToTitle(@$section->element->$k->name)}}</label>
-                                        <select id="{{ $feAddSelId }}" class="form-control {{ $key == 'social_icon' ? 'form-control-sm' : '' }}" name="{{ @$section->element->$k->name }}">
+                                        <select class="form-select form-select-sm" name="{{ @$section->element->$k->name }}">
                                             @foreach($section->element->$k->options as $selectKey => $options)
                                                 <option value="{{ $selectKey }}">{{ $options }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    @else
+                                        <input type="text" class="form-control form-control-sm" name="{{ $k }}" required/>
+                                    @endif
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-label-secondary btn-sm" data-bs-dismiss="modal">@lang('Cancel')</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">@lang('Initialize')</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="updateBtn" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-bottom py-3">
+                <h5 class="modal-title h6">@lang('Update Element Data')</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.frontend.sections.content', $key) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="type" value="element">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        @foreach($section->element ?? [] as $k => $type)
+                            @if($k != 'modal')
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-muted">{{__(keyToTitle($k))}}</label>
+                                    @if($type == 'icon')
+                                        <div class="input-group input-group-merge input-group-sm">
+                                            <input type="text" class="form-control iconPicker icon" autocomplete="off" name="{{ $k }}" required>
+                                            <span class="input-group-text" data-icon="las la-home" role="iconpicker"></span>
+                                        </div>
                                     @elseif($k == 'images')
                                         @foreach($type as $imgKey => $image)
-                                        <input type="hidden" name="has_image" value="1">
-                                        @if($key == 'social_icon')
-                                        <div class="form-group mb-2 border rounded p-2 bg-light-soft">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <label class="small font-weight-bold text-uppercase text-muted mb-0" style="letter-spacing: 0.5px; font-size: 0.65rem;">@lang('Or Upload Image File')</label>
-                                                @if(@$section->element->images->$imgKey->size)
-                                                    <span class="text-muted" style="font-size: 10px;">{{ @$section->element->images->$imgKey->size }}px</span>
-                                                @endif
+                                            <div class="border rounded p-2 mb-2 bg-light-soft d-flex align-items-center gap-2">
+                                                <div class="imageModalUpdate{{ $loop->index }} rounded border" style="width: 50px; height: 40px; background-size: cover; background-position: center;"></div>
+                                                <input type="file" class="form-control form-control-sm" name="image_input[{{ $imgKey }}]" accept=".png,.jpg,.jpeg,.webp">
                                             </div>
-                                            <div class="image-upload social-fe-social-upload">
-                                                <div class="thumb d-flex align-items-center gap-3">
-                                                    <div class="avatar-preview flex-shrink-0 mb-0 position-relative" style="width: 80px; height: 80px; cursor: pointer;" onclick="document.getElementById('fe_add_img_{{ $key }}_{{ $loop->index }}').click()" title="@lang('Click here to select an image')">
-                                                        <div class="profilePicPreview rounded border border-dashed border-secondary bg-white d-flex align-items-center justify-content-center" style="width:80px;height:80px;min-width:80px;min-height:80px;max-width:80px;max-height:80px;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url({{ getImage('/', @$section->element->images->$imgKey->size) }});box-shadow:none; border-width: 1px !important;">
-                                                            @if(!getImage('/', @$section->element->images->$imgKey->size))
-                                                                <i class="las la-plus text-muted" style="font-size: 1.5rem; opacity: 0.4;"></i>
-                                                            @endif
-                                                            <button type="button" class="remove-image position-absolute bg-danger text-white border-0 rounded-circle" style="top:-6px; right:-6px; width:20px; height:20px; font-size:10px; line-height:20px; padding:0; z-index: 10;" onclick="event.stopPropagation();"><i class="fa fa-times"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="avatar-edit flex-grow-1 pt-0">
-                                                        <input type="file" class="profilePicUpload d-none hidden" name="image_input[{{ $imgKey }}]" id="fe_add_img_{{ $key }}_{{ $loop->index }}" accept=".png,.jpg,.jpeg,.webp,.svg">
-                                                        <label for="fe_add_img_{{ $key }}_{{ $loop->index }}" class="btn btn-sm btn-outline-secondary py-1 px-3 border-dashed" style="font-size: 11px; cursor:pointer;">@lang('Click to Choose File')</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @else
-                                        <div class="form-group">
-                                            <label>{{__(keyToTitle($k)) }}</label>
-                                            <div class="image-upload">
-                                                <div class="thumb">
-                                                    <div class="avatar-preview">
-                                                        <div class="profilePicPreview" style="background-image: url({{ getImage('/',@$section->element->images->$imgKey->size) }})">
-                                                            <button type="button" class="remove-image"><i class="fa fa-times"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="avatar-edit">
-                                                        <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_add_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg">
-                                                        <label for="fe_add_img_{{ $key }}_{{ $loop->index }}" class="bg--success">{{ __(keyToTitle($imgKey)) }}</label>
-                                                        <small class="mt-2  ">@lang('Supported files'): <b>@lang('jpeg'), @lang('jpg'), @lang('png')</b>.
-                                                            @if(@$section->element->images->$imgKey->size)
-                                                                | @lang('Will be resized to'): <b>{{@$section->element->images->$imgKey->size}}</b> @lang('px').
-                                                            @endif
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endif
                                         @endforeach
-                                    @elseif($type == 'textarea')
-                                        @php $feAddId = 'fe_add_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        @php $optSocialSvg = ($key == 'social_icon' && $k == 'custom_icon_svg'); @endphp
-                                        <div class="form-group {{ $optSocialSvg ? 'mb-3' : '' }}">
-                                            <label for="{{ $feAddId }}" class="{{ $optSocialSvg ? 'small font-weight-bold mb-1' : '' }}">{{__(keyToTitle($k))}}</label>
-                                            <textarea id="{{ $feAddId }}" rows="{{ $optSocialSvg ? 3 : 4 }}" class="form-control {{ $optSocialSvg ? 'form-control-sm' : '' }}" name="{{ $k }}" dir="ltr" spellcheck="false" @if(!$optSocialSvg) required @endif @if($optSocialSvg) placeholder="{{ __('Paste full &lt;svg&gt;…&lt;/svg&gt; or &lt;img src=&quot;data:image/webp;base64,...&quot; /&gt;') }}" @endif></textarea>
-                                            @if($optSocialSvg)
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">@lang('No file upload needed if you paste code here. Scripts and external URLs are removed for security.')</small>
-                                            @endif
-                                        </div>
-
-                                    @elseif($type == 'textarea-nic')
-                                        @php $feAddId = 'fe_add_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group">
-                                            <label for="{{ $feAddId }}">{{__(keyToTitle($k))}}</label>
-                                            <textarea id="{{ $feAddId }}" rows="4" class="form-control nicEdit" name="{{$k}}"></textarea>
-                                        </div>
-
-                                    @else
-                                        @php $feAddId = 'fe_add_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group mb-2">
-                                            <label for="{{ $feAddId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">{{__(keyToTitle($k))}}</label>
-                                            <div class="{{ $k == 'url' ? 'input-group input-group-sm' : '' }}">
-                                                @if($k == 'url') <span class="input-group-text bg-light border-end-0"><i class="las la-link"></i></span> @endif
-                                                <input type="text" id="{{ $feAddId }}" class="form-control form-control-sm {{ $k == 'url' ? 'border-start-0' : '' }}" name="{{ $k }}" @if(!($key == 'social_icon' && $k == 'url')) required @endif placeholder="{{ ($key == 'social_icon' && $k == 'url') ? 'https://' : '' }}"/>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endif
-                            @endforeach
-                        </div>
-                        <div class="modal-footer {{ $key == 'contact_us' ? 'py-2' : '' }} {{ $key == 'social_icon' ? 'py-2 px-3' : '' }}">
-                            <button type="submit" class="btn btn--primary {{ $key == 'contact_us' || $key == 'social_icon' ? 'btn-sm' : 'w-100 h-45' }}">@lang('Submit')</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        {{-- Update METHOD MODAL --}}
-        <div id="updateBtn" class="modal fade {{ $key == 'contact_us' ? 'contact-element-modal' : '' }} {{ $key == 'social_icon' ? 'social-icon-fe-modal' : '' }}" tabindex="-1" role="dialog">
-            <div class="modal-dialog {{ $key == 'contact_us' ? 'modal-dialog-centered' : '' }} {{ $key == 'social_icon' ? 'modal-dialog-centered' : '' }}" role="document">
-                <div class="modal-content {{ $key == 'social_icon' ? 'font-sans' : '' }}">
-                    <div class="modal-header {{ $key == 'contact_us' ? 'py-2' : '' }} {{ $key == 'social_icon' ? 'py-2 px-3 border-bottom' : '' }}">
-                        <h5 class="modal-title {{ $key == 'contact_us' ? 'small' : '' }} {{ $key == 'social_icon' ? 'h6 mb-0 font-weight-bold' : '' }}"> @lang('Update')  {{__(keyToTitle($key))}} @lang('Item')</h5>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                            <i class="las la-times"></i>
-                        </button>
-                    </div>
-                    <form action="{{ route('admin.frontend.sections.content', $key) }}" class="edit-route" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="type" value="element">
-                        <input type="hidden" name="id">
-                        <div class="modal-body {{ $key == 'contact_us' ? 'py-2' : '' }} {{ $key == 'social_icon' ? 'py-2 px-3' : '' }}">
-                            @foreach($section->element as $k => $type)
-                                @if($k != 'modal')
-                                    @if($k == 'title')
-                                        <div class="row g-2 mb-2">
-                                            <div class="col-sm-7">
-                                                @php $feUpdId = 'fe_upd_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                                <div class="form-group mb-0">
-                                                    <label for="{{ $feUpdId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">{{__(keyToTitle($k))}}</label>
-                                                    <input type="text" id="{{ $feUpdId }}" class="form-control form-control-sm" name="{{ $k }}" required/>
-                                                </div>
-                                            </div>
-                                            @php $iconKUpd = array_search('icon', (array)$section->element); @endphp
-                                            @if($iconKUpd)
-                                            <div class="col-sm-5">
-                                                @php $feUpdIconId = 'fe_upd_' . $key . '_icon'; @endphp
-                                                <div class="form-group mb-0">
-                                                    <label for="{{ $feUpdIconId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">@lang('Icon Name')</label>
-                                                    <div class="input-group input-group-sm">
-                                                        <input type="text" id="{{ $feUpdIconId }}" class="form-control iconPicker icon form-control-sm" autocomplete="off" name="icon" placeholder="fab fa-facebook-f" @if($key != 'social_icon') required @endif>
-                                                        <span class="input-group-text input-group-addon py-0 px-2" data-icon="lab la-share-alt" role="iconpicker"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endif
-                                        </div>
-                                    @elseif($k == 'icon')
-                                        {{-- Handled above --}}
-                                    @elseif($type == 'icon')
-                                        @php $feUpdId = 'fe_upd_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group mb-2">
-                                            <label for="{{ $feUpdId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">{{keyToTitle($k)}}</label>
-                                            <div class="input-group input-group-sm">
-                                                <input type="text" id="{{ $feUpdId }}" class="form-control iconPicker icon form-control-sm" autocomplete="off" name="{{ $k }}" required>
-                                                <span class="input-group-text input-group-addon py-0 px-2" data-icon="las la-home" role="iconpicker"></span>
-                                            </div>
-                                        </div>
-                                    @elseif($k == 'custom_icon_svg')
-                                        @php $feUpdId = 'fe_upd_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group mb-2">
-                                            <label for="{{ $feUpdId }}" class="small mb-1 font-weight-bold text-uppercase text-muted" style="letter-spacing: 0.5px; font-size: 0.65rem;">@lang('Custom Icon (SVG/HTML)')</label>
-                                            <textarea id="{{ $feUpdId }}" rows="3" class="form-control form-control-sm font-monospace" style="font-size: 11px;" name="{{ $k }}" dir="ltr" spellcheck="false"></textarea>
-                                        </div>
-
+                                    @elseif($type == 'textarea' || $type == 'textarea-nic')
+                                        <textarea rows="4" class="form-control form-control-sm {{ $type == 'textarea-nic' ? 'nicEdit' : '' }}" name="{{ $k }}"></textarea>
                                     @elseif($k == 'select')
-                                        @php $feUpdSelId = 'fe_upd_' . $key . '_sel_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $section->element->$k->name ?? $k); @endphp
-                                    <div class="form-group {{ $key == 'social_icon' ? 'mb-2' : '' }}">
-                                        <label for="{{ $feUpdSelId }}" class="{{ $key == 'social_icon' ? 'small mb-1 font-weight-bold text-uppercase text-muted' : '' }}" @if($key == 'social_icon') style="letter-spacing: 0.5px; font-size: 0.65rem;" @endif>{{keyToTitle(@$section->element->$k->name)}}</label>
-                                        <select id="{{ $feUpdSelId }}" class="form-control {{ $key == 'social_icon' ? 'form-control-sm' : '' }}" name="{{ @$section->element->$k->name }}">
+                                        <select class="form-select form-select-sm" name="{{ @$section->element->$k->name }}">
                                             @foreach($section->element->$k->options as $selectKey => $options)
                                                 <option value="{{ $selectKey }}">{{ $options }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
-
-                                    @elseif($k == 'images')
-                                        @foreach($type as $imgKey => $image)
-                                        <input type="hidden" name="has_image" value="1">
-                                        @if($key == 'social_icon')
-                                        <div class="form-group mb-2 border rounded p-2 bg-light-soft">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <label class="small font-weight-bold text-uppercase text-muted mb-0" style="letter-spacing: 0.5px; font-size: 0.65rem;">@lang('Or Upload Image File')</label>
-                                                @if(@$section->element->images->$imgKey->size)
-                                                    <span class="text-muted" style="font-size: 10px;">{{ @$section->element->images->$imgKey->size }}px</span>
-                                                @endif
-                                            </div>
-                                            <div class="image-upload social-fe-social-upload">
-                                                <div class="thumb d-flex align-items-center gap-3">
-                                                    <div class="avatar-preview flex-shrink-0 mb-0 position-relative" style="width: 80px; height: 80px; cursor: pointer;" onclick="document.getElementById('fe_upd_img_{{ $key }}_{{ $loop->index }}').click()" title="@lang('Click here to select an image')">
-                                                        <div class="profilePicPreview imageModalUpdate{{ $loop->index }} rounded border border-dashed border-secondary bg-white d-flex align-items-center justify-content-center" style="width:80px;height:80px;min-width:80px;min-height:80px;max-width:80px;max-height:80px;background-size:contain;background-position:center;background-repeat:no-repeat;box-shadow:none; border-width: 1px !important;">
-                                                            <button type="button" class="remove-image position-absolute bg-danger text-white border-0 rounded-circle" style="top:-6px; right:-6px; width:20px; height:20px; font-size:10px; line-height:20px; padding:0; z-index: 10;" onclick="event.stopPropagation();"><i class="fa fa-times"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="avatar-edit flex-grow-1 pt-0">
-                                                        <input type="file" class="profilePicUpload d-none hidden" name="image_input[{{ $imgKey }}]" id="fe_upd_img_{{ $key }}_{{ $loop->index }}" accept=".png,.jpg,.jpeg,.webp,.svg">
-                                                        <label for="fe_upd_img_{{ $key }}_{{ $loop->index }}" class="btn btn-sm btn-outline-secondary py-1 px-3 border-dashed" style="font-size: 11px; cursor:pointer;">@lang('Click to Choose File')</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @else
-                                        <div class="form-group">
-                                            <label>{{__(keyToTitle($k))}}</label>
-                                            <div class="image-upload">
-                                                <div class="thumb">
-                                                    <div class="avatar-preview">
-                                                        <div class="profilePicPreview imageModalUpdate{{ $loop->index }}">
-                                                            <button type="button" class="remove-image"><i class="fa fa-times"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="avatar-edit">
-                                                        <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_upd_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg">
-                                                        <label for="fe_upd_img_{{ $key }}_{{ $loop->index }}" class="bg--success">{{ __(keyToTitle($imgKey)) }}</label>
-                                                        <small class="mt-2  ">@lang('Supported files'): <b>@lang('jpeg'), @lang('jpg'), @lang('png')</b>.
-                                                            @if(@$section->element->images->$imgKey->size)
-                                                                | @lang('Will be resized to'): <b>{{@$section->element->images->$imgKey->size}}</b> @lang('px').
-                                                            @endif
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endif
-                                        @endforeach
-                                    @elseif($type == 'textarea')
-                                        @php $feUpdId = 'fe_upd_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        @php $optSocialSvgUpd = ($key == 'social_icon' && $k == 'custom_icon_svg'); @endphp
-                                        <div class="form-group {{ $optSocialSvgUpd ? 'mb-3' : '' }}">
-                                            <label for="{{ $feUpdId }}" class="{{ $optSocialSvgUpd ? 'small font-weight-bold mb-1' : '' }}">{{keyToTitle($k)}}</label>
-                                            <textarea id="{{ $feUpdId }}" rows="{{ $optSocialSvgUpd ? 3 : 4 }}" class="form-control {{ $optSocialSvgUpd ? 'form-control-sm' : '' }}" name="{{ $k }}" dir="ltr" spellcheck="false" @if(!$optSocialSvgUpd) required @endif @if($optSocialSvgUpd) placeholder="{{ __('Paste full &lt;svg&gt;…&lt;/svg&gt; or &lt;img src=&quot;data:image/webp;base64,...&quot; /&gt;') }}" @endif></textarea>
-                                            @if($optSocialSvgUpd)
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">@lang('No file upload needed if you paste code here. Scripts and external URLs are removed for security.')</small>
-                                            @endif
-                                        </div>
-
-                                    @elseif($type == 'textarea-nic')
-                                        @php $feUpdId = 'fe_upd_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group">
-                                            <label for="{{ $feUpdId }}">{{keyToTitle($k)}}</label>
-                                            <textarea id="{{ $feUpdId }}" rows="4" class="form-control nicEdit" name="{{$k}}"></textarea>
-                                        </div>
-
                                     @else
-                                        @php $feUpdId = 'fe_upd_' . $key . '_' . $loop->iteration . '_' . preg_replace('/[^a-z0-9]/', '_', $k); @endphp
-                                        <div class="form-group {{ $key == 'social_icon' ? 'mb-2' : '' }}">
-                                            <label for="{{ $feUpdId }}" class="{{ $key == 'social_icon' ? 'small mb-1' : '' }}">{{keyToTitle($k)}}</label>
-                                            <input type="text" id="{{ $feUpdId }}" class="form-control {{ $key == 'social_icon' ? 'form-control-sm' : '' }}" name="{{ $k }}" @if(!($key == 'social_icon' && $k == 'url')) required @endif placeholder="{{ ($key == 'social_icon' && $k == 'url') ? 'https://' : '' }}"/>
-                                            @if($key == 'social_icon' && $k == 'url')
-                                                <small class="text-muted font-sans d-block" style="font-size: 0.72rem;">@lang('Optional; use # if not a web link.')</small>
-                                            @endif
-                                        </div>
-
+                                        <input type="text" class="form-control form-control-sm" name="{{ $k }}" required/>
                                     @endif
-                                @endif
-                            @endforeach
-                        </div>
-
-                        <div class="modal-footer {{ $key == 'contact_us' ? 'py-2' : '' }} {{ $key == 'social_icon' ? 'py-2 px-3' : '' }}">
-                            <button type="submit" class="btn btn--primary {{ $key == 'contact_us' || $key == 'social_icon' ? 'btn-sm' : 'w-100 h-45' }}">@lang('Submit')</button>
-                        </div>
-                    </form>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-label-secondary btn-sm" data-bs-dismiss="modal">@lang('Cancel')</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">@lang('Update Matrix')</button>
+                </div>
+            </form>
         </div>
+    </div>
+</div>
 
-        @push('breadcrumb-plugins')
-            @if($section->element->modal)
-                <a href="javascript:void(0)" class="btn btn-sm btn-outline--primary addBtn"><i class="las la-plus"></i>@lang('Add New')</a>
-            @else
-                <a href="{{ route(getFrontendSectionRoute($key, 'element')) }}" class="btn btn-sm btn-outline--primary"><i class="las la-plus"></i>@lang('Add New')</a>
-            @endif
-        @endpush
-    @endif
-    {{-- if section element end --}}
-
-    <x-confirmation-modal />
+<x-confirmation-modal />
 
 @endsection
 
-@if(isset($key) && $key == 'contact_us')
 @push('style')
-
-{{-- inline style moved to critical-admin.css --}}
-
-@endpush
-@endif
-
-@push('style')
-
-{{-- inline style moved to critical-admin.css --}}
-
+<style>
+    .ls-1 { letter-spacing: 0.5px; }
+    .tiny { font-size: 0.72rem; }
+    .bg-light-soft { background-color: rgba(var(--bs-light-rgb), 0.5); }
+    .bg-lighter { background-color: #f8f9fa; }
+    .preview-mockup { min-height: 150px; display: flex; align-items: center; justify-content: center; }
+    .shadow-xs { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+    .element-row:hover { background-color: rgba(var(--bs-primary-rgb), 0.02) !important; }
+    .w-px-200 { width: 200px !important; }
+</style>
 @endpush
 
 @push('script-lib')
@@ -666,145 +438,54 @@
 @endpush
 
 @push('script')
+<script>
+    (function ($) {
+        "use strict";
 
-    <script>
-        (function ($) {
-            "use strict";
-            function adminFeShowModal($modal) {
-                if (!$modal || !$modal.length) return;
-                var node = $modal[0];
-                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                    bootstrap.Modal.getOrCreateInstance(node).show();
-                } else if (typeof $modal.modal === 'function') {
-                    $modal.modal('show');
+        // Image Preview Sync
+        $('.image-upload-input').on('change', function() {
+            const input = this;
+            const preview = $(this).closest('.fe-image-upload-wrapper').find('.preview-img-target');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.attr('src', e.target.result);
                 }
+                reader.readAsDataURL(input.files[0]);
             }
-            function feDecodeB64Utf8Json(b64) {
-                if (!b64 || typeof b64 !== 'string') {
-                    return null;
-                }
-                try {
-                    var bin = atob(b64);
-                    var bytes = new Uint8Array(bin.length);
-                    for (var i = 0; i < bin.length; i++) {
-                        bytes[i] = bin.charCodeAt(i);
-                    }
-                    var json = new TextDecoder('utf-8').decode(bytes);
-                    return JSON.parse(json);
-                } catch (err) {
-                    return null;
-                }
-            }
-            function applyFeEditPayload($modal, obj) {
-                if (!$modal || !$modal.length || !obj || typeof obj !== 'object') {
-                    return;
-                }
+        });
+
+        // Search Filter
+        $('#elementSearch').on('input', function() {
+            const query = $(this).val().toLowerCase();
+            $('.element-row').each(function() {
+                const text = $(this).attr('data-search');
+                $(this).toggle(text.includes(query));
+            });
+        });
+
+        // Modal Helpers
+        function adminFeShowModal($modal) {
+            bootstrap.Modal.getOrCreateInstance($modal[0]).show();
+        }
+
+        function feDecodeB64(b64) {
+            try { return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)))); } catch(e) { return null; }
+        }
+
+        $('.addBtn').on('click', function () {
+            $('#addModal').find('form')[0].reset();
+            adminFeShowModal($('#addModal'));
+        });
+
+        $(document).on('click', '.updateBtn', function () {
+            const $btn = $(this);
+            const modal = $('#updateBtn');
+            modal.find('input[name=id]').val($btn.data('id'));
+            
+            const obj = feDecodeB64($btn.attr('data-fe-dv'));
+            if (obj) {
                 $.each(obj, function (index, value) {
-                    if (value === null || value === undefined) {
-                        value = '';
-                    }
-                    if (typeof value === 'object') {
-                        return;
-                    }
-                    var name = String(index);
-                    if (name === 'show_on_public') {
-                        value = String(parseInt(value, 10) === 0 ? 0 : 1);
-                    }
-                    $modal.find('input[name], select[name], textarea[name]').filter(function () {
-                        if (this.type === 'file') {
-                            return false;
-                        }
-                        return this.name === name;
-                    }).val(value);
-                });
-            }
-            function feSyncIconPickerAddons($modal) {
-                $modal.find('input.iconPicker').each(function () {
-                    var v = ($(this).val() || '').trim();
-                    var $addon = $(this).closest('.input-group').find('.input-group-text, .input-group-addon').first();
-                    if (!$addon.length) {
-                        return;
-                    }
-                    var $ico = $addon.find('i').first();
-                    if ($ico.length) {
-                        $ico.attr('class', v || 'las la-icons');
-                    } else if (v) {
-                        $addon.prepend($('<i></i>').attr('class', v));
-                    }
-                });
-            }
-            function moveFrontendElementModalsToBody() {
-                ['addModal', 'updateBtn'].forEach(function (id) {
-                    var el = document.getElementById(id);
-                    if (el && el.parentNode && el.parentNode !== document.body) {
-                        document.body.appendChild(el);
-                    }
-                });
-            }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', moveFrontendElementModalsToBody);
-            } else {
-                moveFrontendElementModalsToBody();
-            }
-            $('.addBtn').on('click', function () {
-                var modal = $('#addModal');
-                modal.find('form')[0] && modal.find('form')[0].reset();
-                adminFeShowModal(modal);
-            });
-            $(document).on('click', '.updateBtn', function () {
-                var $btn = $(this);
-                var modal = $('#updateBtn');
-                modal.find('input[name=id]').val($btn.data('id'));
-                var obj = feDecodeB64Utf8Json($btn.attr('data-fe-dv'));
-                if (!obj) {
-                    obj = $btn.data('all');
-                    var legacy = $btn.attr('data-all');
-                    if ((typeof obj !== 'object' || obj === null) && legacy) {
-                        try {
-                            obj = JSON.parse(legacy);
-                        } catch (e1) {
-                            obj = null;
-                        }
-                    }
-                }
-                if (!obj || typeof obj !== 'object') {
-                    obj = {};
-                }
-                modal.data('feEditDv', obj);
-                var images = feDecodeB64Utf8Json($btn.attr('data-fe-images'));
-                if (!images) {
-                    images = $btn.data('images');
-                    if (images && typeof images === 'string') {
-                        try {
-                            images = JSON.parse(images);
-                        } catch (e2) {
-                            images = null;
-                        }
-                    }
-                }
-                if (images && images.length) {
-                    for (var i = 0; i < images.length; i++) {
-                        var imgloc = images[i];
-                        if (!imgloc) {
-                            continue;
-                        }
-                        var u = String(imgloc).replace(/\\/g, '/');
-                        modal.find('.imageModalUpdate' + i).css('background-image', 'url("' + u.replace(/"/g, '\\"') + '")');
-                    }
-                }
-                applyFeEditPayload(modal, obj);
-                feSyncIconPickerAddons(modal);
-                adminFeShowModal(modal);
-            });
-            $('#updateBtn').on('shown.bs.modal', function (e) {
-                $(document).off('focusin.modal');
-            });
-            $('#addModal').on('shown.bs.modal', function (e) {
-                $(document).off('focusin.modal');
-            });
-            function initFrontendIconPickers($root) {
-                $root = $root && $root.length ? $root : $(document);
-                $root.find('.iconPicker').each(function () {
                     var $el = $(this);
                     if ($el.data('iconpicker')) {
                         try { $el.iconpicker('destroy'); } catch (err) {}
