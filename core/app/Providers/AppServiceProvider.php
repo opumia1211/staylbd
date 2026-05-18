@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -283,6 +286,8 @@ class AppServiceProvider extends ServiceProvider
             });
         }
     }
+
+
 
     /**
      * When the app boots from htdocs/{app}/index.php but Laravel public/ is

@@ -137,6 +137,7 @@
                                                     $categoryResource = [
                                                         'id' => $category->id,
                                                         'name' => $category->name,
+                                                        'name_bn' => $category->name_bn,
                                                         'image_with_path' => $category->imageShow(),
                                                         'publish_status' => $category->publish_status ?? 'public',
                                                         'scheduled_at' => $catScheduled,
@@ -221,6 +222,10 @@
                                 <div class="form-group">
                                     <label>@lang('Name') <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="name" value="{{ old('name') }}" required />
+                                </div>
+                                <div class="form-group">
+                                    <label>@lang('Name (Bengali)')</label>
+                                    <input type="text" class="form-control" name="name_bn" value="{{ old('name_bn') }}" />
                                 </div>
                                 <div class="form-group">
                                     <label>@lang('Image')</label>

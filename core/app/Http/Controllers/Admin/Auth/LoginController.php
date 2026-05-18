@@ -29,7 +29,9 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers {
+        sendLoginResponse as traitSendLoginResponse;
+    }
 
     /**
      * Where to redirect users after login.
@@ -43,7 +45,7 @@ class LoginController extends Controller
     {
         $request->session()->put('admin_just_logged_in', true);
         $request->session()->put('admin_login_at', time());
-        return parent::sendLoginResponse($request);
+        return $this->traitSendLoginResponse($request);
     }
 
     /**
@@ -76,9 +78,11 @@ class LoginController extends Controller
      */
     private function generateCaptchaCode(): string
     {
-        $pool = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+        // High-security character pool: Uppercase, Lowercase, Numbers, and Special Characters
+        $pool = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789!@#$%^&*+?';
         $len = strlen($pool) - 1;
         $code = '';
+        // Increased complexity: 6 characters from the diverse pool
         for ($i = 0; $i < 6; $i++) {
             $code .= $pool[random_int(0, $len)];
         }
@@ -301,7 +305,7 @@ class LoginController extends Controller
         $validator = Validator::make($request->all(), [
             $this->username() => 'required|string',
             'password' => 'required|string',
-            'remember' => 'accepted',
+            'policy_confirm' => 'accepted',
         ]);
 
         if ($validator->fails()) {

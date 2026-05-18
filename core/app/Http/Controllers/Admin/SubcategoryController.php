@@ -36,7 +36,7 @@ class SubcategoryController extends Controller
 			->searchable(['name', 'category:name'])
 			->orderBy($sortBy, $sortDir)
 			->paginate($perPage)
-			->withQueryString();
+			->appends(request()->all());
 
 		return view('admin.sub_category', compact('pageTitle', 'subcategories', 'categories', 'sortBy', 'sortDir'));
 	}
@@ -45,6 +45,7 @@ class SubcategoryController extends Controller
 	{
 		$request->validate([
 			'name'        => 'required|max:255',
+			'name_bn'     => 'nullable|max:255',
 			'category_id' => 'required|integer|exists:categories,id',
 		]);
 
@@ -57,6 +58,7 @@ class SubcategoryController extends Controller
 		}
 
 		$subcategory->name        = $request->name;
+		$subcategory->name_bn     = $request->name_bn;
 		$subcategory->category_id  = $request->category_id;
 		$subcategory->save();
 

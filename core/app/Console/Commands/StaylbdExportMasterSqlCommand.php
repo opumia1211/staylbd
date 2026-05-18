@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Config;
 class StaylbdExportMasterSqlCommand extends Command
 {
     protected $signature = 'staylbd:export-master-sql
-                            {--output= : Full path to output SQL file (default: staylbd_master_final.sql)}
-                            {--mysqldump= : Path to mysqldump executable (e.g. C:\\xampp\\mysql\\bin\\mysqldump.exe)}';
-    protected $description = 'Export current database to master staylbd_master_final.sql for cPanel (no migration dependency)';
+                            {--output= : Full path to output SQL file (default: staylbd_wintersm.sql in database folder)}
+                            {--mysqldump= : Path to mysqldump executable}';
+    protected $description = 'Export current database to staylbd_wintersm.sql and backup';
 
     public function handle(): int
     {
@@ -37,20 +37,14 @@ class StaylbdExportMasterSqlCommand extends Command
             return self::FAILURE;
         }
 
+        $dbDir = base_path('database');
         $outputPath = $this->option('output');
         if (empty($outputPath)) {
-            $projectRoot = dirname(base_path());
-            $outputPath = $projectRoot . DIRECTORY_SEPARATOR . 'staylbd_master_final.sql';
+            $outputPath = $dbDir . DIRECTORY_SEPARATOR . 'staylbd_wintersm.sql';
         }
-        $outputPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $outputPath);
+        $backupPath = $dbDir . DIRECTORY_SEPARATOR . 'staylbd_wintersm_backup.sql';
 
-        $dir = dirname($outputPath);
-        if (!is_dir($dir)) {
-            if (!@mkdir($dir, 0755, true)) {
-                $this->error("Cannot create directory: {$dir}");
-                return self::FAILURE;
-            }
-        }
+        $outputPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $outputPath);
 
         $mysqldump = $this->option('mysqldump');
         if (empty($mysqldump)) {
@@ -85,23 +79,13 @@ class StaylbdExportMasterSqlCommand extends Command
             return self::FAILURE;
         }
 
-        if (!is_file($outputPath) || filesize($outputPath) < 100) {
-            $this->error('Output file missing or too small.');
-            return self::FAILURE;
+        if (is_file($outputPath)) {
+            $this->info('Creating backup: ' . $backupPath);
+            copy($outputPath, $backupPath);
         }
 
-        $content = file_get_contents($outputPath);
-        $header = "-- StayLBD Master DB - Import only this file in cPanel. No migrations/patches required.\n";
-        $header .= "CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\nUSE `{$dbName}`;\n\n";
-        if (strpos($content, 'CREATE DATABASE') === false && strpos($content, 'USE `') === false) {
-            $content = $header . $content;
-            file_put_contents($outputPath, $content);
-        } elseif (strpos($content, $header) !== 0) {
-            $content = $header . $content;
-            file_put_contents($outputPath, $content);
-        }
-
-        $this->info('Master SQL exported. Import staylbd_master_final.sql in cPanel – no migrations or patches required.');
+        $this->info('Master SQL and Backup exported successfully.');
         return self::SUCCESS;
     }
+
 }

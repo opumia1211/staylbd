@@ -7,14 +7,14 @@
         
         @include('admin.partials.topnav')
 
-        <!-- Layout container -->
+        <!-- Layout page -->
         <div class="layout-page">
+          
+          {{-- Horizontal Menu --}}
+          @include('admin.partials.sidenav')
+
           <!-- Content wrapper -->
           <div class="content-wrapper">
-            
-            {{-- Horizontal Menu --}}
-            @include('admin.partials.sidenav')
-
             <!-- Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
               

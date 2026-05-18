@@ -40,7 +40,7 @@
   }
 @endphp
 
-<aside id="layout-menu" class="layout-menu-horizontal menu-horizontal menu flex-grow-0">
+<aside id="layout-menu" class="layout-menu-horizontal menu-horizontal menu bg-menu-theme flex-grow-0">
   <div class="container-xxl d-flex h-100">
     <ul class="menu-inner">
 
@@ -360,12 +360,14 @@
               <li class="menu-item {{ menuActive('admin.api.courier.manage') }}"><a
                   href="{{ route('admin.api.courier.manage') }}" class="menu-link">@lang('Courier Settings')</a></li>
               @foreach($activeCourierProviders ?? [] as $courierProvider)
-                <li class="menu-item {{ menuActive('admin.orders.bulk.courier', null, $courierProvider->type) }}">
-                  <a href="{{ route('admin.orders.bulk.courier', $courierProvider->type) }}" class="menu-link">
-                    <i class="menu-icon icon-base las la-shipping-fast"></i>
-                    <div data-i18n="Bulk">@lang('Bulk') ({{ $courierProvider->display_name }})</div>
-                  </a>
-                </li>
+                @if(is_object($courierProvider))
+                  <li class="menu-item {{ menuActive('admin.orders.bulk.courier', null, $courierProvider->type) }}">
+                    <a href="{{ route('admin.orders.bulk.courier', $courierProvider->type) }}" class="menu-link">
+                      <i class="menu-icon icon-base las la-shipping-fast"></i>
+                      <div data-i18n="Bulk">@lang('Bulk') ({{ $courierProvider->display_name }})</div>
+                    </a>
+                  </li>
+                @endif
               @endforeach
               @if(empty($activeCourierProviders) || $activeCourierProviders->isEmpty())
                 <li class="menu-item {{ menuActive('admin.api.courier.*') ? 'active' : '' }}"><a

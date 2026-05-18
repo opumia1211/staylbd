@@ -21,11 +21,13 @@ use App\Models\BannerAnalytics;
 use App\Models\SupportAttachment;
 use App\Models\SupportMessage;
 use App\Models\SupportTicket;
+use App\Models\AutoResponse;
 use App\Services\ContactChannelService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
@@ -50,7 +52,7 @@ class SiteController extends Controller
             return Product::available()
                 ->todayDeal()
                 ->with(['category:id,name', 'brand:id,name', 'activeVariants'])
-                ->withCount(['reviews' => fn ($r) => $r->visibleOnProduct()])
+                ->withCount(['reviews' => fn($r) => $r->visibleOnProduct()])
                 ->latest('id')
                 ->take(8)
                 ->get();
@@ -75,9 +77,11 @@ class SiteController extends Controller
         if ($bannersWithImage->isEmpty()) {
             $anyWithImage = Frontend::where('data_keys', 'banner.element')->orderBy('id', 'asc')->get()->filter(function ($b) {
                 $dv = $b->data_values;
-                if (!$dv) return false;
+                if (!$dv)
+                    return false;
                 $img = is_object($dv) ? ($dv->image ?? null) : (is_array($dv) ? ($dv['image'] ?? null) : null);
-                if (is_array($img)) $img = $img['desktop'] ?? $img['image'] ?? null;
+                if (is_array($img))
+                    $img = $img['desktop'] ?? $img['image'] ?? null;
                 return is_string($img) && trim($img) !== '';
             })->values();
             if ($anyWithImage->isNotEmpty()) {
@@ -85,25 +89,25 @@ class SiteController extends Controller
             }
         }
         $bannerModuleData = [
-            'banners'  => $bannersWithImage,
+            'banners' => $bannersWithImage,
             'settings' => $bannerModuleService->getSettings(),
         ];
 
         $homeDataRaw = \App\Services\HomepageDataService::getCachedData();
         $initialSize = \App\Services\HomepageDataService::INITIAL_PAGE_SIZE;
         $homeData = [
-            'hotDealProducts'     => $homeDataRaw['hotDealProducts']->take($initialSize),
-            'featuredProducts'    => $homeDataRaw['featuredProducts']->take($initialSize),
+            'hotDealProducts' => $homeDataRaw['hotDealProducts']->take($initialSize),
+            'featuredProducts' => $homeDataRaw['featuredProducts']->take($initialSize),
             'bestSellingProducts' => $homeDataRaw['bestSellingProducts']->take($initialSize),
             'recommendedProducts' => $homeDataRaw['recommendedProducts']->take($initialSize),
-            'trendingBest'        => $homeDataRaw['trendingBest']->take($initialSize),
-            'newArrivals'         => $homeDataRaw['newArrivals']->take($initialSize),
-            'reviews'             => $homeDataRaw['reviews'],
-            'topRatedProducts'    => $homeDataRaw['topRatedProducts'],
-            'categories'          => $homeDataRaw['categories'],
-            'topCategories'       => $homeDataRaw['topCategories'],
-            'topBrands'           => $homeDataRaw['topBrands'],
-            'customProductRows'   => collect($homeDataRaw['customProductRows'] ?? [])->map(function ($item) use ($initialSize) {
+            'trendingBest' => $homeDataRaw['trendingBest']->take($initialSize),
+            'newArrivals' => $homeDataRaw['newArrivals']->take($initialSize),
+            'reviews' => $homeDataRaw['reviews'],
+            'topRatedProducts' => $homeDataRaw['topRatedProducts'],
+            'categories' => $homeDataRaw['categories'],
+            'topCategories' => $homeDataRaw['topCategories'],
+            'topBrands' => $homeDataRaw['topBrands'],
+            'customProductRows' => collect($homeDataRaw['customProductRows'] ?? [])->map(function ($item) use ($initialSize) {
                 return [
                     'row' => $item['row'],
                     'products' => $item['products']->take($initialSize),
@@ -168,11 +172,11 @@ class SiteController extends Controller
                     }
                 },
             ],
-            'offset'  => 'nullable|integer|min:0',
-            'limit'   => 'nullable|integer|min:1|max:16',
+            'offset' => 'nullable|integer|min:0',
+            'limit' => 'nullable|integer|min:1|max:16',
         ]);
-        $offset  = (int) $request->get('offset', 8);
-        $limit   = (int) $request->get('limit', 8);
+        $offset = (int) $request->get('offset', 8);
+        $limit = (int) $request->get('limit', 8);
         $products = \App\Services\HomepageDataService::getSectionProducts($section, $offset, $limit);
         $general = gs();
         $activeTemplate = $this->activeTemplate;
@@ -405,7 +409,7 @@ class SiteController extends Controller
                 ->with([
                     'category:id,name',
                     'brand:id,name',
-                    'reviews' => fn ($q) => $q->visibleOnProduct()->latest()->limit(10)->with('user:id,username,firstname,lastname,image'),
+                    'reviews' => fn($q) => $q->visibleOnProduct()->latest()->limit(10)->with('user:id,username,firstname,lastname,image'),
                     'activeVariants',
                 ])
                 ->findOrFail($id);
@@ -417,17 +421,17 @@ class SiteController extends Controller
             // 1) Related: same category, up to 12 (for carousel + sidebar)
             $relatedProduct = Product::active()
                 ->select($productSelect)
-                ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                ->withCount(['reviews' => fn($q) => $q->visibleOnProduct()])
                 ->with(['category:id,name', 'brand:id,name'])
                 ->where('id', '!=', $id)
-                ->when($categoryId, fn ($q) => $q->where('category_id', $categoryId))
+                ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
                 ->latest()
                 ->take(12)
                 ->get();
             if ($relatedProduct->isEmpty()) {
                 $relatedProduct = Product::active()
                     ->select($productSelect)
-                    ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                    ->withCount(['reviews' => fn($q) => $q->visibleOnProduct()])
                     ->with(['category:id,name', 'brand:id,name'])
                     ->where('id', '!=', $id)
                     ->latest()
@@ -442,7 +446,7 @@ class SiteController extends Controller
             if ($brandId) {
                 $sameBrandProducts = Product::active()
                     ->select($productSelect)
-                    ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                    ->withCount(['reviews' => fn($q) => $q->visibleOnProduct()])
                     ->with(['category:id,name', 'brand:id,name'])
                     ->where('brand_id', $brandId)
                     ->whereNotIn('id', $excludeIds)
@@ -454,10 +458,10 @@ class SiteController extends Controller
             // 3) You may also like: other categories, best selling / trending
             $youMayAlsoLike = Product::active()
                 ->select($productSelect)
-                ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                ->withCount(['reviews' => fn($q) => $q->visibleOnProduct()])
                 ->with(['category:id,name', 'brand:id,name'])
                 ->whereNotIn('id', array_merge($excludeIds, $sameBrandProducts->pluck('id')->all()))
-                ->when($categoryId, fn ($q) => $q->where('category_id', '!=', $categoryId))
+                ->when($categoryId, fn($q) => $q->where('category_id', '!=', $categoryId))
                 ->orderByRaw('COALESCE(sale_count, 0) DESC, created_at DESC')
                 ->take(12)
                 ->get();
@@ -471,24 +475,24 @@ class SiteController extends Controller
             $reviewsTotal = (int) $reviewStats->sum('cnt');
 
             return [
-                'product'            => $product,
-                'reviews'            => $product->reviews,
-                'relatedProduct'     => $relatedProduct,
-                'sameBrandProducts'  => $sameBrandProducts,
-                'youMayAlsoLike'      => $youMayAlsoLike,
-                'ratingBreakdown'    => $ratingBreakdown,
-                'reviewsTotal'       => $reviewsTotal,
+                'product' => $product,
+                'reviews' => $product->reviews,
+                'relatedProduct' => $relatedProduct,
+                'sameBrandProducts' => $sameBrandProducts,
+                'youMayAlsoLike' => $youMayAlsoLike,
+                'ratingBreakdown' => $ratingBreakdown,
+                'reviewsTotal' => $reviewsTotal,
             ];
         });
 
-        $product            = $data['product'];
-        $reviews            = $data['reviews'];
-        $relatedProduct     = $data['relatedProduct'];
-        $sameBrandProducts  = $data['sameBrandProducts'] ?? collect();
-        $youMayAlsoLike     = $data['youMayAlsoLike'] ?? collect();
-        $ratingBreakdown    = $data['ratingBreakdown'] ?? [];
-        $reviewsTotal       = $data['reviewsTotal'] ?? 0;
-        $pageTitle          = $product->meta_title ?: $product->name;
+        $product = $data['product'];
+        $reviews = $data['reviews'];
+        $relatedProduct = $data['relatedProduct'];
+        $sameBrandProducts = $data['sameBrandProducts'] ?? collect();
+        $youMayAlsoLike = $data['youMayAlsoLike'] ?? collect();
+        $ratingBreakdown = $data['ratingBreakdown'] ?? [];
+        $reviewsTotal = $data['reviewsTotal'] ?? 0;
+        $pageTitle = $product->meta_title ?: $product->name;
 
         $canReview = false;
         $hasPurchased = false;
@@ -513,7 +517,7 @@ class SiteController extends Controller
             $wishlistHasProduct = Cache::remember(
                 'wishlist.has_product:' . $userId . ':' . $product->id,
                 60,
-                fn () => \App\Models\Wishlist::where('user_id', $userId)->where('product_id', $product->id)->exists()
+                fn() => \App\Models\Wishlist::where('user_id', $userId)->where('product_id', $product->id)->exists()
             );
             $wishListProductIds = $wishlistHasProduct ? [$product->id] : [];
         } else {
@@ -521,17 +525,17 @@ class SiteController extends Controller
             $wishListProductIds = is_array($wishlist) ? array_map('intval', array_keys($wishlist)) : [];
         }
 
-        $seoContents['keywords']           = $product->meta_keywords ?? [];
-        $seoContents['social_title']       = $product->meta_title ?: $product->name;
-        $seoContents['social_description']  = $product->meta_description ?: $product->summary;
-        $seoContents['description']        = $product->meta_description ?: $product->summary;
-        $seoContents['meta_description']  = $product->meta_description ?: $product->summary;
-        $seoContents['image']              = $product->imageShow();
-        $seoContents['image_size']         = getFileSize('product');
+        $seoContents['keywords'] = $product->meta_keywords ?? [];
+        $seoContents['social_title'] = $product->meta_title ?: $product->name;
+        $seoContents['social_description'] = $product->meta_description ?: $product->summary;
+        $seoContents['description'] = $product->meta_description ?: $product->summary;
+        $seoContents['meta_description'] = $product->meta_description ?: $product->summary;
+        $seoContents['image'] = $product->imageShow();
+        $seoContents['image_size'] = getFileSize('product');
 
         // Precompute for view (avoids repeated getImage/route in blade)
         $productUrl = product_detail_url($product);
-        $seoContents['canonical_url']      = $productUrl;
+        $seoContents['canonical_url'] = $productUrl;
         $productImages = $this->productDetailImageList($product);
         $breadcrumbList = $this->productDetailBreadcrumb($product, $productUrl);
         $detailPrice = productPrice($product);
@@ -551,7 +555,7 @@ class SiteController extends Controller
 
         // Social proof: view count in last 24h (outside cache so it stays fresh)
         $productViews24h = 0;
-        if (class_exists(\App\Models\UserActivityLog::class) && \Illuminate\Support\Facades\Schema::hasTable('user_activity_logs')) {
+        if (Schema::hasTable('user_activity_logs')) {
             $productViews24h = (int) Cache::remember('product.views24h:' . $id, 60, function () use ($id) {
                 return \App\Models\UserActivityLog::where('action_type', \App\Models\UserActivityLog::PRODUCT_VIEW)
                     ->where('model_type', 'product')
@@ -580,8 +584,21 @@ class SiteController extends Controller
         $limit = max(8, min(48, $limit));
 
         $productSelect = [
-            'id', 'name', 'slug', 'image', 'price', 'discount', 'discount_type', 'today_deals',
-            'category_id', 'brand_id', 'sale_count', 'avg_rate', 'quantity', 'created_at', 'gallery'
+            'id',
+            'name',
+            'slug',
+            'image',
+            'price',
+            'discount',
+            'discount_type',
+            'today_deals',
+            'category_id',
+            'brand_id',
+            'sale_count',
+            'avg_rate',
+            'quantity',
+            'created_at',
+            'gallery'
         ];
 
         $recentCookie = (string) request()->cookie('recently_viewed_ids', '');
@@ -590,8 +607,8 @@ class SiteController extends Controller
             $decoded = json_decode(urldecode($recentCookie), true);
             if (is_array($decoded)) {
                 $recentIds = collect($decoded)
-                    ->map(fn ($v) => (int) $v)
-                    ->filter(fn ($v) => $v > 0 && $v !== $currentProductId)
+                    ->map(fn($v) => (int) $v)
+                    ->filter(fn($v) => $v > 0 && $v !== $currentProductId)
                     ->unique()
                     ->take($limit)
                     ->values()
@@ -603,11 +620,11 @@ class SiteController extends Controller
         if (!empty($recentIds)) {
             $recentProducts = Product::active()
                 ->select($productSelect)
-                ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                ->withCount(['reviews' => fn($q) => $q->visibleOnProduct()])
                 ->with(['category:id,name', 'brand:id,name'])
                 ->whereIn('id', $recentIds)
                 ->get()
-                ->sortBy(fn ($p) => array_search((int) $p->id, $recentIds, true))
+                ->sortBy(fn($p) => array_search((int) $p->id, $recentIds, true))
                 ->values();
         }
 
@@ -617,7 +634,7 @@ class SiteController extends Controller
             $excludeIds = $recentProducts->pluck('id')->push($currentProductId)->unique()->values()->all();
             $fillerProducts = Product::active()
                 ->select($productSelect)
-                ->withCount(['reviews' => fn ($q) => $q->visibleOnProduct()])
+                ->withCount(['reviews' => fn($q) => $q->visibleOnProduct()])
                 ->with(['category:id,name', 'brand:id,name'])
                 ->whereNotIn('id', $excludeIds)
                 ->latest()
@@ -654,10 +671,12 @@ class SiteController extends Controller
             ['name' => __($product->name), 'url' => $productUrl],
         ];
         if ($product->category) {
-            array_splice($list, 1, 0, [[
-                'name' => __($product->category->name),
-                'url'  => route('category.products', [slug($product->category->name), $product->category->id]),
-            ]]);
+            array_splice($list, 1, 0, [
+                [
+                    'name' => __($product->category->name),
+                    'url' => route('category.products', [slug($product->category->name), $product->category->id]),
+                ]
+            ]);
         }
         return $list;
     }
@@ -665,8 +684,8 @@ class SiteController extends Controller
     public function fetchReviews(Request $request, $id)
     {
         $validate = Validator::make($request->all(), [
-            'skip'  => 'required|integer|min:0',
-            'sort'  => 'nullable|string|in:recent,highest,lowest,helpful',
+            'skip' => 'required|integer|min:0',
+            'sort' => 'nullable|string|in:recent,highest,lowest,helpful',
         ]);
 
         if ($validate->fails()) {
@@ -702,8 +721,8 @@ class SiteController extends Controller
 
         $view = view($this->activeTemplate . 'products.load_reviews', compact('reviews'))->render();
         return response()->json([
-            'success'  => true,
-            'html'     => $view,
+            'success' => true,
+            'html' => $view,
             'has_more' => $reviews->count() === 10,
         ]);
     }
@@ -744,8 +763,8 @@ class SiteController extends Controller
     {
 
         $this->validate($request, [
-            'name'    => 'required',
-            'email'   => 'required',
+            'name' => 'required',
+            'email' => 'required',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:500',
         ]);
@@ -759,28 +778,28 @@ class SiteController extends Controller
         $random = getNumber();
 
         $user = auth()->user();
-        $ticket           = new SupportTicket();
-        $ticket->user_id  = $user->id;
-        $ticket->name     = $user->fullname ?? $request->name;
-        $ticket->email    = $user->email ?? $request->email;
+        $ticket = new SupportTicket();
+        $ticket->user_id = $user->id;
+        $ticket->name = $user->fullname ?? $request->name;
+        $ticket->email = $user->email ?? $request->email;
         $ticket->priority = Status::PRIORITY_MEDIUM;
 
-        $ticket->ticket     = $random;
-        $ticket->subject    = $request->subject;
+        $ticket->ticket = $random;
+        $ticket->subject = $request->subject;
         $ticket->last_reply = Carbon::now();
-        $ticket->status     = Status::TICKET_OPEN;
+        $ticket->status = Status::TICKET_OPEN;
         $ticket->save();
 
-        $adminNotification            = new AdminNotification();
-        $adminNotification->user_id   = auth()->user() ? auth()->user()->id : 0;
+        $adminNotification = new AdminNotification();
+        $adminNotification->user_id = auth()->user() ? auth()->user()->id : 0;
         $msgPreview = \Illuminate\Support\Str::limit(strip_tags($request->message ?? ''), 60);
-        $adminNotification->title     = auth()->user() ? ('New message from ' . auth()->user()->username . ': ' . $msgPreview) : 'A new contact message has been submitted';
+        $adminNotification->title = auth()->user() ? ('New message from ' . auth()->user()->username . ': ' . $msgPreview) : 'A new contact message has been submitted';
         $adminNotification->click_url = (auth()->user() && auth()->user()->id) ? urlPath('admin.ticket.view.user', auth()->user()->id) : urlPath('admin.ticket.view', $ticket->id);
         $adminNotification->save();
 
-        $message                    = new SupportMessage();
+        $message = new SupportMessage();
         $message->support_ticket_id = $ticket->id;
-        $message->message           = $request->message;
+        $message->message = $request->message;
         $message->save();
 
         activity_log(\App\Models\UserActivityLog::CONTACT_SUBMIT, 'Contact form / ticket: ' . $request->subject, null, $ticket->id);
@@ -795,17 +814,17 @@ class SiteController extends Controller
     {
 
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'mp3', 'm4a', 'mp4', 'webm'];
-        $maxSizeMb        = (int) substr(ini_get('upload_max_filesize'), 0, -1) ?: 4;
-        $maxFiles         = 5;
+        $maxSizeMb = (int) substr(ini_get('upload_max_filesize'), 0, -1) ?: 4;
+        $maxFiles = 5;
 
         $request->merge(['subject' => trim((string) $request->input('subject', ''))]);
         $allowedSubjects = ['Live Chat Message', 'General Inquiry', 'Report a Problem', 'Order Support'];
         $rules = [
-            'name'    => 'required|string|max:255',
-            'email'   => 'required|email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
             'subject' => 'required|string|in:' . implode(',', $allowedSubjects),
             'message' => 'required|string|max:500',
-            'attachments'   => 'nullable',
+            'attachments' => 'nullable',
             'attachments.*' => 'file|max:' . ($maxSizeMb * 1024),
         ];
 
@@ -817,7 +836,7 @@ class SiteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -957,7 +976,7 @@ class SiteController extends Controller
                     }
                     $attachment = new SupportAttachment();
                     $attachment->support_message_id = $message->id;
-                    $attachment->attachment         = $savedName;
+                    $attachment->attachment = $savedName;
                     $attachment->save();
                 } catch (\Exception $e) {
                     // Log and continue; one failed upload does not rollback ticket
@@ -966,9 +985,9 @@ class SiteController extends Controller
         }
 
         try {
-            if (\Illuminate\Support\Facades\Schema::hasTable('auto_responses')) {
-                $query = \App\Models\AutoResponse::keyword()->active();
-                if (\Illuminate\Support\Facades\Schema::hasColumn('auto_responses', 'is_public')) {
+            if (Schema::hasTable('auto_responses')) {
+                $query = AutoResponse::keyword()->active();
+                if (Schema::hasColumn('auto_responses', 'is_public')) {
                     $query->where('is_public', true);
                 }
                 $autoReplies = $query->get();
@@ -1021,14 +1040,14 @@ class SiteController extends Controller
                 'created_at' => $dt->format('g:i A'),
                 'created_at_full' => $dt->format('M d, H:i'),
                 'date_label' => $dateLabel,
-                'attachments' => $m->attachments->map(fn ($a) => route('ticket.download', encrypt($a->id)))->toArray(),
+                'attachments' => $m->attachments->map(fn($a) => route('ticket.download', encrypt($a->id)))->toArray(),
             ];
         }
 
         if ($userId) {
-            \Illuminate\Support\Facades\Cache::forget('contact_chat_feed_' . $userId);
+            Cache::forget('contact_chat_feed_' . $userId);
         }
-        
+
         $response = response()->json([
             'success' => true,
             'message' => __('Message sent! We will reply soon.'),
@@ -1058,7 +1077,7 @@ class SiteController extends Controller
             $ticketIds = SupportTicket::where('user_id', $user->id)
                 ->where('created_at', '>=', now()->subDays(30))
                 ->pluck('id');
-            $lastSeen = \Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at') ? $user->last_chat_seen_at : null;
+            $lastSeen = Schema::hasColumn('users', 'last_chat_seen_at') ? $user->last_chat_seen_at : null;
         } else {
             $guestTicket = $request->cookie('stayl_guest_ticket');
             if ($guestTicket) {
@@ -1078,12 +1097,12 @@ class SiteController extends Controller
 
         if ($user) {
             $cacheKey = 'contact_chat_feed_' . $user->id;
-            $messages = \Illuminate\Support\Facades\Cache::remember($cacheKey, 12, function () use ($user) {
+            $messages = Cache::remember($cacheKey, 12, function () use ($user) {
                 return $this->contactChannelService->buildChatFeedForUser($user);
             });
             $latestTicket = SupportTicket::where('user_id', $user->id)->latest('id')->first();
-            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at')) {
-                \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update(['last_chat_seen_at' => now()]);
+            if (Schema::hasColumn('users', 'last_chat_seen_at')) {
+                \DB::table('users')->where('id', $user->id)->update(['last_chat_seen_at' => now()]);
             }
         } else {
             $messages = [];
@@ -1102,7 +1121,7 @@ class SiteController extends Controller
                         'created_at' => $dt->format('g:i A'),
                         'created_at_full' => $dt->format('M d, H:i'),
                         'date_label' => $dateLabel,
-                        'attachments' => $m->attachments->map(fn ($a) => route('ticket.download', encrypt($a->id)))->toArray(),
+                        'attachments' => $m->attachments->map(fn($a) => route('ticket.download', encrypt($a->id)))->toArray(),
                     ];
                 }
             }
@@ -1127,7 +1146,7 @@ class SiteController extends Controller
 
         if ($user) {
             $ticketIds = SupportTicket::where('user_id', $user->id)->where('created_at', '>=', now()->subDays(30))->pluck('id');
-            $lastSeen = \Illuminate\Support\Facades\Schema::hasColumn('users', 'last_chat_seen_at') ? $user->last_chat_seen_at : null;
+            $lastSeen = Schema::hasColumn('users', 'last_chat_seen_at') ? $user->last_chat_seen_at : null;
         } else {
             $guestTicket = $request->cookie('stayl_guest_ticket');
             if ($guestTicket) {
@@ -1156,16 +1175,16 @@ class SiteController extends Controller
         $request->validate([
             'channel' => 'required|in:whatsapp,telegram,email',
             'message' => 'required|string|max:2000',
-            'name'    => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255',
             'subject' => 'nullable|string|max:255',
-            'email'   => 'nullable|email',
+            'email' => 'nullable|email',
         ]);
 
         $contactContent = getContent('contact_us.content', true);
-        $contactEmail   = trim(@$contactContent->data_values->contact_email ?? '');
-        $wa             = preg_replace('/[^0-9]/', '', @$contactContent->data_values->whatsapp_number ?? '');
-        $tg             = trim(@$contactContent->data_values->telegram_username ?? '');
-        $tg             = $tg ? ltrim($tg, '@') : '';
+        $contactEmail = trim(@$contactContent->data_values->contact_email ?? '');
+        $wa = preg_replace('/[^0-9]/', '', @$contactContent->data_values->whatsapp_number ?? '');
+        $tg = trim(@$contactContent->data_values->telegram_username ?? '');
+        $tg = $tg ? ltrim($tg, '@') : '';
 
         $channel = $request->channel;
         $message = $request->message;
@@ -1174,31 +1193,31 @@ class SiteController extends Controller
             if (!$contactEmail) {
                 return response()->json(['success' => false, 'message' => __('This channel is not configured.')], 400);
             }
-            $name    = $request->name ?: __('Visitor');
+            $name = $request->name ?: __('Visitor');
             $subject = $request->subject ?: __('Message from ') . $name;
-            $random  = getNumber();
-            $ticket  = new SupportTicket();
-            $ticket->user_id    = auth()->id() ?? 0;
-            $ticket->name       = $name;
-            $ticket->email      = $request->email ?? auth()->user()?->email ?? 'noreply@' . parse_url(url('/'), PHP_URL_HOST);
-            $ticket->priority   = Status::PRIORITY_MEDIUM;
-            $ticket->ticket     = $random;
-            $ticket->subject    = $subject;
+            $random = getNumber();
+            $ticket = new SupportTicket();
+            $ticket->user_id = auth()->id() ?? 0;
+            $ticket->name = $name;
+            $ticket->email = $request->email ?? auth()->user()?->email ?? 'noreply@' . parse_url(url('/'), PHP_URL_HOST);
+            $ticket->priority = Status::PRIORITY_MEDIUM;
+            $ticket->ticket = $random;
+            $ticket->subject = $subject;
             $ticket->last_reply = Carbon::now();
-            $ticket->status     = Status::TICKET_OPEN;
+            $ticket->status = Status::TICKET_OPEN;
             if (Schema::hasColumn('support_tickets', 'channel')) {
                 $ticket->channel = 'email';
             }
             $ticket->save();
             $uid = auth()->user()?->id ?? 0;
             $adminNotification = new AdminNotification();
-            $adminNotification->user_id   = $uid;
-            $adminNotification->title    = $uid ? ('New message from ' . auth()->user()->username . ': ' . \Illuminate\Support\Str::limit(strip_tags($message ?? ''), 60)) : 'New contact (Email channel)';
+            $adminNotification->user_id = $uid;
+            $adminNotification->title = $uid ? ('New message from ' . auth()->user()->username . ': ' . \Illuminate\Support\Str::limit(strip_tags($message ?? ''), 60)) : 'New contact (Email channel)';
             $adminNotification->click_url = $uid ? urlPath('admin.ticket.view.user', $uid) : urlPath('admin.ticket.view', $ticket->id);
             $adminNotification->save();
             $msg = new SupportMessage();
             $msg->support_ticket_id = $ticket->id;
-            $msg->message           = $message;
+            $msg->message = $message;
             $msg->save();
             $this->contactChannelService->logMessage([
                 'channel' => 'email',
@@ -1296,7 +1315,7 @@ class SiteController extends Controller
     {
         $allowed = ['en', 'bn', 'hi', 'ar', 'ur', 'ru', 'zh', 'es', 'fr', 'de', 'pt', 'ja'];
         $inputCode = strtolower(trim((string) $lang));
-        
+
         if (!in_array($inputCode, $allowed)) {
             $inputCode = 'en';
         }
@@ -1307,19 +1326,19 @@ class SiteController extends Controller
 
         $previousUrl = url()->previous();
         $rootUrl = $request->getSchemeAndHttpHost() . $request->getBaseUrl();
-        
+
         // Check if previous URL is internal to site
         if (str_starts_with($previousUrl, $rootUrl)) {
             $path = trim(substr($previousUrl, strlen($rootUrl)), '/');
             $segments = explode('/', $path);
-            
+
             // If the first segment is an existing locale, replace it; otherwise unshift
             if (isset($segments[0]) && in_array($segments[0], $allowed)) {
                 $segments[0] = $inputCode;
             } else {
                 array_unshift($segments, $inputCode);
             }
-            
+
             $targetPath = implode('/', $segments);
             return redirect()->to($targetPath);
         }
@@ -1368,7 +1387,7 @@ class SiteController extends Controller
     public function cookiePolicy()
     {
         $pageTitle = 'Cookie Policy';
-        $cookie    = Frontend::where('data_keys', 'cookie.data')->first();
+        $cookie = Frontend::where('data_keys', 'cookie.data')->first();
         return view($this->activeTemplate . 'cookie', compact('pageTitle', 'cookie'));
     }
 
@@ -1439,11 +1458,11 @@ class SiteController extends Controller
             return redirect(asset('assets/images/default.png'));
         }
 
-        $imgWidth  = explode('x', $size)[0];
+        $imgWidth = explode('x', $size)[0];
         $imgHeight = explode('x', $size)[1];
-        $text      = $imgWidth . '×' . $imgHeight;
-        $fontFile  = realpath('assets/font/RobotoMono-Regular.ttf');
-        $fontSize  = round(($imgWidth - 50) / 8);
+        $text = $imgWidth . '×' . $imgHeight;
+        $fontFile = realpath('assets/font/RobotoMono-Regular.ttf');
+        $fontSize = round(($imgWidth - 50) / 8);
 
         if ($fontSize <= 9) {
             $fontSize = 9;
@@ -1453,15 +1472,15 @@ class SiteController extends Controller
             $fontSize = 30;
         }
 
-        $image     = imagecreatetruecolor($imgWidth, $imgHeight);
+        $image = imagecreatetruecolor($imgWidth, $imgHeight);
         $colorFill = imagecolorallocate($image, 100, 100, 100);
-        $bgFill    = imagecolorallocate($image, 175, 175, 175);
+        $bgFill = imagecolorallocate($image, 175, 175, 175);
         imagefill($image, 0, 0, $bgFill);
-        $textBox    = imagettfbbox($fontSize, 0, $fontFile, $text);
-        $textWidth  = abs($textBox[4] - $textBox[0]);
+        $textBox = imagettfbbox($fontSize, 0, $fontFile, $text);
+        $textWidth = abs($textBox[4] - $textBox[0]);
         $textHeight = abs($textBox[5] - $textBox[1]);
-        $textX      = ($imgWidth - $textWidth) / 2;
-        $textY      = ($imgHeight + $textHeight) / 2;
+        $textX = ($imgWidth - $textWidth) / 2;
+        $textY = ($imgHeight + $textHeight) / 2;
         header('Content-Type: image/jpeg');
         imagettftext($image, $fontSize, 0, $textX, $textY, $colorFill, $fontFile, $text);
         imagejpeg($image);
@@ -1471,9 +1490,9 @@ class SiteController extends Controller
     public function maintenance()
     {
         $pageTitle = 'Maintenance Mode';
-        $general   = gs();
+        $general = gs();
 
-        if(gs('maintenance_mode') == Status::DISABLE){
+        if (gs('maintenance_mode') == Status::DISABLE) {
             return to_route('home');
         }
 
@@ -1573,9 +1592,11 @@ class SiteController extends Controller
                 if ($request->filled('min_price') || $request->filled('max_price')) {
                     $min = $request->get('min_price') ?: $request->get('min');
                     $max = $request->get('max_price') ?: $request->get('max');
-                    if ($min || $max) $parts[] = 'Price: ' . ($min ?: '0') . '-' . ($max ?: '∞');
+                    if ($min || $max)
+                        $parts[] = 'Price: ' . ($min ?: '0') . '-' . ($max ?: '∞');
                 }
-                if (empty($parts)) return;
+                if (empty($parts))
+                    return;
                 $query = mb_substr(implode(' | ', $parts), 0, 500);
                 $source = 'filter';
             }
@@ -1594,26 +1615,26 @@ class SiteController extends Controller
 
     public function hotDeal()
     {
-        $pageTitle    = "Hot Deal Product";
-        $data         = $this->getProductData('hotDeal');
+        $pageTitle = "Hot Deal Product";
+        $data = $this->getProductData('hotDeal');
         $data['subcategoryList'] = collect();
         $variantLists = $this->getVariantFilterLists($data['products']);
         $data['sizeList'] = $variantLists['sizes'];
         $data['colorList'] = $variantLists['colors'];
-        $products     = $data['products']->paginate(getPaginate());
+        $products = $data['products']->paginate(getPaginate());
         $productScope = 'hotDeal';
         return view($this->activeTemplate . 'products.index', compact('pageTitle', 'products', 'data', 'productScope'));
     }
 
     public function featured()
     {
-        $pageTitle    = "Featured Product";
-        $data         = $this->getProductData('featured');
+        $pageTitle = "Featured Product";
+        $data = $this->getProductData('featured');
         $data['subcategoryList'] = collect();
         $variantLists = $this->getVariantFilterLists($data['products']);
         $data['sizeList'] = $variantLists['sizes'];
         $data['colorList'] = $variantLists['colors'];
-        $products     = $data['products']->paginate(getPaginate());
+        $products = $data['products']->paginate(getPaginate());
         $productScope = 'featured';
         return view($this->activeTemplate . 'products.index', compact('pageTitle', 'products', 'data', 'productScope'));
     }
@@ -1621,26 +1642,26 @@ class SiteController extends Controller
     public function todayDeal()
     {
         $pageTitle = __('Today\'s Deal');
-        $data      = $this->getProductData('todayDeal');
+        $data = $this->getProductData('todayDeal');
         $data['subcategoryList'] = collect();
         $variantLists = $this->getVariantFilterLists($data['products']);
         $data['sizeList'] = $variantLists['sizes'];
         $data['colorList'] = $variantLists['colors'];
-        $products     = $data['products']->paginate(getPaginate());
+        $products = $data['products']->paginate(getPaginate());
         $productScope = 'todayDeal';
         return view($this->activeTemplate . 'products.index', compact('pageTitle', 'products', 'data', 'productScope'));
     }
 
     public function bestSelling()
     {
-        $pageTitle    = "Best Selling Product";
-        $data         = $this->getProductData('bestSelling');
+        $pageTitle = "Best Selling Product";
+        $data = $this->getProductData('bestSelling');
         $data['products'] = $data['products']->notSpotlight();
         $data['subcategoryList'] = collect();
         $variantLists = $this->getVariantFilterLists($data['products']);
         $data['sizeList'] = $variantLists['sizes'];
         $data['colorList'] = $variantLists['colors'];
-        $products     = $data['products']->paginate(getPaginate());
+        $products = $data['products']->paginate(getPaginate());
         $productScope = 'bestSelling';
         return view($this->activeTemplate . 'products.index', compact('pageTitle', 'products', 'data', 'productScope'));
     }
@@ -1648,25 +1669,25 @@ class SiteController extends Controller
     public function newArrival()
     {
         $pageTitle = __('New Arrival');
-        $data      = $this->getProductData();
+        $data = $this->getProductData();
         $data['subcategoryList'] = collect();
         $variantLists = $this->getVariantFilterLists($data['products']);
         $data['sizeList'] = $variantLists['sizes'];
         $data['colorList'] = $variantLists['colors'];
-        $products  = $data['products']->latest()->paginate(getPaginate());
+        $products = $data['products']->latest()->paginate(getPaginate());
         return view($this->activeTemplate . 'products.index', compact('pageTitle', 'products', 'data'));
     }
 
     public function discount()
     {
         $pageTitle = __('Discount & Offers');
-        $data      = $this->getProductData();
+        $data = $this->getProductData();
         $data['subcategoryList'] = collect();
         $variantLists = $this->getVariantFilterLists($data['products']);
         $data['sizeList'] = $variantLists['sizes'];
         $data['colorList'] = $variantLists['colors'];
-        $products  = $data['products']->where(function ($q) {
-            $q->where('discount', '>', 0)->orWhere('today_deals', \App\Constants\Status::YES);
+        $products = $data['products']->where(function ($q) {
+            $q->where('discount', '>', 0)->orWhere('today_deals', Status::YES);
         })->latest()->paginate(getPaginate());
         return view($this->activeTemplate . 'products.index', compact('pageTitle', 'products', 'data'));
     }
@@ -1693,12 +1714,16 @@ class SiteController extends Controller
             $query = Category::query()
                 ->active()
                 ->publicPublished()
-                ->withCount(['product' => function ($q) {
-                    $q->where('status', \App\Constants\Status::ENABLE);
-                }])
-                ->with(['subcategories' => function ($q) {
-                    $q->active()->orderBy('name')->limit(6);
-                }]);
+                ->withCount([
+                    'product' => function ($q) {
+                        $q->where('status', Status::ENABLE);
+                    }
+                ])
+                ->with([
+                    'subcategories' => function ($q) {
+                        $q->active()->orderBy('name')->limit(6);
+                    }
+                ]);
 
             if ($featuredOnly) {
                 $query->where('featured', 1);
@@ -1727,9 +1752,11 @@ class SiteController extends Controller
                 ->active()
                 ->publicPublished()
                 ->orderBy('name')
-                ->with(['subcategories' => function ($q) {
-                    $q->active()->orderBy('name');
-                }])
+                ->with([
+                    'subcategories' => function ($q) {
+                        $q->active()->orderBy('name');
+                    }
+                ])
                 ->get();
         });
 
@@ -1752,7 +1779,7 @@ class SiteController extends Controller
     public function allBrand()
     {
         $pageTitle = 'All Brands';
-        $brands    = Brand::active()->orderBy('name')->paginate(getPaginate());
+        $brands = Brand::active()->orderBy('name')->paginate(getPaginate());
         return view($this->activeTemplate . 'all_brands', compact('pageTitle', 'brands'));
     }
 
@@ -1768,7 +1795,7 @@ class SiteController extends Controller
         $currentSubcategoryId = null;
         $data['subcategoryList'] = Subcategory::where('category_id', $id)->where('status', Status::ENABLE)
             ->whereIn('id', (clone $data['products'])->where('category_id', $id)->distinct()->pluck('subcategory_id')->filter())
-            ->withCount(['products' => fn ($q) => $q->where('status', Status::ENABLE)])
+            ->withCount(['products' => fn($q) => $q->where('status', Status::ENABLE)])
             ->orderBy('name')
             ->get();
         $variantLists = $this->getVariantFilterLists($data['products']->where('category_id', $id));
@@ -1808,7 +1835,7 @@ class SiteController extends Controller
     public function subCategoryProduct($slug, $id)
     {
         $id = (int) $id;
-        $subcategory = \App\Models\Subcategory::find($id);
+        $subcategory = Subcategory::find($id);
         $name = $subcategory ? $subcategory->name : keyToTitle($slug);
         $pageTitle = __('Products in') . ' ' . $name;
         $data = $this->getProductData();
@@ -1818,7 +1845,7 @@ class SiteController extends Controller
         $data['subcategoryList'] = $currentCategoryId
             ? Subcategory::where('category_id', $currentCategoryId)->where('status', Status::ENABLE)
                 ->whereIn('id', (clone $data['products'])->where('category_id', $currentCategoryId)->distinct()->pluck('subcategory_id'))
-                ->withCount(['products' => fn ($q) => $q->where('status', Status::ENABLE)])
+                ->withCount(['products' => fn($q) => $q->where('status', Status::ENABLE)])
                 ->orderBy('name')
                 ->get()
             : collect();
@@ -1864,7 +1891,7 @@ class SiteController extends Controller
 
         if ($request->categoryId) {
             if ($request->categoryId != 0) {
-                $productList   = $productList->where('category_id', $request->categoryId);
+                $productList = $productList->where('category_id', $request->categoryId);
                 $productFilter = $this->subcategoriesQuery($productList, $request);
             }
         } else {
@@ -1899,7 +1926,7 @@ class SiteController extends Controller
             $paginate = $request->paginate;
         }
 
-        $products     = $productFilter->latest()->paginate($paginate);
+        $products = $productFilter->latest()->paginate($paginate);
         $emptyMessage = 'No products found';
         return view($this->activeTemplate . 'products.show_products', compact('products', 'emptyMessage'));
     }
@@ -1951,7 +1978,7 @@ class SiteController extends Controller
         // Price filter - Enhanced
         $minPrice = $request->min_price ?? $request->min;
         $maxPrice = $request->max_price ?? $request->max;
-        
+
         if ($minPrice && $maxPrice) {
             $minPrice = (float) $minPrice;
             $maxPrice = (float) $maxPrice;
@@ -1972,7 +1999,7 @@ class SiteController extends Controller
 
         // Sort filter
         if ($request->sort) {
-            $sort          = explode('_', $request->sort);
+            $sort = explode('_', $request->sort);
             $productFilter = $productFilter->orderBy(@$sort[0], @$sort[1]);
         }
 
@@ -2072,20 +2099,20 @@ class SiteController extends Controller
         if (request()->has('search') && !empty(trim(request()->search))) {
             $searchTerm = trim(request()->search);
             if (strlen($searchTerm) >= 2) {
-                $products = $products->where(function($query) use ($searchTerm) {
+                $products = $products->where(function ($query) use ($searchTerm) {
                     $query->where('products.name', 'LIKE', "%{$searchTerm}%")
-                          ->orWhere('products.description', 'LIKE', "%{$searchTerm}%")
-                          ->orWhere('products.summary', 'LIKE', "%{$searchTerm}%")
-                          ->orWhere('products.product_sku', 'LIKE', "%{$searchTerm}%")
-                          ->orWhereHas('category', function($q) use ($searchTerm) {
-                              $q->where('categories.name', 'LIKE', "%{$searchTerm}%");
-                          })
-                          ->orWhereHas('brand', function($q) use ($searchTerm) {
-                              $q->where('brands.name', 'LIKE', "%{$searchTerm}%");
-                          })
-                          ->orWhereHas('subcategory', function($q) use ($searchTerm) {
-                              $q->where('subcategories.name', 'LIKE', "%{$searchTerm}%");
-                          });
+                        ->orWhere('products.description', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('products.summary', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('products.product_sku', 'LIKE', "%{$searchTerm}%")
+                        ->orWhereHas('category', function ($q) use ($searchTerm) {
+                            $q->where('categories.name', 'LIKE', "%{$searchTerm}%");
+                        })
+                        ->orWhereHas('brand', function ($q) use ($searchTerm) {
+                            $q->where('brands.name', 'LIKE', "%{$searchTerm}%");
+                        })
+                        ->orWhereHas('subcategory', function ($q) use ($searchTerm) {
+                            $q->where('subcategories.name', 'LIKE', "%{$searchTerm}%");
+                        });
                 })->where('products.status', Status::ENABLE);
             } else {
                 $products = $products->available();
@@ -2111,10 +2138,10 @@ class SiteController extends Controller
             ->with(['category:id,name', 'brand:id,name']);
 
         return [
-            'products'     => $products,
-            'minPrice'     => $data['minPrice'],
-            'maxPrice'     => $data['maxPrice'],
-            'brands'       => $data['brands'],
+            'products' => $products,
+            'minPrice' => $data['minPrice'],
+            'maxPrice' => $data['maxPrice'],
+            'brands' => $data['brands'],
             'categoryList' => $data['categoryList'],
         ];
     }
@@ -2146,9 +2173,9 @@ class SiteController extends Controller
                 return $brand;
             });
         return [
-            'minPrice'     => $minPrice ?? 0,
-            'maxPrice'     => $maxPrice ?? 0,
-            'brands'       => $brands,
+            'minPrice' => $minPrice ?? 0,
+            'maxPrice' => $maxPrice ?? 0,
+            'brands' => $brands,
             'categoryList' => $categoryList,
         ];
     }
@@ -2175,7 +2202,7 @@ class SiteController extends Controller
     public function download($id, $fileName)
     {
         Product::where('id', $id)->where('digital_item', Status::YES)->where('file_type', 1)->where('file', $fileName)->firstOrFail();
-        $path    = fileManager()->productFile()->path.'/'.$fileName;
+        $path = fileManager()->productFile()->path . '/' . $fileName;
         return response()->download($path);
     }
 
@@ -2206,17 +2233,21 @@ class SiteController extends Controller
     /**
      * Serve banner image from project root or public so it loads regardless of server static path.
      */
-    public function serveBannerImage(string $filename)
+    public function serveBannerImage($localeOrFilename = null, $filename = null)
     {
-        $filename = basename($filename);
-        if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $filename)) {
+        $resolvedFilename = $filename;
+        if ($resolvedFilename === null) {
+            $resolvedFilename = $localeOrFilename;
+        }
+        $resolvedFilename = basename((string) $resolvedFilename);
+        if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $resolvedFilename)) {
             abort(404);
         }
         $base = \App\Services\BannerService::UPLOAD_BASE . '/' . \App\Services\BannerService::DESKTOP_DIR;
         $paths = [
-            base_path('../' . $base . '/' . $filename),
-            public_path($base . '/' . $filename),
-            base_path('../' . \App\Services\BannerService::UPLOAD_BASE . '/' . $filename),
+            base_path('../' . $base . '/' . $resolvedFilename),
+            public_path($base . '/' . $resolvedFilename),
+            base_path('../' . \App\Services\BannerService::UPLOAD_BASE . '/' . $resolvedFilename),
         ];
         foreach ($paths as $path) {
             if (is_file($path) && is_readable($path)) {
@@ -2230,16 +2261,20 @@ class SiteController extends Controller
     /**
      * Serve row split promo images from project root assets or Laravel public (same reliability as hero banners).
      */
-    public function serveRowSplitBanner(string $filename)
+    public function serveRowSplitBanner($localeOrFilename = null, $filename = null)
     {
-        $filename = basename($filename);
-        if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $filename)) {
+        $resolvedFilename = $filename;
+        if ($resolvedFilename === null) {
+            $resolvedFilename = $localeOrFilename;
+        }
+        $resolvedFilename = basename((string) $resolvedFilename);
+        if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $resolvedFilename)) {
             abort(404);
         }
         $rel = \App\Services\BannerService::ROW_SPLIT_RELATIVE;
         $paths = [
-            base_path('../' . $rel . '/' . $filename),
-            public_path($rel . '/' . $filename),
+            base_path('../' . $rel . '/' . $resolvedFilename),
+            public_path($rel . '/' . $resolvedFilename),
         ];
         foreach ($paths as $path) {
             if (is_file($path) && is_readable($path)) {

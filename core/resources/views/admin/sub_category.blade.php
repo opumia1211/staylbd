@@ -83,6 +83,7 @@
                                                         $subcatResource = [
                                                             'id' => $subcategory->id,
                                                             'name' => $subcategory->name,
+                                                            'name_bn' => $subcategory->name_bn,
                                                             'category_id' => $subcategory->category_id,
                                                         ];
                                                     @endphp
@@ -160,6 +161,10 @@
                                 <div class="form-group">
                                     <label>@lang('Name') <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="name" value="{{ old('name') }}" required />
+                                </div>
+                                <div class="form-group">
+                                    <label>@lang('Name (Bengali)')</label>
+                                    <input type="text" class="form-control" name="name_bn" value="{{ old('name_bn') }}" />
                                 </div>
                             </div>
                         </div>

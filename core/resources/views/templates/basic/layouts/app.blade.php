@@ -162,7 +162,7 @@
     </script>
 </head>
 
-<body class="antialiased" style="padding-top: var(--stayl-dynamic-header-height, 175px) !important;"
+<body class="antialiased" style="padding-top: var(--stayl-dynamic-header-height, 142px) !important;"
     @php $activeThemeTemplate = $previewThemeTemplate ?: (optional($uiSettings)->theme_template ?? 'default'); @endphp
     @if($activeThemeTemplate && $activeThemeTemplate !== 'default') data-theme="{{ $activeThemeTemplate }}" @endif
     @stack('body_attrs')>

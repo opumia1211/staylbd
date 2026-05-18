@@ -328,7 +328,7 @@
 
 @push('script')
 <script src="{{ asset('assets/global/js/apexcharts.min.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="{{ asset('assets/admin-ui/vendor/libs/moment/moment.js') }}"></script>
 <script>
     "use strict";
     $(function() {

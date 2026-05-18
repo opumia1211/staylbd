@@ -76,6 +76,8 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         Route::middleware('web')->get('maintenance-mode','App\Http\Controllers\SiteController@maintenance')->name('maintenance');
+        Route::middleware('web')->get('banner-image/{filename}', 'App\Http\Controllers\SiteController@serveBannerImage')->name('banner.image')->where('filename', '[a-zA-Z0-9_.-]+');
+        Route::middleware('web')->get('row-split-banner/{filename}', 'App\Http\Controllers\SiteController@serveRowSplitBanner')->name('row.split.image')->where('filename', '[a-zA-Z0-9_.-]+');
     }
 
     /**

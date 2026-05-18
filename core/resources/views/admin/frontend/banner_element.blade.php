@@ -102,76 +102,137 @@
                                     }
                                 }
                             @endphp
-                            <div class="banner-upload-cell border rounded-4 position-relative overflow-hidden group shadow-none hover-shadow-sm transition-all bg-white" 
-                                 data-banner-id="{{ $bannerId }}"
-                                 id="bannerCell{{ $bannerId ?? $i }}">
-                                 @if($bannerId)
-                                    <div class="banner-cell-content uploaded h-100 d-flex flex-column">
-                                        <div class="banner-cell-image-container position-relative bg-light overflow-hidden" style="height: 120px;">
-                                            @if($hasImage)
-                                                <img src="{{ $imageUrl }}" alt="Banner {{ $displayOrder }}" class="w-100 h-100 object-fit-cover shadow-sm">
-                                            @else
-                                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary">
-                                                    <i class="las la-image fs-1"></i>
-                                                </div>
-                                            @endif
-                                            <div class="position-absolute top-0 start-0 p-2 d-flex flex-column gap-1">
-                                                <span class="badge bg-dark opacity-75">#{{ $displayOrder }}</span>
-                                                @if(!$hasImage)
-                                                    <span class="badge bg-danger">@lang('FILE MISSING')</span>
-                                                @endif
-                                            </div>
-                                            <div class="banner-cell-overlay d-flex align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index: 5;">
-                                                <div class="d-flex gap-2 p-2 flex-wrap justify-content-center">
-                                                    <a href="{{ route('admin.frontend.sections.banner') }}?edit={{ $bannerId }}" class="btn btn-sm btn--primary shadow-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 8px;" title="@lang('Edit Content')">
-                                                        <i class="las la-pen fs-5"></i>
-                                                    </a>
-                                                    
-                                                    <button type="button" class="btn btn-sm {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'btn--warning' : 'btn--success' }} shadow-sm d-flex align-items-center justify-content-center banner-toggle-status" 
-                                                            style="width: 35px; height: 35px; border-radius: 8px;" 
-                                                            data-banner-id="{{ $bannerId }}" 
-                                                            data-current="{{ (int)(@$banner->data_values->is_active ?? 1) }}"
-                                                            title="{{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? __('Make Private') : __('Make Public') }}">
-                                                        <i class="las {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'la-eye-slash' : 'la-eye' }} fs-5"></i>
-                                                    </button>
-                                                    
-                                                    <form method="POST" action="{{ route('admin.frontend.remove', $bannerId) }}" class="d-inline banner-delete-form">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm btn--danger shadow-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 8px;" title="@lang('Delete')">
-                                                            <i class="las la-trash fs-5"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="p-2 bg-white d-flex align-items-center justify-content-between border-top mt-auto">
-                                            <span class="text-muted fw-bold" style="font-size: 10px;">@lang('SLIDE') {{ $displayOrder }}</span>
-                                            <div class="d-flex align-items-center gap-1">
-                                                <div class="dot {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'bg-success' : 'bg-secondary' }}" style="width: 8px; height: 8px; border-radius: 50%;"></div>
-                                                <span class="text-muted fw-bold" style="font-size: 10px;">{{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? __('PUBLIC') : __('PRIVATE') }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="banner-cell-content empty h-100">
-                                        <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" enctype="multipart/form-data" class="banner-upload-form h-100">
-                                            @csrf
-                                            <input type="hidden" name="type" value="element">
-                                            @if($bannerId) <input type="hidden" name="id" value="{{ $bannerId }}"> @endif
-                                            <input type="hidden" name="display_order" value="{{ $displayOrder }}">
-                                            <div class="d-flex flex-column align-items-center justify-content-center h-100 bg-light py-4 px-2 text-center border-dashed border-2 rounded-4 hover-bg-white transition-all cursor-pointer">
-                                                <input type="file" class="banner-file-input d-none" name="image_input[image]" id="upz{{ $bannerId ?? $i }}" accept="image/*">
-                                                <label for="upz{{ $bannerId ?? $i }}" class="mb-0 cursor-pointer w-100">
-                                                    <div class="mb-1"><i class="las la-cloud-upload-alt fs-2 text-muted"></i></div>
-                                                    <span class="d-block small fw-bold mb-1">@lang('Fast Upload')</span>
-                                                    <span class="d-block text-muted opacity-75" style="font-size: 9px;">@lang('Format: JPG, PNG, WEBP, MP4')</span>
-                                                    <span class="d-block text-muted opacity-75" style="font-size: 8px;">@lang('Image: 1920x400 | Mobile: 1024x1024')</span>
-                                                    <span class="d-block text-muted opacity-75" style="font-size: 8px;">@lang('Video: 1080p | Max: 5MB')</span>
-                                                </label>
-                                            </div>
-                                        </form>
-                                    </div>
-                                @endif
+                             <div class="banner-upload-cell border rounded-4 position-relative overflow-hidden group shadow-none hover-shadow-sm transition-all bg-white" 
+                                  data-banner-id="{{ $bannerId }}"
+                                  id="bannerCell{{ $bannerId ?? $i }}">
+                                  @if($bannerId && $hasImage)
+                                     <div class="banner-cell-content uploaded h-100 w-100 position-relative" style="min-height: 162px;">
+                                         <!-- Full Bleed Image -->
+                                         @if($hasImage)
+                                             <img src="{{ $imageUrl }}" alt="Banner {{ $displayOrder }}" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                                         @else
+                                             <div class="w-100 h-100 position-absolute top-0 start-0 d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary">
+                                                 <i class="las la-image fs-1"></i>
+                                             </div>
+                                         @endif
+
+                                         <!-- Small Top Badges (Order and Status Dot) -->
+                                         <div class="position-absolute top-0 start-0 p-2 d-flex gap-1.5 align-items-center" style="z-index: 4;">
+                                             <span class="badge bg-dark bg-opacity-75">#{{ $displayOrder }}</span>
+                                             <div class="dot {{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? 'bg-success' : 'bg-secondary' }}" 
+                                                  style="width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #fff;"
+                                                  title="{{ (int)(@$banner->data_values->is_active ?? 1) === 1 ? __('Public') : __('Private') }}"></div>
+                                         </div>
+
+                                          <!-- Full Card Hover Overlay -->
+                                          <div class="banner-cell-overlay d-flex flex-column align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100" 
+                                               style="background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 5;">
+                                              
+                                              <!-- Floating Action Buttons -->
+                                              <div class="d-flex gap-2 p-2 flex-wrap justify-content-center mb-1">
+                                                  <!-- Edit & Settings Modal Trigger -->
+                                                  <button type="button" 
+                                                          class="btn btn-sm btn--primary shadow-sm d-flex align-items-center justify-content-center open-edit-modal" 
+                                                          style="width: 36px; height: 36px; border-radius: 8px; background-color: #0d9488 !important; border: none !important; color: #fff !important;" 
+                                                          data-id="{{ $bannerId }}"
+                                                          data-url="{{ @$banner->data_values->url }}"
+                                                          data-title="{{ @$banner->data_values->banner_content->title ?? '' }}"
+                                                          data-subtitle="{{ @$banner->data_values->banner_content->subtitle ?? '' }}"
+                                                          data-desc="{{ @$banner->data_values->banner_content->description ?? '' }}"
+                                                          data-order="{{ $displayOrder }}"
+                                                          data-animation="{{ @$banner->data_values->animation_type ?? 'none' }}"
+                                                          data-active="{{ (int)(@$banner->data_values->is_active ?? 1) }}"
+                                                          title="@lang('Edit Settings & Visibility')">
+                                                      <i class="las la-pen fs-5"></i>
+                                                  </button>
+                                                  
+                                                  <!-- Replace Image Trigger -->
+                                                  <label for="replaceInput{{ $bannerId }}" 
+                                                         class="btn btn-sm btn--info shadow-sm d-flex align-items-center justify-content-center mb-0 cursor-pointer" 
+                                                         style="width: 36px; height: 36px; border-radius: 8px; background-color: #0284c7 !important; border: none !important; color: #fff !important; cursor: pointer;" 
+                                                         title="@lang('Replace Image')">
+                                                     <i class="las la-cloud-upload-alt fs-5"></i>
+                                                  </label>
+                                                  <input type="file" 
+                                                         class="banner-replace-input d-none" 
+                                                         id="replaceInput{{ $bannerId }}" 
+                                                         data-banner-id="{{ $bannerId }}" 
+                                                         accept="image/*">
+                                                  
+                                                  <!-- Delete / Remove Banner -->
+                                                  <form method="POST" action="{{ route('admin.frontend.remove', $bannerId) }}" class="d-inline banner-delete-form">
+                                                      @csrf
+                                                      <button type="submit" 
+                                                              class="btn btn-sm btn--danger shadow-sm d-flex align-items-center justify-content-center" 
+                                                              style="width: 36px; height: 36px; border-radius: 8px; background-color: #ef4444 !important; border: none !important; color: #fff !important;" 
+                                                              title="@lang('Delete / Remove Banner')">
+                                                          <i class="las la-trash fs-5"></i>
+                                                      </button>
+                                                  </form>
+                                              </div>
+
+                                              <span class="text-white x-small opacity-75 mt-1 fw-semibold text-uppercase">@lang('SLIDE') {{ $displayOrder }}</span>
+                                          </div>
+                                     </div>
+                                 @else
+                                     <div class="banner-cell-content empty h-100 w-100">
+                                         <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" enctype="multipart/form-data" class="banner-upload-form h-100 w-100">
+                                             @csrf
+                                             <input type="hidden" name="type" value="element">
+                                             @if($bannerId) <input type="hidden" name="id" value="{{ $bannerId }}"> @endif
+                                             <input type="hidden" name="display_order" value="{{ $displayOrder }}">
+                                             <div class="d-flex flex-column align-items-center justify-content-center h-100 bg-light py-4 px-3 text-center border-dashed border-2 rounded-4 hover-bg-white transition-all cursor-pointer position-relative" 
+                                                  style="min-height: 162px;"
+                                                  onclick="if(!event.target.closest('.open-edit-modal') && !event.target.closest('.banner-delete-form')) { document.getElementById('upz{{ $bannerId ?? $i }}').click(); }">
+                                                 <input type="file" class="banner-file-input d-none" name="image_input[image]" id="upz{{ $bannerId ?? $i }}" accept="image/*">
+                                                 
+                                                 <!-- Floating slide number badge on empty card if slot exists -->
+                                                 <div class="position-absolute top-0 start-0 p-2" style="z-index: 4;">
+                                                     <span class="badge bg-secondary bg-opacity-75">#{{ $displayOrder }}</span>
+                                                 </div>
+
+                                                 <!-- Floating Action Buttons for Empty Slot -->
+                                                 @if($bannerId)
+                                                 <div class="position-absolute top-0 end-0 p-2 d-flex gap-1 align-items-center" style="z-index: 10;">
+                                                     <!-- Edit Details -->
+                                                     <button type="button" 
+                                                             class="btn btn-xs btn--primary shadow-sm d-flex align-items-center justify-content-center open-edit-modal" 
+                                                             style="width: 28px; height: 28px; border-radius: 6px; padding: 0;" 
+                                                             data-id="{{ $bannerId }}"
+                                                             data-url="{{ @$banner->data_values->url }}"
+                                                             data-title="{{ @$banner->data_values->banner_content->title ?? '' }}"
+                                                             data-subtitle="{{ @$banner->data_values->banner_content->subtitle ?? '' }}"
+                                                             data-desc="{{ @$banner->data_values->banner_content->description ?? '' }}"
+                                                             data-order="{{ $displayOrder }}"
+                                                             data-animation="{{ @$banner->data_values->animation_type ?? 'none' }}"
+                                                             data-active="{{ (int)(@$banner->data_values->is_active ?? 1) }}"
+                                                             title="@lang('Edit Settings')">
+                                                         <i class="las la-pen fs-6"></i>
+                                                     </button>
+                                                     
+                                                     <!-- Delete Slot -->
+                                                     <form method="POST" action="{{ route('admin.frontend.remove', $bannerId) }}" class="d-inline banner-delete-form">
+                                                         @csrf
+                                                         <button type="submit" 
+                                                                 class="btn btn-xs btn--danger shadow-sm d-flex align-items-center justify-content-center" 
+                                                                 style="width: 28px; height: 28px; border-radius: 6px; padding: 0;" 
+                                                                 title="@lang('Delete Slot')">
+                                                             <i class="las la-trash fs-6"></i>
+                                                         </button>
+                                                     </form>
+                                                 </div>
+                                                 @endif
+
+                                                 <div class="mb-2"><i class="las la-cloud-upload-alt fs-2 text-primary"></i></div>
+                                                 <span class="d-block small fw-bold text-dark mb-2">@lang('Upload Banner Slide')</span>
+                                                 <div class="d-flex flex-column gap-1 align-items-center mt-1 w-100">
+                                                     <span class="badge bg-label-info px-2 py-1 w-100 text-truncate" style="font-size: 10px; font-weight: 700; border-radius: 4px;">@lang('Size: 1920 × 400 px')</span>
+                                                     <span class="badge bg-label-secondary px-2 py-1 w-100 text-truncate" style="font-size: 10px; font-weight: 700; border-radius: 4px;">@lang('Formats: JPG, JPEG, PNG, WEBP')</span>
+                                                 </div>
+                                             </div>
+                                         </form>
+                                     </div>
+                                 @endif
                             </div>
                         @endforeach
                     </div>
@@ -259,126 +320,139 @@
             </div>
         </div>
 
-        <!-- Edit Banner Form (only shown when editing) -->
-        @if(@$data && request()->get('edit'))
-            <div class="col-12 mb-3">
-                <div class="card border-0 shadow-sm border-start border-4 border--info rounded-4 overflow-hidden">
-                    <div class="card-header bg-white border-0 py-2 px-3 d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-bold small text-uppercase text-muted"><i class="las la-pen-fancy me-1"></i>@lang('Refine Slide Content') #{{ @$data->data_values->display_order ?? $data->id }}</h6>
-                        <a href="{{ route('admin.frontend.sections.banner') }}" class="btn btn-xs btn-outline-secondary rounded-pill px-2">@lang('Close')</a>
+        <!-- Edit Slide Modal -->
+        <div class="modal fade" id="editSlideModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                    <div class="modal-header border-bottom py-3 px-4 bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="las la-pen-fancy text-primary fs-4"></i>
+                            <h5 class="modal-title fw-bold text-dark fs-5">@lang('Edit Slide Settings & Visibility')</h5>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="card-body pt-0 px-3 pb-3">
-                        <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="type" value="element">
-                            <input type="hidden" name="id" value="{{ $data->id }}">
-                            
-                            <!-- Split Layout: Media vs Metadata -->
+                    <form action="{{ route('admin.frontend.sections.content.banner') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="type" value="element">
+                        <input type="hidden" name="id" id="modalSlideId" value="">
+                        
+                        <div class="modal-body py-4 px-4">
                             <div class="row g-4">
-                                <!-- LEFT: Media Sources -->
-                                <div class="col-lg-5">
-                                    <div class="p-3 bg-light rounded-4 border border-dashed text-center">
-                                        <h6 class="small fw-bold text-muted text-uppercase mb-3"><i class="las la-image me-1"></i>@lang('Visual Sources')</h6>
-                                        
-                                        <!-- Desktop Media -->
-                                        <div class="mb-4">
-                                            <div class="position-relative d-inline-block mb-2 shadow-sm rounded-3 overflow-hidden bg-white" style="width: 100%; height: 100px;">
-                                                <img src="{{ \App\Services\BannerService::bannerImageUrl(@$data->data_values->image ?? '') ?: asset('assets/images/default.png') }}" class="w-100 h-100 object-fit-cover shadow-sm">
-                                                <div class="position-absolute bottom-0 end-0 bg-dark text-white px-2 py-1 small rounded-start">@lang('DESKTOP')</div>
-                                            </div>
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text"><i class="las la-laptop"></i></span>
-                                                <input type="file" class="form-control" name="image_input[image]" accept="image/*">
-                                            </div>
-                                            <small class="text-muted d-block mt-1" style="font-size: 9px;">@lang('Ideal for laptops/desktops: 1920 &times; 400 px')</small>
-                                        </div>
-
-                                        <!-- Mobile Media -->
-                                        <div class="mb-0">
-                                            <div class="position-relative d-inline-block mb-2 shadow-sm rounded-3 overflow-hidden bg-white" style="width: 100%; height: 100px;">
-                                                @php $mImg = @$data->data_values->mobile_image; @endphp
-                                                <img src="{{ $mImg ? \App\Services\BannerService::bannerImageUrl($mImg) : asset('assets/images/default.png') }}" class="w-100 h-100 object-fit-cover shadow-sm">
-                                                <div class="position-absolute bottom-0 end-0 bg--info text-white px-2 py-1 small rounded-start">@lang('MOBILE')</div>
-                                            </div>
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text"><i class="las la-mobile-alt"></i></span>
-                                                <input type="file" class="form-control" name="image_input[mobile_image]" accept="image/*">
-                                            </div>
-                                            <small class="text-muted d-block mt-1" style="font-size: 9px;">@lang('Ideal for mobile/tab: 1024 &times; 1024 px (1:1 aspect)')</small>
-                                        </div>
+                                <!-- LEFT: Media Upload -->
+                                <div class="col-md-5 border-end pe-md-4">
+                                    <h6 class="small fw-bold text-muted text-uppercase mb-3"><i class="las la-image me-1"></i>@lang('Slide Images')</h6>
+                                    
+                                    <!-- Desktop Image -->
+                                    <div class="mb-3">
+                                        <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Desktop Image')</label>
+                                        <input type="file" class="form-control form-control-sm" name="image_input[image]" accept="image/*">
+                                        <small class="text-muted d-block mt-1" style="font-size: 9px;">@lang('Ideal size: 1920 × 400 px')</small>
+                                    </div>
+                                    
+                                    <!-- Mobile Image -->
+                                    <div class="mb-0">
+                                        <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Mobile Image')</label>
+                                        <input type="file" class="form-control form-control-sm" name="image_input[mobile_image]" accept="image/*">
+                                        <small class="text-muted d-block mt-1" style="font-size: 9px;">@lang('Ideal size: 1024 × 1024 px')</small>
                                     </div>
                                 </div>
-
-                                <!-- RIGHT: Configuration & Content -->
-                                <div class="col-lg-7">
+                                
+                                <!-- RIGHT: Meta / Text Fields -->
+                                <div class="col-md-7 ps-md-4">
                                     <div class="row g-3">
                                         <div class="col-md-9">
-                                            <label class="small fw-bold text-muted mb-1">@lang('Target Redirect URL')</label>
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text bg-white"><i class="las la-link"></i></span>
-                                                <input type="url" name="url" class="form-control" value="{{ @$data->data_values->url }}" placeholder="https://...">
-                                            </div>
+                                            <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Target Redirect URL')</label>
+                                            <input type="url" name="url" id="modalSlideUrl" class="form-control form-control-sm" placeholder="https://...">
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="small fw-bold text-muted mb-1">@lang('Slide Pos.')</label>
-                                            <input type="number" name="display_order" class="form-control form-control-sm" value="{{ @$data->data_values->display_order }}">
+                                            <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Position')</label>
+                                            <input type="number" name="display_order" id="modalSlideOrder" class="form-control form-control-sm" required>
                                         </div>
-
+                                        
                                         <div class="col-md-6">
-                                            <label class="small fw-bold text-muted mb-1">@lang('Overlay Title')</label>
-                                            <input type="text" name="banner_title" class="form-control form-control-sm" value="{{ @$data->data_values->banner_content->title ?? '' }}">
+                                            <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Title Overlay')</label>
+                                            <input type="text" name="banner_title" id="modalSlideTitleOverlay" class="form-control form-control-sm">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="small fw-bold text-muted mb-1">@lang('Subtitle')</label>
-                                            <input type="text" name="banner_subtitle" class="form-control form-control-sm" value="{{ @$data->data_values->banner_content->subtitle ?? '' }}">
+                                            <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Subtitle')</label>
+                                            <input type="text" name="banner_subtitle" id="modalSlideSubtitle" class="form-control form-control-sm">
                                         </div>
-
+                                        
                                         <div class="col-12">
-                                            <label class="small fw-bold text-muted mb-1">@lang('Short Description')</label>
-                                            <textarea name="banner_description" class="form-control form-control-sm" rows="1">{{ @$data->data_values->banner_content->description ?? '' }}</textarea>
+                                            <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Short Description')</label>
+                                            <textarea name="banner_description" id="modalSlideDesc" class="form-control form-control-sm" rows="2"></textarea>
                                         </div>
-
-                                        <div class="col-md-4">
-                                            <label class="small fw-bold text-muted mb-1">@lang('Entrance Effect')</label>
-                                            <select name="animation_type" class="form-select form-select-sm">
-                                                <option value="none" {{ (@$data->data_values->animation_type ?? 'none') == 'none' ? 'selected' : '' }}>@lang('None')</option>
-                                                <option value="fadeIn" {{ (@$data->data_values->animation_type ?? '') == 'fadeIn' ? 'selected' : '' }}>@lang('Fade In')</option>
-                                                <option value="slideInLeft" {{ (@$data->data_values->animation_type ?? '') == 'slideInLeft' ? 'selected' : '' }}>@lang('Slide from Left')</option>
-                                                <option value="slideInRight" {{ (@$data->data_values->animation_type ?? '') == 'slideInRight' ? 'selected' : '' }}>@lang('Slide from Right')</option>
-                                                <option value="zoomIn" {{ (@$data->data_values->animation_type ?? '') == 'zoomIn' ? 'selected' : '' }}>@lang('Zoom In')</option>
+                                        
+                                        <div class="col-md-6">
+                                            <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Entrance Effect')</label>
+                                            <select name="animation_type" id="modalSlideAnimation" class="form-select form-select-sm">
+                                                <option value="none">@lang('None')</option>
+                                                <option value="fadeIn">@lang('Fade In')</option>
+                                                <option value="slideInLeft">@lang('Slide from Left')</option>
+                                                <option value="slideInRight">@lang('Slide from Right')</option>
+                                                <option value="zoomIn">@lang('Zoom In')</option>
                                             </select>
                                         </div>
-
-                                        <div class="col-md-4">
-                                            <label class="small fw-bold text-muted mb-1">@lang('Visibility')</label>
-                                            <select name="is_active" class="form-select form-select-sm">
-                                                <option value="1" {{ (int)(@$data->data_values->is_active ?? 1) === 1 ? 'selected' : '' }}>@lang('Live on Site')</option>
-                                                <option value="0" {{ (int)(@$data->data_values->is_active ?? 1) === 0 ? 'selected' : '' }}>@lang('Hidden Preview')</option>
+                                        
+                                        <div class="col-md-6">
+                                            <label class="small fw-bold text-muted mb-1" style="font-size: 11px;">@lang('Visibility Status')</label>
+                                            <select name="is_active" id="modalSlideActive" class="form-select form-select-sm">
+                                                <option value="1">@lang('Live on Site (Public)')</option>
+                                                <option value="0">@lang('Hidden Preview (Private)')</option>
                                             </select>
-                                        </div>
-
-                                        <div class="col-md-4 align-self-end">
-                                            <button type="submit" class="btn btn--primary btn-sm w-100 rounded-pill shadow-sm py-2">
-                                                <i class="las la-check-circle me-1"></i> @lang('Commit Changes')
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                        
+                        <div class="modal-footer border-top py-3 px-4 bg-light">
+                            <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">@lang('Cancel')</button>
+                            <button type="submit" class="btn btn-primary btn-sm px-4 shadow-sm"><i class="las la-check-circle me-1"></i>@lang('Save Changes')</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        @endif
+        </div>
     </div>
 
     <x-confirmation-modal />
 @endsection
 
 @push('style')
-
-{{-- inline style moved to critical-admin.css --}}
-
+<style>
+    .banner-upload-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1.25rem !important;
+    }
+    @media (max-width: 1199px) {
+        .banner-upload-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+    }
+    @media (max-width: 767px) {
+        .banner-upload-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+    .banner-upload-cell {
+        min-height: 162px !important;
+        border-radius: 12px !important;
+    }
+    .bg-label-info {
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+    }
+    .bg-label-secondary {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;
+    }
+    .hover-bg-white:hover {
+        background-color: #ffffff !important;
+        border-color: #0e9f90 !important;
+    }
+</style>
 @endpush
 
 @push('script')
@@ -617,6 +691,32 @@
                     $(input).val('');
                 }
             });
+        });
+
+        // Populate and open edit modal when pencil is clicked
+        $(document).on('click', '.open-edit-modal', function(e) {
+            e.preventDefault();
+            const btn = $(this);
+            const id = btn.data('id');
+            const url = btn.data('url');
+            const title = btn.data('title');
+            const subtitle = btn.data('subtitle');
+            const desc = btn.data('desc');
+            const order = btn.data('order');
+            const animation = btn.data('animation');
+            const active = btn.data('active');
+            
+            $('#modalSlideId').val(id);
+            $('#modalSlideUrl').val(url);
+            $('#modalSlideOrder').val(order);
+            $('#modalSlideTitleOverlay').val(title);
+            $('#modalSlideSubtitle').val(subtitle);
+            $('#modalSlideDesc').val(desc);
+            $('#modalSlideAnimation').val(animation).change();
+            $('#modalSlideActive').val(active).change();
+            
+            const myModal = new bootstrap.Modal(document.getElementById('editSlideModal'));
+            myModal.show();
         });
     })(jQuery);
     

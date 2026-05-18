@@ -32,7 +32,7 @@
         display: block !important;
         width: 100% !important;
         background: transparent !important;
-        margin: 0 !important;
+        margin: -30px 0 0 0 !important; /* Keep a tiny, premium visual gap */
         padding: 0 !important;
     }
     
@@ -55,17 +55,18 @@
         border-radius: 0 !important;
     }
 
-    /* All slides */
+    /* All slides: transparent layer, soft cross-fade transitions */
     html body #home-banner-section .banner-slider .banner-slide-inner {
         width: 100% !important;
         height: 100% !important;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
         z-index: 1;
         pointer-events: none !important;
         position: absolute !important;
         inset: 0 !important;
+        overflow: hidden !important;
     }
     
     /* Active Slide */
@@ -91,6 +92,7 @@
         position: absolute !important;
         inset: 0 !important;
         background: transparent !important;
+        overflow: hidden !important;
     }
 
     html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link {
@@ -98,10 +100,11 @@
         height: auto !important;
     }
 
-    /* Standard responsive images */
+    /* Standard responsive images & videos - completely static layout (no zoom) */
     html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link img,
     html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link picture,
-    html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link picture img {
+    html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link picture img,
+    html body #home-banner-section .banner-slider .banner-slide-inner .banner-slide-link video {
         width: 100% !important;
         height: 100% !important;
         display: block !important;
@@ -109,18 +112,66 @@
         object-position: center !important;
         max-height: none !important;
         background-color: transparent !important;
-        transform: none !important;
         position: absolute !important;
         inset: 0 !important;
+        transform: none !important;
     }
 
-    /* First slide's image pushes physical height naturally */
+    /* First slide's media pushes physical height naturally */
     html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link img,
     html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link picture,
-    html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link picture img {
+    html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link picture img,
+    html body #home-banner-section .banner-slider .banner-slide-inner:first-child .banner-slide-link video {
         position: relative !important;
         height: auto !important;
         object-fit: contain !important; /* Safety for natural flow */
+    }
+
+    /* High-fidelity dots navigation styling */
+    .banner-slider-dots {
+        position: absolute !important;
+        bottom: 20px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        display: flex !important;
+        gap: 8px !important;
+        z-index: 10 !important;
+    }
+    
+    .banner-slider-dots .banner-slider-dot {
+        width: 8px !important;
+        height: 8px !important;
+        border-radius: 50% !important;
+        background: rgba(255, 255, 255, 0.4) !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        padding: 0 !important;
+        outline: none !important;
+    }
+    
+    .banner-slider-dots .banner-slider-dot.is-active {
+        width: 24px !important;
+        border-radius: 4px !important;
+        background: #ffffff !important;
+    }
+
+    /* Clean Static Text Overlays - no complex sliding delay */
+    .banner-overlay .banner-badge,
+    .banner-overlay .banner-title,
+    .banner-overlay .banner-subtitle,
+    .banner-overlay .banner-desc,
+    .banner-overlay .banner-cta {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .banner-slide-active .banner-overlay .banner-badge,
+    .banner-slide-active .banner-overlay .banner-title,
+    .banner-slide-active .banner-overlay .banner-subtitle,
+    .banner-slide-active .banner-overlay .banner-desc,
+    .banner-slide-active .banner-overlay .banner-cta {
+        opacity: 1 !important;
     }
 </style>
 <section id="home-banner-section" class="banner-module banner-section" style="--hb-w: {{ $bannerWidth }}; --hb-h: {{ $bannerHeight }};" aria-label="@lang('Banner')">
@@ -160,16 +211,24 @@
                     $layoutType = $dv['layout_type'] ?? 'hero_full_width';
                     $overlayStyle = 'background:'.($bc['overlay_color'] ?? 'rgba(0,0,0,0.3)').'; color:'.($bc['text_color'] ?? '#fff').'; text-align:'.($bc['title_align'] ?? 'center').';';
                     $useMobileArt = $mobileUrl !== $imgUrl;
+                    
+                    // Determine if the media is a video file
+                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                    $isVideo = in_array($ext, ['mp4', 'webm', 'ogv']);
                 @endphp
                 <div class="banner-slide-inner banner-layout-{{ $layoutType }}">
                     <a href="{{ !empty($dv['url']) ? $dv['url'] : '#' }}" class="banner-slide-link" data-banner-id="{{ $banner->id }}">
-                        @if($useMobileArt)
-                        <picture class="banner-slide-media">
-                            <source media="(max-width: 1024px)" srcset="{{ $mobileUrl }}">
-                            <img src="{{ $imgUrl }}" alt="{{ $bc['title'] ?? 'banner' }}" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" {{ $index === 0 ? 'fetchpriority="high"' : '' }} decoding="async" width="{{ $bannerWidth }}" height="{{ $bannerHeight }}" class="banner-img-fullscreen" sizes="{{ $bannerSizesAttr }}" onerror="{{ $bannerImgOnError }}">
-                        </picture>
+                        @if($isVideo)
+                        <video src="{{ $imgUrl }}" autoplay muted loop playsinline class="banner-img-fullscreen banner-slide-media" style="width: 100% !important; height: 100% !important; object-fit: fill !important;"></video>
                         @else
-                        <img src="{{ $imgUrl }}" alt="{{ $bc['title'] ?? 'banner' }}" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" {{ $index === 0 ? 'fetchpriority="high"' : '' }} decoding="async" width="{{ $bannerWidth }}" height="{{ $bannerHeight }}" class="banner-img-fullscreen banner-slide-media" sizes="{{ $bannerSizesAttr }}" onerror="{{ $bannerImgOnError }}">
+                            @if($useMobileArt)
+                            <picture class="banner-slide-media">
+                                <source media="(max-width: 1024px)" srcset="{{ $mobileUrl }}">
+                                <img src="{{ $imgUrl }}" alt="{{ $bc['title'] ?? 'banner' }}" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" {{ $index === 0 ? 'fetchpriority="high"' : '' }} decoding="async" width="{{ $bannerWidth }}" height="{{ $bannerHeight }}" class="banner-img-fullscreen" sizes="{{ $bannerSizesAttr }}" onerror="{{ $bannerImgOnError }}">
+                            </picture>
+                            @else
+                            <img src="{{ $imgUrl }}" alt="{{ $bc['title'] ?? 'banner' }}" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" {{ $index === 0 ? 'fetchpriority="high"' : '' }} decoding="async" width="{{ $bannerWidth }}" height="{{ $bannerHeight }}" class="banner-img-fullscreen banner-slide-media" sizes="{{ $bannerSizesAttr }}" onerror="{{ $bannerImgOnError }}">
+                            @endif
                         @endif
                         {{-- Dark Obscuring Gradient Removed as requested --}}
                         @if(!empty($bc['title']) || !empty($bc['subtitle']) || !empty($bc['button_text']))

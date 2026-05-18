@@ -26,7 +26,6 @@ Route::get('serve-css/tailwind-admin', [ServeAssetController::class, 'tailwindAd
 Route::get('serve-css/admin-panel', [ServeAssetController::class, 'adminPanel'])->name('serve.css.admin.panel');
 Route::get('serve-css/{name}', [ServeAssetController::class, 'css'])->name('serve.css');
 
-
 // Autopay: app/SMS message bridge (Android etc. send payment confirmation here)
 Route::post('api/autopay/incoming-message', [AutopayIncomingController::class, 'incomingMessage'])->name('api.autopay.incoming')->middleware('throttle:60,1');
 
@@ -109,9 +108,6 @@ Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'en|bn|hi|ar|ur|r
 
         // Banner analytics (impression/click tracking)
         Route::post('banner/analytics', 'recordBannerAnalytics')->name('banner.analytics');
-        // Serve banner image from project root or public (works regardless of server static path)
-        Route::get('banner-image/{filename}', 'serveBannerImage')->name('banner.image')->where('filename', '[a-zA-Z0-9_.-]+');
-        Route::get('row-split-banner/{filename}', 'serveRowSplitBanner')->name('row.split.image')->where('filename', '[a-zA-Z0-9_.-]+');
     });
 
     Route::controller('WishController')->prefix('wish-list')->name('wish.list.')->group(function () {

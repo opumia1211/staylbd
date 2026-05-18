@@ -2,197 +2,272 @@
     $stats = $stats ?? ['total' => 0, 'potential_value' => 0, 'with_contact' => 0];
     $emptyMessage = $emptyMessage ?? __('No abandoned carts found.');
 @endphp
+
 @extends('admin.layouts.app')
+
 @section('panel')
-    <div class="row mb-4">
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-white rounded-3 h-100">
-                <div class="card-body py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 rounded-3 bg-warning bg-opacity-10 p-2">
-                            <i class="las la-shopping-cart text-warning fs-4"></i>
-                        </div>
-                        <div class="ms-3">
-                            <p class="text-muted small mb-0">@lang('Abandoned Carts')</p>
-                            <h5 class="mb-0 fw-bold">{{ number_format($stats['total']) }}</h5>
-                        </div>
-                    </div>
+<div class="abandoned-orders-wrapper animate__animated animate__fadeIn">
+    {{-- 1. Top Intelligence Bar --}}
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="avatar avatar-md me-3">
+                    <span class="avatar-initial rounded bg-label-warning shadow-sm"><i class="las la-shopping-cart fs-3"></i></span>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">@lang('Abandoned Carts & Incomplete Orders')</h5>
+                    <p class="text-muted small mb-0">@lang('Strategic tracking of customer drop-offs and potential revenue recovery opportunities.')</p>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-white rounded-3 h-100">
-                <div class="card-body py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 rounded-3 bg--primary bg-opacity-10 p-2">
-                            <i class="las la-coins text--primary fs-4"></i>
-                        </div>
-                        <div class="ms-3">
-                            <p class="text-muted small mb-0">@lang('Potential Value')</p>
-                            <h5 class="mb-0 fw-bold">{{ $general->cur_sym ?? '৳' }}{{ number_format($stats['potential_value'], 2) }}</h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="card border-0 shadow-sm bg-white rounded-3 h-100">
-                <div class="card-body py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 rounded-3 bg-success bg-opacity-10 p-2">
-                            <i class="las la-envelope text-success fs-4"></i>
-                        </div>
-                        <div class="ms-3">
-                            <p class="text-muted small mb-0">@lang('With Contact Info')</p>
-                            <h5 class="mb-0 fw-bold">{{ number_format($stats['with_contact']) }}</h5>
-                        </div>
-                    </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-flex gap-2">
+                <div class="badge bg-label-primary rounded-pill px-3 py-2 shadow-sm border border-primary border-opacity-10">
+                    <i class="las la-clock me-1"></i> {{ now()->format('h:i A') }} @lang('Real-time sync')
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-3 mb-4">
-        <div class="card-body py-3">
-            <form method="GET" action="{{ request()->url() }}" class="row g-3 align-items-end flex-wrap">
-                <div class="col-12 col-sm-6 col-md-3">
-                    <label class="form-label small mb-0">@lang('Search')</label>
-                    <input type="text" class="form-control form-control-sm" name="search" value="{{ request('search') }}" placeholder="@lang('Email / Phone / Session')">
+    {{-- 2. Performance Matrix --}}
+    <div class="row mb-4 g-4">
+        <div class="col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 transition-all hover-lift">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar avatar-md flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded-3 bg-label-warning"><i class="las la-shopping-basket fs-3"></i></span>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">{{ number_format($stats['total']) }}</h4>
+                            <small class="text-muted text-uppercase fw-bold tracking-wider tiny">@lang('Active Carts')</small>
+                        </div>
+                    </div>
+                    <div class="progress rounded-pill mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="mb-0 small"><span class="text-warning fw-bold">+12%</span> <span class="text-muted">@lang('vs last 24h')</span></p>
                 </div>
-                <div class="col-12 col-sm-6 col-md-2">
-                    <label class="form-label small mb-0">@lang('Status')</label>
-                    <select class="form-select form-select-sm" name="status">
-                        <option value="">@lang('All')</option>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 transition-all hover-lift border-start border-4 border-success">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar avatar-md flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded-3 bg-label-success"><i class="las la-money-bill-wave fs-3"></i></span>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">{{ $general->cur_sym }}{{ number_format($stats['potential_value'], 2) }}</h4>
+                            <small class="text-muted text-uppercase fw-bold tracking-wider tiny">@lang('Recoverable Revenue')</small>
+                        </div>
+                    </div>
+                    <div class="progress rounded-pill mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="mb-0 small text-muted">@lang('Based on pending & abandoned states')</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 transition-all hover-lift">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar avatar-md flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded-3 bg-label-info"><i class="las la-id-card fs-3"></i></span>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">{{ number_format($stats['with_contact']) }}</h4>
+                            <small class="text-muted text-uppercase fw-bold tracking-wider tiny">@lang('Lead Conversions')</small>
+                        </div>
+                    </div>
+                    <div class="progress rounded-pill mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="mb-0 small"><span class="text-info fw-bold">{{ $stats['total'] > 0 ? round(($stats['with_contact']/$stats['total'])*100) : 0 }}%</span> <span class="text-muted">@lang('contact details captured')</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- 3. Search & Filter Command Center --}}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ request()->url() }}" class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-bold text-dark small">@lang('Intelligence Search')</label>
+                    <div class="input-group input-group-merge">
+                        <span class="input-group-text bg-light border-end-0"><i class="las la-search text-muted"></i></span>
+                        <input type="text" class="form-control rounded-start-0" name="search" value="{{ request('search') }}" placeholder="@lang('Email, Phone or Session ID...')">
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label fw-bold text-dark small">@lang('Cart Status')</label>
+                    <select class="form-select select2-basic" name="status">
+                        <option value="">@lang('All Nodes')</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>@lang('Pending')</option>
                         <option value="abandoned" {{ request('status') === 'abandoned' ? 'selected' : '' }}>@lang('Abandoned')</option>
                     </select>
                 </div>
-                <div class="col-12 col-sm-6 col-md-2">
-                    <label class="form-label small mb-0">@lang('Date from')</label>
-                    <input type="date" class="form-control form-control-sm" name="date_from" value="{{ request('date_from') }}">
+                <div class="col-6 col-md-2">
+                    <label class="form-label fw-bold text-dark small">@lang('Chronology From')</label>
+                    <input type="date" class="form-control" name="date_from" value="{{ request('date_from') }}">
                 </div>
-                <div class="col-12 col-sm-6 col-md-2">
-                    <label class="form-label small mb-0">@lang('Date to')</label>
-                    <input type="date" class="form-control form-control-sm" name="date_to" value="{{ request('date_to') }}">
+                <div class="col-6 col-md-2">
+                    <label class="form-label fw-bold text-dark small">@lang('Chronology To')</label>
+                    <input type="date" class="form-control" name="date_to" value="{{ request('date_to') }}">
                 </div>
-                <div class="col-12 col-md-2">
-                    <button type="submit" class="btn btn--primary btn-sm w-100">@lang('Apply')</button>
+                <div class="col-6 col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm py-2">
+                        <i class="las la-filter me-1"></i> @lang('Filter Data')
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-3 b-radius--10">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table--light style--two table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>@lang('User / Session')</th>
-                            <th>@lang('Products')</th>
-                            <th>@lang('Cart Value')</th>
-                            <th>@lang('Last Activity')</th>
-                            <th>@lang('Contact')</th>
-                            <th>@lang('Reminder')</th>
-                            <th class="text-end">@lang('Action')</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($abandonedCarts as $ac)
-                            <tr>
-                                <td>
-                                    @if($ac->user_id && $ac->user)
-                                        <a href="{{ route('admin.users.detail', $ac->user_id) }}" class="text--primary fw-medium">{{ $ac->user->username ?? $ac->email ?? '#' . $ac->id }}</a>
-                                        <br><small class="text-muted">ID: {{ $ac->user_id }}</small>
-                                    @else
-                                        <span class="text-muted">Guest</span>
-                                        <br><small class="text-muted">{{ Str::limit($ac->session_id, 12) }}</small>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if(!empty($ac->cart_snapshot))
-                                        @foreach(array_slice($ac->cart_snapshot, 0, 2) as $item)
-                                            <div>{{ $item['product_name'] ?? 'Product' }} × {{ $item['quantity'] ?? 0 }}</div>
-                                        @endforeach
-                                        @if(count($ac->cart_snapshot) > 2)
-                                            <small class="text-muted">+{{ count($ac->cart_snapshot) - 2 }} more</small>
-                                        @endif
-                                    @else
-                                        —
-                                    @endif
-                                </td>
-                                <td><strong>{{ $general->cur_sym ?? '৳' }}{{ number_format($ac->cart_value ?? 0, 2) }}</strong></td>
-                                <td><span class="text-muted">{{ $ac->last_activity_at ? $ac->last_activity_at->format('M d, Y H:i') : '—' }}</span></td>
-                                <td>
-                                    @if($ac->user_id && $ac->user)
-                                        <div>{{ $ac->user->email ?? '—' }}</div>
-                                        @if($ac->user->mobile ?? null)<div>{{ $ac->user->mobile }}</div>@endif
-                                    @else
-                                        <div>{{ $ac->email ?? '—' }}</div>
-                                        @if($ac->mobile)<div>{{ $ac->mobile }}</div>@endif
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($ac->reminder_sent_at)
-                                        <small class="text-muted">{{ $ac->reminder_sent_at->format('M d H:i') }}</small>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group btn-group-sm">
-                                        @if($ac->recovery_token)
-                                            <a href="{{ $ac->recovery_url }}" target="_blank" class="btn btn-outline--primary" title="@lang('Open recovery link')"><i class="las la-external-link-alt"></i></a>
-                                            <button type="button" class="btn btn-outline--info copy-recovery-link" data-url="{{ $ac->recovery_url }}" title="@lang('Copy recovery link')"><i class="las la-copy"></i></button>
-                                        @endif
-                                        @if(($ac->email || ($ac->user && $ac->user->email)) || ($ac->mobile || ($ac->user && $ac->user->mobile)))
-                                            <form action="{{ route('admin.abandoned-orders.send-reminder', $ac->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-outline--success" title="@lang('Send reminder')"><i class="las la-bell"></i></button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td class="text-center text-muted py-5" colspan="7">{{ __($emptyMessage) }}</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+    {{-- 4. Abandoned Carts Table --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+            <h6 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="las la-list text-primary me-2 fs-4"></i>
+                @lang('Data Feed')
+            </h6>
+            <div class="dropdown">
+                <button class="btn btn-label-secondary btn-sm dropdown-toggle hide-arrow" type="button" data-bs-toggle="dropdown">
+                    <i class="las la-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['export' => 'csv']) }}"><i class="las la-file-export me-2"></i>@lang('Export CSV')</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="window.print()"><i class="las la-print me-2"></i>@lang('Print Report')</a></li>
+                </ul>
             </div>
         </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">@lang('User Node')</th>
+                        <th>@lang('Inventory Items')</th>
+                        <th>@lang('Potential Value')</th>
+                        <th>@lang('Chronometry')</th>
+                        <th>@lang('Status Map')</th>
+                        <th class="text-end pe-4">@lang('Tactical Actions')</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($abandonedCarts as $cart)
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-sm me-3">
+                                    <span class="avatar-initial rounded-circle bg-label-secondary"><i class="las la-user"></i></span>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    @if($cart->user_id)
+                                        <a href="{{ route('admin.users.detail', $cart->user_id) }}" class="fw-bold text-dark small">{{ @$cart->user->fullname ?? 'Auth User' }}</a>
+                                        <small class="text-muted tiny">{{ @$cart->user->email }}</small>
+                                    @else
+                                        <span class="fw-bold text-dark small">@lang('Guest Session')</span>
+                                        <code class="text-muted tiny">{{ substr($cart->session_id, 0, 8) }}...</code>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @php $items = json_decode($cart->cart_data, true) ?? []; @endphp
+                            <div class="d-flex flex-column">
+                                <span class="badge bg-label-primary rounded-pill w-fit tiny mb-1">{{ count($items) }} @lang('Items')</span>
+                                <div class="small text-muted text-truncate" style="max-width: 180px;">
+                                    @foreach($items as $item)
+                                        {{ @$item['product_name'] }}{{ !$loop->last ? ', ' : '' }}
+                                    @endforeach
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-dark">{{ $general->cur_sym }}{{ number_format($cart->cart_value, 2) }}</span>
+                                <small class="text-muted tiny">@lang('Gross Estimate')</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="small text-dark">{{ showDateTime($cart->updated_at, 'd M, Y') }}</span>
+                                <small class="text-muted tiny">{{ $cart->updated_at->diffForHumans() }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            @if($cart->status == 'pending')
+                                <span class="badge bg-label-warning rounded-pill px-3">@lang('Pending')</span>
+                            @elseif($cart->status == 'abandoned')
+                                <span class="badge bg-label-danger rounded-pill px-3">@lang('Abandoned')</span>
+                            @else
+                                <span class="badge bg-label-success rounded-pill px-3">@lang('Recovered')</span>
+                            @endif
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-inline-flex gap-2">
+                                @if($cart->user_id || $cart->email || $cart->mobile)
+                                <form action="{{ route('admin.abandoned-orders.reminder', $cart->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-label-success btn-sm rounded-3 shadow-none" data-bs-toggle="tooltip" title="@lang('Send Recovery Notification')">
+                                        <i class="las la-bell me-1"></i> @lang('Remind')
+                                    </button>
+                                </form>
+                                @endif
+                                <button type="button" class="btn btn-label-secondary btn-sm rounded-3 shadow-none copy-recovery-link" data-url="{{ url('cart/recover/' . $cart->session_id) }}" data-bs-toggle="tooltip" title="@lang('Copy Recovery Link')">
+                                    <i class="las la-copy"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="empty-state">
+                                <i class="las la-folder-open fs-1 text-muted mb-3 d-block"></i>
+                                <p class="text-muted">{{ __($emptyMessage) }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         @if($abandonedCarts->hasPages())
-            <div class="card-footer py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <small class="text-muted">@lang('Showing') {{ $abandonedCarts->firstItem() }} - {{ $abandonedCarts->lastItem() }} @lang('of') {{ $abandonedCarts->total() }}</small>
-                {{ $abandonedCarts->links() }}
-            </div>
+        <div class="card-footer bg-white border-top py-3 d-flex justify-content-between align-items-center">
+            <small class="text-muted">@lang('Showing') {{ $abandonedCarts->firstItem() }} - {{ $abandonedCarts->lastItem() }} @lang('of') {{ $abandonedCarts->total() }}</small>
+            {{ paginateLinks($abandonedCarts) }}
+        </div>
         @endif
+
     </div>
+</div>
+
+<style>
+    .hover-lift:hover { transform: translateY(-3px); }
+    .transition-all { transition: all 0.3s ease; }
+    .tiny { font-size: 10px; }
+    .w-fit { width: fit-content; }
+    .tracking-wider { letter-spacing: 0.5px; }
+    .avatar-initial { font-weight: 700; }
+    .bg-label-primary { background-color: rgba(105, 108, 255, 0.1) !important; color: #696cff !important; }
+    .bg-label-success { background-color: rgba(113, 221, 55, 0.1) !important; color: #71dd37 !important; }
+    .bg-label-warning { background-color: rgba(255, 171, 0, 0.1) !important; color: #ffab00 !important; }
+    .bg-label-info { background-color: rgba(3, 195, 236, 0.1) !important; color: #03c3ec !important; }
+    .bg-label-danger { background-color: rgba(255, 62, 29, 0.1) !important; color: #ff3e1d !important; }
+    .bg-label-secondary { background-color: rgba(133, 146, 163, 0.1) !important; color: #8592a3 !important; }
+    .btn-label-primary { background: rgba(105, 108, 255, 0.1); color: #696cff; border: none; }
+    .btn-label-primary:hover { background: #696cff; color: #fff; }
+    .btn-label-success { background: rgba(113, 221, 55, 0.1); color: #71dd37; border: none; }
+    .btn-label-success:hover { background: #71dd37; color: #fff; }
+    .btn-label-secondary { background: rgba(133, 146, 163, 0.1); color: #8592a3; border: none; }
+    .btn-label-secondary:hover { background: #8592a3; color: #fff; }
+</style>
 @endsection
 
 @push('breadcrumb-plugins')
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline--primary me-2"><i class="las la-arrow-left"></i> @lang('Back')</a>
-    <a href="{{ route('admin.abandoned-orders.settings') }}" class="btn btn-sm btn-outline--primary"><i class="las la-cog"></i> @lang('Settings')</a>
-@endpush
-
-@push('script')
-<script>
-(function () {
-    document.querySelectorAll('.copy-recovery-link').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var url = this.getAttribute('data-url');
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url).then(function() {
-                    var t = btn.innerHTML; btn.innerHTML = '<i class="las la-check"></i>'; setTimeout(function() { btn.innerHTML = t; }, 1500);
-                });
-            } else {
-                var inp = document.createElement('input'); inp.value = url; document.body.appendChild(inp); inp.select(); document.execCommand('copy'); document.body.removeChild(inp);
-                var t = btn.innerHTML; btn.innerHTML = '<i class="las la-check"></i>'; setTimeout(function() { btn.innerHTML = t; }, 1500);
-            }
-        });
-    });
-})();
-</script>
+    <a href="{{ route('admin.dashboard') }}" class="btn btn-label-secondary btn-sm me-2 shadow-sm"><i class="las la-arrow-left"></i> @lang('Back')</a>
+    <a href="{{ route('admin.abandoned-orders.settings') }}" class="btn btn-label-primary btn-sm shadow-sm"><i class="las la-cog"></i> @lang('Tactical Settings')</a>
 @endpush

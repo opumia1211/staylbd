@@ -1,18 +1,29 @@
 @extends('admin.layouts.app')
 @section('panel')
-<div class="registration-control-wrapper">
+<div class="registration-control-wrapper animate__animated animate__fadeIn">
     {{-- Top Action Bar --}}
     <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h5 class="fw-bold mb-0">@lang('Registration & User Profile Architecture')</h5>
-            <p class="text-muted small mb-0">@lang('Configure the fields, security, and visual flow of your user registration experience.')</p>
-        </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <div class="btn-group shadow-sm">
-                <a href="{{ route('admin.frontend.sections.register') }}" class="btn btn-primary btn-sm active px-3"><i class="las la-cog me-1"></i> @lang('Registration')</a>
-                <a href="{{ route('admin.frontend.sections.userprofile') }}" class="btn btn-outline-primary btn-sm px-3"><i class="las la-user-circle me-1"></i> @lang('Profile Edit')</a>
+        <div class="col-md-7">
+            <div class="d-flex align-items-center">
+                <div class="avatar avatar-md me-3">
+                    <span class="avatar-initial rounded bg-label-primary shadow-sm"><i class="las la-user-plus fs-3"></i></span>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">@lang('Registration Architecture')</h5>
+                    <p class="text-muted small mb-0">@lang('Design and regulate your site\'s entry point and user onboarding flow.')</p>
+                </div>
             </div>
-            <button type="submit" form="registerMasterForm" class="btn btn--success btn-sm px-4 ms-2 shadow-sm"><i class="las la-save me-1"></i> @lang('Save All Changes')</button>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-flex gap-2">
+                <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                    <a href="{{ route('admin.frontend.sections.register') }}" class="btn btn-primary btn-sm px-3 active border-0"><i class="las la-cog me-1"></i> @lang('Registration')</a>
+                    <a href="{{ route('admin.frontend.sections.userprofile') }}" class="btn btn-outline-primary btn-sm px-3 border-0 bg-white"><i class="las la-user-circle me-1"></i> @lang('Profile Edit')</a>
+                </div>
+                <button type="submit" form="registerMasterForm" class="btn btn-primary btn-sm px-4 shadow-md rounded-pill">
+                    <i class="las la-save me-1"></i> @lang('Deploy Changes')
+                </button>
+            </div>
         </div>
     </div>
 
@@ -23,103 +34,114 @@
                 @csrf
                 <input type="hidden" name="type" value="content">
                 
-                {{-- 1. Security & Core settings --}}
-                <div class="card border-0 shadow-sm mb-4 overflow-hidden border-top-premium-warning">
-                    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom-0">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar-sm bg-label-warning rounded me-3 d-flex align-items-center justify-content-center">
-                                <i class="las la-shield-alt fs-4 text-warning"></i>
+                {{-- 1. Security Matrix --}}
+                <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+                    <div class="card-header border-bottom py-3 bg-white">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-label-warning p-2 me-3 rounded">
+                                    <i class="las la-shield-alt fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@lang('Security & Anti-Bot Matrix')</h6>
+                                    <small class="text-muted">@lang('Multi-layered verification for authentication routes')</small>
+                                </div>
                             </div>
-                            <div>
-                                <h6 class="mb-0">@lang('Security & Bot Protection')</h6>
-                                <small class="text-muted">@lang('Anti-spam measures for login and signup')</small>
-                            </div>
+                            <span class="badge bg-label-secondary rounded-pill">@lang('Auth Shield')</span>
                         </div>
                     </div>
-                    <div class="card-body pt-0">
+                    <div class="card-body pt-4">
                         <div class="row g-3">
                             @php
                                 $loginCaptchaEnabled = isset($content->data_values->login_captcha_enabled) ? (int) $content->data_values->login_captcha_enabled === 1 : true;
                                 $registerCaptchaEnabled = isRegistrationFieldEnabled('captcha');
                             @endphp
                             <div class="col-md-6">
-                                <div class="security-toggle-card p-3 rounded border bg-light-premium transition-all">
+                                <label class="security-toggle-option p-3 rounded border w-100 cursor-pointer transition-all h-100 {{ $loginCaptchaEnabled ? 'border-primary bg-label-primary' : 'bg-light' }}" for="login_captcha_enabled">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <span class="fw-semibold text-dark">@lang('Login Captcha')</span>
+                                        <div class="d-flex align-items-center">
+                                            <i class="las la-sign-in-alt fs-4 me-2 {{ $loginCaptchaEnabled ? 'text-primary' : 'text-muted' }}"></i>
+                                            <span class="fw-bold">@lang('Login Captcha')</span>
+                                        </div>
                                         <div class="form-check form-switch modern-switch">
                                             <input type="hidden" name="login_captcha_enabled" value="0">
-                                            <input class="form-check-input" type="checkbox" name="login_captcha_enabled" value="1" id="login_captcha_enabled" {{ $loginCaptchaEnabled ? 'checked' : '' }}>
+                                            <input class="form-check-input security-toggle-cb" type="checkbox" name="login_captcha_enabled" value="1" id="login_captcha_enabled" {{ $loginCaptchaEnabled ? 'checked' : '' }}>
                                         </div>
                                     </div>
-                                    <p class="small text-muted mb-0">@lang('Show verification on both floating and full login pages.')</p>
-                                </div>
+                                    <p class="small text-muted mb-0 lh-sm">@lang('Enforce verification on both floating and full-page login modules.')</p>
+                                </label>
                             </div>
                             <div class="col-md-6">
-                                <div class="security-toggle-card p-3 rounded border bg-light-premium transition-all">
+                                <label class="security-toggle-option p-3 rounded border w-100 cursor-pointer transition-all h-100 {{ $registerCaptchaEnabled ? 'border-primary bg-label-primary' : 'bg-light' }}" for="reg_captcha_switch">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <span class="fw-semibold text-dark">@lang('Register Captcha')</span>
+                                        <div class="d-flex align-items-center">
+                                            <i class="las la-user-plus fs-4 me-2 {{ $registerCaptchaEnabled ? 'text-primary' : 'text-muted' }}"></i>
+                                            <span class="fw-bold">@lang('Register Captcha')</span>
+                                        </div>
                                         <div class="form-check form-switch modern-switch">
                                             <input type="hidden" name="registration_fields[captcha]" value="0">
-                                            <input class="form-check-input reg-field-cb" type="checkbox" name="registration_fields[captcha]" value="1" id="reg_captcha_switch" data-field="captcha" {{ $registerCaptchaEnabled ? 'checked' : '' }}>
+                                            <input class="form-check-input reg-field-cb security-toggle-cb" type="checkbox" name="registration_fields[captcha]" value="1" id="reg_captcha_switch" data-field="captcha" {{ $registerCaptchaEnabled ? 'checked' : '' }}>
                                         </div>
                                     </div>
-                                    <p class="small text-muted mb-0">@lang('Requires users to solve a captcha during registration.')</p>
-                                </div>
+                                    <p class="small text-muted mb-0 lh-sm">@lang('Prevent automated bot account creation with math verification.')</p>
+                                </label>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- 2. Registration Fields with Search --}}
-                <div class="card border-0 shadow-sm mb-4 border-top-premium-success">
-                    <div class="card-header bg-white py-3 border-bottom-0">
+                {{-- 2. Data Elements --}}
+                <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+                    <div class="card-header border-bottom py-3 bg-white">
                         <div class="row align-items-center g-3">
                             <div class="col-md-6 d-flex align-items-center">
-                                <div class="avatar-sm bg-label-success rounded me-3 d-flex align-items-center justify-content-center">
-                                    <i class="las la-list-ul fs-4 text-success"></i>
+                                <div class="badge bg-label-success p-2 me-3 rounded">
+                                    <i class="las la-stream fs-4"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-0">@lang('Data Collection Architecture')</h6>
-                                    <small class="text-muted">@lang('Select which fields should appear on the signup form')</small>
+                                    <h6 class="mb-0 fw-bold">@lang('Field Configuration Matrix')</h6>
+                                    <small class="text-muted">@lang('Enable or disable data collection modules')</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="input-group input-group-sm search-fields-box shadow-none border rounded-pill overflow-hidden">
-                                    <span class="input-group-text bg-white border-0"><i class="las la-search text-muted"></i></span>
-                                    <input type="text" class="form-control border-0 ps-0" id="fieldSearch" placeholder="@lang('Search fields...')">
+                                <div class="input-group input-group-merge search-box shadow-none border rounded-pill px-2">
+                                    <span class="input-group-text border-0 bg-transparent"><i class="las la-search text-muted"></i></span>
+                                    <input type="text" class="form-control border-0 bg-transparent ps-0" id="fieldSearch" placeholder="@lang('Filter modules...')">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body pt-0">
+                    <div class="card-body pt-4">
                         @foreach(registrationFieldsListGrouped() as $groupKey => $group)
-                        <div class="registration-field-group mb-4" data-group="{{ $groupKey }}">
-                            <div class="d-flex align-items-center justify-content-between mb-3 group-header p-2 bg-light rounded border-start border-3 border-{{ $groupKey == 'basic' ? 'primary' : 'info' }}">
+                        <div class="registration-field-group mb-5 animate__animated animate__fadeInUp" data-group="{{ $groupKey }}">
+                            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                                 <div class="d-flex align-items-center">
-                                    <i class="{{ $group['icon'] }} me-2 text-primary fs-5"></i>
-                                    <span class="fw-bold text-dark">{{ $group['title'] }}</span>
-                                    <span class="badge bg-label-primary rounded-pill ms-2 small group-count">0</span>
+                                    <div class="avatar avatar-xs me-2">
+                                        <span class="avatar-initial rounded-circle bg-label-{{ $groupKey == 'basic' ? 'primary' : 'info' }}"><i class="{{ $group['icon'] }}"></i></span>
+                                    </div>
+                                    <span class="fw-bold text-dark text-uppercase tracking-wider small">{{ $group['title'] }}</span>
+                                    <span class="badge bg-label-primary rounded-pill ms-2 group-count">0</span>
                                 </div>
-                                <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-outline-primary px-3 reg-group-action" data-action="all">@lang('All')</button>
-                                    <button type="button" class="btn btn-outline-secondary px-3 reg-group-action" data-action="none">@lang('None')</button>
+                                <div class="btn-group btn-group-sm rounded-pill overflow-hidden border">
+                                    <button type="button" class="btn btn-light px-3 reg-group-action" data-action="all">@lang('All')</button>
+                                    <button type="button" class="btn btn-light px-3 reg-group-action border-start" data-action="none">@lang('None')</button>
                                 </div>
                             </div>
-                            <div class="reg-fields-premium-grid">
+                            <div class="reg-fields-grid">
                                 @foreach($group['fields'] as $fkey => $label)
                                 @if($fkey === 'captcha') @continue @endif
-                                <div class="field-item-wrapper" data-label="{{ strtolower($label) }}" data-key="{{ strtolower($fkey) }}">
-                                    <label class="premium-field-label" for="reg_field_{{ $fkey }}">
-                                        <div class="d-flex align-items-center justify-content-between w-100">
-                                            <div class="d-flex align-items-center overflow-hidden">
-                                                <div class="field-indicator rounded-circle me-2"></div>
-                                                <span class="text-truncate" title="{{ $label }}">{{ $label }}</span>
+                                <div class="field-card-item" data-label="{{ strtolower($label) }}" data-key="{{ strtolower($fkey) }}">
+                                    <input type="hidden" name="registration_fields[{{ $fkey }}]" value="0">
+                                    <input type="checkbox" class="d-none reg-field-cb" name="registration_fields[{{ $fkey }}]" value="1" id="reg_field_{{ $fkey }}" {{ isRegistrationFieldEnabled($fkey) ? 'checked' : '' }} data-field="{{ $fkey }}">
+                                    <label class="field-card-label rounded border p-3 w-100 transition-all cursor-pointer h-100 d-flex flex-column" for="reg_field_{{ $fkey }}">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="field-icon-box rounded bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="las la-{{ $fkey == 'email' ? 'envelope' : ($fkey == 'mobile' ? 'mobile' : ($fkey == 'password' ? 'key' : 'id-card')) }} text-muted"></i>
                                             </div>
-                                            <div class="form-check modern-checkbox">
-                                                <input type="hidden" name="registration_fields[{{ $fkey }}]" value="0">
-                                                <input type="checkbox" class="form-check-input reg-field-cb" name="registration_fields[{{ $fkey }}]" value="1" id="reg_field_{{ $fkey }}" {{ isRegistrationFieldEnabled($fkey) ? 'checked' : '' }} data-field="{{ $fkey }}">
-                                            </div>
+                                            <div class="status-indicator"></div>
                                         </div>
+                                        <span class="fw-semibold text-dark mb-1 text-truncate">{{ $label }}</span>
+                                        <span class="tiny text-muted text-uppercase tracking-tighter">{{ $fkey }}</span>
                                     </label>
                                 </div>
                                 @endforeach
@@ -129,39 +151,44 @@
                     </div>
                 </div>
 
-                {{-- 3. Visual Branding Content --}}
-                <div class="card border-0 shadow-sm mb-4 border-top-premium-primary">
-                    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom-0" data-bs-toggle="collapse" data-bs-target="#sectionContentCollapse" style="cursor: pointer;">
+                {{-- 3. Visual Identity --}}
+                <div class="card border-0 shadow-sm mb-4 overflow-hidden border-start border-4 border-primary">
+                    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between cursor-pointer" data-bs-toggle="collapse" data-bs-target="#visualBrandingCollapse">
                         <div class="d-flex align-items-center">
-                            <div class="avatar-sm bg-label-primary rounded me-3 d-flex align-items-center justify-content-center">
-                                <i class="las la-palette fs-4 text-primary"></i>
+                            <div class="badge bg-label-primary p-2 me-3 rounded">
+                                <i class="las la-magic fs-4"></i>
                             </div>
                             <div>
-                                <h6 class="mb-0">@lang('Visual Branding & Content')</h6>
-                                <small class="text-muted">@lang('Customize text and imagery on the registration page')</small>
+                                <h6 class="mb-0 fw-bold">@lang('Visual Identity & Onboarding Content')</h6>
+                                <small class="text-muted">@lang('Customize imagery and instructional text')</small>
                             </div>
                         </div>
-                        <i class="las la-angle-down transition-all collapse-icon"></i>
+                        <i class="las la-angle-down transition-all collapse-chevron"></i>
                     </div>
-                    <div class="collapse show" id="sectionContentCollapse">
-                        <div class="card-body pt-0 mt-2">
+                    <div class="collapse show" id="visualBrandingCollapse">
+                        <div class="card-body border-top pt-4">
                             <div class="row g-4">
                                 @if(@$section->content)
                                     @foreach($section->content as $k => $item)
                                         @if($k == 'images')
                                             @foreach($item as $imgKey => $image)
                                                 <div class="col-12">
-                                                    <div class="image-upload-wrapper p-3 border rounded bg-light-premium">
-                                                        <div class="row align-items-center">
+                                                    <div class="branding-image-card p-4 rounded border bg-light-soft">
+                                                        <div class="row align-items-center g-3">
                                                             <div class="col-md-3">
-                                                                <label class="form-label fw-semibold mb-2 mb-md-0">{{ __(keyToTitle($imgKey)) }}</label>
-                                                                <div class="image-preview-container rounded shadow-sm overflow-hidden" style="height: 80px; width: 120px; background: #fff url({{ getImage('assets/images/frontend/register/'. (@$content->data_values->$imgKey ?? ''), @$section->content->images->$imgKey->size) }}) center/contain no-repeat;">
+                                                                <div class="image-preview-box rounded shadow-sm border p-2 bg-white text-center">
+                                                                    <img src="{{ getImage('assets/images/frontend/register/'. (@$content->data_values->$imgKey ?? ''), @$section->content->images->$imgKey->size) }}" class="img-fluid rounded preview-branding-img" style="max-height: 80px;" id="branding_img_target_{{ $imgKey }}">
+                                                                    <div class="mt-2 tiny text-muted fw-bold">@lang('Current View')</div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-9 mt-3 mt-md-0">
+                                                            <div class="col-md-9">
+                                                                <label class="form-label fw-bold text-dark mb-2">{{ __(keyToTitle($imgKey)) }}</label>
                                                                 <input type="hidden" name="has_image" value="1">
-                                                                <input type="file" class="form-control premium-file-input" name="image_input[{{ $imgKey }}]" accept=".png,.jpg,.jpeg">
-                                                                <small class="text-muted mt-1 d-block"><i class="las la-info-circle me-1"></i> @lang('Recommended size'): {{ @$section->content->images->$imgKey->size }}</small>
+                                                                <input type="file" class="form-control branding-file-input" name="image_input[{{ $imgKey }}]" data-target="branding_img_target_{{ $imgKey }}" accept=".png,.jpg,.jpeg,.webp">
+                                                                <div class="d-flex align-items-center mt-2">
+                                                                    <span class="badge bg-label-secondary small me-2">{{ @$section->content->images->$imgKey->size }}px</span>
+                                                                    <small class="text-muted"><i class="las la-info-circle me-1"></i> @lang('High-resolution recommended for retina displays.')</small>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -170,11 +197,11 @@
                                         @elseif($k != 'images')
                                             <div class="{{ $item == 'textarea' ? 'col-12' : 'col-md-6' }}">
                                                 <div class="form-group mb-0">
-                                                    <label class="form-label fw-semibold">{{ __(keyToTitle($k)) }}</label>
+                                                    <label class="form-label fw-bold text-dark mb-2">{{ __(keyToTitle($k)) }}</label>
                                                     @if($item == 'textarea')
-                                                        <textarea rows="3" class="form-control premium-control" name="{{ $k }}" placeholder="@lang('Enter ' . keyToTitle($k))">{{ @$content->data_values->$k }}</textarea>
+                                                        <textarea rows="3" class="form-control branding-input" name="{{ $k }}" data-preview="{{ $k }}" placeholder="@lang('Enter ' . keyToTitle($k))">{{ @$content->data_values->$k }}</textarea>
                                                     @else
-                                                        <input type="text" class="form-control premium-control" name="{{ $k }}" value="{{ @$content->data_values->$k }}" placeholder="@lang('Enter ' . keyToTitle($k))">
+                                                        <input type="text" class="form-control branding-input" name="{{ $k }}" data-preview="{{ $k }}" value="{{ @$content->data_values->$k }}" placeholder="@lang('Enter ' . keyToTitle($k))">
                                                     @endif
                                                 </div>
                                             </div>
@@ -188,303 +215,293 @@
             </form>
         </div>
 
-        {{-- Sticky Preview Column --}}
+        {{-- Interactive Preview --}}
         <div class="col-xl-4 col-lg-5">
-            <div class="sticky-preview-container">
-                <div class="preview-header mb-3 d-flex align-items-center justify-content-between">
-                    <h6 class="mb-0 fw-bold"><i class="las la-mobile-alt me-2 text-primary"></i>@lang('Live Device Preview')</h6>
-                    <span class="badge bg-primary rounded-pill shadow-sm" id="activeFieldsBadge">0 @lang('Fields')</span>
+            <div class="sticky-preview-wrapper">
+                <div class="preview-header mb-3 d-flex align-items-center justify-content-between px-2">
+                    <div class="d-flex align-items-center">
+                        <i class="las la-eye text-primary fs-4 me-2"></i>
+                        <h6 class="mb-0 fw-bold">@lang('Live Render')</h6>
+                    </div>
+                    <span class="badge bg-label-primary px-3 py-2 rounded-pill" id="activeFieldsBadge">0 @lang('Active Fields')</span>
                 </div>
                 
-                {{-- Phone Mockup --}}
-                <div class="phone-mockup shadow-lg mx-auto">
-                    <div class="phone-frame">
-                        <div class="phone-speaker"></div>
-                        <div class="phone-screen bg-white">
-                            <div class="app-status-bar d-flex justify-content-between px-3 pt-2 small text-muted">
-                                <span>9:41</span>
-                                <div class="d-flex gap-1">
-                                    <i class="las la-signal"></i>
-                                    <i class="las la-wifi"></i>
-                                    <i class="las la-battery-full"></i>
+                {{-- High-Fidelity Phone Mockup --}}
+                <div class="phone-shell shadow-2xl mx-auto">
+                    <div class="phone-bezel">
+                        <div class="phone-sensor-strip"></div>
+                        <div class="phone-screen-container">
+                            <div class="phone-header-bar d-flex justify-content-between align-items-center px-4 pt-3">
+                                <span class="fw-bold small clock-real-time">9:41</span>
+                                <div class="d-flex gap-1 align-items-center">
+                                    <i class="las la-signal text-dark" style="font-size: 0.7rem;"></i>
+                                    <i class="las la-wifi text-dark" style="font-size: 0.7rem;"></i>
+                                    <div class="battery-icon"></div>
                                 </div>
                             </div>
                             
-                            <div class="app-content-scrollable p-3">
-                                <div class="text-center mb-4 pt-2">
-                                    <div class="app-logo-placeholder mx-auto mb-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center bg-light text-primary">
-                                        <i class="las la-user-plus fs-3"></i>
+                            <div class="phone-content-body custom-scrollbar">
+                                <div class="app-onboarding-header text-center mb-4 pt-4 px-4">
+                                    <div class="mockup-logo-area mx-auto mb-3">
+                                        <img src="{{ getImage('assets/images/frontend/register/'. (@$content->data_values->image ?? ''), @$section->content->images->image->size) }}" class="mockup-img-sync shadow-sm rounded-3" id="mockup_logo_img">
                                     </div>
-                                    <h6 class="fw-bold mb-1 mockup-heading text-dark">{{ @$content->data_values->heading ?? __('Join Us') }}</h6>
-                                    <p class="small text-muted mockup-subheading">{{ @$content->data_values->subheading ?? __('Create your account today') }}</p>
+                                    <h5 class="fw-bold mb-1 mockup-text-sync text-dark" data-sync="heading">{{ @$content->data_values->heading ?? __('Join Us') }}</h5>
+                                    <p class="small text-muted mockup-text-sync mb-0" data-sync="subheading">{{ @$content->data_values->subheading ?? __('Create your account today') }}</p>
                                 </div>
 
-                                <div id="mockupFormFields" class="mockup-form-fields">
-                                    {{-- Fields injected here via JS --}}
-                                </div>
+                                <div class="mockup-form-area px-4">
+                                    <div id="mockupFieldsList" class="mockup-field-stack">
+                                        {{-- Dynamic --}}
+                                    </div>
 
-                                <div class="mt-4 pt-2">
-                                    <button type="button" class="btn btn-primary w-100 rounded-pill shadow-sm py-2 fw-bold small" style="font-size: 0.85rem;">@lang('REGISTER NOW')</button>
-                                    <p class="text-center mt-3 small text-muted">
-                                        @lang('Already have an account?') <a href="javascript:void(0)" class="text-primary fw-bold">@lang('Login')</a>
-                                    </p>
+                                    <div class="mt-4 pt-2 mb-5">
+                                        <button type="button" class="btn btn-primary w-100 rounded-3 shadow-md py-2 fw-bold text-uppercase ls-1" style="font-size: 0.8rem;">@lang('Create My Account')</button>
+                                        <div class="text-center mt-3 tiny text-muted">
+                                            @lang('By registering, you agree to our') <a href="javascript:void(0)" class="text-primary fw-bold text-decoration-none">@lang('Terms of Service')</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="phone-home-button"></div>
+                        <div class="phone-home-indicator"></div>
                     </div>
                 </div>
                 
-                <div class="alert alert-info border-0 shadow-sm mt-4 p-3 d-flex align-items-start rounded-3">
-                    <i class="las la-lightbulb fs-4 text-info me-3 mt-1"></i>
-                    <div>
-                        <h6 class="alert-heading mb-1 text-info fs-6 fw-bold">@lang('Pro Tip')</h6>
-                        <p class="mb-0 small text-dark opacity-75">@lang('Keep the registration form short to increase your conversion rate. Only enable essential fields for the initial signup.')</p>
+                <div class="premium-note-card mt-4 p-4 rounded-4 border-0 shadow-sm bg-gradient-light position-relative overflow-hidden">
+                    <div class="d-flex align-items-start position-relative z-index-1">
+                        <div class="badge bg-primary p-2 rounded-circle me-3 shadow-sm">
+                            <i class="las la-lightbulb fs-4 text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">@lang('Tactical Insight')</h6>
+                            <p class="mb-0 small text-muted lh-base">@lang('Minimize friction by requesting only essential data during sign-up. You can always collect additional profile details later in the user dashboard.')</p>
+                        </div>
                     </div>
+                    <div class="abstract-shape"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<x-confirmation-modal />
 @endsection
 
 @push('style')
 <style>
-    /* Premium Architecture Styles */
     :root {
         --premium-primary: #696cff;
-        --premium-success: #71dd37;
-        --premium-warning: #ffab00;
-        --premium-info: #03c3ec;
-        --premium-gray-light: #f5f5f9;
-        --premium-border: #d9dee3;
+        --premium-bg-light: #f8f9fa;
+        --phone-bezel: #1e1e2d;
+        --phone-frame: #343444;
     }
 
-    .bg-label-primary { background-color: #e7e7ff !important; color: #696cff !important; }
+    .registration-control-wrapper { font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    
+    /* Sneat Badges & Avatars */
+    .bg-label-primary { background-color: #e7e7ff !important; color: var(--premium-primary) !important; }
     .bg-label-success { background-color: #e8fadf !important; color: #71dd37 !important; }
+    .bg-label-info { background-color: #d7f5fc !important; color: #03c3ec !important; }
     .bg-label-warning { background-color: #fff2d6 !important; color: #ffab00 !important; }
-    .bg-light-premium { background-color: #f8f9fa; }
+    .bg-label-secondary { background-color: #ebeef0 !important; color: #8592a3 !important; }
     
-    .border-top-premium-primary { border-top: 4px solid var(--premium-primary) !important; }
-    .border-top-premium-success { border-top: 4px solid var(--premium-success) !important; }
-    .border-top-premium-warning { border-top: 4px solid var(--premium-warning) !important; }
+    .avatar-md { width: 48px; height: 48px; }
+    .avatar-xs { width: 26px; height: 26px; }
+    .tracking-wider { letter-spacing: 1px; }
+    .tracking-tighter { letter-spacing: -0.5px; }
 
-    .avatar-sm { width: 40px; height: 40px; }
-    .transition-all { transition: all 0.3s ease; }
+    /* Security Options */
+    .security-toggle-option { border-width: 2px !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .security-toggle-option:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
     
-    /* Modern Switch */
-    .modern-switch .form-check-input {
-        width: 3rem;
-        height: 1.5rem;
-        cursor: pointer;
-    }
-    .modern-switch .form-check-input:checked {
-        background-color: var(--premium-primary);
-        border-color: var(--premium-primary);
-    }
-
     /* Grid Layout */
-    .reg-fields-premium-grid {
+    .reg-fields-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
     }
 
-    .field-item-wrapper {
-        perspective: 1000px;
-    }
-
-    .premium-field-label {
-        display: block;
-        padding: 0.75rem 1rem;
-        border: 1px solid var(--premium-border);
-        border-radius: 0.5rem;
+    .field-card-label {
+        border-width: 2px !important;
         background: #fff;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        margin-bottom: 0;
-        user-select: none;
+        transition: all 0.2s ease;
     }
 
-    .premium-field-label:hover {
-        border-color: var(--premium-primary);
-        background: #fdfdff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+    .field-card-label:hover { border-color: var(--premium-primary) !important; background-color: #fdfdff; }
 
-    .field-item-wrapper input:checked + label,
-    .field-item-wrapper label:has(input:checked) {
-        border-color: var(--premium-primary);
+    .reg-field-cb:checked + .field-card-label {
+        border-color: var(--premium-primary) !important;
         background-color: #f8f8ff;
         box-shadow: 0 4px 12px rgba(105, 108, 255, 0.1);
     }
 
-    .field-indicator {
-        width: 8px;
-        height: 8px;
-        background-color: #e0e0e0;
-        transition: background-color 0.3s ease;
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        transition: all 0.3s ease;
     }
-    .field-item-wrapper label:has(input:checked) .field-indicator {
+
+    .reg-field-cb:checked + .field-card-label .status-indicator {
         background-color: var(--premium-primary);
         box-shadow: 0 0 8px var(--premium-primary);
     }
 
-    /* Modern Checkbox */
-    .modern-checkbox .form-check-input {
-        width: 1.25rem;
-        height: 1.25rem;
-        border-radius: 4px;
-        border-width: 2px;
-        cursor: pointer;
+    .reg-field-cb:checked + .field-card-label .field-icon-box {
+        background-color: var(--premium-primary) !important;
+    }
+    .reg-field-cb:checked + .field-card-label .field-icon-box i {
+        color: #fff !important;
     }
 
     /* Search Box */
-    .search-fields-box {
-        transition: all 0.3s ease;
-    }
-    .search-fields-box:focus-within {
-        border-color: var(--premium-primary) !important;
-        box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.15) !important;
-    }
+    .search-box { transition: all 0.3s; }
+    .search-box:focus-within { border-color: var(--premium-primary) !important; box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.1) !important; }
 
-    /* Phone Mockup */
-    .sticky-preview-container {
-        position: sticky;
-        top: 2rem;
-    }
-
-    .phone-mockup {
+    /* Interactive Preview System */
+    .sticky-preview-wrapper { position: sticky; top: 120px; }
+    
+    .phone-shell {
         width: 300px;
-        height: 600px;
-        background: #1e1e1e;
-        border-radius: 40px;
+        height: 620px;
+        background: var(--phone-frame);
         padding: 12px;
+        border-radius: 45px;
         position: relative;
-        border: 4px solid #333;
+        box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3);
     }
 
-    .phone-frame {
+    .phone-bezel {
         width: 100%;
         height: 100%;
         background: #fff;
-        border-radius: 32px;
+        border-radius: 35px;
         overflow: hidden;
         position: relative;
-        display: flex;
-        flex-direction: column;
+        border: 4px solid #000;
     }
 
-    .phone-speaker {
+    .phone-sensor-strip {
         position: absolute;
-        top: 15px;
+        top: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 60px;
-        height: 5px;
-        background: #333;
-        border-radius: 10px;
-        z-index: 10;
+        width: 120px;
+        height: 25px;
+        background: #000;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        z-index: 100;
     }
 
-    .phone-screen {
-        flex: 1;
+    .phone-screen-container {
+        height: 100%;
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    .app-content-scrollable {
+    .phone-content-body {
         flex: 1;
         overflow-y: auto;
-        scrollbar-width: none; /* Firefox */
-    }
-    .app-content-scrollable::-webkit-scrollbar { display: none; } /* Chrome/Safari */
-
-    .app-logo-placeholder {
-        width: 50px;
-        height: 50px;
+        padding-bottom: 40px;
     }
 
-    .mockup-field-skeleton {
-        margin-bottom: 0.75rem;
-    }
-    .mockup-field-label {
-        font-size: 0.65rem;
-        font-weight: 600;
-        color: #666;
-        margin-bottom: 2px;
-        display: block;
-    }
-    .mockup-field-input {
-        height: 32px;
+    .mockup-logo-area {
+        width: 60px;
+        height: 60px;
         background: #f8f9fa;
-        border: 1px solid #eee;
-        border-radius: 6px;
-        width: 100%;
-        padding: 0 10px;
-        font-size: 0.7rem;
+        border-radius: 15px;
         display: flex;
         align-items: center;
-        color: #999;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .mockup-logo-area img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+
+    .battery-icon {
+        width: 18px;
+        height: 9px;
+        border: 1px solid #333;
+        border-radius: 2px;
+        position: relative;
+    }
+    .battery-icon::after {
+        content: '';
+        position: absolute;
+        right: -3px;
+        top: 2px;
+        width: 2px;
+        height: 3px;
+        background: #333;
     }
 
-    .phone-home-button {
+    .phone-home-indicator {
         position: absolute;
         bottom: 8px;
         left: 50%;
         transform: translateX(-50%);
         width: 100px;
         height: 4px;
-        background: #333;
-        border-radius: 10px;
-        z-index: 10;
+        background: #000;
+        border-radius: 2px;
+        opacity: 0.2;
     }
 
-    .premium-control {
-        border-radius: 0.5rem;
-        padding: 0.6rem 1rem;
-        border-color: var(--premium-border);
-    }
-    .premium-control:focus {
-        border-color: var(--premium-primary);
-        box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.1);
+    .mockup-field-item {
+        margin-bottom: 12px;
+        animation: slideInUp 0.3s ease;
     }
 
-    .premium-file-input {
-        border-radius: 0.5rem;
-        padding: 0.5rem;
+    .mockup-f-label { font-size: 0.65rem; color: #697a8d; font-weight: 600; margin-bottom: 3px; display: block; }
+    .mockup-f-input {
+        height: 36px;
+        background: #fcfdfe;
+        border: 1px solid #d9dee3;
+        border-radius: 8px;
+        width: 100%;
+        padding: 0 12px;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        color: #ccd1d6;
     }
 
-    /* Animations */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    .ls-1 { letter-spacing: 1px; }
+
+    /* Custom Scrollbar for Phone */
+    .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+    /* Branding Card */
+    .branding-image-card { transition: all 0.3s; }
+    .branding-image-card:hover { border-color: var(--premium-primary) !important; background-color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+
+    .premium-note-card { background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); }
+    .abstract-shape {
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        width: 100px;
+        height: 100px;
+        background: var(--premium-primary);
+        opacity: 0.05;
+        border-radius: 50%;
     }
 
-    .field-item-wrapper {
-        animation: fadeInUp 0.3s ease forwards;
+    @keyframes slideInUp {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
 
-    .collapse-icon {
-        transition: transform 0.3s ease;
-    }
-    [aria-expanded="true"] .collapse-icon {
-        transform: rotate(180deg);
-    }
+    /* Collapse Animation */
+    .collapse-chevron { transition: transform 0.3s; }
+    [aria-expanded="true"] .collapse-chevron { transform: rotate(180deg); }
 
-    /* Responsive */
-    @media (max-width: 991px) {
-        .sticky-preview-container {
-            position: relative;
-            top: 0;
-            margin-top: 2rem;
-        }
-        .phone-mockup {
-            width: 100%;
-            max-width: 320px;
-        }
+    @media (max-width: 1199px) {
+        .sticky-preview-wrapper { position: relative; top: 0; margin-top: 3rem; }
+        .phone-shell { width: 100%; max-width: 300px; }
     }
 </style>
 @endpush
@@ -494,67 +511,67 @@
 (function ($) {
     'use strict';
 
-    // 1. Field Mapping for Preview
+    // 1. Data Definitions
     const fieldLabels = {!! json_encode(registrationFieldsList()) !!};
     
-    // 2. Update Live Preview
-    function updatePreview() {
-        const $mockupContainer = $('#mockupFormFields');
-        $mockupContainer.empty();
+    // 2. Real-time Clock for Mockup
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        $('.clock-real-time').text(hours + ':' + minutes);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 3. Live Preview Engine
+    function syncMockup() {
+        const $list = $('#mockupFieldsList');
+        $list.empty();
         
         let activeCount = 0;
         let groupCounts = {};
 
         $('.reg-field-cb').each(function () {
             const $cb = $(this);
+            const isChecked = $cb.is(':checked');
             const fieldKey = $cb.data('field');
-            const fieldLabel = fieldLabels[fieldKey] || fieldKey;
-            const $group = $cb.closest('.registration-field-group');
-            const groupKey = $group.data('group');
+            const label = fieldLabels[fieldKey] || fieldKey;
+            const groupKey = $cb.closest('.registration-field-group').data('group');
 
             if (!groupCounts[groupKey]) groupCounts[groupKey] = 0;
 
-            if ($cb.is(':checked')) {
+            // Highlight the card
+            const $card = $cb.closest('.security-toggle-option, .field-card-item');
+            if ($card.length) {
+                if (isChecked) {
+                    $card.addClass('border-primary bg-label-primary').removeClass('bg-light');
+                } else {
+                    $card.removeClass('border-primary bg-label-primary').addClass('bg-light');
+                }
+            }
+
+            if (isChecked) {
                 activeCount++;
                 groupCounts[groupKey]++;
                 
-                // Add to Mockup
-                let inputType = 'text';
-                let placeholder = fieldLabel + '...';
-                
-                if (fieldKey === 'password') {
-                    inputType = 'password';
-                    placeholder = '••••••••';
-                }
-
+                // Add to Mockup Stack
                 let html = `
-                    <div class="mockup-field-skeleton animate-fade-in" id="mockup_${fieldKey}">
-                        <span class="mockup-field-label">${fieldLabel}</span>
-                        <div class="mockup-field-input">
-                            ${fieldKey === 'agree' || fieldKey === 'newsletter_subscribe' ? 
-                                '<i class="las la-check-square me-2 text-primary"></i> <span style="font-size:0.6rem">' + fieldLabel + '</span>' : 
-                                placeholder
+                    <div class="mockup-field-item" id="mockup_f_${fieldKey}">
+                        <span class="mockup-f-label">${label}</span>
+                        <div class="mockup-f-input">
+                            ${fieldKey === 'agree' ? '<i class="las la-check-square me-2 text-primary"></i> <span style="font-size:0.6rem">@lang("I agree to terms")</span>' : 
+                              (fieldKey === 'captcha' ? '<div class="d-flex gap-2 w-100"><div class="bg-light rounded p-1 flex-grow-1 text-center small opacity-50" style="font-size:0.6rem">1 + 4 = ?</div><div class="mockup-f-input p-0" style="width:50px"></div></div>' : 
+                               label + '...')
                             }
                         </div>
                     </div>
                 `;
-                
-                if (fieldKey === 'captcha') {
-                    html = `
-                        <div class="mockup-field-skeleton" id="mockup_${fieldKey}">
-                            <div class="d-flex gap-2">
-                                <div class="bg-light rounded p-1 flex-grow-1 text-center small opacity-50" style="font-size:0.6rem">1 + 4 = ?</div>
-                                <div class="mockup-field-input" style="width: 60px">?</div>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                $mockupContainer.append(html);
+                $list.append(html);
             }
         });
 
-        $('#activeFieldsBadge').text(activeCount + ' ' + (activeCount === 1 ? '@lang("Field")' : '@lang("Fields")'));
+        $('#activeFieldsBadge').text(activeCount + ' ' + (activeCount === 1 ? '@lang("Active Field")' : '@lang("Active Fields")'));
         
         // Update group badges
         Object.keys(groupCounts).forEach(key => {
@@ -562,51 +579,57 @@
         });
     }
 
-    // 3. Field Search Logic
+    // 4. Content Sync
+    $('.branding-input').on('input', function() {
+        const target = $(this).data('preview');
+        $(`.mockup-text-sync[data-sync="${target}"]`).text($(this).val());
+    });
+
+    // 5. Image Sync
+    $('.branding-file-input').on('change', function() {
+        const input = this;
+        const targetId = $(this).data('target');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $(`#${targetId}`).attr('src', e.target.result);
+                // Also update mockup if it's the main logo
+                if (targetId.includes('image')) {
+                    $('#mockup_logo_img').attr('src', e.target.result);
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
+
+    // 6. Search Filter
     $('#fieldSearch').on('input', function() {
         const query = $(this).val().toLowerCase();
-        $('.field-item-wrapper').each(function() {
+        $('.field-card-item').each(function() {
             const $item = $(this);
             const text = $item.data('label') + ' ' + $item.data('key');
-            if (text.includes(query)) {
-                $item.show();
-            } else {
-                $item.hide();
-            }
+            $item.toggle(text.includes(query));
         });
 
-        // Hide empty groups
         $('.registration-field-group').each(function() {
-            const visibleFields = $(this).find('.field-item-wrapper:visible').length;
-            $(this).toggle(visibleFields > 0);
+            const visible = $(this).find('.field-card-item:visible').length;
+            $(this).toggle(visible > 0);
         });
     });
 
-    // 4. Batch Actions
+    // 7. Batch Actions
     $('.reg-group-action').on('click', function() {
         const action = $(this).data('action');
         const $group = $(this).closest('.registration-field-group');
-        const $checkboxes = $group.find('.reg-field-cb');
-        
-        if (action === 'all') {
-            $checkboxes.prop('checked', true);
-        } else if (action === 'none') {
-            $checkboxes.prop('checked', false);
-        }
-        
-        updatePreview();
+        $group.find('.reg-field-cb').prop('checked', action === 'all').trigger('change');
     });
 
-    // 5. Initial Call & Event Binding
-    $(document).on('change', '.reg-field-cb', updatePreview);
-    
-    // Live update headings
-    $('input[name="heading"]').on('input', function() { $('.mockup-heading').text($(this).val() || '@lang("Join Us")'); });
-    $('input[name="subheading"]').on('input', function() { $('.mockup-subheading').text($(this).val() || '@lang("Create your account today")'); });
-
-    updatePreview();
+    // Initialization
+    $(document).on('change', '.reg-field-cb, .security-toggle-cb', syncMockup);
+    syncMockup();
 
 })(jQuery);
 </script>
 @endpush
+
 

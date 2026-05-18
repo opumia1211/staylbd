@@ -2,60 +2,92 @@
 @section('content')
 @php
     $twoFaSubtitle = $pageTitle ?? __('Two-Factor Authentication');
+    $adminLoginLogo = getLogo('logo_dark') ?: getLogo('logo');
+    
+    // Define assetBase in child view to ensure availability
+    $assetBase = str_replace('/core/public', '', url('/'));
+    if (str_ends_with($assetBase, '/')) {
+        $assetBase = rtrim($assetBase, '/');
+    }
 @endphp
-<div class="login-main login-main--no-captcha login-main--2fa">
-    <div class="admin-login-shell">
-        <div class="login-area login-area--compact login-area--2fa">
-            <div class="login-wrapper login-wrapper--compact login-wrapper--2fa">
-                @include('admin.auth.partials.auth-card-header', ['subtitle' => $twoFaSubtitle])
-                <div class="login-wrapper__body admin-auth-form">
-                    <form action="{{ route('admin.2fa.verify.submit') }}" method="POST" class="cmn-form login-form" autocomplete="off" id="admin2faVerifyForm">
-                        @csrf
-                        <p class="admin-2fa-lead">@lang('Enter the 6-digit code from your authenticator app.')</p>
-                        <div class="form-group admin-2fa-otp-group">
-                            <label class="sr-only" for="admin2faCode">@lang('Authentication code')</label>
-                            <input type="text"
-                                   name="code"
-                                   id="admin2faCode"
-                                   class="form-control admin-2fa-otp-input"
-                                   placeholder="000000"
-                                   maxlength="6"
-                                   inputmode="numeric"
-                                   pattern="[0-9]*"
-                                   autocomplete="one-time-code"
-                                   autofocus>
-                        </div>
-                        <p class="admin-2fa-hint">@lang('Codes refresh every 30 seconds. Wait for a new code if the current one fails.')</p>
 
-                        <div class="admin-2fa-divider" role="presentation">
-                            <span>@lang('or')</span>
-                        </div>
-
-                        <div class="form-group admin-2fa-recovery-wrap">
-                            <label class="admin-2fa-recovery-label" for="admin2faRecovery">@lang('Recovery code')</label>
-                            <input type="text"
-                                   name="recovery_code"
-                                   id="admin2faRecovery"
-                                   class="form-control"
-                                   placeholder="@lang('One-time backup code')"
-                                   autocomplete="off"
-                                   spellcheck="false"
-                                   autocapitalize="characters">
-                            <p class="admin-2fa-recovery-hint mb-0">@lang('Use a saved recovery code if you cannot access your authenticator.')</p>
-                        </div>
-
-                        <div class="form-group admin-2fa-actions mb-0">
-                            <button type="submit" class="btn cmn-btn w-100" id="admin2faVerifyBtn" data-submitting="0">
-                                @lang('Verify & continue')
-                            </button>
-                            <a href="{{ route('admin.logout') }}" class="btn btn-outline-secondary w-100 admin-2fa-cancel">@lang('Cancel and return to login')</a>
-                        </div>
-                    </form>
-                </div>
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+      <div class="authentication-inner">
+        <!-- 2FA Verification -->
+        <div class="card overflow-hidden">
+          <div class="card-body py-4 px-4">
+            <!-- Logo -->
+            <div class="app-brand justify-content-center mb-3">
+              <a href="{{ route('home') }}" class="app-brand-link gap-2 transition-transform hover:scale-105">
+                <span class="app-brand-logo demo">
+                  <img src="{{ str_replace(url('/') . '/', $assetBase . '/', $adminLoginLogo) }}" alt="logo" class="h-8 w-auto">
+                </span>
+              </a>
             </div>
+            <!-- /Logo -->
+            <div class="text-center mb-4">
+                <h5 class="mb-0 fw-bold">@lang('2FA Verification')</h5>
+                <p class="mb-0 text-muted x-small">@lang('Enter your security code to continue')</p>
+            </div>
+
+            <form id="admin2faVerifyForm" action="{{ route('admin.2fa.verify.submit') }}" method="POST" autocomplete="off">
+                @csrf
+              
+              <div class="mb-3 form-control-validation">
+                <label for="admin2faCode" class="form-label text-[10px] uppercase fw-bold text-muted mb-1">@lang('Authentication Code')</label>
+                <input type="text" 
+                       name="code" 
+                       id="admin2faCode" 
+                       class="form-control text-center fs-4 tracking-widest fw-bold" 
+                       placeholder="000000" 
+                       maxlength="6" 
+                       inputmode="numeric" 
+                       pattern="[0-9]*" 
+                       autocomplete="one-time-code" 
+                       autofocus />
+                <p class="text-[10px] text-muted mt-1 text-center">@lang('6-digit code from your app')</p>
+              </div>
+
+              <div class="divider my-4">
+                <div class="divider-text text-muted x-small uppercase">@lang('Or Use Recovery Code')</div>
+              </div>
+
+              <div class="mb-4 form-control-validation">
+                <label for="admin2faRecovery" class="form-label text-[10px] uppercase fw-bold text-muted mb-1">@lang('Recovery Code')</label>
+                <input type="text" 
+                       name="recovery_code" 
+                       id="admin2faRecovery" 
+                       class="form-control" 
+                       placeholder="@lang('One-time backup code')" 
+                       autocomplete="off" />
+              </div>
+
+              <div class="mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="policy_confirm" id="policyConfirm" required />
+                    <label class="form-check-label x-small" for="policyConfirm"> @lang('Confirm my 2FA identity') </label>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <button class="btn btn-primary d-grid w-100 shadow-sm py-2" type="submit" id="admin2faVerifyBtn">@lang('Verify & Continue')</button>
+              </div>
+
+              <div class="text-center">
+                <a href="{{ route('admin.logout') }}" class="btn btn-link text-muted x-small p-0">
+                  <i class="icon-base bx bx-chevron-left"></i>
+                  @lang('Cancel and Logout')
+                </a>
+              </div>
+            </form>
+
+          </div>
         </div>
+        <!-- /2FA Verification -->
+      </div>
     </div>
-</div>
+  </div>
 
 @push('script')
 <script>
@@ -68,7 +100,7 @@
                 if (btn.getAttribute('data-submitting') === '1') return;
                 btn.setAttribute('data-submitting', '1');
                 btn.disabled = true;
-                btn.textContent = @json(__('Please wait...'));
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> ' + @json(__('Verifying...'));
             });
         }
         var otp = document.getElementById('admin2faCode');

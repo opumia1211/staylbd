@@ -1,18 +1,29 @@
 @extends('admin.layouts.app')
 @section('panel')
-<div class="user-profile-control-wrapper">
+<div class="user-profile-control-wrapper animate__animated animate__fadeIn">
     {{-- Top Action Bar --}}
     <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h5 class="fw-bold mb-0">@lang('User Profile Architecture')</h5>
-            <p class="text-muted small mb-0">@lang('Control which data users can view and update in their account settings.')</p>
-        </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <div class="btn-group shadow-sm">
-                <a href="{{ route('admin.frontend.sections.register') }}" class="btn btn-outline-primary btn-sm px-3"><i class="las la-cog me-1"></i> @lang('Registration')</a>
-                <a href="{{ route('admin.frontend.sections.userprofile') }}" class="btn btn-primary btn-sm active px-3"><i class="las la-user-circle me-1"></i> @lang('Profile Edit')</a>
+        <div class="col-md-7">
+            <div class="d-flex align-items-center">
+                <div class="avatar avatar-md me-3">
+                    <span class="avatar-initial rounded bg-label-info shadow-sm"><i class="las la-user-cog fs-3"></i></span>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">@lang('User Profile Architecture')</h5>
+                    <p class="text-muted small mb-0">@lang('Configure the data nodes available for user-side modifications and visibility.')</p>
+                </div>
             </div>
-            <button type="submit" form="userprofileForm" class="btn btn--success btn-sm px-4 ms-2 shadow-sm"><i class="las la-save me-1"></i> @lang('Deploy Configuration')</button>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-flex gap-2">
+                <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                    <a href="{{ route('admin.frontend.sections.register') }}" class="btn btn-outline-primary btn-sm px-3 border-0 bg-white"><i class="las la-cog me-1"></i> @lang('Registration')</a>
+                    <a href="{{ route('admin.frontend.sections.userprofile') }}" class="btn btn-primary btn-sm px-3 active border-0"><i class="las la-user-circle me-1"></i> @lang('Profile Edit')</a>
+                </div>
+                <button type="submit" form="userprofileForm" class="btn btn-primary btn-sm px-4 shadow-md rounded-pill">
+                    <i class="las la-save me-1"></i> @lang('Deploy Configuration')
+                </button>
+            </div>
         </div>
     </div>
 
@@ -22,20 +33,20 @@
             <form action="{{ route('admin.frontend.sections.userprofile.save') }}" method="POST" id="userprofileForm">
                 @csrf
 
-                {{-- Search & Bulk Actions --}}
-                <div class="card border-0 shadow-sm mb-4">
+                {{-- Global Controls --}}
+                <div class="card border-0 shadow-sm mb-4 bg-white overflow-hidden">
                     <div class="card-body p-3">
                         <div class="row align-items-center g-3">
                             <div class="col-md-7">
-                                <div class="input-group input-group-sm search-fields-box shadow-none border rounded-pill overflow-hidden">
-                                    <span class="input-group-text bg-white border-0"><i class="las la-search text-muted"></i></span>
-                                    <input type="text" class="form-control border-0 ps-0" id="fieldSearch" placeholder="@lang('Search profile fields...')">
+                                <div class="input-group input-group-merge search-box shadow-none border rounded-pill px-2">
+                                    <span class="input-group-text border-0 bg-transparent"><i class="las la-search text-muted"></i></span>
+                                    <input type="text" class="form-control border-0 bg-transparent ps-0" id="fieldSearch" placeholder="@lang('Filter profile elements...')">
                                 </div>
                             </div>
                             <div class="col-md-5 text-md-end">
-                                <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-outline-secondary px-3" id="checkAll">@lang('Select All')</button>
-                                    <button type="button" class="btn btn-outline-secondary px-3" id="uncheckAll">@lang('Reset')</button>
+                                <div class="btn-group btn-group-sm rounded-pill overflow-hidden border">
+                                    <button type="button" class="btn btn-light px-3" id="checkAll">@lang('Select All')</button>
+                                    <button type="button" class="btn btn-light px-3 border-start" id="uncheckAll">@lang('Reset')</button>
                                 </div>
                             </div>
                         </div>
@@ -43,43 +54,46 @@
                 </div>
 
                 @foreach(registrationFieldsListGrouped() as $groupKey => $group)
-                    <div class="card border-0 shadow-sm mb-4 overflow-hidden border-top-premium-{{ $groupKey === 'basic' ? 'primary' : 'warning' }} field-group-card" data-group="{{ $groupKey }}">
-                        <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom-0">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm bg-label-{{ $groupKey === 'basic' ? 'primary' : 'warning' }} rounded me-3 d-flex align-items-center justify-content-center">
-                                    <i class="{{ $group['icon'] }} fs-4"></i>
+                    <div class="card border-0 shadow-sm mb-4 overflow-hidden field-group-card animate__animated animate__fadeInUp" data-group="{{ $groupKey }}">
+                        <div class="card-header border-bottom py-3 bg-white">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-xs me-3">
+                                        <span class="avatar-initial rounded-circle bg-label-{{ $groupKey === 'basic' ? 'primary' : 'warning' }}"><i class="{{ $group['icon'] }}"></i></span>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ $group['title'] }}</h6>
+                                        <small class="text-muted">@lang('User-side edit permissions')</small>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h6 class="mb-0">{{ $group['title'] }}</h6>
-                                    <small class="text-muted">@lang('Visibility for profile settings')</small>
+                                <div class="form-check form-switch modern-switch">
+                                    <input class="form-check-input group-master-toggle" type="checkbox" data-group="{{ $groupKey }}" id="master_{{ $groupKey }}">
+                                    <label class="form-check-label tiny fw-bold text-muted" for="master_{{ $groupKey }}">@lang('TOGGLE GROUP')</label>
                                 </div>
-                            </div>
-                            <div class="form-check form-switch modern-switch">
-                                <input class="form-check-input group-master-toggle" type="checkbox" data-group="{{ $groupKey }}">
                             </div>
                         </div>
-                        <div class="card-body pt-0 px-0">
+                        <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0 border-top">
+                                <table class="table table-hover align-middle mb-0">
                                     <thead class="bg-light-premium">
                                         <tr>
-                                            <th class="ps-4 py-2 small fw-bold">@lang('FIELD NAME')</th>
-                                            <th class="py-2 small fw-bold d-none d-sm-table-cell">@lang('KEY')</th>
-                                            <th class="text-end pe-4 py-2 small fw-bold">@lang('STATUS')</th>
+                                            <th class="ps-4 py-3 small fw-bold text-muted">@lang('DATA NODE')</th>
+                                            <th class="py-3 small fw-bold text-muted d-none d-sm-table-cell">@lang('SYSTEM KEY')</th>
+                                            <th class="text-end pe-4 py-3 small fw-bold text-muted">@lang('VISIBILITY')</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody class="border-top-0">
                                         @foreach($group['fields'] as $fkey => $label)
                                             @if(in_array($fkey, ['captcha', 'password', 'agree', 'referBy'])) @continue @endif
                                             <tr class="field-row transition-all" data-search="{{ strtolower($label) }} {{ strtolower($fkey) }}">
                                                 <td class="ps-4">
                                                     <div class="d-flex align-items-center">
-                                                        <div class="field-indicator rounded-circle me-3 {{ isProfileFieldEnabled($fkey) ? 'bg-primary shadow-premium' : 'bg-gray' }}"></div>
+                                                        <div class="field-status-dot rounded-circle me-3 {{ isProfileFieldEnabled($fkey) ? 'bg-primary shadow-premium' : 'bg-secondary' }}"></div>
                                                         <span class="fw-semibold text-dark">{{ $label }}</span>
                                                     </div>
                                                 </td>
                                                 <td class="d-none d-sm-table-cell">
-                                                    <span class="badge bg-label-secondary small rounded-pill">{{ $fkey }}</span>
+                                                    <code class="small text-primary bg-label-primary px-2 py-1 rounded">{{ $fkey }}</code>
                                                 </td>
                                                 <td class="text-end pe-4">
                                                     <div class="form-check form-switch modern-switch d-inline-block">
@@ -100,221 +114,235 @@
             </form>
         </div>
 
-        {{-- Sticky Preview Column --}}
+        {{-- Interactive Dashboard Preview --}}
         <div class="col-xl-4 col-lg-5">
-            <div class="sticky-preview-container">
-                <div class="preview-header mb-3 d-flex align-items-center justify-content-between">
-                    <h6 class="mb-0 fw-bold"><i class="las la-mobile-alt me-2 text-primary"></i>@lang('Profile Device Preview')</h6>
-                    <span class="badge bg-primary rounded-pill shadow-sm" id="activeProfileFieldsBadge">0 @lang('Fields')</span>
+            <div class="sticky-preview-wrapper">
+                <div class="preview-header mb-3 d-flex align-items-center justify-content-between px-2">
+                    <div class="d-flex align-items-center">
+                        <i class="las la-eye text-primary fs-4 me-2"></i>
+                        <h6 class="mb-0 fw-bold">@lang('Dashboard Render')</h6>
+                    </div>
+                    <span class="badge bg-label-primary px-3 py-2 rounded-pill" id="activeProfileFieldsBadge">0 @lang('Enabled Nodes')</span>
                 </div>
                 
-                {{-- Phone Mockup --}}
-                <div class="phone-mockup shadow-lg mx-auto">
-                    <div class="phone-frame">
-                        <div class="phone-speaker"></div>
-                        <div class="phone-screen bg-white">
-                            <div class="app-status-bar d-flex justify-content-between px-3 pt-2 small text-muted">
-                                <span>12:30</span>
-                                <div class="d-flex gap-1">
-                                    <i class="las la-signal"></i>
-                                    <i class="las la-wifi"></i>
-                                    <i class="las la-battery-full"></i>
+                {{-- Phone Shell --}}
+                <div class="phone-shell shadow-2xl mx-auto">
+                    <div class="phone-bezel">
+                        <div class="phone-sensor-strip"></div>
+                        <div class="phone-screen-container">
+                            <div class="phone-header-bar d-flex justify-content-between align-items-center px-4 pt-3">
+                                <span class="fw-bold small clock-real-time">12:30</span>
+                                <div class="d-flex gap-1 align-items-center">
+                                    <i class="las la-signal text-white" style="font-size: 0.7rem;"></i>
+                                    <i class="las la-wifi text-white" style="font-size: 0.7rem;"></i>
+                                    <div class="battery-icon border-white"></div>
                                 </div>
                             </div>
                             
-                            <div class="app-content-scrollable">
-                                <div class="profile-header-mockup bg-primary p-4 text-center text-white pb-5">
-                                    <div class="avatar-placeholder mx-auto mb-3 rounded-circle shadow border border-3 border-white d-flex align-items-center justify-content-center bg-light text-primary" style="width: 80px; height: 80px;">
-                                        <i class="las la-user fs-1"></i>
+                            <div class="phone-content-body custom-scrollbar">
+                                <div class="profile-hero-mockup bg-primary p-4 text-center text-white pb-5 position-relative">
+                                    <div class="mockup-avatar-wrapper mx-auto mb-3">
+                                        <div class="avatar avatar-xl">
+                                            <img src="{{ asset('assets/images/default-user.png') }}" class="rounded-circle border border-3 border-white shadow-lg" onerror="this.src='https://ui-avatars.com/api/?name=John+Doe&background=fff&color=696cff'">
+                                        </div>
                                     </div>
                                     <h6 class="fw-bold mb-0 text-white">John Doe</h6>
-                                    <p class="small opacity-75 mb-0">@lang('User Dashboard')</p>
+                                    <p class="tiny text-white-50 mb-0 text-uppercase tracking-wider">@lang('Customer Platinum')</p>
+                                    <div class="hero-decoration"></div>
                                 </div>
                                 
-                                <div class="profile-body-mockup p-3 bg-white rounded-top shadow-sm" style="margin-top: -20px;">
+                                <div class="profile-card-mockup mx-3 p-4 bg-white rounded-4 shadow-premium-soft position-relative" style="margin-top: -30px; z-index: 5;">
                                     <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <h6 class="small fw-bold text-dark mb-0"><i class="las la-user-edit me-2 text-primary"></i>@lang('Profile Settings')</h6>
-                                        <i class="las la-ellipsis-h text-muted"></i>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-label-primary p-2 rounded-3 me-2">
+                                                <i class="las la-user-edit"></i>
+                                            </div>
+                                            <h6 class="small fw-bold text-dark mb-0">@lang('Account Identity')</h6>
+                                        </div>
+                                        <i class="las la-cog text-muted small"></i>
                                     </div>
 
-                                    <div id="profileMockupFields" class="mockup-form-fields">
-                                        {{-- Fields injected here via JS --}}
+                                    <div id="profileMockupFields" class="mockup-field-stack">
+                                        {{-- Dynamic nodes --}}
                                     </div>
 
-                                    <div class="mt-4 pt-2">
-                                        <button type="button" class="btn btn-primary w-100 rounded shadow-sm py-2 fw-bold small" style="font-size: 0.85rem;">@lang('UPDATE PROFILE')</button>
+                                    <div class="mt-4">
+                                        <button type="button" class="btn btn-primary btn-sm w-100 rounded-3 shadow-md py-2 fw-bold text-uppercase" style="font-size: 0.7rem;">@lang('Update Account')</button>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 mt-2">
+                                    <div class="card border-0 bg-label-secondary p-3 rounded-4">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="las la-shield-alt me-2 text-dark"></i>
+                                            <span class="tiny fw-bold text-dark">@lang('SECURITY PRIVACY')</span>
+                                        </div>
+                                        <div class="mockup-placeholder-row w-100 mb-2"></div>
+                                        <div class="mockup-placeholder-row w-75"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="phone-home-button"></div>
+                        <div class="phone-home-indicator"></div>
                     </div>
                 </div>
                 
-                <div class="alert alert-warning border-0 shadow-sm mt-4 p-3 d-flex align-items-start rounded-3">
-                    <i class="las la-exclamation-circle fs-4 text-warning me-3 mt-1"></i>
+                <div class="alert alert-warning border-0 shadow-sm mt-4 p-4 rounded-4 d-flex align-items-start">
+                    <div class="badge bg-warning p-2 rounded-circle me-3">
+                        <i class="las la-exclamation-triangle text-white"></i>
+                    </div>
                     <div>
-                        <h6 class="alert-heading mb-1 text-warning fs-6 fw-bold">@lang('Security Warning')</h6>
-                        <p class="mb-0 small text-dark opacity-75">@lang('Only enable fields that users actually need to change. Sensitive data should be managed by administrators.')</p>
+                        <h6 class="alert-heading mb-1 text-dark fw-bold fs-6">@lang('Data Governance')</h6>
+                        <p class="mb-0 small text-muted lh-base">@lang('Enable only fields that require frequent updates. Sensitive identifiers should be locked to prevent unauthorized identity shifts.')</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<x-confirmation-modal />
 @endsection
 
 @push('style')
 <style>
-    /* Premium Architecture Styles */
     :root {
         --premium-primary: #696cff;
-        --premium-success: #71dd37;
-        --premium-warning: #ffab00;
-        --premium-info: #03c3ec;
-        --premium-gray-light: #f5f5f9;
-        --premium-border: #d9dee3;
+        --phone-frame: #343444;
     }
 
-    .bg-label-primary { background-color: #e7e7ff !important; color: #696cff !important; }
+    .user-profile-control-wrapper { font-family: 'Public Sans', sans-serif; }
+
+    /* Sneat Colors */
+    .bg-label-primary { background-color: #e7e7ff !important; color: var(--premium-primary) !important; }
     .bg-label-warning { background-color: #fff2d6 !important; color: #ffab00 !important; }
-    .bg-label-secondary { background-color: #ebeef0 !important; color: #8592a3 !important; }
+    .bg-label-info { background-color: #d7f5fc !important; color: #03c3ec !important; }
+    .bg-label-secondary { background-color: #f5f5f9 !important; color: #8592a3 !important; }
     .bg-light-premium { background-color: #f8f9fa; }
     
-    .border-top-premium-primary { border-top: 4px solid var(--premium-primary) !important; }
-    .border-top-premium-warning { border-top: 4px solid var(--premium-warning) !important; }
+    .avatar-md { width: 48px; height: 48px; }
+    .avatar-xs { width: 28px; height: 28px; }
+    .avatar-xl { width: 80px; height: 80px; }
 
-    .avatar-sm { width: 40px; height: 40px; }
-    .transition-all { transition: all 0.3s ease; }
-    
-    .shadow-premium { box-shadow: 0 0 8px var(--premium-primary); }
-    .bg-gray { background-color: #e0e0e0; }
+    .shadow-premium { box-shadow: 0 0 10px rgba(105, 108, 255, 0.4); }
+    .shadow-premium-soft { box-shadow: 0 10px 30px rgba(105, 108, 255, 0.08); }
 
     /* Modern Switch */
-    .modern-switch .form-check-input {
-        width: 3rem;
-        height: 1.5rem;
-        cursor: pointer;
-    }
-    .modern-switch .form-check-input:checked {
-        background-color: var(--premium-primary);
-        border-color: var(--premium-primary);
-    }
+    .modern-switch .form-check-input { width: 3rem; height: 1.5rem; cursor: pointer; }
+    .modern-switch .form-check-input:checked { background-color: var(--premium-primary); border-color: var(--premium-primary); }
 
-    /* Table Hover */
-    .field-row:hover {
-        background-color: #fdfdff !important;
-    }
-    .field-indicator {
-        width: 8px;
-        height: 8px;
-        transition: all 0.3s ease;
-    }
+    /* Table Styles */
+    .field-row { cursor: default; }
+    .field-row:hover { background-color: #fcfdfe !important; }
+    .field-status-dot { width: 8px; height: 8px; transition: all 0.3s; }
 
     /* Search Box */
-    .search-fields-box {
-        transition: all 0.3s ease;
-    }
-    .search-fields-box:focus-within {
-        border-color: var(--premium-primary) !important;
-        box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.15) !important;
-    }
+    .search-box { transition: all 0.3s; }
+    .search-box:focus-within { border-color: var(--premium-primary) !important; box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.1) !important; }
 
-    /* Phone Mockup */
-    .sticky-preview-container {
-        position: sticky;
-        top: 2rem;
-    }
-
-    .phone-mockup {
+    /* Phone Shell Styling */
+    .sticky-preview-wrapper { position: sticky; top: 120px; }
+    
+    .phone-shell {
         width: 300px;
-        height: 600px;
-        background: #1e1e1e;
-        border-radius: 40px;
+        height: 620px;
+        background: var(--phone-frame);
         padding: 12px;
+        border-radius: 45px;
         position: relative;
-        border: 4px solid #333;
+        box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3);
     }
 
-    .phone-frame {
+    .phone-bezel {
         width: 100%;
         height: 100%;
         background: #fff;
-        border-radius: 32px;
+        border-radius: 35px;
         overflow: hidden;
         position: relative;
-        display: flex;
-        flex-direction: column;
+        border: 4px solid #000;
     }
 
-    .phone-speaker {
+    .phone-sensor-strip {
         position: absolute;
-        top: 15px;
+        top: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 60px;
-        height: 5px;
-        background: #333;
-        border-radius: 10px;
-        z-index: 10;
+        width: 120px;
+        height: 25px;
+        background: #000;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        z-index: 100;
     }
 
-    .phone-screen {
-        flex: 1;
+    .phone-screen-container {
+        height: 100%;
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    .app-content-scrollable {
+    .phone-content-body {
         flex: 1;
         overflow-y: auto;
-        scrollbar-width: none;
     }
-    .app-content-scrollable::-webkit-scrollbar { display: none; }
 
-    .mockup-field-skeleton {
-        margin-bottom: 0.75rem;
-    }
-    .mockup-field-label {
-        font-size: 0.65rem;
-        font-weight: 600;
-        color: #888;
-        margin-bottom: 2px;
-        display: block;
-    }
-    .mockup-field-input {
-        height: 32px;
-        background: #fcfdfe;
-        border: 1px solid #d9dee3;
-        border-radius: 6px;
+    .hero-decoration {
+        position: absolute;
+        bottom: 0;
+        left: 0;
         width: 100%;
-        padding: 0 10px;
-        font-size: 0.7rem;
+        height: 40px;
+        background: linear-gradient(to top, rgba(255,255,255,0.1), transparent);
+    }
+
+    .mockup-field-node {
+        margin-bottom: 12px;
+        animation: slideInUp 0.3s ease;
+    }
+
+    .mockup-n-label { font-size: 0.65rem; color: #8592a3; font-weight: 600; margin-bottom: 3px; display: block; }
+    .mockup-n-value {
+        height: 34px;
+        background: #f8f9fb;
+        border-bottom: 1px solid #d9dee3;
+        width: 100%;
+        padding: 0 4px;
+        font-size: 0.75rem;
         display: flex;
         align-items: center;
-        color: #444;
+        color: #566a7f;
+        font-weight: 500;
     }
 
-    .phone-home-button {
+    .mockup-placeholder-row { height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; }
+    
+    .battery-icon { width: 18px; height: 9px; border: 1px solid #fff; border-radius: 2px; position: relative; }
+    .battery-icon::after { content: ''; position: absolute; right: -3px; top: 2px; width: 2px; height: 3px; background: #fff; }
+
+    .phone-home-indicator {
         position: absolute;
         bottom: 8px;
         left: 50%;
         transform: translateX(-50%);
         width: 100px;
         height: 4px;
-        background: #333;
-        border-radius: 10px;
-        z-index: 10;
+        background: #000;
+        border-radius: 2px;
+        opacity: 0.2;
     }
 
-    /* Responsive */
-    @media (max-width: 991px) {
-        .sticky-preview-container {
-            position: relative;
-            top: 0;
-            margin-top: 2rem;
-        }
+    .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+    @keyframes slideInUp {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 1199px) {
+        .sticky-preview-wrapper { position: relative; top: 0; margin-top: 3rem; }
     }
 </style>
 @endpush
@@ -324,85 +352,92 @@
 (function ($) {
     'use strict';
 
-    // 1. Update Live Preview
-    function updatePreview() {
-        const $mockupContainer = $('#profileMockupFields');
-        $mockupContainer.empty();
+    // 1. Real-time Clock
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        $('.clock-real-time').text(hours + ':' + minutes);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 2. Preview Synchronizer
+    function syncDashboardPreview() {
+        const $mockupStack = $('#profileMockupFields');
+        $mockupStack.empty();
         
         const $checked = $('.profile-field-cb:checked');
-        $('#activeProfileFieldsBadge').text($checked.length + ' ' + ($checked.length === 1 ? '@lang("Field")' : '@lang("Fields")'));
+        $('#activeProfileFieldsBadge').text($checked.length + ' ' + ($checked.length === 1 ? '@lang("Enabled Node")' : '@lang("Enabled Nodes")'));
 
         if ($checked.length === 0) {
-            $mockupContainer.html('<div class="text-center py-4 opacity-50"><i class="las la-ghost fs-1"></i><p class="small">@lang("No fields enabled")</p></div>');
+            $mockupStack.html('<div class="text-center py-4 opacity-50"><i class="las la-fingerprint fs-1"></i><p class="tiny fw-bold text-uppercase mt-2">@lang("No visible data")</p></div>');
             return;
         }
 
         $checked.each(function (index) {
-            if (index >= 8) return; // Only show first 8 to keep mockup clean
+            if (index >= 6) return; // Keep mockup concise
             const label = $(this).closest('.field-row').find('.fw-semibold').text();
             
             const html = `
-                <div class="mockup-field-skeleton">
-                    <span class="mockup-field-label">${label}</span>
-                    <div class="mockup-field-input">John Doe...</div>
+                <div class="mockup-field-node">
+                    <span class="mockup-n-label">${label}</span>
+                    <div class="mockup-n-value">John Doe...</div>
                 </div>
             `;
-            $mockupContainer.append(html);
+            $mockupStack.append(html);
         });
 
-        if ($checked.length > 8) {
-            $mockupContainer.append(`<div class="text-center small text-muted opacity-50">+ ${$checked.length - 8} @lang("more fields")...</div>`);
+        if ($checked.length > 6) {
+            $mockupStack.append(`<div class="text-center tiny text-muted fw-bold py-1 bg-light rounded mt-2">+ ${$checked.length - 6} @lang("ADDITIONAL NODES")</div>`);
         }
 
-        // Update Indicators
+        // Sync Table Status Dots
         $('.profile-field-cb').each(function() {
-            const $indicator = $(this).closest('.field-row').find('.field-indicator');
+            const $dot = $(this).closest('.field-row').find('.field-status-dot');
             if ($(this).is(':checked')) {
-                $indicator.addClass('bg-primary shadow-premium').removeClass('bg-gray');
+                $dot.addClass('bg-primary shadow-premium').removeClass('bg-secondary');
             } else {
-                $indicator.removeClass('bg-primary shadow-premium').addClass('bg-gray');
+                $dot.removeClass('bg-primary shadow-premium').addClass('bg-secondary');
             }
         });
     }
 
-    // 2. Field Search Logic
+    // 3. Advanced Filtering
     $('#fieldSearch').on('input', function() {
         const query = $(this).val().toLowerCase();
         $('.field-row').each(function() {
             const $row = $(this);
             const text = $row.data('search');
-            if (text.includes(query)) {
-                $row.show();
-            } else {
-                $row.hide();
-            }
+            $row.toggle(text.includes(query));
         });
 
-        // Hide empty groups
         $('.field-group-card').each(function() {
-            const visibleRows = $(this).find('.field-row:visible').length;
-            $(this).toggle(visibleRows > 0);
+            const visible = $(this).find('.field-row:visible').length;
+            $(this).toggle(visible > 0);
         });
     });
 
-    // 3. Bulk Actions
+    // 4. Global Operations
     $('#checkAll').on('click', function() {
         $('.profile-field-cb').prop('checked', true).trigger('change');
+        $('.group-master-toggle').prop('checked', true);
     });
 
     $('#uncheckAll').on('click', function() {
         $('.profile-field-cb').prop('checked', false).trigger('change');
+        $('.group-master-toggle').prop('checked', false);
     });
 
-    // 4. Group Master Toggle
+    // 5. Group Logic
     $('.group-master-toggle').on('change', function() {
         const group = $(this).data('group');
         $(`.profile-field-cb[data-group="${group}"]`).prop('checked', this.checked).trigger('change');
     });
 
-    // 5. Initial Call & Event Binding
-    $(document).on('change', '.profile-field-cb', updatePreview);
-    updatePreview();
+    // Initial Sync
+    $(document).on('change', '.profile-field-cb', syncDashboardPreview);
+    syncDashboardPreview();
 
 })(jQuery);
 </script>

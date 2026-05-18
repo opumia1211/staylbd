@@ -9,71 +9,120 @@
   <title>{{ $general->siteName($pageTitle ?? '') }}</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  @php $adminFavicon = getLogo('favicon'); @endphp
+  @php 
+    $adminFavicon = getLogo('favicon'); 
+    // Fix for subdirectory asset pathing
+    $assetBase = str_replace('/core/public', '', url('/'));
+    if (str_ends_with($assetBase, '/')) {
+        $assetBase = rtrim($assetBase, '/');
+    }
+  @endphp
   <link rel="icon" type="image/x-icon" href="{{ $adminFavicon }}" />
 
-  <!-- Fonts: Standardizing on Outfit (Brand) and Inter (UI) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Fonts: Standardizing on Local System Fonts -->
 
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/fonts/iconify-icons.css') }}" />
-  <link rel="stylesheet" href="{{ url('assets/global/css/line-awesome.min.css') }}">
-  <link rel="stylesheet" href="{{ url('assets/admin/css/vendor/datepicker.min.css') }}">
+  <!-- Tailwind CSS Library Integration -->
+  <script src="{{ $assetBase }}/assets/global/js/tailwind.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              teal: '#0e9f90',
+              hover: '#0c8a7d',
+            }
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/fonts/iconify-icons.css" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/global/css/line-awesome.min.css">
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin/css/vendor/datepicker.min.css">
 
   <!-- Core CSS -->
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/libs/pickr/pickr-themes.css') }}" />
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/css/core.css') }}" />
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/css/demo.css') }}" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/pickr/pickr-themes.css" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/css/core.css" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/css/demo.css" />
 
   <!-- Vendors CSS -->
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/fonts/flag-icons.css') }}" />
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/libs/apex-charts/apex-charts.css') }}" />
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/libs/select2/select2.css') }}">
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/libs/sweetalert2/sweetalert2.css') }}">
-  <link rel="stylesheet" href="{{ url('assets/admin-ui/vendor/libs/animate-css/animate.css') }}">
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/fonts/flag-icons.css" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/apex-charts/apex-charts.css" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/select2/select2.css">
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/sweetalert2/sweetalert2.css">
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/animate-css/animate.css">
 
   <!-- Helpers -->
-  <script src="{{ url('assets/admin-ui/vendor/js/helpers.js') }}"></script>
-  <script src="{{ url('assets/admin-ui/vendor/js/template-customizer.js') }}"></script>
-  <script src="{{ url('assets/admin-ui/js/config.js') }}"></script>
+  <script src="{{ $assetBase }}/assets/admin-ui/vendor/js/helpers.js"></script>
+  <script src="{{ $assetBase }}/assets/admin-ui/vendor/js/template-customizer.js"></script>
+  <script src="{{ $assetBase }}/assets/admin-ui/js/config.js"></script>
 
   @include('partials.storefront_ui_variables')
   <style>
     :root {
-      --bs-font-sans-serif: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif !important;
-      --bs-body-font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif !important;
+      --bs-font-sans-serif: 'Inter', system-ui, -apple-system, sans-serif !important;
+      --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
     }
+
     body {
-      font-family: 'Outfit', 'Inter', sans-serif !important;
+      font-family: 'Inter', sans-serif !important;
     }
+
     .layout-navbar {
       backdrop-filter: blur(10px);
       background: rgba(255, 255, 255, 0.8) !important;
     }
+
     .btn-primary {
       background-color: var(--product-buy-now-color, #0e9f90) !important;
       border-color: var(--product-buy-now-color, #0e9f90) !important;
     }
+
     .btn-primary:hover {
       background-color: var(--product-buy-now-hover, #0c8a7d) !important;
       border-color: var(--product-buy-now-hover, #0c8a7d) !important;
     }
+
     .bg-menu-theme {
-      background-color: #0f172a !important; /* Matching footer_bg from storefront */
-      color: #fff !important;
+      background-color: #ffffff !important;
+      color: #566a7f !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+      border-bottom: 1px solid rgba(67, 89, 113, 0.1) !important;
     }
-    .bg-menu-theme .menu-link, .bg-menu-theme .menu-header {
-      color: rgba(255, 255, 255, 0.7) !important;
+
+    .bg-menu-theme .menu-link,
+    .bg-menu-theme .menu-header {
+      color: #566a7f !important;
     }
-    .bg-menu-theme .menu-item.active > .menu-link {
-      background: var(--product-buy-now-color, #0e9f90) !important;
-      color: #fff !important;
+
+    .bg-menu-theme .menu-item.active>.menu-link {
+      background: rgba(14, 159, 144, 0.08) !important;
+      color: #0e9f90 !important;
+      border-radius: 6px !important;
+    }
+
+    .bg-menu-theme .menu-item.active>.menu-link i {
+      color: #0e9f90 !important;
+    }
+
+    /* Remove the dot pseudo-elements that appear in some theme versions */
+    .layout-menu-horizontal .menu-link::before,
+    .layout-menu-horizontal .menu-sub .menu-link::before {
+      display: none !important;
+      content: none !important;
     }
 
     /* Search Results Styling */
-    .admin-header-search-wrapper { min-width: 300px; }
+    .admin-header-search-wrapper {
+      min-width: 300px;
+    }
+
     .search-results-pane {
       position: absolute;
       top: 100%;
@@ -87,44 +136,222 @@
       margin-top: 0.5rem;
       display: none;
       scrollbar-width: thin;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
-    .search-results-pane.show { display: block; }
-    .search-results-category {
-      padding: 10px 15px;
-      background: #f8f9fa;
-      font-weight: 700;
-      font-size: 11px;
-      text-uppercase: uppercase;
-      color: #6c757d;
-      border-bottom: 1px solid #edf2f7;
+
+    .search-results-pane.show {
+      display: block;
     }
+
     .search-result-item {
       padding: 12px 15px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      transition: all 0.2s;
+      transition: background 0.2s;
       border-bottom: 1px solid #f1f5f9;
     }
-    .search-result-item:hover, .search-result-item.active {
+
+    .search-result-item:hover {
       background: #f1f5f9;
     }
-    .search-result-icon {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(14, 159, 144, 0.1);
-      color: #0e9f90;
-      border-radius: 6px;
-      margin-right: 12px;
+
+    /* Submenu Card Styling - Clean & Sparkling */
+    .layout-menu-horizontal .menu-sub {
+      background-color: #ffffff !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+      border: 1px solid rgba(67, 89, 113, 0.1) !important;
+      border-radius: 8px !important;
+      padding: 0.5rem 0 !important;
+      z-index: 1100 !important;
+      min-width: 230px !important;
+      list-style: none !important;
+      margin: 0 !important;
     }
-    .search-result-title { font-weight: 600; font-size: 14px; color: #334155; }
-    .search-result-description { font-size: 12px; color: #64748b; margin-bottom: 0; }
-    .search-result-url { font-size: 10px; color: #94a3b8; display: block; }
-    .search-no-results { padding: 30px; text-align: center; color: #64748b; }
-    .highlight { background: #fef08a; padding: 0 2px; border-radius: 2px; }
+
+    .layout-menu-horizontal .menu-sub .menu-link {
+      color: #435971 !important;
+      padding: 0.65rem 1.25rem !important;
+      font-weight: 500 !important;
+      font-size: 0.9375rem !important;
+      display: flex !important;
+      align-items: center !important;
+      transition: background 0.2s, color 0.2s !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-link:hover {
+      background-color: #f5f5f9 !important;
+      color: #0e9f90 !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-icon {
+      color: #697a8d !important;
+      margin-right: 0.85rem !important;
+      font-size: 1.25rem !important;
+      width: 1.25rem !important;
+      text-align: center !important;
+    }
+    
+    .layout-menu-horizontal .menu-sub .menu-item-header {
+      color: #a1acb8 !important;
+      font-weight: 700 !important;
+      font-size: 0.75rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.8px !important;
+      padding: 0.85rem 1.25rem 0.35rem !important;
+      opacity: 0.8 !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-toggle::after {
+      color: #a1acb8 !important;
+    }
+
+    /* Perfect Alignment & Orientation - No Overlapping, No Upside-Down */
+    .layout-menu-horizontal .menu-link.menu-toggle {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      position: relative !important;
+      padding-right: 1.25rem !important;
+      white-space: nowrap !important;
+    }
+
+    .layout-menu-horizontal .menu-toggle::after {
+      content: "" !important;
+      display: inline-block !important;
+      position: static !important;
+      margin-left: 0.65rem !important;
+      width: 12px !important;
+      height: 12px !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23566a7f' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-size: contain !important;
+      transform: translateY(1px) !important; /* Fine-tune vertical alignment with text */
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      opacity: 0.8 !important;
+      flex-shrink: 0 !important;
+      border: none !important;
+    }
+
+    /* Only rotate when the dropdown is actually OPEN */
+    .layout-menu-horizontal .menu-item.open > .menu-link.menu-toggle::after {
+      transform: translateY(1px) rotate(-180deg) !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230e9f90' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+      opacity: 1 !important;
+    }
+
+    /* Keep color teal on active items but keep arrow DOWN if not open */
+    .layout-menu-horizontal .menu-item.active > .menu-link.menu-toggle {
+      color: #0e9f90 !important;
+    }
+    
+    .layout-menu-horizontal .menu-item.active > .menu-link.menu-toggle::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230e9f90' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+      opacity: 1 !important;
+    }
+
+    /* Badge dot alignment */
+    .layout-menu-horizontal .menu-link .badge-dot {
+      margin-left: 0.5rem !important;
+      margin-right: -0.2rem !important;
+      position: static !important;
+      display: inline-block !important;
+      vertical-align: middle !important;
+    }
+
+    .layout-menu-horizontal .menu-inner > .menu-item.active > .menu-link {
+      background: transparent !important;
+      color: #0e9f90 !important;
+      font-weight: 700 !important;
+    }
+
+    .layout-menu-horizontal .menu-inner > .menu-item.active > .menu-link i {
+      color: #0e9f90 !important;
+    }
+    
+    /* Hover effect for top-level items on white background */
+    .layout-menu-horizontal .menu-inner > .menu-item:hover > .menu-link {
+      background: rgba(14, 159, 144, 0.05) !important;
+      color: #0e9f90 !important;
+      border-radius: 6px !important;
+    }
+
+    .layout-menu-horizontal .menu-inner > .menu-item:hover > .menu-link i {
+      color: #0e9f90 !important;
+    }
+
+    .layout-menu-horizontal .menu-inner > .menu-item > .menu-link i {
+      color: #566a7f !important;
+    }
+
+    /* Fix Clipping of last menu item (Frontend) */
+    .layout-menu-horizontal .menu-inner {
+      overflow: visible !important;
+    }
+
+    .layout-menu-horizontal .menu-inner > .menu-item > .menu-link {
+      white-space: nowrap !important;
+      min-width: max-content !important;
+    }
+
+    /* Fix Nested Sub-menus (Sections, Sys Tools) in Horizontal Layout */
+    .layout-menu-horizontal .menu-sub .menu-item {
+      position: relative !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-sub {
+      display: none !important;
+      position: absolute !important;
+      left: 100% !important;
+      top: 0 !important;
+      z-index: 1200 !important;
+      margin-left: 0.1rem !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-item:hover > .menu-sub {
+      display: block !important;
+    }
+
+    /* Correct Centering - Max Width 1920px for content containers only */
+    .container-xxl {
+      max-width: 1920px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+
+    /* Handle Menu wrapping/overflow for standard desktops */
+    @media (min-width: 1200px) {
+      .layout-menu-horizontal .menu-inner {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-start !important;
+        flex-wrap: nowrap !important;
+      }
+      
+      .layout-menu-horizontal .menu-inner > .menu-item > .menu-link {
+        padding-left: 0.9rem !important;
+        padding-right: 0.9rem !important;
+      }
+    }
+
+    /* Adjustments for smaller laptops to prevent wrapping */
+    @media (min-width: 1200px) and (max-width: 1600px) {
+      .layout-menu-horizontal .menu-inner > .menu-item > .menu-link {
+        padding-left: 0.6rem !important;
+        padding-right: 0.6rem !important;
+        font-size: 0.85rem !important;
+      }
+      .layout-menu-horizontal .menu-inner > .menu-item > .menu-link .menu-icon {
+        margin-right: 0.4rem !important;
+        font-size: 1.15rem !important;
+      }
+    }
+
+    /* Smooth transition for responsive adjustments */
+    .menu-link, .container-xxl {
+      transition: all 0.2s ease !important;
+    }
   </style>
 
   @stack('style-lib')
@@ -165,16 +392,16 @@
   @stack('script')
 
   <script>
-  document.addEventListener('DOMContentLoaded', function() {
-      setInterval(function() {
-          var meta = document.querySelector('meta[name="csrf-token"]');
-          if (!meta) return;
-          fetch('{{ route('admin.session.keepalive') }}', { credentials: 'same-origin' })
-              .then(function(r) { return r.json(); })
-              .then(function(d) { if (d.csrf) meta.content = d.csrf; })
-              .catch(function() {});
+    document.addEventListener('DOMContentLoaded', function () {
+      setInterval(function () {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        if (!meta) return;
+        fetch('{{ route('admin.session.keepalive') }}', { credentials: 'same-origin' })
+          .then(function (r) { return r.json(); })
+          .then(function (d) { if (d.csrf) meta.content = d.csrf; })
+          .catch(function () { });
       }, 90000);
-  });
+    });
   </script>
 </body>
 

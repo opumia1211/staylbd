@@ -19,9 +19,12 @@
         $firstBanner = $bannersPreload->first();
         $firstFilename = app(\App\Modules\Banner\BannerModuleService::class)->getImageFilename($firstBanner);
         if ($firstFilename !== null) {
-            $homeBannerPreloadUrl = \App\Services\BannerService::bannerImageUrl($firstFilename);
-            $dvPre = is_array($firstBanner->data_values ?? null) ? $firstBanner->data_values : (array)($firstBanner->data_values ?? []);
-            $homeBannerPreloadMobileUrl = \App\Services\BannerService::mobileImageUrl($dvPre['mobile_image'] ?? null, $firstFilename);
+            $extPre = strtolower(pathinfo($firstFilename, PATHINFO_EXTENSION));
+            if (!in_array($extPre, ['mp4', 'webm', 'ogv'])) {
+                $homeBannerPreloadUrl = \App\Services\BannerService::bannerImageUrl($firstFilename);
+                $dvPre = is_array($firstBanner->data_values ?? null) ? $firstBanner->data_values : (array)($firstBanner->data_values ?? []);
+                $homeBannerPreloadMobileUrl = \App\Services\BannerService::mobileImageUrl($dvPre['mobile_image'] ?? null, $firstFilename);
+            }
         }
     }
 @endphp
@@ -250,75 +253,6 @@
 <script>
 (function() {
   try {
-  var slideIntervalMs = {{ $slideIntervalSeconds }} * 1000;
-  if (slideIntervalMs < 1000) slideIntervalMs = 5000;
-  if (slideIntervalMs > 60000) slideIntervalMs = 60000;
-  var autoplay = {{ $bannerAutoplay }} ? 1 : 0;
-
-  function runNativeBannerSlider() {
-    var section = document.getElementById("home-banner-section");
-    if (!section) return;
-    var slider = section.querySelector(".js-banner-slider");
-    if (!slider) return;
-    var slides = slider.querySelectorAll(".banner-slide-inner");
-    if (slides.length === 0) return;
-    var intervalMs = parseInt(slider.getAttribute("data-slide-interval-ms"), 10) || slideIntervalMs;
-    var autoplayVal = slider.getAttribute("data-autoplay");
-    if (autoplayVal !== null && autoplayVal !== "") autoplay = (autoplayVal === "1" || autoplayVal === "true") ? 1 : 0;
-
-    slides.forEach(function(s, i) { s.classList.remove("banner-slide-active"); s.setAttribute("data-slide-index", i); });
-    slides[0].classList.add("banner-slide-active");
-
-    var dotsWrap = section.querySelector(".banner-slider-dots");
-    if (dotsWrap && slides.length > 1) {
-      dotsWrap.innerHTML = "";
-      for (var i = 0; i < slides.length; i++) {
-        var dot = document.createElement("span");
-        dot.className = "dot" + (i === 0 ? " active" : "");
-        dot.setAttribute("data-index", i);
-        dot.setAttribute("aria-label", "Slide " + (i + 1));
-        (function(idx) { dot.addEventListener("click", function() { goTo(idx); }); })(i);
-        dotsWrap.appendChild(dot);
-      }
-    }
-
-    var currentIndex = 0;
-    var timerId = null;
-
-    function goTo(index) {
-      if (index < 0) index = slides.length - 1;
-      if (index >= slides.length) index = 0;
-      currentIndex = index;
-      slides.forEach(function(s, i) {
-        s.classList.toggle("banner-slide-active", i === currentIndex);
-      });
-      if (dotsWrap) {
-        var dots = dotsWrap.querySelectorAll(".dot");
-        dots.forEach(function(d, i) { d.classList.toggle("active", i === currentIndex); });
-      }
-    }
-
-    function next() {
-      goTo(currentIndex + 1);
-    }
-
-    if (autoplay === 1 && slides.length > 1) {
-      timerId = setInterval(next, intervalMs);
-    }
-
-    window.__bannerGoTo = goTo;
-    window.__bannerNext = next;
-  }
-
-  function init() {
-    runNativeBannerSlider();
-  }
-
-  if (document.readyState === "complete") {
-    init();
-  } else {
-    window.addEventListener("load", init);
-  }
 
   // Lazy load more products (button click or scroll into view via Intersection Observer)
   function loadMoreForSection(sectionId) {

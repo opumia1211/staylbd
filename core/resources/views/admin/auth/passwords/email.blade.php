@@ -5,75 +5,95 @@
     $useImageCaptcha = $useImageCaptcha ?? false;
     $passResetLockoutUntil = (int) ($passResetLockoutUntil ?? 0);
     $passResetFormLocked = $passResetLockoutUntil > time();
+
+    // Define assetBase in child view to ensure availability
+    $assetBase = str_replace('/core/public', '', url('/'));
+    if (str_ends_with($assetBase, '/')) {
+        $assetBase = rtrim($assetBase, '/');
+    }
 @endphp
-<div class="login-main">
-    <div class="admin-login-shell">
-                <div class="login-area">
-                    <div class="login-wrapper">
-                        @include('admin.auth.partials.auth-card-header', ['subtitle' => __('Recover Account')])
-                        <div class="login-wrapper__body admin-auth-form">
-                            @if($passResetFormLocked)
-                            <div id="adminPassResetCountdownWrap" class="admin-login-countdown-wrap" data-retry-at="{{ $passResetLockoutUntil }}">
-                                <div class="admin-login-countdown-inner">
-                                    <span class="admin-login-countdown-icon" aria-hidden="true"><i class="las la-clock"></i></span>
-                                    <span class="admin-login-countdown-text">@lang('Too many attempts. Try again in')</span>
-                                    <span id="adminPassResetCountdown" class="admin-login-countdown-timer">--:--</span>
-                                </div>
-                                <p class="admin-login-countdown-note mb-0">@lang('The form will unlock when the countdown ends.')</p>
-                            </div>
-                            @endif
-                            <form action="{{ route('admin.password.reset') }}" method="POST" class="cmn-form login-form" autocomplete="off" id="adminPasswordResetForm" @if($passResetFormLocked) data-blocked="1" @endif>
-                                @csrf
-                                <div class="form-group">
-                                    <label class="sr-only" for="adminResetEmail">@lang('Email')</label>
-                                    <input type="email"
-                                           id="adminResetEmail"
-                                           name="email"
-                                           class="form-control"
-                                           value="{{ old('email') }}"
-                                           placeholder="@lang('Email address')"
-                                           required
-                                           autocomplete="email"
-                                           @if($passResetFormLocked) disabled @endif>
-                                </div>
-                                @if($captchaCode || $useImageCaptcha)
-                                <div class="form-group admin-code-captcha-wrap">
-                                    <label class="sr-only" for="adminResetCaptchaInput">@lang('Captcha')</label>
-                                    <div class="admin-captcha-toolbar" role="group">
-                                        <div class="captcha-image-wrap" aria-hidden="true">
-                                            @if($useImageCaptcha)
-                                            <img src="{{ route('admin.login.captcha.image') }}?t={{ time() }}" alt="" id="adminResetCaptchaImage" class="admin-captcha-img" width="132" height="34" decoding="async" fetchpriority="low">
-                                            @else
-                                            <span class="code-captcha-image" id="adminResetCaptchaCode">{{ $captchaCode }}</span>
-                                            @endif
-                                        </div>
-                                        <button type="button" class="captcha-refresh-btn" id="adminResetCaptchaRefresh" title="@lang('Refresh')" aria-label="@lang('Refresh')" @if($passResetFormLocked) disabled @endif><i class="las la-redo-alt" aria-hidden="true"></i></button>
-                                        <input type="text"
-                                               name="admin_login_captcha"
-                                               id="adminResetCaptchaInput"
-                                               class="form-control admin-captcha-inline-input code-captcha-input"
-                                               placeholder="@lang('Code')"
-                                               title="@lang('Enter the code as shown. Capital or small letters both work.')"
-                                               required
-                                               autocomplete="off"
-                                               inputmode="text"
-                                               maxlength="10"
-                                               @if($passResetFormLocked) disabled @endif>
-                                    </div>
-                                </div>
-                                @endif
-                                <div class="form-group mb-0">
-                                    <a href="{{ route('admin.login') }}" class="forget-text">@lang('Login Here')</a>
-                                </div>
-                                <button type="submit" class="btn cmn-btn w-100" id="adminPasswordResetBtn" data-submitting="0" @if($passResetFormLocked) disabled @endif>
-                                    @lang('Submit')
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+      <div class="authentication-inner">
+        <!-- Recover Account -->
+        <div class="card overflow-hidden">
+          <div class="card-body py-4 px-4">
+            <!-- Logo -->
+            <div class="app-brand justify-content-center mb-3">
+              <a href="{{ route('home') }}" class="app-brand-link gap-2 transition-transform hover:scale-105">
+                <span class="app-brand-logo demo">
+                  @php $adminLoginLogo = getLogo('logo_dark') ?: getLogo('logo'); @endphp
+                  <img src="{{ str_replace(url('/') . '/', $assetBase . '/', $adminLoginLogo) }}" alt="logo" class="h-8 w-auto">
+                </span>
+              </a>
+            </div>
+            <!-- /Logo -->
+            <div class="text-center mb-4">
+                <h5 class="mb-0 fw-bold text-danger">@lang('Account Recovery')</h5>
+                <p class="mb-0 text-muted x-small">@lang('Enter email to reset your password')</p>
+            </div>
+
+            @if($passResetFormLocked)
+            <div id="adminPassResetCountdownWrap" class="mb-3 p-3 bg-lighter rounded text-center border" data-retry-at="{{ $passResetLockoutUntil }}">
+                <div class="d-flex align-items-center justify-center gap-2 text-danger fw-bold mb-1">
+                    <i class="las la-clock fs-5"></i>
+                    <span id="adminPassResetCountdown" class="small">--:--</span>
                 </div>
+                <p class="x-small text-muted mb-0">@lang('Too many attempts. Please wait.')</p>
+            </div>
+            @endif
+
+            <form action="{{ route('admin.password.reset') }}" method="POST" autocomplete="off" id="adminPasswordResetForm" @if($passResetFormLocked) data-blocked="1" @endif>
+                @csrf
+              <div class="mb-4 form-control-validation">
+                <label for="adminResetEmail" class="form-label text-[10px] uppercase fw-bold text-muted mb-1">@lang('Registered Email')</label>
+                <input type="email" class="form-control" id="adminResetEmail" name="email" value="{{ old('email') }}" placeholder="@lang('Email address')" required autocomplete="email" @if($passResetFormLocked) disabled @endif />
+              </div>
+
+              @if($captchaCode || $useImageCaptcha)
+              <div class="mb-4 form-control-validation">
+                <label class="form-label text-[10px] uppercase fw-bold text-muted mb-1">@lang('Verification')</label>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="captcha-img-wrap bg-lighter rounded px-3 py-1 flex-grow-1 text-center border">
+                        @if($useImageCaptcha)
+                            <img src="{{ route('admin.login.captcha.image') }}?t={{ time() }}" alt="" id="adminResetCaptchaImage" class="h-px-25 rounded">
+                        @else
+                            <span class="text-brand-teal fw-bold fs-6" id="adminCaptchaCode">{{ $captchaCode }}</span>
+                        @endif
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-icon btn-sm" id="adminResetCaptchaRefresh" title="@lang('Refresh')" @if($passResetFormLocked) disabled @endif>
+                        <i class="las la-redo-alt"></i>
+                    </button>
+                </div>
+                <input type="text" name="admin_login_captcha" id="adminResetCaptchaInput" class="form-control form-control-sm text-center tracking-widest" placeholder="@lang('Enter Code')" required autocomplete="off" maxlength="10" @if($passResetFormLocked) disabled @endif>
+              </div>
+              @endif
+
+              <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="policy_confirm" id="policyConfirm" required />
+                    <label class="form-check-label x-small" for="policyConfirm"> @lang('I confirm this account recovery request') </label>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <button class="btn btn-primary d-grid w-100 shadow-sm py-2" type="submit" id="adminPasswordResetBtn">@lang('Send Reset Link')</button>
+              </div>
+
+              <div class="text-center mt-3">
+                <a href="{{ route('admin.login') }}" class="btn btn-link text-brand-teal fw-bold p-0">
+                  <i class="icon-base bx bx-chevron-left"></i>
+                  @lang('Go Back to Login Page')
+                </a>
+              </div>
+            </form>
+
+          </div>
+        </div>
+        <!-- /Recover Account -->
+      </div>
     </div>
-</div>
+  </div>
 
 @push('script')
 <script>

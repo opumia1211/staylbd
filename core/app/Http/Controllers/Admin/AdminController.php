@@ -74,9 +74,25 @@ class AdminController extends Controller
         $dashboard = $data['dashboard'] ?? [];
 
         return view('admin.dashboard', compact(
-            'pageTitle', 'emptyMessage', 'widget', 'chart', 'deposit', 'depositsMonth', 'months', 'monthlyDepositAmounts',
-            'delivered', 'trxReport', 'plusTrx', 'minusTrx', 'order', 'orders', 'recentOrders',
-            'lowStockProducts', 'recentOrdersForActivity', 'recentUsersForActivity', 'recentDepositsForActivity',
+            'pageTitle',
+            'emptyMessage',
+            'widget',
+            'chart',
+            'deposit',
+            'depositsMonth',
+            'months',
+            'monthlyDepositAmounts',
+            'delivered',
+            'trxReport',
+            'plusTrx',
+            'minusTrx',
+            'order',
+            'orders',
+            'recentOrders',
+            'lowStockProducts',
+            'recentOrdersForActivity',
+            'recentUsersForActivity',
+            'recentDepositsForActivity',
             'dashboard'
         ));
     }
@@ -87,7 +103,7 @@ class AdminController extends Controller
     public function businessInsights(BusinessDashboardService $biService, AdminAiAssistantService $aiService)
     {
         $pageTitle = 'Business Intelligence & AI Insights';
-        
+
         $revenueTrends = $biService->getRevenueTrends();
         $conversionRate = $biService->getConversionRate();
         $averageCLV = $biService->getAverageCLV();
@@ -104,8 +120,19 @@ class AdminController extends Controller
         $topKeywords = $biService->getTopKeywords(); // Fixed method name if needed or mocked
 
         return view('admin.business_insights', compact(
-            'pageTitle', 'revenueTrends', 'conversionRate', 'averageCLV', 'funnel', 'aiSummary', 'topProducts',
-            'categoryDistribution', 'retentionRate', 'revenueGrowth', 'recentOrders', 'lowStockProducts', 'topKeywords'
+            'pageTitle',
+            'revenueTrends',
+            'conversionRate',
+            'averageCLV',
+            'funnel',
+            'aiSummary',
+            'topProducts',
+            'categoryDistribution',
+            'retentionRate',
+            'revenueGrowth',
+            'recentOrders',
+            'lowStockProducts',
+            'topKeywords'
         ));
     }
 
@@ -135,38 +162,38 @@ class AdminController extends Controller
 
         // All counts from DB – no scope so every product/category is counted
         $widget = [
-            'total_users'              => User::count(),
-            'verified_users'           => User::active()->count(),
-            'email_unverified_users'   => User::emailUnverified()->count(),
-            'mobile_unverified_users'  => User::mobileUnverified()->count(),
-            'total_product'            => Product::count(),
-            'total_category'           => Category::count(),
-            'total_brands'             => Brand::count(),
-            'total_subcategory'        => Subcategory::count(),
-            'total_coupon'             => Coupon::count(),
-            'ticket_pending'           => SupportTicket::where('status', Status::TICKET_OPEN)->count(),
-            'total_subscriber'         => Subscriber::count(),
-            'total_shipping_methods'   => ShippingMethod::count(),
-            'product_featured'        => Product::where('featured_product', Status::YES)->count(),
-            'product_today_deals'      => Product::where('today_deals', Status::YES)->count(),
-            'unread_notifications'     => AdminNotification::where('is_read', Status::NO)->count(),
-            'report_pending'           => AdminReport::pending()->count(),
+            'total_users' => User::count(),
+            'verified_users' => User::active()->count(),
+            'email_unverified_users' => User::emailUnverified()->count(),
+            'mobile_unverified_users' => User::mobileUnverified()->count(),
+            'total_product' => Product::count(),
+            'total_category' => Category::count(),
+            'total_brands' => Brand::count(),
+            'total_subcategory' => Subcategory::count(),
+            'total_coupon' => Coupon::count(),
+            'ticket_pending' => SupportTicket::where('status', Status::TICKET_OPEN)->count(),
+            'total_subscriber' => Subscriber::count(),
+            'total_shipping_methods' => ShippingMethod::count(),
+            'product_featured' => Product::where('featured_product', Status::YES)->count(),
+            'product_today_deals' => Product::where('today_deals', Status::YES)->count(),
+            'unread_notifications' => AdminNotification::where('is_read', Status::NO)->count(),
+            'report_pending' => AdminReport::pending()->count(),
         ];
 
         $deposit = [
-            'total_deposit_amount'  => Deposit::successful()->sum('amount'),
-            'total_deposit_pending'  => Deposit::pending()->count(),
+            'total_deposit_amount' => Deposit::successful()->sum('amount'),
+            'total_deposit_pending' => Deposit::pending()->count(),
             'total_deposit_rejected' => Deposit::rejected()->count(),
-            'total_deposit_charge'  => Deposit::successful()->sum('charge'),
+            'total_deposit_charge' => Deposit::successful()->sum('charge'),
         ];
 
         $order = [
-            'total_order'      => Order::count(),
-            'pending_order'    => Order::pending()->count(),
-            'rejected_order'   => Order::cancel()->count(),
-            'shipped_order'    => Order::shipped()->count(),
-            'confirmed_order'  => Order::confirmed()->count(),
-            'delivered_order'  => Order::delivered()->count(),
+            'total_order' => Order::count(),
+            'pending_order' => Order::pending()->count(),
+            'rejected_order' => Order::cancel()->count(),
+            'shipped_order' => Order::shipped()->count(),
+            'confirmed_order' => Order::confirmed()->count(),
+            'delivered_order' => Order::delivered()->count(),
         ];
 
         $lowStockThreshold = 5;
@@ -189,8 +216,14 @@ class AdminController extends Controller
         $recentDepositsForActivity = Deposit::latest()->take(3)->get(['id', 'amount', 'status', 'created_at']);
 
         return compact(
-            'widget', 'deposit', 'order', 'recentOrders', 'lowStockProducts',
-            'recentOrdersForActivity', 'recentUsersForActivity', 'recentDepositsForActivity'
+            'widget',
+            'deposit',
+            'order',
+            'recentOrders',
+            'lowStockProducts',
+            'recentOrdersForActivity',
+            'recentUsersForActivity',
+            'recentDepositsForActivity'
         );
     }
 
@@ -203,9 +236,9 @@ class AdminController extends Controller
 
         $userLoginData = UserLogin::where('created_at', '>=', $thirtyDaysAgo)->get(['browser', 'os', 'country']);
         $chart = [
-            'user_browser_counter'  => $userLoginData->groupBy('browser')->map->count(),
-            'user_os_counter'      => $userLoginData->groupBy('os')->map->count(),
-            'user_country_counter' => $userLoginData->groupBy('country')->map->count()->sort()->reverse()->take(5),
+            'user_browser_counter' => $userLoginData->groupBy('browser')->map(fn($group) => $group->count()),
+            'user_os_counter' => $userLoginData->groupBy('os')->map(fn($group) => $group->count()),
+            'user_country_counter' => $userLoginData->groupBy('country')->map(fn($group) => $group->count())->sortDesc()->take(5),
         ];
 
         $plusTrx = Transaction::where('trx_type', '+')->where('created_at', '>=', $thirtyDaysAgo)
@@ -249,21 +282,28 @@ class AdminController extends Controller
             ->selectRaw('SUM(total) as totalAmount, DATE(created_at) as day')
             ->groupBy('day')->get();
         $delivered = [
-            'per_day'        => $deliveredRows->map(fn ($r) => date('d M', strtotime($r->day)))->values(),
-            'per_day_amount' => $deliveredRows->map(fn ($r) => $r->totalAmount + 0)->values(),
+            'per_day' => $deliveredRows->map(fn($r) => date('d M', strtotime($r->day)))->values(),
+            'per_day_amount' => $deliveredRows->map(fn($r) => $r->totalAmount + 0)->values(),
         ];
 
         $orderRows = Order::where('created_at', '>=', $thirtyDaysAgo)
             ->selectRaw('COUNT(id) as totalOrder, DATE(created_at) as day')
             ->groupBy('day')->get();
         $orders = [
-            'per_day'        => $orderRows->map(fn ($r) => date('d M', strtotime($r->day)))->values(),
-            'per_day_amount' => $orderRows->map(fn ($r) => $r->totalOrder + 0)->values(),
+            'per_day' => $orderRows->map(fn($r) => date('d M', strtotime($r->day)))->values(),
+            'per_day_amount' => $orderRows->map(fn($r) => $r->totalOrder + 0)->values(),
         ];
 
         return compact(
-            'chart', 'depositsMonth', 'months', 'monthlyDepositAmounts', 'delivered', 'trxReport',
-            'plusTrx', 'minusTrx', 'orders'
+            'chart',
+            'depositsMonth',
+            'months',
+            'monthlyDepositAmounts',
+            'delivered',
+            'trxReport',
+            'plusTrx',
+            'minusTrx',
+            'orders'
         );
     }
 
@@ -275,31 +315,62 @@ class AdminController extends Controller
         $empty = collect([]);
         return [
             'widget' => [
-                'total_users' => 0, 'verified_users' => 0, 'email_unverified_users' => 0, 'mobile_unverified_users' => 0,
-                'total_product' => 0, 'total_category' => 0, 'total_brands' => 0, 'total_subcategory' => 0,
-                'total_coupon' => 0, 'ticket_pending' => 0, 'total_subscriber' => 0, 'total_shipping_methods' => 0,
-                'product_featured' => 0, 'product_today_deals' => 0, 'low_stock_count' => 0,
-                'unread_notifications' => 0, 'report_pending' => 0,
-                'orders_today' => 0, 'new_users_today' => 0, 'today_revenue' => 0, 'pending_payments_today' => 0,
-                'revenue_this_week' => 0, 'revenue_last_week' => 0, 'orders_this_week' => 0, 'orders_last_week' => 0,
+                'total_users' => 0,
+                'verified_users' => 0,
+                'email_unverified_users' => 0,
+                'mobile_unverified_users' => 0,
+                'total_product' => 0,
+                'total_category' => 0,
+                'total_brands' => 0,
+                'total_subcategory' => 0,
+                'total_coupon' => 0,
+                'ticket_pending' => 0,
+                'total_subscriber' => 0,
+                'total_shipping_methods' => 0,
+                'product_featured' => 0,
+                'product_today_deals' => 0,
+                'low_stock_count' => 0,
+                'unread_notifications' => 0,
+                'report_pending' => 0,
+                'orders_today' => 0,
+                'new_users_today' => 0,
+                'today_revenue' => 0,
+                'pending_payments_today' => 0,
+                'revenue_this_week' => 0,
+                'revenue_last_week' => 0,
+                'orders_this_week' => 0,
+                'orders_last_week' => 0,
             ],
             'chart' => ['user_browser_counter' => $empty, 'user_os_counter' => $empty, 'user_country_counter' => $empty],
             'deposit' => ['total_deposit_amount' => 0, 'total_deposit_pending' => 0, 'total_deposit_rejected' => 0, 'total_deposit_charge' => 0],
             'order' => ['total_order' => 0, 'pending_order' => 0, 'rejected_order' => 0, 'shipped_order' => 0, 'confirmed_order' => 0, 'delivered_order' => 0],
-            'depositsMonth' => $empty, 'months' => $empty, 'monthlyDepositAmounts' => [],
+            'depositsMonth' => $empty,
+            'months' => $empty,
+            'monthlyDepositAmounts' => [],
             'delivered' => ['per_day' => $empty, 'per_day_amount' => $empty],
-            'trxReport' => ['date' => []], 'plusTrx' => $empty, 'minusTrx' => $empty,
+            'trxReport' => ['date' => []],
+            'plusTrx' => $empty,
+            'minusTrx' => $empty,
             'orders' => ['per_day' => $empty, 'per_day_amount' => $empty],
-            'recentOrders' => $empty, 'lowStockProducts' => $empty,
-            'recentOrdersForActivity' => $empty, 'recentUsersForActivity' => $empty, 'recentDepositsForActivity' => $empty,
+            'recentOrders' => $empty,
+            'lowStockProducts' => $empty,
+            'recentOrdersForActivity' => $empty,
+            'recentUsersForActivity' => $empty,
+            'recentDepositsForActivity' => $empty,
             'dashboard' => [
-                'product' => [], 'order' => [], 'payment' => [], 'user' => [], 'delivery' => [],
-                'support' => [], 'system' => ['database_status' => 'ok', 'cache_status' => 'ok', 'storage_usage_percent' => 0],
+                'product' => [],
+                'order' => [],
+                'payment' => [],
+                'user' => [],
+                'delivery' => [],
+                'support' => [],
+                'system' => ['database_status' => 'ok', 'cache_status' => 'ok', 'storage_usage_percent' => 0],
                 'security' => ['failed_logins_24h' => 0, 'lockout_count' => 0, 'admin_count' => 0, 'admin_with_2fa' => 0, 'two_fa_percent' => 0],
                 'report' => ['transactions_week' => 0, 'login_history_week' => 0, 'notification_history_week' => 0],
                 'courier' => ['failed_courier_count' => 0],
                 'subscriber' => ['total_subscriber' => 0, 'subscriber_growth_percent' => 0],
-                'alerts' => [], 'revenue_overview' => ['revenue_today_vs_yesterday_percent' => 0],
+                'alerts' => [],
+                'revenue_overview' => ['revenue_today_vs_yesterday_percent' => 0],
             ],
         ];
     }
@@ -307,14 +378,14 @@ class AdminController extends Controller
     public function profile()
     {
         $pageTitle = 'Profile';
-        $admin     = auth('admin')->user();
+        $admin = auth('admin')->user();
         return view('admin.profile', compact('pageTitle', 'admin'));
     }
 
     public function profileUpdate(Request $request)
     {
         $this->validate($request, [
-            'name'  => 'required|string|max:191',
+            'name' => 'required|string|max:191',
             'email' => 'required|email',
             'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp', 'svg'])],
         ], [
@@ -324,7 +395,7 @@ class AdminController extends Controller
 
         if ($request->hasFile('image')) {
             try {
-                $old         = $user->image;
+                $old = $user->image;
                 $user->image = fileUploader($request->image, getFilePath('adminProfile'), getFileSize('adminProfile'), $old);
             } catch (\Exception $exp) {
                 $notify[] = ['error', __('Could not upload image. Please use PNG, JPG, WebP or SVG.')];
@@ -332,7 +403,7 @@ class AdminController extends Controller
             }
         }
 
-        $user->name  = $request->name;
+        $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
         $notify[] = ['success', __('Profile updated successfully.')];
@@ -342,7 +413,7 @@ class AdminController extends Controller
     public function password()
     {
         $pageTitle = 'Password Setting';
-        $admin     = auth('admin')->user();
+        $admin = auth('admin')->user();
         return view('admin.password', compact('pageTitle', 'admin'));
     }
 
@@ -350,11 +421,11 @@ class AdminController extends Controller
     {
         $request->validate([
             'old_password' => ['required', 'string'],
-            'password'     => ['required', 'string', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+            'password' => ['required', 'string', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ], [
             'old_password.required' => __('Current password is required.'),
-            'password.required'     => __('New password is required.'),
-            'password.confirmed'    => __('New password confirmation does not match.'),
+            'password.required' => __('New password is required.'),
+            'password.confirmed' => __('New password confirmation does not match.'),
         ]);
 
         $user = auth('admin')->user();
@@ -375,8 +446,8 @@ class AdminController extends Controller
     public function notifications()
     {
         $notifications = AdminNotification::orderBy('id', 'desc')->with('user')->paginate(getPaginate());
-        $pageTitle     = __('Notifications');
-        $emptyMessage  = __('No notifications yet.');
+        $pageTitle = __('Notifications');
+        $emptyMessage = __('No notifications yet.');
         $breadcrumb = [
             ['label' => __('Dashboard'), 'url' => route('admin.dashboard')],
             ['label' => __('Manage Orders'), 'url' => route('admin.orders.index')],
@@ -408,7 +479,7 @@ class AdminController extends Controller
 
     public function notificationRead($id)
     {
-        $notification          = AdminNotification::findOrFail($id);
+        $notification = AdminNotification::findOrFail($id);
         $notification->is_read = Status::YES;
         $notification->save();
         AdminNotification::clearNotificationCache();
@@ -442,7 +513,7 @@ class AdminController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-        $reports = $query->paginate(15)->withQueryString();
+        $reports = $query->paginate(15);
         $stats = [
             'total' => AdminReport::count(),
             'bugs' => AdminReport::bug()->count(),
@@ -456,7 +527,7 @@ class AdminController extends Controller
     public function reportSubmit(Request $request)
     {
         $request->validate([
-            'type'    => 'required|in:bug,feature',
+            'type' => 'required|in:bug,feature',
             'message' => 'required|string|max:5000',
         ]);
 

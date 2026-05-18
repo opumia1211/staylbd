@@ -21,6 +21,38 @@ class TOTPService
     }
 
     /**
+     * Get local time adjusted for clock drift using cached difference against internet time.
+     */
+    public static function getSyncedTime(): int
+    {
+        try {
+            $drift = \Illuminate\Support\Facades\Cache::get('totp_time_drift');
+            if ($drift === null) {
+                $drift = 0;
+                $ch = curl_init('https://timeapi.io/api/Time/current/zone?timeZone=UTC');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $response = curl_exec($ch);
+                curl_close($ch);
+                if ($response) {
+                    $data = json_decode($response, true);
+                    if (isset($data['dateTime'])) {
+                        $internetTime = strtotime($data['dateTime'] . ' UTC');
+                        if ($internetTime > 0) {
+                            $drift = $internetTime - time();
+                        }
+                    }
+                }
+                \Illuminate\Support\Facades\Cache::put('totp_time_drift', $drift, now()->addMinutes(10));
+            }
+            return time() + $drift;
+        } catch (\Throwable $e) {
+            return time();
+        }
+    }
+
+    /**
      * Verify using admin config window (clock skew tolerance).
      */
     public static function adminVerify(string $secret, string $code): bool
@@ -39,7 +71,7 @@ class TOTPService
         if (!ctype_digit($code) || strlen($code) !== self::LENGTH) {
             return false;
         }
-        $timeSlice = floor(time() / self::PERIOD);
+        $timeSlice = floor(self::getSyncedTime() / self::PERIOD);
         for ($i = -$window; $i <= $window; $i++) {
             $expected = self::generateCode($secret, $timeSlice + $i);
             if (hash_equals((string) $expected, $code)) {
@@ -54,7 +86,7 @@ class TOTPService
      */
     public static function generateCode(string $secret, ?int $timeSlice = null): string
     {
-        $timeSlice = $timeSlice ?? floor(time() / self::PERIOD);
+        $timeSlice = $timeSlice ?? floor(self::getSyncedTime() / self::PERIOD);
         $secretKey = self::base32Decode($secret);
         $time = pack('N*', 0) . pack('N*', $timeSlice);
         $hash = hash_hmac('sha1', $time, $secretKey, true);

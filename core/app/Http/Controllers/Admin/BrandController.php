@@ -25,6 +25,7 @@ class BrandController extends Controller
 
 		$request->validate([
 			'name'  => 'required|unique:brands,name,' . $id,
+			'name_bn' => 'nullable|max:255',
 			'image' => [$isRequired, 'file', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp', 'svg'])],
 		]);
 
@@ -46,6 +47,7 @@ class BrandController extends Controller
 		}
 
 		$brand->name = $request->name;
+		$brand->name_bn = $request->name_bn;
 		$brand->save();
 
 		ProductCacheService::clearProductListings();

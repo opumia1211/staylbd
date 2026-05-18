@@ -38,7 +38,7 @@ class CategoryController extends Controller
 			->searchable(['name'])
 			->orderBy($sortBy, $sortDir)
 			->paginate($perPage)
-			->withQueryString();
+			->appends(request()->all());
 
 		return view('admin.category', compact('pageTitle', 'categories', 'sortBy', 'sortDir'));
 	}
@@ -49,6 +49,7 @@ class CategoryController extends Controller
 
 		$request->validate([
 			'name'           => 'required|max:255|unique:categories,name,' . (int) $id,
+			'name_bn'        => 'nullable|max:255',
 			'image'          => [$isRequired, 'file', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp', 'svg'])],
 			'publish_status' => 'nullable|in:pending,public,scheduled',
 			'scheduled_at'   => 'nullable|date',
@@ -90,6 +91,7 @@ class CategoryController extends Controller
 		}
 
 		$category->name = $request->name;
+		$category->name_bn = $request->name_bn;
 		if (\Illuminate\Support\Facades\Schema::hasColumn($category->getTable(), 'home_line')) {
 			$category->home_line = (int) $request->input('home_line', 1);
 		}

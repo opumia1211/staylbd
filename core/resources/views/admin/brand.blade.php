@@ -125,6 +125,10 @@
                                     <input type="text" class="form-control" name="name" value="{{ old('name') }}" required>
                                 </div>
                                 <div class="form-group">
+                                    <label>@lang('Name (Bengali)')</label>
+                                    <input type="text" class="form-control" name="name_bn" value="{{ old('name_bn') }}">
+                                </div>
+                                <div class="form-group">
                                     <label>@lang('Image')</label>
                                     <div class="image-upload">
                                         <div class="thumb">
