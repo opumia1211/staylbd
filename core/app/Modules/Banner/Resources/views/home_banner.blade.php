@@ -32,7 +32,7 @@
         display: block !important;
         width: 100% !important;
         background: transparent !important;
-        margin: -30px 0 0 0 !important; /* Keep a tiny, premium visual gap */
+        margin: 0 !important;
         padding: 0 !important;
     }
     

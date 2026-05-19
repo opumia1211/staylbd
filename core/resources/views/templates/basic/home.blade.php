@@ -1,4 +1,5 @@
 @extends($activeTemplate . 'layouts.frontend')
+@push('body_attrs') data-page="home" @endpush
 @php
     $disableLegacyBootstrapBundle = true;
     $disableLegacyJquery = true;
@@ -54,12 +55,14 @@
         $homeRowScrollIntervalSec = max(2, min(30, (int) $categoryScrollIntervalSec));
     @endphp
 
+    {{-- Banner ওপরে ticker/scrollbar --}}
+    @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_above', 'options' => ['page' => 'home']])
+
     @include('modules.Banner::home_banner', array_merge($bannerModuleData, [
         'flashSaleEndsAt' => config('stayl.flash_sale_ends_at'),
     ]))
     <div class="storefront-banner-separation" aria-hidden="true"></div>
     {{-- Banner নিচে ticker/scrollbar restore --}}
-    @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_above', 'options' => ['page' => 'home']])
     @include($activeTemplate . 'partials.scrollbar', ['position' => 'banner_below', 'options' => ['page' => 'home']])
 
     {{-- Premium Services/Promo Features section --}}
@@ -128,6 +131,7 @@
                 'sectionTitle' => $hpLabel,
             ])
         @elseif($hpId === 'quick_deals')
+            @include($activeTemplate . 'partials.scrollbar', ['position' => 'product_line'])
             @include($activeTemplate . 'partials.product_carousel_section', [
                 'products' => $todayDealProducts ?? collect(),
                 'general' => $general,
@@ -188,30 +192,35 @@
                 </section>
             @endif
         @elseif($hpId === 'hot_deal')
+            @include($activeTemplate . 'partials.scrollbar', ['position' => 'product_line'])
             @include($activeTemplate . 'partials.hot_deal', [
                 'sectionLabel' => $hpLabel,
                 'carouselIntervalSec' => $hpInterval,
                 'carouselSpeedMs' => $hpSpeedMs,
             ])
         @elseif($hpId === 'featured')
+            @include($activeTemplate . 'partials.scrollbar', ['position' => 'product_line'])
             @include($activeTemplate . 'partials.featured_product', [
                 'sectionLabel' => $hpLabel,
                 'carouselIntervalSec' => $hpInterval,
                 'carouselSpeedMs' => $hpSpeedMs,
             ])
         @elseif($hpId === 'new_arrivals')
+            @include($activeTemplate . 'partials.scrollbar', ['position' => 'product_line'])
             @include($activeTemplate . 'partials.new_arrivals', [
                 'sectionLabel' => $hpLabel,
                 'carouselIntervalSec' => $hpInterval,
                 'carouselSpeedMs' => $hpSpeedMs,
             ])
         @elseif($hpId === 'trending')
+            @include($activeTemplate . 'partials.scrollbar', ['position' => 'product_line'])
             @include($activeTemplate . 'partials.trending_now', [
                 'sectionLabel' => $hpLabel,
                 'carouselIntervalSec' => $hpInterval,
                 'carouselSpeedMs' => $hpSpeedMs,
             ])
         @elseif($hpId === 'best_selling')
+            @include($activeTemplate . 'partials.scrollbar', ['position' => 'product_line'])
             @include($activeTemplate . 'partials.best_selling', [
                 'sectionLabel' => $hpLabel,
                 'carouselIntervalSec' => $hpInterval,
@@ -220,6 +229,7 @@
         @elseif(\Illuminate\Support\Str::startsWith($hpId, 'custom_row_'))
             @php $crid = (int) substr($hpId, 11); @endphp
             @if(!empty($customRowsById[$crid]))
+                @include($activeTemplate . 'partials.scrollbar', ['position' => 'product_line'])
                 @include($activeTemplate . 'partials.custom_home_product_row', [
                     'rowModel' => $customRowsById[$crid]['row'],
                     'products' => $customRowsById[$crid]['products'] ?? collect(),

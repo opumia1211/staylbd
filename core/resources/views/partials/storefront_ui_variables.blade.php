@@ -40,28 +40,66 @@
 {{-- Admin-driven CSS variables (must stay server-rendered) --}}
 <style id="stayl-storefront-ui-vars">
     :root {
-        --stayl-color-primary: {{ $general->base_color ?: '#3e8804' }};
-        --stayl-color-secondary: {{ $general->secondary_color ?: '#060662' }};
+        --stayl-color-primary:
+            {{ $general->base_color ?: '#3e8804' }}
+        ;
+        --stayl-color-secondary:
+            {{ $general->secondary_color ?: '#060662' }}
+        ;
         --footer-bg-image: url('{{ url("serve-css/img/footer-bg.png") }}?v={{ $assetVersion }}');
-        --product-card-bg: {{ $uiSource['product_card_bg'] }};
-        --product-button-color: {{ $uiSource['product_button_color'] }};
-        --product-button-hover: {{ $uiSource['product_buy_now_hover'] }};
-        --product-buy-now-color: {{ $uiSource['product_buy_now_color'] }};
-        --product-buy-now-hover: {{ $uiSource['product_buy_now_hover'] }};
-        --product-price-color: {{ $uiSource['product_price_color'] }};
-        --product-rating-color: {{ $uiSource['rating_color'] }};
-        --product-discount-badge: {{ $uiSource['discount_badge_color'] }};
-        --product-stock-color: {{ $uiSource['stock_color'] }};
-        --product-shipping-color: {{ $uiSource['shipping_badge_color'] }};
-        --category-card-bg: {{ $uiSource['product_card_bg'] }};
-        --category-card-text: {{ $uiSource['product_button_color'] }};
-        --category-title-color: {{ $uiSource['product_button_color'] }};
-        --header-bg: {{ $uiSource['header_bg'] ?: '#ffffff' }};
+        --product-card-bg:
+            {{ $uiSource['product_card_bg'] }}
+        ;
+        --product-button-color:
+            {{ $uiSource['product_button_color'] }}
+        ;
+        --product-button-hover:
+            {{ $uiSource['product_buy_now_hover'] }}
+        ;
+        --product-buy-now-color:
+            {{ $uiSource['product_buy_now_color'] }}
+        ;
+        --product-buy-now-hover:
+            {{ $uiSource['product_buy_now_hover'] }}
+        ;
+        --product-price-color:
+            {{ $uiSource['product_price_color'] }}
+        ;
+        --product-rating-color:
+            {{ $uiSource['rating_color'] }}
+        ;
+        --product-discount-badge:
+            {{ $uiSource['discount_badge_color'] }}
+        ;
+        --product-stock-color:
+            {{ $uiSource['stock_color'] }}
+        ;
+        --product-shipping-color:
+            {{ $uiSource['shipping_badge_color'] }}
+        ;
+        --category-card-bg:
+            {{ $uiSource['product_card_bg'] }}
+        ;
+        --category-card-text:
+            {{ $uiSource['product_button_color'] }}
+        ;
+        --category-title-color:
+            {{ $uiSource['product_button_color'] }}
+        ;
+        --header-bg:
+            {{ $uiSource['header_bg'] ?: '#ffffff' }}
+        ;
         --header-top-bg: #020617;
         /* Deeper Professional Navy */
-        --footer-bg-color: {{ $uiSource['footer_bg'] ?: '#0f172a' }};
-        --header-icon-color: {{ $uiSource['product_button_color'] }};
-        --header-accent-color: {{ $uiSource['product_buy_now_color'] }};
+        --footer-bg-color:
+            {{ $uiSource['footer_bg'] ?: '#0f172a' }}
+        ;
+        --header-icon-color:
+            {{ $uiSource['product_button_color'] }}
+        ;
+        --header-accent-color:
+            {{ $uiSource['product_buy_now_color'] }}
+        ;
         /* Unified premium storefront palette */
         --stayl-color-header-top: #020617;
         --stayl-color-header-main: #0f172a;
@@ -540,7 +578,7 @@
 
     /* Header <-> banner gap */
     body.antialiased {
-        padding-top: calc(var(--stayl-dynamic-header-height, 175px) + 14px) !important;
+        padding-top: var(--stayl-dynamic-header-height, 175px) !important;
     }
 
     .storefront-main {
@@ -548,12 +586,12 @@
     }
 
     #home-banner-section {
-        margin-top: 10px !important;
+        margin-top: 0px !important;
     }
 
     /* Banner নিচের gap আরও professional */
     .storefront-banner-separation {
-        height: 14px !important;
+        height: 0px !important;
     }
 
     .storefront-section-separation {
@@ -596,8 +634,17 @@
         padding-bottom: clamp(10px, 1.1vw, 16px) !important;
     }
 
+    body[data-page="home"] .storefront-main>.main-container {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+
     .storefront-main section {
         margin-bottom: clamp(14px, 1.6vw, 24px) !important;
+    }
+
+    body[data-page="home"] #home-banner-section {
+        margin-bottom: 0px !important;
     }
 
     /* Buttons + accents consistent */
@@ -743,5 +790,45 @@
 
     body.antialiased {
         padding-top: var(--stayl-dynamic-header-height, 175px) !important;
+    }
+
+    /* Collapse parent and section spaces for scrollbars to achieve exact 1px spacing */
+    .storefront-main .main-container:has(.scrollbar-section:first-child),
+    .storefront-main .main-container:has(> .scrollbar-bar-outer:first-child),
+    .storefront-main .main-container:has(> .scrollbar-section:first-child) {
+        padding-top: 0px !important;
+    }
+
+    .storefront-main .scrollbar-section {
+        margin-top: 1px !important;
+        margin-bottom: 0px !important;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+
+    /* Target direct siblings under scrollbar section to force 1px top margin */
+    .scrollbar-section ~ #home-banner-section,
+    .scrollbar-section ~ .banner-section,
+    .scrollbar-section ~ .storefront-banner-separation,
+    .scrollbar-section ~ .storefront-section-separation {
+        margin-top: 1px !important;
+        padding-top: 0px !important;
+    }
+
+    /* Collapse separation elements when they are adjacent to a scrollbar */
+    .scrollbar-section + .storefront-banner-separation,
+    .scrollbar-section + .storefront-section-separation,
+    .storefront-banner-separation:has(+ .scrollbar-section),
+    .storefront-section-separation:has(+ .scrollbar-section) {
+        height: 1px !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Vertical alignment fix for scrollbar content to prevent character cropping */
+    .scrollbar-content {
+        vertical-align: middle !important;
     }
 </style>

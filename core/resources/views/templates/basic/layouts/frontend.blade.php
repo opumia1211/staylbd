@@ -39,7 +39,9 @@
         @include($activeTemplate . 'partials.scrollbar', ['position' => 'content_bottom'])
     </main>
     @include($activeTemplate . 'partials.global_positioned_ads')
+    @include($activeTemplate . 'partials.scrollbar', ['position' => 'footer_above'])
     @include($activeTemplate . 'partials.footer')
+    @include($activeTemplate . 'partials.scrollbar', ['position' => 'footer_below'])
 
     {{-- Floating WhatsApp Integration --}}
     @if($general->whatsapp_number)

@@ -2155,3 +2155,63 @@ img.staylbd-icon {
         flex: 0 0 38px !important;
     }
 }
+
+@layer components {
+    /* StayLBD Global Scrollbar Utility Layer */
+    .stayl-scrollbar-wrapper {
+        @apply w-full overflow-hidden relative;
+        margin-top: 1px !important;
+        margin-bottom: 1px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        line-height: 1.5 !important;
+    }
+
+    .stayl-scrollbar-inner {
+        @apply flex items-center whitespace-nowrap;
+        min-height: unset !important;
+        height: auto !important;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+    }
+
+    /* Collapse parent and section spaces for scrollbars to achieve exact 1px spacing */
+    .storefront-main .main-container:has(.scrollbar-section:first-child),
+    .storefront-main .main-container:has(> .scrollbar-bar-outer:first-child),
+    .storefront-main .main-container:has(> .scrollbar-section:first-child) {
+        padding-top: 0px !important;
+    }
+
+    .storefront-main .scrollbar-section {
+        margin-top: 1px !important;
+        margin-bottom: 0px !important;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+
+    /* Target direct siblings under scrollbar section to force 1px top margin */
+    .scrollbar-section ~ #home-banner-section,
+    .scrollbar-section ~ .banner-section,
+    .scrollbar-section ~ .storefront-banner-separation,
+    .scrollbar-section ~ .storefront-section-separation {
+        margin-top: 1px !important;
+        padding-top: 0px !important;
+    }
+
+    /* Collapse separation elements when they are adjacent to a scrollbar */
+    .scrollbar-section + .storefront-banner-separation,
+    .scrollbar-section + .storefront-section-separation,
+    .storefront-banner-separation:has(+ .scrollbar-section),
+    .storefront-section-separation:has(+ .scrollbar-section) {
+        height: 1px !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Vertical alignment fix for scrollbar content to prevent character cropping */
+    .scrollbar-content {
+        vertical-align: middle !important;
+    }
+}

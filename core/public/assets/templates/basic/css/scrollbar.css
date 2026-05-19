@@ -2,10 +2,13 @@
  * Scroll Bar / Headline Ticker - TV-style, professional.
  * Static asset: safe to cache (CSS). Served from assets/ with long cache headers.
  */
-/* ~2mm gap above and below bar on all positions */
+/* Symmetrical Precision: Zero out all vertical margins and paddings so scrollbar occupies exactly its configured height */
 .scrollbar-section {
-    margin: 0;
-    padding: 6px 0;
+    margin-top: 1px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
     width: 100%;
     min-height: 0;
     display: flex;
@@ -13,8 +16,11 @@
 }
 
 .scrollbar-section--banner_below {
-    margin-top: 0;
-    padding: 0;
+    margin-top: 1px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -34,22 +40,40 @@
 .scrollbar-section--category_below,
 .scrollbar-section--product_detail_above,
 .scrollbar-section--product_detail_below,
-.scrollbar-section--custom { padding: 6px 0; }
-
-/* হেডার ↔ মেইন / ব্যানার: উপরে ফাঁক নয়; নিচে সামান্য শ্বাস */
-.scrollbar-section--header_below {
-    padding: 0 0 6px;
+.scrollbar-section--custom,
+.scrollbar-section--header_below { 
+    margin-top: 1px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important; 
 }
 
 /* মেইনের প্রথম টিকার: উপরে ফাঁক নয় (হেডার-পরবর্তী লাইন ↔ ব্যানার) */
 main > .scrollbar-section--content_top:first-of-type {
-    padding-top: 0;
+    margin-top: 1px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
 }
 
-/* Outer: full width, no side padding so bar is truly full width and centered */
+/* Outer: constrained to the layout width of the public pages for perfect alignment */
 .scrollbar-bar-outer {
     width: 100%;
-    max-width: 100%;
+    max-width: var(--stayl-content-max, min(1920px, calc(100vw - 2 * var(--stayl-pad-x, 16px)))) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: calc(var(--stayl-pad-x, 16px) + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(var(--stayl-pad-x, 16px) + env(safe-area-inset-right, 0px)) !important;
+    box-sizing: border-box !important;
+}
+
+/* Reset max-width and paddings when nested inside page content wrappers to prevent double padding / narrow scrollbar issues */
+.main-container .scrollbar-bar-outer,
+.container .scrollbar-bar-outer,
+.container-fluid .scrollbar-bar-outer {
+    max-width: 100% !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
 }
@@ -58,9 +82,13 @@ main > .scrollbar-section--content_top:first-of-type {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
-    padding: 8px 16px;
-    line-height: 1.4;
-    min-height: 52px; /* overridden by inline style from bar_height (8–120px) */
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    line-height: 1.5 !important;
+    min-height: 32px !important;
+    /* Preserve template specified border-radius (e.g. 8px for glass/solid/dark/offer/alert/info) */
     display: flex;
     align-items: center;
     box-sizing: border-box;
@@ -70,47 +98,77 @@ main > .scrollbar-section--content_top:first-of-type {
 
 /* Bar size: minimal padding so bar stays thin when bar_height is 8–24px */
 .scrollbar--size-extra-small {
-    padding: 0 6px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
 }
 .scrollbar--size-extra-small .scrollbar-track { font-size: 0.72rem; line-height: 1.1; }
 .scrollbar--size-small {
-    padding: 2px 8px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
 }
 .scrollbar--size-small .scrollbar-track { font-size: 0.9rem; }
 .scrollbar--size-large {
-    padding: 12px 16px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
 }
 .scrollbar--size-large .scrollbar-track { font-size: 1.1rem; }
 .scrollbar--size-extra-large {
-    padding: 14px 20px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
 }
 .scrollbar--size-extra-large .scrollbar-track { font-size: 1.2rem; }
 
 /* Bar thickness: extra_thin = very thin bar */
 .scrollbar--thickness-ultra-thin {
-    padding: 0 4px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
     border-width: 0;
     border-radius: 3px;
 }
 .scrollbar--thickness-extra-thin {
-    padding: 0 6px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
     border-width: 0;
     border-radius: 4px;
 }
 .scrollbar--thickness-thin {
-    padding: 2px 8px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
     border-width: 1px;
 }
 .scrollbar--thickness-thick {
-    padding: 16px 20px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
     border-width: 3px;
 }
 .scrollbar--thickness-extra-thick {
-    padding: 20px 24px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
     border-width: 4px;
 }
 .scrollbar--thickness-ultra-thick {
-    padding: 24px 28px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 28px !important;
+    padding-right: 28px !important;
     border-width: 5px;
 }
 
@@ -139,7 +197,55 @@ main > .scrollbar-section--content_top:first-of-type {
 .scrollbar--text-weight-extrabold .scrollbar-rich-chunk { font-weight: 800; }
 
 .scrollbar-wrapper + .scrollbar-wrapper {
-    margin-top: 12px;
+    margin-top: 1px !important;
+}
+
+/* Symmetrical Spacing Collapse: Ensure exactly 1px gap below any scrollbar to the next section/content */
+
+/* Any element following a scrollbar in the same container */
+.scrollbar-section ~ * {
+    margin-top: 1px !important;
+    padding-top: 0 !important;
+}
+
+/* Specific overrides for main and nested containers when preceded by a scrollbar */
+.scrollbar-section ~ main,
+.scrollbar-section ~ div,
+.scrollbar-section ~ section {
+    margin-top: 1px !important;
+    padding-top: 0 !important;
+}
+
+.scrollbar-section ~ main .main-container,
+.scrollbar-section ~ div .main-container,
+.scrollbar-section ~ .main-container {
+    margin-top: 1px !important;
+    padding-top: 0px !important;
+}
+
+/* Sibling after banner separation (if banner separation is present) */
+.scrollbar-section ~ .storefront-banner-separation ~ * {
+    margin-top: 1px !important;
+    padding-top: 0 !important;
+}
+
+/* First visible content blocks inside containers preceded by a scrollbar */
+.scrollbar-section ~ main .main-container > *:first-child,
+.scrollbar-section ~ main > *:first-child,
+.scrollbar-section ~ div > *:first-child,
+.scrollbar-section ~ .main-container > *:first-child {
+    margin-top: 1px !important;
+    padding-top: 0 !important;
+}
+
+/* Explicit banner rules to guarantee exactly 1px gap below the scrollbar */
+.scrollbar-section ~ #home-banner-section,
+.scrollbar-section ~ main #home-banner-section,
+.scrollbar-section ~ .main-container #home-banner-section,
+.main-container .scrollbar-section ~ #home-banner-section,
+.scrollbar-section ~ main .main-container #home-banner-section {
+    margin-top: 1px !important;
+    padding-top: 0 !important;
 }
 
 .scrollbar-track {
@@ -436,4 +542,58 @@ body.st-scrollbar-admin-preview {
     top: auto !important;
     width: 100% !important;
     max-width: 100% !important;
+}
+
+/* Collapse separation elements when they are adjacent to a scrollbar */
+.scrollbar-section + .storefront-banner-separation,
+.scrollbar-section + .storefront-section-separation,
+.storefront-banner-separation:has(+ .scrollbar-section),
+.storefront-section-separation:has(+ .scrollbar-section) {
+    height: 1px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* StayLBD Global Scrollbar utility fallback/overrides in scrollbar.css */
+.stayl-scrollbar-wrapper {
+    width: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+    margin-top: 1px !important;
+    margin-bottom: 1px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1.2 !important;
+    min-height: var(--mobile-h, 30px) !important;
+    height: var(--mobile-h, 30px) !important;
+}
+
+@media (min-width: 768px) {
+    .stayl-scrollbar-wrapper {
+        min-height: var(--desktop-h, 32px) !important;
+        height: var(--desktop-h, 32px) !important;
+    }
+}
+
+.stayl-scrollbar-inner {
+    display: flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    min-height: unset !important;
+    height: auto !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+
+/* Typography fix for Bengali font rendering */
+.stayl-scrollbar-inner,
+.scrollbar-segment,
+.scrollbar-segment--text,
+.scrollbar-rich-chunk {
+    font-family: "Inter", "Noto Sans Bengali", sans-serif !important;
+    line-height: normal !important;
+    letter-spacing: normal !important;
+    overflow: visible !important;
 }
