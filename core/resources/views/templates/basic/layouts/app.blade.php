@@ -227,8 +227,9 @@
     @endphp
     <script src="{{ $staylLucideJs }}?v={{ $assetVersion }}" defer></script>
     {{-- Fly To Header & Product Carousel – defer for fast TTI --}}
-    <script src="{{ url('serve-js/fly-to-header') }}?v={{ $assetVersion }}" defer></script>
-    <script src="{{ url('serve-js/glass-header') }}?v={{ $assetVersion }}" defer></script>
+    <script src="{{ route('serve.js', 'fly-to-header') }}?v={{ $assetVersion }}" defer></script>
+    <script src="{{ route('serve.js', 'product-line-autoscroll') }}?v={{ $assetVersion }}" defer></script>
+    <script src="{{ route('serve.js', 'glass-header') }}?v={{ $assetVersion }}" defer></script>
     @if(empty($disableLegacyJqueryUi))
     <script src="{{ asset($activeTemplateTrue . 'js/jquery-ui.min.js') }}?v={{ $assetVersion }}" defer></script>
     @endif
@@ -240,7 +241,7 @@
     <script src="{{ asset($activeTemplateTrue . 'js/wow.min.js') }}?v={{ $assetVersion }}" defer></script>
     @endif
     @if(empty($disableLegacyCarouselJs))
-    <script src="{{ url('serve-js/product-carousel') }}?v={{ $assetVersion }}" defer></script>
+    <script src="{{ route('serve.js', 'product-carousel') }}?v={{ $assetVersion }}" defer></script>
     @endif
     {{-- WOW: delay 600ms after load so first paint is stable – avoids reflow that breaks product card CSS --}}
     @if(empty($disableLegacyWow))

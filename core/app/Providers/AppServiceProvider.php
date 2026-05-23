@@ -36,6 +36,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Courier\CourierManager::class, function () {
             return new \App\Services\Courier\CourierManager();
         });
+
+        $this->app->extend('url', function ($url, $app) {
+            $routes = $app['router']->getRoutes();
+
+            return new \App\Routing\StorefrontUrlGenerator(
+                $routes,
+                $app['request'],
+                $app['config']['app.asset_url'] ?? null
+            );
+        });
     }
 
     /**

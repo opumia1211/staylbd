@@ -102,6 +102,9 @@ Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'en|bn|hi|ar|ur|r
         Route::get('product/{slug}', 'productDetailsBySlug')->name('product.detail')
             ->where('slug', '[a-zA-Z0-9][a-zA-Z0-9\-]*');
 
+        // Legacy product URLs (product/details/123) → canonical slug URL
+        Route::get('product/details/{id}', 'productDetailsLegacy')->name('product.detail.legacy')->whereNumber('id');
+
         //Track Order
         Route::get('track/order', 'trackOrder')->name('track.order');
         Route::post('get-track/order', 'getTrackOrder')->name('get.track.order');

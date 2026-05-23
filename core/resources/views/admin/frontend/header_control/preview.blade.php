@@ -81,7 +81,7 @@
 
     {{-- Essential scripts for header interactivity --}}
     <script src="{{ asset('assets/global/js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ url('serve-js/glass-header') }}?v={{ $assetVersion }}" defer></script>
+    <script src="{{ route('serve.js', 'glass-header') }}?v={{ $assetVersion }}" defer></script>
     
     <script>
         // Simple theme toggle support for preview

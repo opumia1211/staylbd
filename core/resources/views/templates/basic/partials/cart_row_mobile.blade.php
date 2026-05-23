@@ -94,6 +94,12 @@
                 <span>@lang('SKU'): {{ $sku }}</span>
                 <span>@lang('Category'): {{ $categoryName }}</span>
                 <span>@lang('Brand'): {{ $brandName }}</span>
+                @if(in_array($product->product_type, ['digital', 'service']))
+                    <span class="text-primary"><i class="las la-download"></i> {{ ucfirst($product->product_type) }}</span>
+                @endif
+                @if($product->shipping_weight > 0)
+                    <span><i class="las la-weight"></i> {{ $product->shipping_weight }} kg</span>
+                @endif
             </div>
             <div class="cart-row-mobile__stock-rating mt-1 d-flex align-items-center flex-wrap gap-2">
                 <span class="badge {{ $inStock ? 'bg-success' : 'bg-secondary' }}">{{ $inStock ? __('In Stock') : __('Out of Stock') }}</span>

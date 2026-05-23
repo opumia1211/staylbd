@@ -237,10 +237,19 @@
                                     @if($product->product_sku)
                                         <br><small class="text-muted">@lang('SKU'): {{ $product->product_sku }}</small>
                                     @endif
+                                    @if($product->warehouse_location)
+                                        <br><small class="text-info"><i class="las la-warehouse"></i> @lang('Whouse'): {{ $product->warehouse_location }}</small>
+                                    @endif
+                                    @if($product->source_url)
+                                        <br><small><a href="{{ $product->source_url }}" target="_blank" class="text-secondary text-decoration-underline"><i class="las la-link"></i> @lang('Source URL')</a></small>
+                                    @endif
+                                    @if(in_array($product->product_type, ['digital', 'service']))
+                                        <br><span class="badge bg-indigo text-white mt-1" style="font-size: 0.65rem;"><i class="las la-download"></i> {{ ucfirst($product->product_type) }}</span>
+                                    @endif
                                     @if($product->file)
-                                        <br><a href="{{ route('download', [$product->id, $product->file]) }}" class="small text--primary"><i class="las la-download"></i> @lang('Download')</a>
+                                        <br><a href="{{ route('download', [$product->id, $product->file]) }}" class="small text--primary mt-1 d-inline-block"><i class="las la-download"></i> @lang('Download')</a>
                                     @elseif($product->link)
-                                        <br><a href="{{ $product->link }}" target="_blank" rel="noopener" class="small text--primary"><i class="las la-external-link-alt"></i> @lang('Link')</a>
+                                        <br><a href="{{ $product->link }}" target="_blank" rel="noopener" class="small text--primary mt-1 d-inline-block"><i class="las la-external-link-alt"></i> @lang('Link')</a>
                                     @endif
                                 @else
                                     <span class="text-muted">@lang('Product removed')</span>

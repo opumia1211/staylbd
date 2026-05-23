@@ -735,20 +735,43 @@
         color: #94a3b8 !important;
     }
 
-        {
-            {
-            -- Logo Adjustment --
-        }
-    }
-
     body.dark-mode .logo img {
         filter: brightness(0) invert(1) !important;
     }
 
-        {
-            {
-            -- Product Cards & General Surfaces --
-        }
+    body.dark-mode .storefront-main,
+    body.dark-mode .pro-detail-page,
+    body.dark-mode .products-section,
+    body.dark-mode .policy-page,
+    body.dark-mode .guest-order-page {
+        background: #030712 !important;
+        color: #f8fafc !important;
+    }
+
+    body.dark-mode .pro-detail-info-card,
+    body.dark-mode .pro-detail-gallery-col .pro-detail-zoom-area,
+    body.dark-mode .modal-content,
+    body.dark-mode #guestCheckoutModal .modal-content {
+        background: #0f172a !important;
+        border-color: rgba(148, 163, 184, 0.18) !important;
+        color: #f8fafc !important;
+    }
+
+    body.dark-mode .pro-detail-page .text-muted,
+    body.dark-mode .pro-detail-service-links a {
+        color: #94a3b8 !important;
+    }
+
+    body.dark-mode .pro-detail-page .pdp-cart-action-row .action-buttons > .compare-btn:not(.in-compare),
+    body.dark-mode .pro-detail-page .pdp-cart-action-row .action-buttons > .chat-btn:not(.pdp-chat-active) {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border-color: rgba(148, 163, 184, 0.35) !important;
+    }
+
+    body.dark-mode .pro-detail-buy-now-wrap .cmn--btn.buy-now,
+    body.dark-mode .pro-detail-quick-order-wrap .cmn--btn {
+        color: #fff !important;
     }
 
     body.dark-mode .product-card {

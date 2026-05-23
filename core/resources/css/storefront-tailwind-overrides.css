@@ -723,7 +723,6 @@ button.scrollToTop.active:focus-visible {
         text-indent: 0 !important;
         overflow: visible !important;
         object-fit: contain !important;
-        vertical-align: middle;
         color: currentColor;
     }
 
@@ -2213,5 +2212,33 @@ img.staylbd-icon {
     /* Vertical alignment fix for scrollbar content to prevent character cropping */
     .scrollbar-content {
         vertical-align: middle !important;
+    }
+
+    /* Elite product card — equal visible action buttons */
+    .stayl-product-card .stayl-card-action-btn {
+        -webkit-tap-highlight-color: transparent;
+    }
+    .stayl-product-card .add-wishlist.added,
+    .stayl-product-card .add-wishlist.active {
+        background: #fb7185 !important;
+        border-color: #e11d48 !important;
+        color: #fff !important;
+    }
+    .stayl-product-card .add-to-compare.in-compare {
+        background: #7c3aed !important;
+        border-color: #6d28d9 !important;
+        color: #fff !important;
+    }
+    .stayl-product-card .add-to-cart.in-cart {
+        background: #dc2626 !important;
+        border-color: #b91c1c !important;
+    }
+    .product-line-flex-row > .product-card-col {
+        min-width: 148px;
+    }
+    @media (min-width: 768px) {
+        .product-line-flex-row > .product-card-col {
+            min-width: 168px;
+        }
     }
 }

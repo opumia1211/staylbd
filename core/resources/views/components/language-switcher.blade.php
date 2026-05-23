@@ -64,15 +64,7 @@
         aria-haspopup="listbox"
         aria-expanded="false"
     >
-        <img
-            src="https://flagcdn.com/w40/{{ $currentMeta['flag'] }}.png"
-            srcset="https://flagcdn.com/w80/{{ $currentMeta['flag'] }}.png 2x"
-            alt="{{ $currentMeta['name'] }}"
-            class="w-5 h-4 shrink-0 rounded-none object-cover"
-            width="20"
-            height="20"
-            loading="eager"
-        />
+        <x-country-flag :iso="$currentMeta['flag'] ?? 'us'" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
         <span id="staylCurrentLanguageLabel" class="font-inter uppercase notranslate">{{ strtoupper($currentLocale === '' ? ($currentMeta['code'] ?? 'en') : $currentLocale) }}</span>
         <svg class="size-3.5 shrink-0 opacity-70 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
@@ -105,15 +97,7 @@
                     data-no-ajax
                 >
                     <span class="flex min-w-0 items-center gap-2.5">
-                        <img
-                            src="https://flagcdn.com/w40/{{ $lang['flag'] }}.png"
-                            srcset="https://flagcdn.com/w80/{{ $lang['flag'] }}.png 2x"
-                            alt="{{ $lang['name'] }}"
-                            class="w-5 h-4 shrink-0 rounded-none object-cover"
-                            width="20"
-                            height="20"
-                            loading="lazy"
-                        />
+                        <x-country-flag :iso="$lang['flag'] ?? 'us'" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
                         <span class="truncate font-semibold">{{ $lang['native'] }}</span>
                     </span>
                     @if($active)

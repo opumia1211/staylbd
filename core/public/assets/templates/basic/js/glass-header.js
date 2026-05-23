@@ -429,19 +429,21 @@
         const html = document.documentElement;
         if (!themeBtn) return;
 
-        themeBtn.addEventListener('click', () => {
-            // Lock transitions globally for an instant switch
-            html.classList.add('theme-switching-fast');
-            
-            body.classList.toggle('dark-mode');
-            html.classList.toggle('dark'); // Sync with Tailwind
+        function syncThemeToggleUi() {
             const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('stayl-theme', isDark ? 'dark' : 'light');
-            
+            html.classList.toggle('dark', isDark);
             if (sunIcon) sunIcon.classList.toggle('hidden', !isDark);
             if (moonIcon) moonIcon.classList.toggle('hidden', isDark);
-            
-            // Unlock transitions immediately after render
+        }
+
+        syncThemeToggleUi();
+
+        themeBtn.addEventListener('click', () => {
+            html.classList.add('theme-switching-fast');
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('stayl-theme', isDark ? 'dark' : 'light');
+            syncThemeToggleUi();
             setTimeout(() => {
                 html.classList.remove('theme-switching-fast');
             }, 50);

@@ -324,55 +324,106 @@ body {
     color: var(--stayl-header-main-text);
 }
 
-/* Phase 5.6: Action Grid - Premium Minimalist Layout */
+/* Phase 5.6: Action Grid — single row, equal icons (6 items: orders, track, compare, wishlist, cart, account) */
 .stayl-action-grid {
-    display: grid !important;
-    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-    gap: 16px !important;
-    /* Tightened gap as requested */
-    width: fit-content;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
-    /* Perfect vertical centering in header bar */
-    justify-items: center;
-    margin: 0 auto !important;
-    height: 100%;
-    /* Take full height of parent for centering */
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    width: auto !important;
+    max-width: 100%;
+    margin: 0 !important;
+    height: auto !important;
 }
 
 .stayl-action-item {
-    display: flex !important;
-    flex-direction: column !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
     position: relative !important;
-    /* Required for absolute labels */
-    min-width: 44px;
-    /* Standardized to match search icons */
-    color: var(--stayl-header-main-text);
-    /* Dynamic color for dark mode support */
-    transition: all 0.2s ease;
-    height: 100%;
+    flex: 0 0 auto !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    padding: 0 !important;
+    color: var(--stayl-header-main-text, #334155) !important;
+    transition: color 0.2s ease, transform 0.2s ease;
+    border-radius: 10px;
 }
 
 .stayl-action-item:hover,
 .stayl-action-item:hover .action-icon {
     color: var(--header-accent-color, #0ea5e9) !important;
+    background: rgba(14, 165, 233, 0.06);
 }
 
-.stayl-action-item .action-icon {
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+.stayl-action-item .action-icon,
+.stayl-action-item > svg {
+    width: 24px !important;
+    height: 24px !important;
+    display: block !important;
+    flex-shrink: 0;
+    margin: auto;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.stayl-action-item:hover .action-icon {
-    transform: scale(1.05);
+/* Bag/truck paths are denser — slightly lighter stroke for optical match */
+.stayl-action-item .action-icon--optical {
+    stroke-width: 1.65;
 }
 
+.stayl-action-item:hover .action-icon,
+.stayl-action-item:hover > svg {
+    transform: scale(1.06);
+}
 
+.stayl-action-item .stayl-badge {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    min-width: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    padding: 0 3px !important;
+    font-size: 9px !important;
+    line-height: 16px !important;
+    border-radius: 999px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: none;
+}
 
-@media (max-width: 640px) {
+.stayl-header-side--right {
+    display: flex !important;
+    align-items: center !important;
+    align-self: stretch !important;
+    justify-content: flex-end !important;
+    flex-shrink: 0 !important;
+}
+
+@media (min-width: 1280px) {
     .stayl-action-grid {
-        gap: 16px !important;
+        gap: 10px !important;
+    }
+    .stayl-action-item {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+    .stayl-action-item .action-icon,
+    .stayl-action-item > svg {
+        width: 26px !important;
+        height: 26px !important;
     }
 }
 
@@ -384,6 +435,14 @@ body {
     z-index: 100400;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 1s ease, background 0.3s ease;
     will-change: transform;
+    display: flex;
+    align-items: center;
+}
+
+.stayl-top-bar > .stayl-wrap {
+    align-items: center !important;
+    width: 100%;
+    min-height: var(--stayl-h1);
 }
 
 .stayl-yellow-bar {
@@ -2623,23 +2682,12 @@ body.dark-mode .stayl-scan-btn {
     border-color: #334155;
 }
 
-.stayl-action-item {
-    position: relative;
-    color: var(--stayl-header-icon-color, #334155);
-    transition: color 0.3s, transform 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-
 body.dark-mode .stayl-action-item {
-    --stayl-header-icon-color: #f1f5f9;
+    color: var(--stayl-header-icon-color, #f1f5f9) !important;
 }
 
-.stayl-action-item:hover {
-    color: var(--stayl-color-primary, #0ea5e9);
-    transform: translateY(-2px);
+body.dark-mode .stayl-action-item:hover {
+    background: rgba(56, 189, 248, 0.1);
 }
 
 .stayl-voice-status-indicator {

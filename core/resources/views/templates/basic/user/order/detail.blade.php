@@ -132,25 +132,52 @@
                     @forelse($order->orderDetail as $detail)
                         <tr>
                             <td>
-                                <a href="{{ product_detail_url($detail->product) }}" class="text--base">
-                                    {{ __(strLimit(@$detail->product->name, 15)) }}
-                                </a>
-
-                                @if ($order->order_status == Status::ORDER_DELIVERED)
-                                    @if ($detail->product->file)
-                                        (<span>
-                                            <a href="{{ route('download', [$detail->product->id, $detail->product->file]) }}" class="mr-3 text--primary">
-                                                @include($activeTemplate . 'partials.icon', ['name' => 'download']) @lang('Download File')
-                                            </a>
-                                        </span>)
-                                    @elseif ($detail->product->link)
-                                        (<span>
-                                            <a href="{{ $detail->product->link }}" target="_blank" class="mr-3 text--primary">
-                                                @include($activeTemplate . 'partials.icon', ['name' => 'external-link-alt']) @lang('Visit URL')
-                                            </a>
-                                        </span>)
+                                <div class="d-flex align-items-center gap-2">
+                                    @if(@$detail->product->image)
+                                    <div class="flex-shrink-0">
+                                        <img src="{{ getImage(getFilePath('product') . '/' . @$detail->product->image, getFileSize('product')) }}" alt="{{ __(@$detail->product->name) }}" class="rounded border object-fit-cover bg-light" style="width: 48px; height: 48px;">
+                                    </div>
                                     @endif
-                                @endif
+                                    <div class="flex-grow-1 min-w-0">
+                                        <a href="{{ product_detail_url($detail->product) }}" class="text--base fw-medium text-decoration-none d-block">
+                                            {{ __(@$detail->product->name) }}
+                                        </a>
+                                        
+                                        @if(!empty($detail->variant_details))
+                                            @php
+                                                $vd = is_string($detail->variant_details) ? json_decode($detail->variant_details, true) : $detail->variant_details;
+                                                $vdParts = is_array($vd) ? array_filter(array_map(function($v) { return is_string($v) ? $v : (is_numeric($v) ? (string)$v : null); }, array_values($vd))) : [];
+                                            @endphp
+                                            @if(!empty($vdParts))
+                                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">{{ implode(' · ', $vdParts) }}</div>
+                                            @endif
+                                        @endif
+                                        
+                                        @if(@$detail->product && in_array(@$detail->product->product_type, ['digital', 'service']))
+                                            <div class="mt-1">
+                                                <span class="badge bg-indigo-100 text-indigo-700 border border-indigo-200 px-1 py-0" style="font-size: 0.65rem;">
+                                                    <i class="las la-download"></i> {{ ucfirst(@$detail->product->product_type) }}
+                                                </span>
+                                            </div>
+                                        @endif
+
+                                        @if ($order->order_status == Status::ORDER_DELIVERED || $order->payment_status == Status::ORDER_PAYMENT_SUCCESS)
+                                            @if (@$detail->product->file)
+                                                <div class="mt-2">
+                                                    <a href="{{ route('download', [$detail->product->id, $detail->product->file]) }}" class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size: 0.75rem;">
+                                                        @include($activeTemplate . 'partials.icon', ['name' => 'download']) @lang('Download File')
+                                                    </a>
+                                                </div>
+                                            @elseif (@$detail->product->link)
+                                                <div class="mt-2">
+                                                    <a href="{{ $detail->product->link }}" target="_blank" class="btn btn-sm btn-outline-info py-1 px-2" style="font-size: 0.75rem;">
+                                                        @include($activeTemplate . 'partials.icon', ['name' => 'external-link-alt']) @lang('Visit URL')
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <strong>{{ $detail->quantity }}</strong>

@@ -285,6 +285,7 @@
           wrap.insertAdjacentHTML("beforeend", data.html);
           section.dataset.loadMoreOffset = offset + (data.count || 0);
           if (typeof window.refreshStaylLucide === "function") window.refreshStaylLucide(wrap);
+          if (typeof window.staylInitProductLineAutoScroll === "function") window.staylInitProductLineAutoScroll();
         }
         if (!data.count || data.count < 8) {
           sentinel.style.display = "none";
@@ -319,118 +320,7 @@
     });
   }
 
-  // Category + product rows: every data-interval-sec, smooth-scroll one card width (right→left); at end smooth back to start; no visible scrollbar
-  function initHomeHorizontalAutoScroll() {
-    var rows = [
-      { sel: ".product-line-flex-row[data-auto-scroll=\"1\"]", card: ".product-card-col" },
-      { sel: ".home-category-section__grid[data-auto-scroll=\"1\"]", card: ".home-category-section__card" }
-    ];
-
-    function gapPx(el) {
-      var st = getComputedStyle(el);
-      var g = st.gap || st.columnGap;
-      if (!g || g === "normal") return 0;
-      var n = parseFloat(g, 10);
-      return isNaN(n) ? 0 : n;
-    }
-
-    function stepForGrid(grid, cardSel) {
-      var first = grid.querySelector(cardSel);
-      if (!first) return 0;
-      return first.getBoundingClientRect().width + gapPx(grid);
-    }
-
-    rows.forEach(function(cfg) {
-      document.querySelectorAll(cfg.sel).forEach(function(grid) {
-        if (grid.dataset.staylAutoBound === "1") {
-          if (grid._staylScrollTimer) clearInterval(grid._staylScrollTimer);
-          grid._staylScrollTimer = null;
-        }
-
-        var cards = grid.querySelectorAll(cfg.card);
-        if (cards.length < 2) return;
-
-        var sec = parseFloat(grid.getAttribute("data-interval-sec"), 10);
-        if (!sec || sec < 2) sec = 4;
-        if (sec > 30) sec = 30;
-        var intervalMs = Math.round(sec * 1000);
-
-        var paused = false;
-
-        function maxScroll() {
-          return grid.scrollWidth - grid.clientWidth;
-        }
-
-        function tick() {
-          if (paused) return;
-          var mx = maxScroll();
-          if (mx <= 4) return;
-          var step = stepForGrid(grid, cfg.card);
-          if (step < 48) step = Math.min(200, mx);
-          
-          // Current position
-          var cur = grid.scrollLeft;
-          
-          if (cur >= mx - 10) {
-            // Reached the end: scroll back to start smoothly
-            grid.scrollTo({ left: 0, behavior: "smooth" });
-          } else {
-            // Scroll to next step
-            var target = Math.min(cur + step, mx);
-            grid.scrollTo({ left: target, behavior: "smooth" });
-          }
-        }
-
-        function start() {
-          paused = false;
-        }
-
-        function stop() {
-          paused = true;
-        }
-
-        grid.addEventListener("mouseenter", stop);
-        grid.addEventListener("mouseleave", start);
-        grid.addEventListener("touchstart", stop, { passive: true });
-        grid.addEventListener("touchend", function() {
-          window.setTimeout(start, 2500);
-        }, { passive: true });
-
-        grid._staylScrollTimer = setInterval(tick, intervalMs);
-        grid.dataset.staylAutoBound = "1";
-      });
-    });
-  }
-
-  function runHomeAutoScrollWhenReady() {
-    if (document.readyState === "complete") {
-      requestAnimationFrame(function() {
-        requestAnimationFrame(initHomeHorizontalAutoScroll);
-      });
-    } else {
-      window.addEventListener("load", function() {
-        requestAnimationFrame(function() {
-          requestAnimationFrame(initHomeHorizontalAutoScroll);
-        });
-      });
-    }
-  }
-  runHomeAutoScrollWhenReady();
-
-  var _staylResizeT;
-  window.addEventListener("resize", function() {
-    window.clearTimeout(_staylResizeT);
-    _staylResizeT = window.setTimeout(function() {
-      document.querySelectorAll(".product-line-flex-row[data-auto-scroll=\"1\"]").forEach(function(el) {
-        if (el._staylScrollTimer) {
-          clearInterval(el._staylScrollTimer);
-          el._staylScrollTimer = null;
-        }
-        delete el.dataset.staylAutoBound;
-      });
-      initHomeHorizontalAutoScroll();
-    }, 350);
-  });
+  /* Product-line auto-scroll: global product-line-autoscroll.js (app layout) */
   } catch (e) {
     console.error('home storefront script failed', e);
   }

@@ -88,7 +88,7 @@
             }, true);
         })();
     </script>
-    <script src="{{ url('serve-js/auth') }}?v={{ $assetVersion ?? time() }}" defer></script>
+    <script src="{{ route('serve.js', 'auth') }}?v={{ $assetVersion ?? time() }}" defer></script>
     @stack('script')
 </body>
 </html>

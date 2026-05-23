@@ -27,7 +27,11 @@ class CartController extends Controller
             return response()->json(['error' => $validator->errors()->first()]);
         }
 
-        $product = Product::where('id', $request->product_id)->active()->first();
+        if ($request->boolean('replace')) {
+            $this->emptyCartStorage(auth()->id());
+        }
+
+        $product = Product::available()->where('id', $request->product_id)->first();
 
         if (!$product) {
             return response()->json(['error' => __('Product not found or something went wrong')]);
@@ -178,83 +182,154 @@ class CartController extends Controller
     }
 
     /**
-     * Order Now / Buy Now – কার্টে যোগ করে চেকআউটে রিডাইরেক্ট (JS ছাড়াই কাজ করে)
-     * Products with variants: redirect to product detail to select size.
+     * Order Now / Buy Now – replaces cart with this line item, then redirects to checkout.
+     * Accepts quantity, variant_id, size, custom_size (GET query).
      */
-    public function buyNow($id)
+    public function buyNow(Request $request, ?string $locale, $id)
     {
-        $product = Product::where('id', (int) $id)->active()->first();
+        $product = Product::available()->where('id', (int) $id)->first();
         if (!$product) {
             return redirect()->route('products')->with('error', __('Product not found.'));
         }
-        if ($product->has_variants) {
-            return redirect()->to(product_detail_url($product), 302);
+
+        $quantity = max(1, (int) $request->input('quantity', 1));
+        $ctx = $this->resolveCartLineContext($request, $product, true);
+        if (!empty($ctx['error'])) {
+            return redirect()->back()->with('error', $ctx['error']);
         }
-        $quantity  = 1;
-        $variantId = null;
-        $variantDetails = null;
-        $price = $product->price;
-        $discount = $product->discount ?? 0;
-        $discountType = $product->discount_type ?? 1;
-        $maxQty = $product->quantity;
+
+        $maxQty = (int) $ctx['max_qty'];
+        if ($maxQty > 0 && $quantity > $maxQty) {
+            return redirect()->back()->with('error', __('Requested quantity is not available in our stock'));
+        }
+        $qtyToAdd = $maxQty > 0 ? min($quantity, $maxQty) : $quantity;
+
+        $variantId = $ctx['variant_id'];
+        $variantDetails = $ctx['variant_details'];
+        $price = $ctx['price'];
+        $discount = $ctx['discount'];
+        $discountType = $ctx['discount_type'];
+
         $userId = auth()->id();
         $general = gs();
 
-        if ($quantity > $maxQty) {
-            return redirect()->back()->with('error', __('Requested quantity is not available in our stock'));
-        }
+        $this->emptyCartStorage($userId);
 
         if ($userId) {
-            $cart = Cart::where('user_id', $userId)->where('product_id', $product->id)->whereNull('variant_id')->whereNull('variant_details')->first();
-            if ($cart) {
-                if ($cart->quantity >= $maxQty) {
-                    return redirect()->back()->with('error', __('Requested quantity is not available in our stock'));
-                }
-                $cart->quantity += $quantity;
-            } else {
-                if (Cart::where('user_id', $userId)->count() >= Cart::CART_MAX) {
-                    return redirect()->back()->with('error', __('Maximum :max items allowed in cart. Remove some to add more.', ['max' => Cart::CART_MAX]));
-                }
-                $cart = new Cart();
-                $cart->user_id = $userId;
-                $cart->product_id = $product->id;
-                $cart->variant_id = null;
-                $cart->variant_details = null;
-                $cart->quantity = $quantity;
-            }
+            $cart = new Cart();
+            $cart->user_id = $userId;
+            $cart->product_id = $product->id;
+            $cart->variant_id = $variantId;
+            $cart->variant_details = $variantDetails;
+            $cart->quantity = $qtyToAdd;
             $cart->save();
         } else {
-            $cartKey = $product->id . '_';
-            $cart = session()->get('cart', []);
-            if (isset($cart[$cartKey])) {
-                if ($cart[$cartKey]['quantity'] >= $maxQty) {
-                    return redirect()->back()->with('error', __('Requested quantity is not available in our stock'));
-                }
-                $cart[$cartKey]['quantity'] += $quantity;
-            } else {
-                if (count($cart) >= Cart::CART_MAX) {
-                    return redirect()->back()->with('error', __('Maximum :max items allowed in cart. Remove some to add more.', ['max' => Cart::CART_MAX]));
-                }
-                $cart[$cartKey] = [
+            $cartKey = $variantId
+                ? $product->id . '_' . $variantId . '_' . ($variantDetails ?? '')
+                : $product->id . '_' . ($variantDetails ?? '');
+            $cart = [
+                $cartKey => [
                     'name' => $product->name,
                     'price' => $price,
                     'discount' => ($product->today_deals == Status::YES) ? $general->discount : $discount,
                     'discount_type' => ($product->today_deals == Status::YES) ? $general->discount_type : $discountType,
                     'image' => $product->image,
                     'product_id' => $product->id,
-                    'variant_id' => null,
-                    'variant_details' => null,
-                    'quantity' => $quantity,
-                ];
-            }
+                    'variant_id' => $variantId,
+                    'variant_details' => $variantDetails,
+                    'quantity' => $qtyToAdd,
+                ],
+            ];
             session()->put('cart', $cart);
         }
+
+        activity_log(\App\Models\UserActivityLog::CART_ADD, 'Buy now: ' . $product->name, 'product', $product->id);
 
         if ($userId) {
             return redirect()->route('user.checkout.index');
         }
 
         return redirect()->route('user.guest.order');
+    }
+
+    private function emptyCartStorage(?int $userId): void
+    {
+        if ($userId) {
+            Cart::where('user_id', $userId)->delete();
+        } else {
+            session()->forget('cart');
+        }
+    }
+
+    /**
+     * Resolve variant, price, and stock for cart / buy-now lines.
+     *
+     * @return array{error?: string, variant_id: ?int, variant_details: ?string, max_qty: int, price: mixed, discount: mixed, discount_type: mixed}
+     */
+    private function resolveCartLineContext(Request $request, Product $product, bool $requireVariantWhenListed = false): array
+    {
+        $variantId = $request->variant_id ? (int) $request->variant_id : null;
+        $variantDetails = null;
+        $maxQty = (int) $product->quantity;
+        $price = $product->price;
+        $discount = $product->discount ?? 0;
+        $discountType = $product->discount_type ?? 1;
+
+        if ($product->has_variants) {
+            $hasListedVariants = $product->activeVariants()->exists();
+            if ($requireVariantWhenListed && $hasListedVariants && !$variantId) {
+                return ['error' => __('Please select a size or variant.')];
+            }
+
+            if ($variantId) {
+                $variant = ProductVariant::where('product_id', $product->id)->where('id', $variantId)->where('status', 1)->first();
+                if (!$variant) {
+                    return ['error' => __('Selected option is not available.')];
+                }
+                $maxQty = (int) $variant->quantity;
+                $attrs = $variant->attributes ?? [];
+                $sizeKey = is_array($attrs) ? ($attrs['size'] ?? null) : null;
+                if ($sizeKey === 'NO') {
+                    $customSize = $request->filled('custom_size') ? trim($request->custom_size) : '';
+                    if ($customSize === '') {
+                        return ['error' => __('Please enter your custom size.')];
+                    }
+                    $variantDetails = json_encode(['size' => 'NO', 'custom_size' => $customSize]);
+                } else {
+                    $variantDetails = $variant->attributes ? json_encode($variant->attributes) : null;
+                }
+                $price = $variant->price;
+                $discount = $variant->discount ?? 0;
+                $discountType = $variant->discount_type ?? 1;
+            } else {
+                $variantId = null;
+                if ($request->filled('custom_size')) {
+                    $variantDetails = json_encode(['size' => 'NO', 'custom_size' => trim($request->custom_size)]);
+                } elseif ($request->filled('size')) {
+                    $variantDetails = json_encode(['size' => trim($request->size)]);
+                } else {
+                    $variantDetails = json_encode(['size' => 'NO_SIZE']);
+                }
+                $maxQty = (int) $product->quantity;
+            }
+        } else {
+            $size = $request->filled('size') ? trim($request->size) : null;
+            $customSize = $request->filled('custom_size') ? trim($request->custom_size) : null;
+            if ($size === 'NO' && $customSize !== null) {
+                $variantDetails = json_encode(['size' => 'NO', 'custom_size' => $customSize]);
+            } elseif ($size) {
+                $variantDetails = json_encode(['size' => $size]);
+            }
+        }
+
+        return [
+            'variant_id' => $variantId,
+            'variant_details' => $variantDetails,
+            'max_qty' => $maxQty,
+            'price' => $price,
+            'discount' => $discount,
+            'discount_type' => $discountType,
+        ];
     }
 
     /**

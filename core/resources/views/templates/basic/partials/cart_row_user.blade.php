@@ -61,6 +61,12 @@
         <span class="d-block small text-muted mt-0 cart-row-user__variant" style="font-size:0.65rem;">{{ implode(' · ', $vdParts) }}</span>
         @endif
         @endif
+        @if(in_array($product->product_type, ['digital', 'service']))
+            <span class="d-inline-block small text-primary mt-1" style="font-size:0.65rem;"><i class="las la-download"></i> {{ ucfirst($product->product_type) }}</span>
+        @endif
+        @if($product->shipping_weight > 0)
+            <span class="d-inline-block small text-muted mt-1 {{ in_array($product->product_type, ['digital', 'service']) ? 'ms-1' : '' }}" style="font-size:0.65rem;"><i class="las la-weight"></i> {{ $product->shipping_weight }} kg</span>
+        @endif
     </td>
     <td class="cart-row-user__sku align-middle small text-muted">{{ $sku }}</td>
     <td class="cart-row-user__category align-middle small">{{ __($categoryName) }}</td>

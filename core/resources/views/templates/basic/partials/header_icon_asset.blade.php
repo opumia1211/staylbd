@@ -3,6 +3,7 @@
     $fallback = $fallback ?? 'circle';
     $w = (int) ($width ?? 22);
     $h = (int) ($height ?? $w);
+    $useCompareSvg = ($iconKey === 'compare_icon');
     $lucide = header_icon_lucide_name($iconKey, $fallback);
     $icon3d = filter_var($icon3d ?? false, FILTER_VALIDATE_BOOLEAN);
     $icon3dSm = filter_var($icon3dSm ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -12,6 +13,9 @@
     $wrapClass = trim(($class ?? '').' '.($svgClass ?? ''));
     $alt = $alt ?? '';
 @endphp
+@if($useCompareSvg)
+    @include($activeTemplate . 'partials.icons.compare', ['size' => $w, 'class' => trim('stayl-storefront-icon '.$wrapClass)])
+@else
 <span
     class="stayl-lucide-wrap {{ $icon3d ? 'icon-3d icon-3d--'.$variant.($icon3dSm ? ' icon-3d--sm' : '') : 'stayl-lucide-wrap--flat' }}{{ $wrapClass !== '' ? ' '.$wrapClass : '' }}"
     style="--stayl-lucide-size: {{ $w }}px;{{ $h !== $w ? ' --stayl-lucide-size-y: '.$h.'px;' : '' }}"
@@ -19,3 +23,4 @@
 >
     <i data-lucide="{{ $lucide }}" class="stayl-lucide-glyph" aria-hidden="true"></i>
 </span>
+@endif

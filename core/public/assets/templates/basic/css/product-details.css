@@ -867,8 +867,8 @@ body.pro-lightbox-open {
     overflow: hidden !important;
     flex: 0 0 auto !important;
     flex-shrink: 0 !important;
-    height: clamp(28px, 5.8vw, 34px) !important;
-    align-self: center !important;
+    height: 42px !important;
+    align-self: stretch !important;
     box-sizing: border-box !important;
     background: #fff !important;
     backdrop-filter: none !important;
@@ -955,8 +955,8 @@ body.pro-lightbox-open {
     min-width: 0 !important;
     width: auto !important;
     max-width: 100% !important;
-    height: clamp(28px, 5.8vw, 34px) !important;
-    min-height: clamp(28px, 5.8vw, 34px) !important;
+    height: 42px !important;
+    min-height: 42px !important;
     padding: 0 clamp(3px, 0.9vw, 9px) !important;
     margin: 0 1px !important;
     font-size: clamp(7.5px, 1.5vw, 10.5px) !important;
@@ -996,7 +996,7 @@ body.pro-lightbox-open {
 }
 /* Default: green glass + white text (cart & wishlist); frost white (compare). Red only with .in-cart / .in-compare / .added */
 .pro-detail-page .pdp-cart-action-row .action-buttons > .cart-btn {
-    flex: 1.22 1 0% !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
     font-weight: 700 !important;
     background: linear-gradient(155deg, rgba(16, 185, 129, 0.88), rgba(5, 150, 105, 0.92)) !important;
@@ -1011,7 +1011,7 @@ body.pro-lightbox-open {
     text-shadow: none !important;
 }
 .pro-detail-page .pdp-cart-action-row .action-buttons > .compare-btn {
-    flex: 0.92 1 0% !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
     background: #fff !important;
     color: #0f172a !important;
@@ -1019,7 +1019,7 @@ body.pro-lightbox-open {
     text-shadow: none !important;
 }
 .pro-detail-page .pdp-cart-action-row .action-buttons > .wishlist-btn {
-    flex: 0.92 1 0% !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
     background: linear-gradient(155deg, rgba(16, 185, 129, 0.85), rgba(4, 120, 87, 0.9)) !important;
     color: #fff !important;
@@ -1040,7 +1040,7 @@ body.pro-lightbox-open {
     text-shadow: none !important;
 }
 .pro-detail-page .pdp-cart-action-row .action-buttons > .chat-btn {
-    flex: 0.78 1 0% !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
     background: #fff !important;
     color: #0f172a !important;
@@ -1184,12 +1184,30 @@ body.pro-lightbox-open {
     width: 100%;
 }
 .pro-detail-buy-now-wrap .cmn--btn.buy-now:hover,
-.pro-detail-buy-now-wrap .cmn--btn.buy-now:focus-visible,
-.pro-detail-quick-order-wrap .cmn--btn:hover,
-.pro-detail-quick-order-wrap .cmn--btn:focus-visible {
+.pro-detail-buy-now-wrap .cmn--btn.buy-now:focus-visible {
     transform: translateY(-2px);
-    filter: brightness(1.06);
+    color: #fff !important;
+    background: var(--product-buy-now-hover, #0c8a7d) !important;
+    border-color: var(--product-buy-now-hover, #0c8a7d) !important;
+    text-decoration: none !important;
     box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
+}
+.pro-detail-quick-order-wrap .cmn--btn.quick-order-from-pdp:hover,
+.pro-detail-quick-order-wrap .cmn--btn.quick-order-from-pdp:focus-visible {
+    transform: translateY(-2px);
+    color: #fff !important;
+    background: var(--product-buy-now-color, #0e9f90) !important;
+    border-color: var(--product-buy-now-color, #0e9f90) !important;
+    text-decoration: none !important;
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.28);
+}
+.pro-detail-page .pdp-cart-action-row .action-buttons > .compare-btn:not(.in-compare):hover,
+.pro-detail-page .pdp-cart-action-row .action-buttons > .compare-btn:not(.in-compare):focus-visible,
+.pro-detail-page .pdp-cart-action-row .action-buttons > .chat-btn:not(.pdp-chat-active):hover,
+.pro-detail-page .pdp-cart-action-row .action-buttons > .chat-btn:not(.pdp-chat-active):focus-visible {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-color: rgba(59, 130, 246, 0.55) !important;
 }
 .pro-detail-buy-now-wrap .cmn--btn.buy-now:active,
 .pro-detail-quick-order-wrap .cmn--btn:active {

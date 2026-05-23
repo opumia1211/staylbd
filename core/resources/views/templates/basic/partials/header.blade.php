@@ -133,39 +133,41 @@
     $languageButtonLabel = $currentLangFlag . ' ' . (($headerTopCfg['language_mode'] ?? 'code') === 'name' ? __($currentLangName) : __($currentLangCode));
 
     $headerCurrencies = [
-        ['code' => 'USD', 'symbol' => '$', 'country' => 'United States', 'flag' => 'https://flagcdn.com/w20/us.png'],
-        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Italy', 'flag' => 'https://flagcdn.com/w20/it.png'],
-        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Netherlands', 'flag' => 'https://flagcdn.com/w20/nl.png'],
-        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Spain', 'flag' => 'https://flagcdn.com/w20/es.png'],
-        ['code' => 'GBP', 'symbol' => '£', 'country' => 'United Kingdom', 'flag' => 'https://flagcdn.com/w20/gb.png'],
-        ['code' => 'BDT', 'symbol' => '৳', 'country' => 'Bangladesh', 'flag' => 'https://flagcdn.com/w20/bd.png'],
-        ['code' => 'INR', 'symbol' => '₹', 'country' => 'India', 'flag' => 'https://flagcdn.com/w20/in.png'],
-        ['code' => 'SAR', 'symbol' => 'SR', 'country' => 'Saudi Arabia', 'flag' => 'https://flagcdn.com/w20/sa.png'],
-        ['code' => 'AED', 'symbol' => 'د.إ', 'country' => 'UAE', 'flag' => 'https://flagcdn.com/w20/ae.png'],
-        ['code' => 'MYR', 'symbol' => 'RM', 'country' => 'Malaysia', 'flag' => 'https://flagcdn.com/w20/my.png'],
-        // South Asia
-        ['code' => 'PKR', 'symbol' => '₨', 'country' => 'Pakistan', 'flag' => 'https://flagcdn.com/w20/pk.png'],
-        ['code' => 'LKR', 'symbol' => 'Rs', 'country' => 'Sri Lanka', 'flag' => 'https://flagcdn.com/w20/lk.png'],
-        ['code' => 'NPR', 'symbol' => 'रु', 'country' => 'Nepal', 'flag' => 'https://flagcdn.com/w20/np.png'],
-        ['code' => 'BTN', 'symbol' => 'Nu.', 'country' => 'Bhutan', 'flag' => 'https://flagcdn.com/w20/bt.png'],
-        ['code' => 'MVR', 'symbol' => 'Rf', 'country' => 'Maldives', 'flag' => 'https://flagcdn.com/w20/mv.png'],
-        ['code' => 'AFN', 'symbol' => '؋', 'country' => 'Afghanistan', 'flag' => 'https://flagcdn.com/w20/af.png'],
-        // Popular / Others
-        ['code' => 'RUB', 'symbol' => '₽', 'country' => 'Russia', 'flag' => 'https://flagcdn.com/w20/ru.png'],
-        ['code' => 'CNY', 'symbol' => '¥', 'country' => 'China', 'flag' => 'https://flagcdn.com/w20/cn.png'],
-        ['code' => 'JPY', 'symbol' => '¥', 'country' => 'Japan', 'flag' => 'https://flagcdn.com/w20/jp.png'],
-        ['code' => 'KRW', 'symbol' => '₩', 'country' => 'South Korea', 'flag' => 'https://flagcdn.com/w20/kr.png'],
-        ['code' => 'AUD', 'symbol' => '$', 'country' => 'Australia', 'flag' => 'https://flagcdn.com/w20/au.png'],
-        ['code' => 'CAD', 'symbol' => '$', 'country' => 'Canada', 'flag' => 'https://flagcdn.com/w20/ca.png'],
-        ['code' => 'SGD', 'symbol' => '$', 'country' => 'Singapore', 'flag' => 'https://flagcdn.com/w20/sg.png'],
-        ['code' => 'BRL', 'symbol' => 'R$', 'country' => 'Brazil', 'flag' => 'https://flagcdn.com/w20/br.png'],
-        ['code' => 'ZAR', 'symbol' => 'R', 'country' => 'South Africa', 'flag' => 'https://flagcdn.com/w20/za.png'],
-        ['code' => 'TRY', 'symbol' => '₺', 'country' => 'Turkey', 'flag' => 'https://flagcdn.com/w20/tr.png'],
-        ['code' => 'QAR', 'symbol' => 'ر.ق', 'country' => 'Qatar', 'flag' => 'https://flagcdn.com/w20/qa.png'],
-        ['code' => 'KWD', 'symbol' => 'د.ক', 'country' => 'Kuwait', 'flag' => 'https://flagcdn.com/w20/kw.png'],
-        ['code' => 'UAH', 'symbol' => '₴', 'country' => 'Ukraine', 'flag' => 'https://flagcdn.com/w20/ua.png'],
+        ['code' => 'USD', 'symbol' => '$', 'country' => 'United States', 'flag_iso' => 'us'],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Italy', 'flag_iso' => 'it'],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Netherlands', 'flag_iso' => 'nl'],
+        ['code' => 'EUR', 'symbol' => '€', 'country' => 'Spain', 'flag_iso' => 'es'],
+        ['code' => 'GBP', 'symbol' => '£', 'country' => 'United Kingdom', 'flag_iso' => 'gb'],
+        ['code' => 'BDT', 'symbol' => '৳', 'country' => 'Bangladesh', 'flag_iso' => 'bd'],
+        ['code' => 'INR', 'symbol' => '₹', 'country' => 'India', 'flag_iso' => 'in'],
+        ['code' => 'SAR', 'symbol' => 'SR', 'country' => 'Saudi Arabia', 'flag_iso' => 'sa'],
+        ['code' => 'AED', 'symbol' => 'د.إ', 'country' => 'UAE', 'flag_iso' => 'ae'],
+        ['code' => 'MYR', 'symbol' => 'RM', 'country' => 'Malaysia', 'flag_iso' => 'my'],
+        ['code' => 'PKR', 'symbol' => '₨', 'country' => 'Pakistan', 'flag_iso' => 'pk'],
+        ['code' => 'LKR', 'symbol' => 'Rs', 'country' => 'Sri Lanka', 'flag_iso' => 'lk'],
+        ['code' => 'NPR', 'symbol' => 'रु', 'country' => 'Nepal', 'flag_iso' => 'np'],
+        ['code' => 'BTN', 'symbol' => 'Nu.', 'country' => 'Bhutan', 'flag_iso' => 'bt'],
+        ['code' => 'MVR', 'symbol' => 'Rf', 'country' => 'Maldives', 'flag_iso' => 'mv'],
+        ['code' => 'AFN', 'symbol' => '؋', 'country' => 'Afghanistan', 'flag_iso' => 'af'],
+        ['code' => 'RUB', 'symbol' => '₽', 'country' => 'Russia', 'flag_iso' => 'ru'],
+        ['code' => 'CNY', 'symbol' => '¥', 'country' => 'China', 'flag_iso' => 'cn'],
+        ['code' => 'JPY', 'symbol' => '¥', 'country' => 'Japan', 'flag_iso' => 'jp'],
+        ['code' => 'KRW', 'symbol' => '₩', 'country' => 'South Korea', 'flag_iso' => 'kr'],
+        ['code' => 'AUD', 'symbol' => '$', 'country' => 'Australia', 'flag_iso' => 'au'],
+        ['code' => 'CAD', 'symbol' => '$', 'country' => 'Canada', 'flag_iso' => 'ca'],
+        ['code' => 'SGD', 'symbol' => '$', 'country' => 'Singapore', 'flag_iso' => 'sg'],
+        ['code' => 'BRL', 'symbol' => 'R$', 'country' => 'Brazil', 'flag_iso' => 'br'],
+        ['code' => 'ZAR', 'symbol' => 'R', 'country' => 'South Africa', 'flag_iso' => 'za'],
+        ['code' => 'TRY', 'symbol' => '₺', 'country' => 'Turkey', 'flag_iso' => 'tr'],
+        ['code' => 'QAR', 'symbol' => 'ر.ق', 'country' => 'Qatar', 'flag_iso' => 'qa'],
+        ['code' => 'KWD', 'symbol' => 'د.ক', 'country' => 'Kuwait', 'flag_iso' => 'kw'],
+        ['code' => 'UAH', 'symbol' => '₴', 'country' => 'Ukraine', 'flag_iso' => 'ua'],
     ];
+    $headerCurrenciesJson = array_map(static function (array $row): array {
+        $row['flag'] = country_flag_url($row['flag_iso'] ?? '');
 
+        return $row;
+    }, $headerCurrencies);
     $currentCurrencyCode = strtoupper((string) (session('stayl_display_currency_code') ?: request()->cookie('stayl_display_currency_code') ?: $general->cur_text ?: 'BDT'));
 
     // Keep header hotline in sync with Footer > Company Info fields.
@@ -201,7 +203,6 @@
     $currentLocale = app()->getLocale();
     $isBN = $currentLocale === 'bn';
 
-    // Flag mapping for flagcdn.com
     $isoFlagMap = [
         'en' => 'us', 'bn' => 'bd', 'hi' => 'in', 'ar' => 'sa', 'ur' => 'pk',
         'ru' => 'ru', 'zh' => 'cn', 'es' => 'es', 'fr' => 'fr', 'de' => 'de',
@@ -322,7 +323,7 @@
                              onmouseenter="const m=document.getElementById('langMenu'); if(m) m.classList.remove('hidden')" 
                              onmouseleave="const m=document.getElementById('langMenu'); if(m) m.classList.add('hidden')">
                             <button id="langBtn" class="flex items-center gap-2 px-3 py-1.5 bg-transparent rounded-md text-white border-0 transition-colors hover:text-sky-400 text-sm font-semibold shadow-none outline-none focus:ring-0">
-                                <img src="https://flagcdn.com/w20/{{ $currentLangFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
+                                <x-country-flag :iso="$currentLangFlagCode" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
                                 <span class="uppercase">{{ $currentLangCode }}</span>
                                 <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -344,7 +345,7 @@
                                                 if (request()->getQueryString()) $targetUrl .= '?' . request()->getQueryString();
                                             @endphp
                                             <a href="{{ $targetUrl }}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-lang-option="{{ $lCode }}">
-                                                <img src="https://flagcdn.com/w20/{{ $lFlagCode }}.png" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
+                                                <x-country-flag :iso="$lFlagCode" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
                                                 <span>{{ $lang->name }}</span>
                                                 @if(strtolower($currentLangCode) === $lCode)
                                                     <svg class="ms-auto size-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -366,8 +367,8 @@
                                 @php
                                     $currData = collect($headerCurrencies)->first(fn($c) => strtoupper($c['code']) === strtoupper($currentCurrencyCode));
                                 @endphp
-                                @if($currData && !empty($currData['flag']))
-                                    <img src="{{ $currData['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
+                                @if($currData && !empty($currData['flag_iso']))
+                                    <x-country-flag :iso="$currData['flag_iso']" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
                                 @endif
                                 <span>{{ $currentCurrencyCode }}</span>
                                 <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -384,8 +385,8 @@
                                                 $isActive = strtoupper($currentCurrencyCode) === $cCode;
                                             @endphp
                                             <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-currency-option="{{ $cCode }}">
-                                                @if(!empty($curr['flag']))
-                                                    <img src="{{ $curr['flag'] }}" class="w-5 h-4 shrink-0 rounded-none object-cover" loading="lazy">
+                                                @if(!empty($curr['flag_iso']))
+                                                    <x-country-flag :iso="$curr['flag_iso']" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
                                                 @endif
                                                 <span>{{ $cCode }}</span>
                                                 @if($isActive)
@@ -556,7 +557,7 @@
     {{-- Row 1: The Main Action Bar --}}
     @if($isMainVisible)
         <div class="stayl-top-bar stayl-dynamic-order" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_main'] ?? 2 }};">
-            <div class="stayl-wrap flex items-center justify-between gap-4 py-2 lg:py-3">
+            <div class="stayl-wrap flex items-center justify-between gap-4">
                 {{-- Logo (Left) --}}
                 <div class="stayl-header-side stayl-header-side--left">
                     <a href="{{ route('home') }}" class="block">
@@ -702,8 +703,8 @@
                 <div class="stayl-header-side stayl-header-side--right">
                     <div class="stayl-action-grid">
                         {{-- Orders Icon --}}
-                        <a href="{{ route('user.order.index') }}" class="stayl-action-item group relative" title="{{ __('Orders') }}" data-dashboard-nav="1">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                        <a href="{{ route('user.order.index') }}" class="stayl-action-item group relative" title="{{ __('Orders') }}" data-dashboard-nav="1" aria-label="{{ __('Orders') }}">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="action-icon action-icon--optical" aria-hidden="true">
                                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
                                 <path d="M3 6h18"></path>
                                 <path d="M16 10a4 4 0 0 1-8 0"></path>
@@ -711,8 +712,8 @@
                         </a>
 
                         {{-- Track Order --}}
-                        <a href="{{ route('user.track.order') }}" class="stayl-action-item group relative" title="{{ __('Track Order') }}">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                        <a href="{{ route('user.track.order') }}" class="stayl-action-item group relative" title="{{ __('Track Order') }}" aria-label="{{ __('Track Order') }}">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="action-icon action-icon--optical" aria-hidden="true">
                                 <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
                                 <path d="M15 18H9"></path>
                                 <path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10Z"></path>
@@ -721,40 +722,36 @@
                             </svg>
                         </a>
 
+                        {{-- Compare --}}
+                        <a href="{{ route('user.compare') }}" id="header-compare" class="stayl-action-item stayl-header-icon-compare group relative" title="{{ __('Compare') }}" data-dashboard-nav="1" aria-label="{{ __('Compare') }}">
+                            @include($activeTemplate . 'partials.icons.compare', ['class' => 'action-icon'])
+                            <span class="stayl-badge show-compare-count bg-violet-600 text-white font-bold shadow-sm ring-2 ring-white dark:ring-slate-900">0</span>
+                        </a>
+
                         {{-- Wishlist --}}
-                        <a href="{{ route('user.wishlist') }}" class="stayl-action-item group relative" title="{{ __('Wishlist') }}" data-dashboard-nav="1">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                        <a href="{{ route('user.wishlist') }}" id="header-wishlist" class="stayl-action-item stayl-header-icon-wishlist group relative" title="{{ __('Wishlist') }}" data-dashboard-nav="1" aria-label="{{ __('Wishlist') }}">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="action-icon" aria-hidden="true">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                             </svg>
-                            <span class="stayl-badge show-wishlist-count absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold shadow-sm ring-2 ring-white dark:ring-slate-900 transition-all group-hover:scale-110">0</span>
+                            <span class="stayl-badge show-wishlist-count bg-rose-500 text-white font-bold shadow-sm ring-2 ring-white dark:ring-slate-900">0</span>
                         </a>
 
                         {{-- Cart --}}
-                        <a href="{{ route('user.cart') }}" class="stayl-action-item group relative" title="{{ __('Cart') }}" data-dashboard-nav="1">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-110">
+                        <a href="{{ route('user.cart') }}" id="header-cart" class="stayl-action-item stayl-header-icon-cart group relative" title="{{ __('Cart') }}" data-dashboard-nav="1" aria-label="{{ __('Cart') }}">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="action-icon" aria-hidden="true">
                                 <circle cx="8" cy="21" r="1"></circle>
                                 <circle cx="19" cy="21" r="1"></circle>
                                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
                             </svg>
-                            <span class="stayl-badge show-cart-count absolute -top-1 -right-1 bg-sky-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold shadow-sm ring-2 ring-white dark:ring-slate-900 transition-all group-hover:scale-110">0</span>
+                            <span class="stayl-badge show-cart-count bg-sky-500 text-white font-bold shadow-sm ring-2 ring-white dark:ring-slate-900">0</span>
                         </a>
 
                         {{-- Account --}}
-                        <a href="{{ auth()->check() ? route('user.home') : route('user.login') }}" class="stayl-action-item group flex items-center gap-2" title="{{ __('Account') }}" data-dashboard-nav="1">
-                            <div class="relative">
-                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="action-icon transition-transform group-hover:scale-105">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                            </div>
-                            <div class="hidden xl:flex flex-col items-start leading-none gap-0.5">
-                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                                    @auth @lang('Profile') @else @lang('Hello, Sign in') @endauth
-                                </span>
-                                <span class="text-[12px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[90px]">
-                                    @auth {{ auth()->user()->username }} @else @lang('My Account') @endauth
-                                </span>
-                            </div>
+                        <a href="{{ auth()->check() ? route('user.home') : route('user.login') }}" id="header-account" class="stayl-action-item stayl-header-icon-account group relative" title="@auth {{ auth()->user()->username }} @else @lang('Hello, Sign in') @endauth" data-dashboard-nav="1" aria-label="{{ __('Account') }}">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="action-icon" aria-hidden="true">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
                         </a>
                     </div>
                 </div>
@@ -1706,7 +1703,7 @@
                 const cNameMap = activeLangCode === 'BN' ? currencyNativeNames : currencyNamesEN;
 
                 if (headerCurrencyLabel) {
-                    const cData = @json($headerCurrencies).find(c => String(c.code).toUpperCase() === activeCurrencyCode) || { flag: '' };
+                    const cData = @json($headerCurrenciesJson).find(c => String(c.code).toUpperCase() === activeCurrencyCode) || { flag: '' };
                     headerCurrencyLabel.textContent = activeCurrencyCode;
                     const triggerBtn = headerCurrencyLabel.closest('button');
                     if (triggerBtn) {

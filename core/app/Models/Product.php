@@ -323,10 +323,14 @@ class Product extends Model
     {
         return $query->active()->whereHas('category', function ($category) {
             $category->active();
-        })->whereHas('brand', function ($brand) {
-            $brand->active();
-        })->whereHas('subcategory', function ($subcategory) {
-            $subcategory->active();
+        })->where(function ($query) {
+            $query->whereNull('brand_id')->orWhereHas('brand', function ($brand) {
+                $brand->active();
+            });
+        })->where(function ($query) {
+            $query->whereNull('subcategory_id')->orWhereHas('subcategory', function ($subcategory) {
+                $subcategory->active();
+            });
         });
     }
 

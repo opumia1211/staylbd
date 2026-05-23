@@ -327,10 +327,10 @@ class ProductController extends Controller
             'video'                  => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:102400', new VideoMaxDuration(30)],
             'size_qty'               => 'nullable|array',
             'size_qty.*'             => 'nullable|integer|min:0',
-            'target_gender'          => 'nullable|in:male,female,unisex',
+            'target_gender'          => 'nullable|in:male,female,unisex,kids',
             'target_age_min'         => 'nullable|integer|min:0|max:100',
             'target_age_max'         => 'nullable|integer|min:0|max:100',
-            'product_type'           => 'nullable|in:clothing,general',
+            'product_type'           => 'nullable|in:physical,clothing,general,digital,service',
             'fabric_type'            => 'nullable|string|max:100',
             'material'               => 'nullable|string|max:255',
             'season'                 => 'nullable|string|max:50',
@@ -348,6 +348,11 @@ class ProductController extends Controller
             'home_section_override'  => 'nullable|in:new_arrivals,best_selling,recommended,trending',
             'home_section_rank'      => 'nullable|integer|min:0|max:1000000',
             'home_exclude_from_auto' => 'nullable|in:0,1',
+            'shipping_weight'        => 'nullable|numeric|min:0',
+            'shipping_class'         => 'nullable|string|max:100',
+            'warehouse_location'     => 'nullable|string|max:255',
+            'source_url'             => 'nullable|url|max:500',
+            'delivery_time'          => 'nullable|string|max:100',
         ], [
             'image.max'     => __('The main image must not be greater than 50 MB.'),
             'gallery.*.max' => __('Each gallery image must not be greater than 50 MB.'),
@@ -511,7 +516,8 @@ class ProductController extends Controller
             $product->cod_disabled = (bool) ($request->cod_disabled ?? 0);
         }
         if (Schema::hasColumn('products', 'product_type')) {
-            $product->product_type = $request->product_type === 'clothing' ? 'clothing' : ($product->product_type ?? 'general');
+            $validTypes = ['physical', 'clothing', 'general', 'digital', 'service'];
+            $product->product_type = in_array($request->product_type, $validTypes, true) ? $request->product_type : ($product->product_type ?? 'general');
         }
         if (Schema::hasColumn('products', 'fabric_type')) {
             $product->fabric_type = $request->fabric_type ?: null;
@@ -579,6 +585,22 @@ class ProductController extends Controller
             $product->hot_deals = Status::DISABLE;
         } elseif ($product->hot_deals) {
             $product->featured_product = Status::DISABLE;
+        }
+
+        if (Schema::hasColumn('products', 'shipping_weight')) {
+            $product->shipping_weight = $request->shipping_weight ?: 0;
+        }
+        if (Schema::hasColumn('products', 'shipping_class')) {
+            $product->shipping_class = $request->shipping_class ?: null;
+        }
+        if (Schema::hasColumn('products', 'warehouse_location')) {
+            $product->warehouse_location = $request->warehouse_location ?: null;
+        }
+        if (Schema::hasColumn('products', 'source_url')) {
+            $product->source_url = $request->source_url ?: null;
+        }
+        if (Schema::hasColumn('products', 'delivery_time')) {
+            $product->delivery_time = $request->delivery_time ?: null;
         }
         $product->save();
         ProductCacheService::clearProductDetail($product->id);

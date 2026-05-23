@@ -15,6 +15,150 @@ data-product-id="{{ $product->id }}"
 @push('style')
     <link rel="preconnect" href="{{ url('/') }}" crossorigin>
     <link rel="preload" href="{{ $product->imageShowWebP() }}" as="image" fetchpriority="high">
+    <style>
+        .pro-detail-page .pro-detail-info-card {
+            border-radius: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            box-shadow: 0 4px 22px rgba(15, 23, 42, 0.06);
+        }
+        /* —— PDP action row: equal-size buttons, one line —— */
+        .pro-detail-page .pdp-cart-action-row {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+            margin-bottom: 12px !important;
+        }
+        .pro-detail-page .pdp-cart-action-row .qty-box {
+            flex: 0 0 auto !important;
+            height: 42px !important;
+            min-height: 42px !important;
+            border-radius: 10px !important;
+            border-color: #cbd5e1 !important;
+        }
+        .pro-detail-page .pdp-cart-action-row .qty-box .qty-btn,
+        .pro-detail-page .pdp-cart-action-row .qty-box input.productQuantity {
+            height: 100% !important;
+            font-size: 0.875rem !important;
+        }
+        .pro-detail-page .pdp-cart-action-row .action-buttons {
+            display: flex !important;
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            gap: 6px !important;
+            align-items: stretch !important;
+        }
+        .pro-detail-page .pdp-cart-action-row .action-buttons > .btn,
+        .pro-detail-page .pdp-cart-action-row .action-buttons > .wishlist-btn {
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            width: auto !important;
+            height: 42px !important;
+            min-height: 42px !important;
+            padding: 0 6px !important;
+            font-size: 0.7rem !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+            gap: 4px !important;
+        }
+        .pro-detail-page .pdp-cart-action-row .action-buttons > .btn img,
+        .pro-detail-page .pdp-cart-action-row .action-buttons > .wishlist-btn img {
+            width: 16px !important;
+            height: 16px !important;
+            flex-shrink: 0 !important;
+        }
+        .pro-detail-page .pdp-cart-action-row .action-buttons > .btn > span {
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+        }
+        @media (min-width: 400px) {
+            .pro-detail-page .pdp-cart-action-row .action-buttons > .btn,
+            .pro-detail-page .pdp-cart-action-row .action-buttons > .wishlist-btn {
+                font-size: 0.75rem !important;
+                padding: 0 8px !important;
+            }
+        }
+        @media (min-width: 576px) {
+            .pro-detail-page .pdp-cart-action-row .action-buttons > .btn,
+            .pro-detail-page .pdp-cart-action-row .action-buttons > .wishlist-btn {
+                font-size: 0.8125rem !important;
+            }
+        }
+        /* —— Buy Now + Quick Order: professional paired CTAs —— */
+        .pdp-primary-cta {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .pdp-primary-cta:has(.pdp-cta--quick) {
+            grid-template-columns: 1fr 1fr;
+        }
+        .pdp-cta {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            width: 100% !important;
+            min-height: 46px !important;
+            padding: 0 14px !important;
+            font-size: 0.9375rem !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            border-radius: 10px !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease !important;
+            -webkit-font-smoothing: antialiased;
+            box-sizing: border-box !important;
+        }
+        .pdp-cta img { width: 18px !important; height: 18px !important; flex-shrink: 0; }
+        .pdp-cta--buy {
+            color: #fff !important;
+            border: 2px solid transparent !important;
+            background: linear-gradient(135deg, var(--product-buy-now-color, #0e9f90), var(--product-buy-now-hover, #0c8a7d)) !important;
+            box-shadow: 0 4px 14px rgba(14, 159, 144, 0.35);
+        }
+        .pdp-cta--buy:hover,
+        .pdp-cta--buy:focus-visible {
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 22px rgba(14, 159, 144, 0.4);
+            filter: brightness(1.05);
+        }
+        .pdp-cta--quick {
+            color: var(--product-buy-now-color, #0e9f90) !important;
+            background: #fff !important;
+            border: 2px solid var(--product-buy-now-color, #0e9f90) !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+        }
+        .pdp-cta--quick:hover,
+        .pdp-cta--quick:focus-visible {
+            color: #fff !important;
+            background: var(--product-buy-now-color, #0e9f90) !important;
+            border-color: var(--product-buy-now-color, #0e9f90) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(14, 159, 144, 0.28);
+        }
+        .pdp-cta--buy img { filter: brightness(0) invert(1); }
+        .pdp-cta--quick:hover img,
+        .pdp-cta--quick:focus-visible img { filter: brightness(0) invert(1); }
+        body.dark-mode .pdp-cta--quick {
+            background: #1e293b !important;
+            color: #5eead4 !important;
+            border-color: #5eead4 !important;
+        }
+        body.dark-mode .pdp-cta--quick:hover { color: #0f172a !important; background: #5eead4 !important; }
+        .pro-detail-quick-order-wrap .pdp-cta-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-align: center;
+            margin: 0 0 10px;
+        }
+        body.dark-mode .pro-detail-quick-order-wrap .pdp-cta-hint { color: #94a3b8; }
+    </style>
 @endpush
 
 @section('content')
@@ -314,7 +458,11 @@ data-product-id="{{ $product->id }}"
                         @endif
 
                         {{-- লাল মার্ক জায়গা: একই কার্ডের ভেতরে, নিচের দিকে – সমস্ত ফিচার এখানে --}}
-                        @php $detailMaxQty = $product->has_variants && $product->activeVariants->isNotEmpty() ? $product->activeVariants->pluck('quantity')->max() : (int)$product->quantity; @endphp
+                        @php
+                            $detailMaxQty = $product->has_variants && $product->activeVariants->isNotEmpty() ? $product->activeVariants->pluck('quantity')->max() : (int)$product->quantity;
+                            $pdpBuyNowUrl = storefront_route('cart.list.buy.now', ['id' => $product->id]);
+                            $pdpHasVariantSelect = $product->has_variants && $product->activeVariants->isNotEmpty();
+                        @endphp
                         <div class="pro-detail-actions-block pro-detail-actions-block--in-card">
                             {{-- Quantity + all action buttons in a single row (cart-action-row + action-buttons) --}}
                             {{-- PDP action row: isolated layout — qty + flex action-buttons (no main.css single-add-cart-area bleed) --}}
@@ -338,7 +486,7 @@ data-product-id="{{ $product->id }}"
                                             class="compare-btn btn-compare add-to-compare"
                                             data-product_id="{{ $product->id }}"
                                             title="{{ __('In compare list — click again to remove') }}">
-                                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'sync-alt', 'width' => 20, 'height' => 20, 'alt' => ''])
+                                        @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'compare_icon', 'fallback' => 'exchange-alt', 'width' => 20, 'height' => 20, 'alt' => ''])
                                         <span>@lang('Compare')</span>
                                     </button>
                                     <a href="javascript:void(0)"
@@ -359,20 +507,36 @@ data-product-id="{{ $product->id }}"
                                     </button>
                                 </div>
                             </div>
-                            <div class="pro-detail-buy-now-wrap mb-2">
-                                <a class="cmn--btn buy-now w-100 justify-content-center {{ $detailMaxQty <= 0 ? 'd-none' : '' }}" id="pdpBuyNowLink" href="#0" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
-                                <span class="cmn--btn w-100 cursor-not-allowed justify-content-center opacity-70 disabled {{ $detailMaxQty > 0 ? 'd-none' : '' }}" id="pdpBuyNowOos" role="status">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
-                            </div>
-                            @guest
-                            <div class="pro-detail-quick-order-wrap mb-2">
-                                <a href="#0"
-                                   class="cmn--btn w-100 justify-content-center btn-outline--base buy-now"
-                                   id="openGuestCheckoutFromProduct"
+                            <div class="pdp-primary-cta {{ $detailMaxQty <= 0 ? 'd-none' : '' }}" id="pdpPrimaryCta">
+                                <a class="pdp-cta pdp-cta--buy buy-now"
+                                   id="pdpBuyNowLink"
+                                   href="{{ $pdpBuyNowUrl }}"
+                                   data-no-ajax
+                                   data-buy-now-url="{{ $pdpBuyNowUrl }}"
+                                   data-has-variants="{{ $pdpHasVariantSelect ? '1' : '0' }}"
                                    data-product_id="{{ $product->id }}">
-                                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Quick Order')
+                                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'width' => 18, 'height' => 18, 'alt' => ''])
+                                    @lang('Buy Now')
                                 </a>
-                                <p class="mb-0 mt-1 text-muted small text-center">{{ __('Quick Order – no login required. We will confirm by phone.') }}</p>
+                                @guest
+                                <button type="button"
+                                        class="pdp-cta pdp-cta--quick quick-order-from-pdp"
+                                        id="openGuestCheckoutFromProduct"
+                                        data-product_id="{{ $product->id }}"
+                                        data-has-variants="{{ $pdpHasVariantSelect ? '1' : '0' }}">
+                                    @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'width' => 18, 'height' => 18, 'alt' => ''])
+                                    @lang('Quick Order')
+                                </button>
+                                @endguest
                             </div>
+                            <span class="pdp-cta pdp-cta--buy w-100 cursor-not-allowed opacity-70 disabled {{ $detailMaxQty > 0 ? 'd-none' : '' }}" id="pdpBuyNowOos" role="status">
+                                @include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'width' => 18, 'height' => 18, 'alt' => ''])
+                                @lang('Out Of Stock')
+                            </span>
+                            @guest
+                            @if($detailMaxQty > 0)
+                            <p class="pdp-cta-hint">{{ __('Quick Order – no login required. We will confirm by phone.') }}</p>
+                            @endif
                             @endguest
                             @php
                                 $footerData = getCachedFooterData();
@@ -386,19 +550,19 @@ data-product-id="{{ $product->id }}"
                             @endphp
                             <div class="pro-detail-service-links">
                                 @if($policyPayment)
-                                    <a href="{{ route('policy.pages.short', $policyPayment->id) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_payment_icon', 'fallback' => 'credit-card', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Payment Method')</a>
+                                    <a href="{{ storefront_route('policy.pages.short', ['id' => $policyPayment->id]) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_payment_icon', 'fallback' => 'credit-card', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Payment Method')</a>
                                 @else
-                                    <a href="{{ route('policy.pages.short', 1) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_payment_icon', 'fallback' => 'credit-card', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Payment Method')</a>
+                                    <a href="{{ storefront_route('policy.pages.short', ['id' => 1]) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_payment_icon', 'fallback' => 'credit-card', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Payment Method')</a>
                                 @endif
                                 @if($policyShipping)
-                                    <a href="{{ route('policy.pages.short', $policyShipping->id) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_shipping_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Shipping & Charge')</a>
+                                    <a href="{{ storefront_route('policy.pages.short', ['id' => $policyShipping->id]) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_shipping_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Shipping & Charge')</a>
                                 @else
-                                    <a href="{{ route('policy.pages.short', 2) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_shipping_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Shipping & Charge')</a>
+                                    <a href="{{ storefront_route('policy.pages.short', ['id' => 2]) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_shipping_icon', 'fallback' => 'shipping-fast', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Shipping & Charge')</a>
                                 @endif
                                 @if($policyOrder)
-                                    <a href="{{ route('policy.pages.short', $policyOrder->id) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_order_icon', 'fallback' => 'list-alt', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Order Procedure')</a>
+                                    <a href="{{ storefront_route('policy.pages.short', ['id' => $policyOrder->id]) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_order_icon', 'fallback' => 'list-alt', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Order Procedure')</a>
                                 @else
-                                    <a href="{{ route('policy.pages.short', 3) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_order_icon', 'fallback' => 'list-alt', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Order Procedure')</a>
+                                    <a href="{{ storefront_route('policy.pages.short', ['id' => 3]) }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'policy_order_icon', 'fallback' => 'list-alt', 'width' => 18, 'height' => 18, 'alt' => '']) @lang('Order Procedure')</a>
                                 @endif
                             </div>
                             <div class="mt-2 small text-muted">
@@ -482,7 +646,7 @@ data-product-id="{{ $product->id }}"
                                         <div class="pro-detail-similar-card-actions">
                                             @if($spQty > 0)
                                             <button type="button" class="pro-detail-similar-btn pro-detail-similar-btn--cart add-to-cart" data-product_id="{{ $singleProduct->id }}">@lang('Add to Cart')</button>
-                                            <a href="#0" class="pro-detail-similar-btn pro-detail-similar-btn--buy buy-now" data-product_id="{{ $singleProduct->id }}">@lang('Buy Now')</a>
+                                            <a href="{{ storefront_route('cart.list.buy.now', ['id' => $singleProduct->id]) }}" class="pro-detail-similar-btn pro-detail-similar-btn--buy buy-now" data-no-ajax data-product_id="{{ $singleProduct->id }}">@lang('Buy Now')</a>
                                             @else
                                             <span class="pro-detail-similar-btn disabled">@lang('Out Of Stock')</span>
                                             @endif
@@ -498,11 +662,18 @@ data-product-id="{{ $product->id }}"
             </div>
 
             {{-- Bottom: Tabs (Specifications, Details, Video, Q&A, Review) --}}
+            @php
+                $hasAdvancedSpecs = !empty($product->material) || !empty($product->fabric_type)
+                    || !empty($product->target_gender) || !empty($product->season)
+                    || !empty($product->shipping_weight) || !empty($product->product_type)
+                    || !empty($product->target_age_min) || !empty($product->source_url);
+                $hasAnySpecs = ($features && count($features) > 0) || $hasAdvancedSpecs;
+            @endphp
             <div class="pro-detail-tabs-wrap description-wrapper bg--section" id="product-detail-tabs">
                 <div class="description__header">
                     <ul class="nav nav-tabs van-tabs nav--tabs" role="tablist">
                         <li><a href="#tab-details" data-bs-toggle="tab" class="active">@lang('Details')</a></li>
-                        @if ($features && count($features) > 0)
+                        @if ($hasAnySpecs)
                             <li><a href="#tab-specs" data-bs-toggle="tab">@lang('Specifications')</a></li>
                         @endif
                         @if(!empty($product->video))
@@ -518,17 +689,48 @@ data-product-id="{{ $product->id }}"
                             <p>@php echo $product->description; @endphp</p>
                         </div>
                     </div>
-                    @if ($features && count($features) > 0)
+                    @if ($hasAnySpecs)
                         <div class="tab-pane fade" id="tab-specs">
                             <div class="description__body border-0 p-0">
                                 <table class="table feature-table">
                                     <tbody>
-                                        @foreach ($features as $feature)
+                                        {{-- Admin-defined product features/specs --}}
+                                        @if($features && count($features) > 0)
+                                            @foreach ($features as $feature)
+                                                <tr>
+                                                    <th>{{ __($feature['title'] ?? '') }}</th>
+                                                    <td>{{ __($feature['description'] ?? '') }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                        {{-- Auto-generated specs from advanced fields --}}
+                                        @if(!empty($product->product_type))
+                                            <tr><th>@lang('Product Type')</th><td>{{ ucfirst(__($product->product_type)) }}</td></tr>
+                                        @endif
+                                        @if(!empty($product->material))
+                                            <tr><th>@lang('Material')</th><td>{{ __($product->material) }}</td></tr>
+                                        @endif
+                                        @if(!empty($product->fabric_type))
+                                            <tr><th>@lang('Fabric Type')</th><td>{{ __($product->fabric_type) }}</td></tr>
+                                        @endif
+                                        @if(!empty($product->target_gender))
+                                            <tr><th>@lang('For')</th><td>{{ ucfirst(__($product->target_gender)) }}</td></tr>
+                                        @endif
+                                        @if(!empty($product->target_age_min) || !empty($product->target_age_max))
                                             <tr>
-                                                <th>{{ __($feature['title'] ?? '') }}</th>
-                                                <td>{{ __($feature['description'] ?? '') }}</td>
+                                                <th>@lang('Age Range')</th>
+                                                <td>{{ $product->target_age_min ?? '—' }} – {{ $product->target_age_max ?? '—' }} @lang('years')</td>
                                             </tr>
-                                        @endforeach
+                                        @endif
+                                        @if(!empty($product->season))
+                                            <tr><th>@lang('Season')</th><td>{{ ucfirst(__($product->season)) }}</td></tr>
+                                        @endif
+                                        @if(!empty($product->shipping_weight) && $product->shipping_weight > 0)
+                                            <tr><th>@lang('Weight')</th><td>{{ $product->shipping_weight }} kg</td></tr>
+                                        @endif
+                                        @if(!empty($product->product_sku))
+                                            <tr><th>@lang('SKU / Model')</th><td>{{ $product->product_sku }}</td></tr>
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -547,7 +749,19 @@ data-product-id="{{ $product->id }}"
                     <div class="tab-pane fade" id="tab-shipping">
                         <div class="description__body">
                             <ul class="list-unstyled mb-0 small">
-                                <li>🚚 @lang('Standard delivery within 3–7 business days (Dhaka often 2–3 days).')</li>
+                                @if(!empty($product->delivery_time))
+                                    <li>🚚 @lang('Estimated Delivery'): <strong>{{ __($product->delivery_time) }}</strong></li>
+                                @else
+                                    <li>🚚 @lang('Standard delivery within 3–7 business days (Dhaka often 2–3 days).')</li>
+                                @endif
+                                @if(isset($product->delivery_type) && $product->delivery_type === 'paid' && ($product->delivery_charge ?? 0) > 0)
+                                    <li>📦 @lang('Shipping Charge'): <strong>{{ $general->cur_sym }}{{ showAmount($product->delivery_charge) }}</strong></li>
+                                @else
+                                    <li>🎁 @lang('Free Delivery on this item')</li>
+                                @endif
+                                @if(!empty($product->shipping_weight) && $product->shipping_weight > 0)
+                                    <li>⚖️ @lang('Item Weight'): <strong>{{ $product->shipping_weight }} kg</strong></li>
+                                @endif
                                 <li>💰 @lang('Cash on Delivery available on most locations.')</li>
                                 <li>🔁 @lang('7 Days easy return on eligible items (see policy pages above).')</li>
                             </ul>
@@ -719,7 +933,7 @@ data-product-id="{{ $product->id }}"
                     <span class="cur_sym">{{ $general->cur_sym }}</span><span class="sticky-price-amount">{{ showAmount($detailPrice) }}</span>
                 </div>
                 <button type="button" class="btn--base add-to-cart staylbd-rt-atc inline-flex flex-1 items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" data-product_id="{{ $product->id }}" id="addToCartStickyBtn">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Add To Cart')</button>
-                <a href="#0" class="btn-outline--base buy-now inline-flex items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" id="pdpStickyBuyNowLink" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
+                <a href="{{ $pdpBuyNowUrl }}" class="btn-outline--base buy-now inline-flex items-center justify-center gap-1 {{ $detailMaxQtySticky <= 0 ? 'd-none' : '' }}" id="pdpStickyBuyNowLink" data-no-ajax data-buy-now-url="{{ $pdpBuyNowUrl }}" data-has-variants="{{ $pdpHasVariantSelect ? '1' : '0' }}" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'buy_now_icon', 'fallback' => 'bolt', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Buy Now')</a>
                 <span class="st-btn-secondary flex-1 cursor-not-allowed opacity-70 pointer-events-none select-none {{ $detailMaxQtySticky > 0 ? 'd-none' : '' }}" id="pdpStickyOos">@include($activeTemplate . 'partials.header_icon_asset', ['iconKey' => 'cart_icon', 'fallback' => 'shopping-cart', 'class' => 'me-1', 'width' => 20, 'height' => 20, 'alt' => '']) @lang('Out Of Stock')</span>
             </div>
         </div>
@@ -1175,14 +1389,16 @@ data-product-id="{{ $product->id }}"
                     }
 
                     if (canPurchase) {
-                        $('#pdpBuyNowLink').removeClass('d-none');
+                        $('#pdpPrimaryCta').removeClass('d-none');
                         $('#pdpBuyNowOos').addClass('d-none');
+                        $('.pdp-cta-hint').removeClass('d-none');
                         $('#addToCartStickyBtn').removeClass('d-none');
                         $('#pdpStickyBuyNowLink').removeClass('d-none');
                         $('#pdpStickyOos').addClass('d-none');
                     } else {
-                        $('#pdpBuyNowLink').addClass('d-none');
+                        $('#pdpPrimaryCta').addClass('d-none');
                         $('#pdpBuyNowOos').removeClass('d-none');
+                        $('.pdp-cta-hint').addClass('d-none');
                         $('#addToCartStickyBtn').addClass('d-none');
                         $('#pdpStickyBuyNowLink').addClass('d-none');
                         $('#pdpStickyOos').removeClass('d-none');

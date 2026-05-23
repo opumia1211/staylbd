@@ -379,8 +379,9 @@ class SiteController extends Controller
         }
     }
 
-    public function productDetailsBySlug(string $slug)
+    public function productDetailsBySlug(?string $locale, string $slug)
     {
+        $slug = (string) ($slug ?: request()->route('slug', ''));
         $id = Product::parseIdFromProductSlug($slug);
         abort_if($id === null, 404);
 
@@ -393,10 +394,29 @@ class SiteController extends Controller
             $product->saveQuietly();
         }
         if ($slug !== $canonical) {
-            return redirect()->to(route('product.detail', $canonical), 301);
+            return redirect()->to(storefront_route('product.detail', ['slug' => $canonical]), 301);
         }
 
         return $this->productDetailPage($id);
+    }
+
+    /**
+     * Redirect legacy /product/details/{id} URLs to canonical slug route.
+     */
+    public function productDetailsLegacy(\Illuminate\Http\Request $request)
+    {
+        $id = (int) $request->route('id');
+        abort_if($id <= 0, 404);
+
+        $product = Product::query()->where('id', $id)->first(['id', 'slug', 'name']);
+        abort_if($product === null, 404);
+
+        $slug = trim((string) ($product->slug ?? ''));
+        if ($slug === '' || !preg_match('/-\d+$/', $slug)) {
+            $slug = Product::buildShortSlugForProduct($product);
+        }
+
+        return redirect()->to(storefront_route('product.detail', ['slug' => $slug]), 301);
     }
 
     protected function productDetailPage(int $id)

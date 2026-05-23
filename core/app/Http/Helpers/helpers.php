@@ -65,21 +65,119 @@ function slug($string)
 }
 
 /**
- * Canonical product URL: /product/{slug}
+ * Map positional route() args to named params (skips optional {locale?} prefix).
+ */
+function storefront_normalize_route_parameters(string $name, $parameters): array
+{
+    if (!is_array($parameters)) {
+        $parameters = [$parameters];
+    }
+
+    if ($parameters === [] || !array_is_list($parameters)) {
+        return $parameters;
+    }
+
+    try {
+        $route = \Illuminate\Support\Facades\Route::getRoutes()->getByName($name);
+        if ($route === null) {
+            return $parameters;
+        }
+
+        $names = array_values(array_filter(
+            $route->parameterNames(),
+            static fn (string $param): bool => $param !== 'locale'
+        ));
+
+        if ($names === []) {
+            return $parameters;
+        }
+
+        $normalized = [];
+        foreach ($names as $i => $paramName) {
+            if (array_key_exists($i, $parameters)) {
+                $normalized[$paramName] = $parameters[$i];
+            }
+        }
+
+        return $normalized !== [] ? $normalized : $parameters;
+    } catch (\Throwable $e) {
+        return $parameters;
+    }
+}
+
+/**
+ * Locale-aware storefront route (routes use {locale?}/… prefix).
+ */
+function storefront_route(string $name, $parameters = [], bool $absolute = true): string
+{
+    $parameters = storefront_normalize_route_parameters($name, $parameters);
+
+    if (!array_key_exists('locale', $parameters)) {
+        $defaults = \Illuminate\Support\Facades\URL::getDefaultParameters();
+        if (empty($defaults['locale'])) {
+            $parameters['locale'] = session('locale', config('app.locale', 'en'));
+        }
+    }
+
+    return route($name, $parameters, $absolute);
+}
+
+/**
+ * Local SVG flag asset URL (assets/global/flags/4x3/{iso}.svg) — no external CDN.
+ */
+function country_flag_url(string $isoCode): string
+{
+    $iso = strtolower(preg_replace('/[^a-z]/', '', $isoCode));
+    if (strlen($iso) !== 2) {
+        return '';
+    }
+
+    static $cache = [];
+    if (isset($cache[$iso])) {
+        return $cache[$iso];
+    }
+
+    $relative = 'assets/global/flags/4x3/' . $iso . '.svg';
+    $publicFile = public_path($relative);
+
+    if (!is_file($publicFile)) {
+        $fallback = dirname(base_path()) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+        if (is_file($fallback)) {
+            $dir = dirname($publicFile);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            @copy($fallback, $publicFile);
+        }
+    }
+
+    if (!is_file($publicFile)) {
+        $relative = 'assets/global/flags/4x3/xx.svg';
+        $publicFile = public_path($relative);
+        if (!is_file($publicFile)) {
+            return $cache[$iso] = '';
+        }
+    }
+
+    return $cache[$iso] = asset($relative);
+}
+
+/**
+ * Canonical product URL: /{locale}/product/{slug}
  */
 function product_detail_url($product): string
 {
     if (!is_object($product) || !isset($product->id) || (int) $product->id <= 0) {
-        return url('/all/products');
+        return storefront_route('products');
     }
     $id = (int) $product->id;
     $slug = trim((string) ($product->slug ?? ''), '');
     // Detail URL must end with -{id} matching this product; legacy slugs without suffix 404.
-    if ($slug !== '' && preg_match('/-(\d+)$/', $slug, $m) && (int) $m[1] === $id) {
-        return route('product.detail', $slug);
+    if ($slug === '' || !preg_match('/-(\d+)$/', $slug, $m) || (int) $m[1] !== $id) {
+        $slug = \App\Models\Product::buildShortSlugForProduct($product);
     }
 
-    return route('product.detail', \App\Models\Product::buildShortSlugForProduct($product));
+    return storefront_route('product.detail', ['slug' => $slug]);
 }
 
 /**
@@ -555,7 +653,7 @@ function getImage($image, $size = null)
     $clean = '';
     if (!is_string($image) || $image === '') {
         if ($size) {
-            return route('placeholder.image', $size);
+            return storefront_route('placeholder.image', ['size' => $size]);
         }
         return asset('assets/images/default.png');
     }
@@ -587,7 +685,7 @@ function getImage($image, $size = null)
     }
 
     if ($size) {
-        return route('placeholder.image', $size);
+        return storefront_route('placeholder.image', ['size' => $size]);
     }
     return asset('assets/images/default.png');
 }
@@ -2573,7 +2671,8 @@ function safe_route($name, $parameters = [], $absolute = true)
     if (!\Illuminate\Support\Facades\Route::has($name)) {
         return $absolute ? url('#') : '#';
     }
-    return route($name, $parameters, $absolute);
+
+    return storefront_route($name, $parameters, $absolute);
 }
 
 function showMobileNumber($number)

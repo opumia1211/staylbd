@@ -223,14 +223,34 @@
                                             }
                                             $image = $cart->product->image ?? '';
                                             $name = $cart->product->name ?? '';
+                                            $vdParts = [];
+                                            if (!empty($cart->variant_details)) {
+                                                $vd = is_string($cart->variant_details) ? json_decode($cart->variant_details, true) : $cart->variant_details;
+                                                $vdParts = is_array($vd) ? array_filter(array_map(function($v) { return is_string($v) ? $v : (is_numeric($v) ? (string)$v : null); }, array_values($vd))) : [];
+                                            }
                                         @endphp
                                         <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom checkout-product-row">
-                                            <div class="flex-shrink-0 rounded overflow-hidden checkout-thumb">
+                                            <div class="flex-shrink-0 rounded overflow-hidden checkout-thumb border">
                                                 <img src="{{ getImage(getFilePath('product') . '/' . $image, getFileSize('product')) }}" alt="{{ __($name) }}" class="w-100 h-100 object-fit-contain" loading="lazy" width="56" height="56" decoding="async">
                                             </div>
                                             <div class="flex-grow-1 min-w-0">
                                                 <div class="small fw-medium text-truncate">{{ __($name) }}</div>
-                                                <small class="text-muted">{{ $general->cur_sym }}{{ getAmount($price) }} × {{ $cart->quantity }}</small>
+                                                @if(!empty($vdParts))
+                                                    <div class="small text-muted" style="font-size: 0.7rem;">{{ implode(' · ', $vdParts) }}</div>
+                                                @endif
+                                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                                    @if(in_array($cart->product->product_type, ['digital', 'service']))
+                                                        <span class="badge bg-indigo-100 text-indigo-700 border border-indigo-200 px-1 py-0" style="font-size: 0.65rem;">
+                                                            <i class="las la-download"></i> {{ ucfirst($cart->product->product_type) }}
+                                                        </span>
+                                                    @endif
+                                                    @if($cart->product->shipping_weight > 0)
+                                                        <span class="badge bg-slate-100 text-slate-600 border border-slate-200 px-1 py-0" style="font-size: 0.65rem;">
+                                                            <i class="las la-weight"></i> {{ $cart->product->shipping_weight }} kg
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-muted mt-1" style="font-size: 0.8rem;">{{ $general->cur_sym }}{{ getAmount($price) }} × {{ $cart->quantity }}</div>
                                             </div>
                                             <div class="small fw-semibold text--base flex-shrink-0">{{ $general->cur_sym }}{{ getAmount($price * $cart->quantity) }}</div>
                                         </div>

@@ -266,6 +266,80 @@
                                     </div>
                                 </div>
 
+                                <div class="row g-4 align-items-end mt-2">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Container Mode')</label>
+                                        <select class="form-select border-0 bg-light rounded-3" name="container_mode" id="scrollbarContainerMode">
+                                            <option value="full" {{ old('container_mode', $fd['container_mode'] ?? 'full') == 'full' ? 'selected' : '' }}>@lang('Full Width (Fluid)')</option>
+                                            <option value="container" {{ old('container_mode', $fd['container_mode'] ?? 'full') == 'container' ? 'selected' : '' }}>@lang('Boxed Container')</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Width Layout')</label>
+                                        <select class="form-select border-0 bg-light rounded-3" name="width_type" id="scrollbarWidthType">
+                                            <option value="full" {{ old('width_type', $fd['width_type'] ?? 'full') == 'full' ? 'selected' : '' }}>@lang('Full Span (100%)')</option>
+                                            <option value="custom" {{ old('width_type', $fd['width_type'] ?? 'full') == 'custom' ? 'selected' : '' }}>@lang('Custom Width')</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 scrollbar-custom-width-wrap {{ old('width_type', $fd['width_type'] ?? 'full') === 'custom' ? '' : 'd-none' }}">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Custom Width / Max-Width')</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control border-0 bg-light rounded-start-3" name="width_value" id="scrollbarWidthValue" value="{{ old('width_value', $fd['width_value'] ?? '') }}" placeholder="e.g. 80% or 600px">
+                                            <span class="input-group-text border-0 bg-light">/</span>
+                                            <input type="text" class="form-control border-0 bg-light rounded-end-3" name="max_width" id="scrollbarMaxWidth" value="{{ old('max_width', $fd['max_width'] ?? '') }}" placeholder="e.g. 100%">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 scrollbar-custom-width-wrap {{ old('width_type', $fd['width_type'] ?? 'full') === 'custom' ? '' : 'd-none' }}">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Alignment')</label>
+                                        <select class="form-select border-0 bg-light rounded-3" name="align" id="scrollbarAlign">
+                                            <option value="left" {{ old('align', $fd['align'] ?? 'center') == 'left' ? 'selected' : '' }}>@lang('Left')</option>
+                                            <option value="center" {{ old('align', $fd['align'] ?? 'center') == 'center' ? 'selected' : '' }}>@lang('Center')</option>
+                                            <option value="right" {{ old('align', $fd['align'] ?? 'center') == 'right' ? 'selected' : '' }}>@lang('Right')</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row g-4 align-items-end mt-2">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Scale Size')</label>
+                                        <select class="form-select border-0 bg-light rounded-3" name="bar_size" id="scrollbarBarSize">
+                                            @foreach(['extra_small'=>'Extra Small','small'=>'Small','medium'=>'Medium','large'=>'Large','extra_large'=>'Extra Large'] as $v => $l)
+                                                <option value="{{ $v }}" {{ old('bar_size', $fd['bar_size'] ?? 'medium') == $v ? 'selected' : '' }}>{{ __($l) }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Bar Thickness')</label>
+                                        <select class="form-select border-0 bg-light rounded-3" name="bar_thickness" id="scrollbarBarThickness">
+                                            @foreach(['ultra_thin'=>'Ultra Thin','extra_thin'=>'Extra Thin','thin'=>'Thin','normal'=>'Normal','thick'=>'Thick','extra_thick'=>'Extra Thick','ultra_thick'=>'Ultra Thick'] as $v => $l)
+                                                <option value="{{ $v }}" {{ old('bar_thickness', $fd['bar_thickness'] ?? 'normal') == $v ? 'selected' : '' }}>{{ __($l) }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Typography Size')</label>
+                                        <select class="form-select border-0 bg-light rounded-3" name="default_text_size" id="scrollbarDefaultTextSize">
+                                            @foreach(['extra_small'=>'Extra Small','small'=>'Small','normal'=>'Normal','large'=>'Large','extra_large'=>'Extra Large'] as $v => $l)
+                                                <option value="{{ $v }}" {{ old('default_text_size', $fd['default_text_size'] ?? 'normal') == $v ? 'selected' : '' }}>{{ __($l) }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Z-Index Position')</label>
+                                        <input type="number" class="form-control border-0 bg-light rounded-3" name="z_index" id="scrollbarZIndex" value="{{ old('z_index', $fd['z_index'] ?? 10) }}" min="0" max="999">
+                                     </div>
+                                     <div class="col-md-1 d-flex flex-column align-items-center">
+                                         <label class="form-label small fw-bold text-muted text-uppercase ls-1 mb-2">@lang('Sticky')</label>
+                                         <div class="form-check form-switch pt-2">
+                                             <input class="form-check-input" type="checkbox" name="sticky" id="scrollbarSticky" value="1" {{ old('sticky', $fd['sticky'] ?? 0) ? 'checked' : '' }}>
+                                         </div>
+                                     </div>
+                                     <div class="col-md-2 scrollbar-sticky-offset-wrap {{ old('sticky', $fd['sticky'] ?? 0) ? '' : 'd-none' }}">
+                                         <label class="form-label small fw-bold text-muted text-uppercase ls-1">@lang('Sticky Offset')</label>
+                                         <input type="text" class="form-control border-0 bg-light rounded-3" name="offset_top" id="scrollbarOffsetTop" value="{{ old('offset_top', $fd['offset_top'] ?? '0px') }}" placeholder="0px">
+                                     </div>
+                                </div>
+
                                 @if($isCustomMode)
                                 <div class="mt-4 pt-4 border-top">
                                     <div class="row g-3">
@@ -589,6 +663,17 @@
                 bar_background_value: $('#scrollbarBarColorQuick').val(),
                 bar_background_type: $f.find('[name="bar_background_type"]').val(),
                 default_text_weight: $f.find('[name="default_text_weight"]').val(),
+                container_mode: $f.find('[name="container_mode"]').val(),
+                width_type: $f.find('[name="width_type"]').val(),
+                width_value: $f.find('[name="width_value"]').val(),
+                max_width: $f.find('[name="max_width"]').val(),
+                align: $f.find('[name="align"]').val(),
+                bar_size: $f.find('[name="bar_size"]').val(),
+                bar_thickness: $f.find('[name="bar_thickness"]').val(),
+                default_text_size: $f.find('[name="default_text_size"]').val(),
+                z_index: $f.find('[name="z_index"]').val(),
+                sticky: $f.find('[name="sticky"]').is(':checked') ? 1 : 0,
+                offset_top: $f.find('[name="offset_top"]').val(),
                 items: JSON.stringify([{ type: 'text', segments: getSegments(), is_active: 1 }])
             };
             let url = scrollbarPreviewLiveBase + '?' + $.param(params);
@@ -647,6 +732,30 @@
             $('#previewFrameContainer').css('width', w === '100%' ? '100%' : '320px');
             $('.scrollbar-preview-size-btn').removeClass('active');
             $(this).addClass('active');
+        });
+
+        // Dynamic change triggers for preview and display options
+        $('#scrollbarWidthType').on('change', function() {
+            if ($(this).val() === 'custom') {
+                $('.scrollbar-custom-width-wrap').removeClass('d-none');
+            } else {
+                $('.scrollbar-custom-width-wrap').addClass('d-none');
+            }
+            refreshPreview();
+        });
+
+        $('#scrollbarSticky').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('.scrollbar-sticky-offset-wrap').removeClass('d-none');
+            } else {
+                $('.scrollbar-sticky-offset-wrap').addClass('d-none');
+            }
+            refreshPreview();
+        });
+
+        // General refresh triggers
+        $('#scrollbarContainerMode, #scrollbarAlign, #scrollbarBarSize, #scrollbarBarThickness, #scrollbarDefaultTextSize, #scrollbarZIndex, #scrollbarWidthValue, #scrollbarMaxWidth, #scrollbarOffsetTop').on('input change', function() {
+            refreshPreview();
         });
 
         $('#scrollbarFormPage').on('submit', function() {

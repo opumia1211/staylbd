@@ -278,7 +278,7 @@ class SearchController extends Controller
                         if (strpos($dataKey, 'policy_pages') !== false) {
                             $title = $dataValues->title ?? 'Policy Page';
                             $description = strip_tags($dataValues->details ?? $dataValues->short_details ?? '');
-                            $url = route('policy.pages.short', $page->id);
+                            $url = storefront_route('policy.pages.short', ['id' => $page->id]);
                         }
                         // Contact Information
                         elseif (strpos($dataKey, 'contact_us') !== false) {

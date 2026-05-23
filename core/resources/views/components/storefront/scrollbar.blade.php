@@ -78,15 +78,48 @@
         } else {
             $outerStyle .= "position: relative; z-index: {$zIndex}; ";
         }
+
+        $align = $dv['align'] ?? 'center';
+        $widthType = $dv['width_type'] ?? 'full';
+        $widthValue = trim($dv['width_value'] ?? '');
+        $maxWidth = trim($dv['max_width'] ?? '');
+
+        $wrapperStyle = '';
+        if ($widthType === 'custom') {
+            if ($widthValue !== '') {
+                $wrapperStyle .= "width: {$widthValue} !important; ";
+            }
+            if ($maxWidth !== '') {
+                $wrapperStyle .= "max-width: {$maxWidth} !important; ";
+            }
+            if ($align === 'left') {
+                $wrapperStyle .= "margin-left: 0 !important; margin-right: auto !important; ";
+            } elseif ($align === 'right') {
+                $wrapperStyle .= "margin-left: auto !important; margin-right: 0 !important; ";
+            } else {
+                $wrapperStyle .= "margin-left: auto !important; margin-right: auto !important; ";
+            }
+        }
+
+        // Custom background style
+        $barBgType = $dv['bar_background_type'] ?? '';
+        $barBgValue = $dv['bar_background_value'] ?? '';
+        if ($barBgValue !== '') {
+            if ($barBgType === 'solid' || $barBgType === 'gradient') {
+                $wrapperStyle .= "background: {$barBgValue} !important; ";
+            } elseif ($barBgType === 'image') {
+                $wrapperStyle .= "background-image: url('{$barBgValue}') !important; background-size: cover !important; background-position: center !important; ";
+            }
+        }
     @endphp
 
     <section
         class="scrollbar-section scrollbar-section--{{ $barPosition }} {{ $hideOnMobile ? 'scrollbar-hide-mobile' : '' }} {{ $hideOnDesktop ? 'scrollbar-hide-desktop' : '' }}"
         style="{{ $outerStyle }}">
-        <div class="scrollbar-bar-outer {{ $containerMode === 'box' ? 'container' : '' }}">
-            <div class="stayl-scrollbar-wrapper scrollbar-wrapper scrollbar--{{ $template }} scrollbar--size-{{ $barSize }} scrollbar--thickness-{{ $barThickness }} scrollbar--text-size-{{ $defaultTextSize }} scrollbar--text-weight-{{ $defaultTextWeight }} {{ $pauseOnHover ? 'scrollbar-pause-on-hover' : '' }} scrollbar-hover-{{ $hoverEffect }}"
+        <div class="scrollbar-bar-outer {{ ($containerMode === 'box' || $containerMode === 'container') ? 'container' : '' }}">
+            <div class="stayl-scrollbar-wrapper scrollbar-wrapper scrollbar--{{ $template }} scrollbar--size-{{ str_replace('_', '-', $barSize) }} scrollbar--thickness-{{ str_replace('_', '-', $barThickness) }} scrollbar--text-size-{{ str_replace('_', '-', $defaultTextSize) }} scrollbar--text-weight-{{ str_replace('_', '-', $defaultTextWeight) }} {{ $pauseOnHover ? 'scrollbar-pause-on-hover' : '' }} scrollbar-hover-{{ $hoverEffect }}"
                 data-loop="{{ $loopMode }}"
-                style="--scrollbar-gap: {{ $gapBetweenItems }}px; --desktop-h: {{ $desktopHeight }}px; --mobile-h: {{ $mobileHeight }}px;">
+                style="--scrollbar-gap: {{ $gapBetweenItems }}px; --desktop-h: {{ $desktopHeight }}px; --mobile-h: {{ $mobileHeight }}px; {{ $wrapperStyle }}">
 
                 <div class="stayl-scrollbar-inner scrollbar-track scrollbar--{{ $animationType }}">
                     <div class="scrollbar-content scrollbar-item--{{ $itemAnimation }}"

@@ -1,12 +1,12 @@
 @php
     if ($cart === null) return;
     $user     = auth()->user() ?? null;
-    $product  = $user ? ($cart->product ?? null) : null;
+    $product  = $cart->product ?? null;
     $productId = (int) ($cart->product_id ?? 0);
     if ($productId <= 0) return;
     if ($user && $product === null) return;
-    $image    = $user ? (optional($product)->image ?? '') : ($cart->image ?? '');
-    $name     = $user ? (optional($product)->name ?? '') : ($cart->name ?? '');
+    $image    = $product ? ($product->image ?? '') : ($cart->image ?? '');
+    $name     = $product ? ($product->name ?? '') : ($cart->name ?? '');
     if ($user && ($cart->variant_id ?? 0)) {
         $variant = \App\Models\ProductVariant::find($cart->variant_id);
         $price  = $variant ? showDiscountPrice($variant->price, $variant->discount ?? 0, $variant->discount_type ?? 1) : productPrice($product);
@@ -32,7 +32,7 @@
     $stockQty = $product ? ($product->has_variants && $product->activeVariants->isNotEmpty() ? $product->activeVariants->sum('quantity') : ($product->quantity ?? 0)) : 0;
     $reviewCount = $product ? ($product->reviews_count ?? ($product->reviews->count() ?? 0)) : 0;
     $avgRate = $product ? ($product->avg_rate ?? 0) : 0;
-    $purl = $user && $product ? product_detail_url($product) : product_detail_url_for_id($productId, $name);
+    $purl = $product ? product_detail_url($product) : product_detail_url_for_id($productId, $name);
 @endphp
 @php
     $simpleCart = $simpleCart ?? false;
@@ -54,7 +54,7 @@
                 @if($variantLabel)
                     <span class="me-2">@include($activeTemplate . 'partials.icon', ['name' => 'tag', 'class' => 'me-1']){{ $variantLabel }}</span>
                 @endif
-                @if($user && $product && (!empty($product->product_sku) || !empty(optional($product->brand)->name)))
+                @if($product && (!empty($product->product_sku) || !empty(optional($product->brand)->name) || $product->product_type || $product->shipping_weight))
                     <span class="product-list-row__meta-pill" title="@lang('Details')">
                         @if(!empty($product->product_sku))
                             <span class="me-1">@include($activeTemplate . 'partials.icon', ['name' => 'barcode', 'class' => 'me-1']){{ $product->product_sku }}</span>
@@ -62,9 +62,15 @@
                         @if(!empty(optional($product->brand)->name))
                             <span>@include($activeTemplate . 'partials.icon', ['name' => 'store', 'class' => 'me-1']){{ __($product->brand->name) }}</span>
                         @endif
+                        @if(in_array($product->product_type, ['digital', 'service']))
+                            <span class="ms-1 text-primary"><i class="las la-download me-1"></i>{{ ucfirst($product->product_type) }}</span>
+                        @endif
+                        @if($product->shipping_weight > 0)
+                            <span class="ms-1 text-muted"><i class="las la-weight me-1"></i>{{ $product->shipping_weight }} kg</span>
+                        @endif
                     </span>
                 @endif
-                @if($user && $product && $reviewCount > 0)
+                @if($product && $reviewCount > 0)
                     <span class="product-list-row__meta-rating ms-2" title="@lang('Rating')">
                         {!! showProductRatings($avgRate) !!}<span class="small text-muted ms-1">({{ $reviewCount }})</span>
                     </span>

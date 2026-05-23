@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class ServeAssetController extends Controller
 {
-    private const ALLOWED_JS = ['fly-to-header', 'product-carousel', 'glass-header', 'storefront-lucide', 'auth'];
+    private const ALLOWED_JS = ['fly-to-header', 'product-carousel', 'product-line-autoscroll', 'glass-header', 'storefront-lucide', 'auth'];
 
     /** Template basic CSS files allowed to be served with text/css (fixes MIME type 'text/html' when asset() returns 404) */
     private const ALLOWED_CSS = [

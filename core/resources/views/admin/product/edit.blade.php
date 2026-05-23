@@ -2,6 +2,180 @@
 
 @push('style')
 
+<style>
+    /* Unified Image Section Container */
+    .unified-image-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    /* Common Image Box Style */
+    .img-box {
+        width: 140px;
+        height: 140px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        background-color: #f8f9fa;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    /* Hide ALL native file inputs in this section to prevent layout jumping */
+    .unified-image-section input[type="file"],
+    .image-uploader input[type="file"],
+    .profilePicUpload {
+        opacity: 0 !important;
+        position: absolute !important;
+        width: 0.1px !important;
+        height: 0.1px !important;
+        z-index: -100 !important;
+    }
+
+    /* Main Image Styling */
+    .main-image-wrapper {
+        width: 140px;
+        display: flex;
+        flex-direction: column;
+    }
+    .profilePicPreview {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .avatar-edit {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        z-index: 10;
+    }
+    .avatar-edit label {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #4634ff;
+        text-align: center;
+        line-height: 32px;
+        color: #fff;
+        cursor: pointer;
+        display: block;
+        margin: 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .avatar-edit label i {
+        font-size: 18px;
+        line-height: 32px;
+    }
+
+    /* Gallery Styling */
+    .gallery-images-wrapper {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .image-uploader {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 15px;
+        min-height: 140px !important;
+        border: none !important;
+        background: transparent !important;
+        position: relative;
+    }
+    .input-images .uploaded {
+        display: contents !important;
+    }
+    .input-images .uploaded .uploaded-image {
+        width: 140px !important;
+        height: 140px !important;
+        border-radius: 8px !important;
+        border: 1px solid #ced4da !important;
+        background-color: #f8f9fa !important;
+        padding-bottom: 0 !important;
+        margin: 0 !important;
+        flex: 0 0 auto !important;
+        position: relative;
+        overflow: hidden;
+    }
+    .input-images .uploaded .uploaded-image img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        position: static !important;
+    }
+
+    /* Delete Button Styling (Always visible) */
+    .input-images .uploaded .uploaded-image .delete-image {
+        display: block !important;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #ff4747;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .input-images .uploaded .uploaded-image .delete-image i {
+        display: none !important;
+    }
+    .input-images .uploaded .uploaded-image .delete-image::before {
+        content: '×';
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 28px;
+        color: #fff;
+    }
+
+    /* Empty Drag and Drop area acts as 'Add New' Card */
+    .image-uploader .upload-text {
+        position: static !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 140px !important;
+        height: 140px !important;
+        border: 1px dashed #ced4da;
+        border-radius: 8px;
+        background: #f8f9fa;
+        cursor: pointer;
+        margin: 0 !important;
+        flex-shrink: 0;
+    }
+    .image-uploader .upload-text span {
+        display: none !important;
+    }
+    .image-uploader .upload-text::after {
+        content: 'Add Image';
+        font-size: 12px;
+        color: #6c757d;
+        font-weight: 600;
+        margin-top: 5px;
+    }
+    .image-uploader.has-files .upload-text {
+        display: flex !important; /* Keep it visible to add more */
+    }
+    
+    .section-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        white-space: nowrap;
+    }
+</style>
+
 {{-- inline style moved to critical-admin.css --}}
 
 @endpush
@@ -98,6 +272,84 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Advanced Features Card --}}
+                <div class="card mb-3 border-secondary">
+                    <div class="card-header bg-secondary text-white">
+                        <i class="las la-sliders-h me-1"></i> @lang('Advanced Pricing, Inventory & Attributes')
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'original_price'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Original/MSRP Price') <i class="las la-info-circle text-muted" title="Will show as strike-through if higher than Selling Price"></i></label>
+                                <div class="input-group">
+                                    <input type="number" step="any" min="0" class="form-control" name="original_price" value="{{ old('original_price', getAmount($product->original_price ?? 0)) }}">
+                                    <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                </div>
+                            </div>
+                            @endif
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'profit_margin'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Profit Margin') <i class="las la-info-circle text-muted" title="For internal reporting only"></i></label>
+                                <div class="input-group">
+                                    <input type="number" step="any" min="0" class="form-control" name="profit_margin" value="{{ old('profit_margin', getAmount($product->profit_margin ?? 0)) }}">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            @endif
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'low_stock_alert'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Low Stock Alert')</label>
+                                <input type="number" name="low_stock_alert" min="0" class="form-control" value="{{ old('low_stock_alert', $product->low_stock_alert ?? 5) }}" />
+                            </div>
+                            @endif
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'warehouse_location'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Warehouse Location')</label>
+                                <input type="text" name="warehouse_location" class="form-control" value="{{ old('warehouse_location', $product->warehouse_location ?? '') }}" placeholder="e.g. A1-B2" />
+                            </div>
+                            @endif
+                            
+                            <div class="w-100 mb-2"></div>
+                            
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'shipping_weight'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Shipping Weight (kg)')</label>
+                                <input type="number" step="any" min="0" name="shipping_weight" class="form-control" value="{{ old('shipping_weight', $product->shipping_weight ?? '') }}" />
+                            </div>
+                            @endif
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'product_type'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Product Type')</label>
+                                <select name="product_type" class="form-control">
+                                    <option value="physical" @selected(($product->product_type ?? '') == 'physical')>Physical Goods</option>
+                                    <option value="clothing" @selected(($product->product_type ?? '') == 'clothing')>Clothing / Apparel</option>
+                                    <option value="digital" @selected(($product->product_type ?? '') == 'digital')>Digital Download</option>
+                                    <option value="service" @selected(($product->product_type ?? '') == 'service')>Service</option>
+                                </select>
+                            </div>
+                            @endif
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'material'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Material')</label>
+                                <input type="text" name="material" class="form-control" value="{{ old('material', $product->material ?? '') }}" placeholder="e.g. Cotton, Leather" />
+                            </div>
+                            @endif
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'target_gender'))
+                            <div class="form-group col-md-3">
+                                <label>@lang('Target Gender')</label>
+                                <select name="target_gender" class="form-control">
+                                    <option value="">@lang('Unisex / All')</option>
+                                    <option value="male" @selected(($product->target_gender ?? '') == 'male')>Male</option>
+                                    <option value="female" @selected(($product->target_gender ?? '') == 'female')>Female</option>
+                                    <option value="kids" @selected(($product->target_gender ?? '') == 'kids')>Kids</option>
+                                </select>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
                 <div class="card mb-3">
                     <div class="card-header">@lang('Make Product Digital')</div>
                     <div class="card-body">
@@ -157,18 +409,6 @@
                         <i class="las la-eye me-1"></i> @lang('Visibility & Homepage Badges')
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-light border small mb-3 mb-0">
-                            <strong class="d-block mb-1"><i class="las la-link me-1"></i> @lang('Admin toggle') → @lang('Homepage section')</strong>
-                            <ul class="mb-2 ps-3">
-                                <li><strong>@lang('Today Deal')</strong> → <em>@lang('Quick Deals')</em> (@lang('horizontal strip under categories'))</li>
-                                <li><strong>@lang('Hot Deal')</strong> → <em>@lang('Hot Deals')</em></li>
-                                <li><strong>@lang('Featured')</strong> → <em>@lang('Featured Products')</em></li>
-                                <li><strong>@lang('Trending Now')</strong> → <em>@lang('Trending Now')</em></li>
-                            </ul>
-                            <p class="mb-1 small text-muted"><strong>@lang('New Arrivals')</strong>: @lang('Newest products not marked Featured/Hot/Today — automatic.')</p>
-                            <p class="mb-1 small text-muted"><strong>@lang('Best Selling')</strong> / <strong>@lang('Recommended For You')</strong>: @lang('Based on orders (sale count) and popularity — no separate checkbox.')</p>
-                            <p class="mb-0 small text-muted"><strong>@lang('Category')</strong> @lang('on home'): @lang('Manage from') <a href="{{ route('admin.category.index') }}" target="_blank">@lang('Categories')</a> (@lang('active categories with image show in Category row').)</p>
-                        </div>
                         <p class="text-muted small mb-3 mt-2">@lang('Only one of Featured / Hot Deal / Today Deal at a time. Trending can be ON together with one of them.')</p>
                         @if(\Illuminate\Support\Facades\Schema::hasColumn('products', 'home_section_override'))
                         <div class="row g-3 mb-3">
@@ -305,39 +545,44 @@
                     </div>
                 </div>
 
-                <div class="card mt-3">
-                    <div class="card-header">@lang('Image Section')</div>
+                <div class="card mb-3 mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>@lang('Image Section (Main & Gallery)')</span>
+                        <span class="badge bg-primary" id="galleryImageCount">0 @lang('Gallery Uploaded')</span>
+                    </div>
                     <div class="card-body">
-                        <div class="image-uploader-wrapper">
-                            <div class="profile-uploader">
-                                <label class="form-group">@lang('Main Image') :</label>
-                                <div class="payment-method-item">
-                                    <div class="payment-method-header d-flex flex-wrap">
-                                        <div class="thumb">
-                                            <div class="avatar-preview">
-                                                <div class="profilePicPreview" style="background-image: url('{{ $product->imageShow() }}')"></div>
-                                            </div>
-                                            <div class="avatar-edit">
-                                                <input type="file" name="image" class="profilePicUpload" id="image" accept=".png, .jpg, .jpeg">
-                                                <label for="image" class="bg--primary"><i class="la la-pencil"></i></label>
-                                            </div>
-                                        </div>
+                        <div class="unified-image-section">
+                            
+                            <!-- Main Image Area -->
+                            <div class="main-image-wrapper">
+                                <div class="section-title text-center">@lang('Main Image')</div>
+                                <div class="img-box" onclick="document.getElementById('image').click()" style="cursor: pointer;">
+                                    <div class="profilePicPreview" style="background-image: url('{{ $product->imageShow() }}')"></div>
+                                    <div class="avatar-edit">
+                                        <input type="file" name="image" class="profilePicUpload" id="image" accept="image/*, video/*">
+                                        <label for="image" class="bg--primary" title="@lang('Upload Main Image')"><i class="la la-pencil"></i></label>
                                     </div>
                                 </div>
                             </div>
-                            <div class="gallery-uploader">
-                                <label class="form-label">@lang('Gallery Image') :</label>
+
+                            <!-- Separator -->
+                            <div style="width: 1px; background: #e5e5e5; height: 160px; margin: 0 5px;"></div>
+                            
+                            <!-- Gallery Area -->
+                            <div class="gallery-images-wrapper">
+                                <div class="section-title text-start">@lang('Gallery Images') <small class="text-muted fw-normal">(Max 6)</small></div>
                                 <div class="input-field">
                                     <div class="input-images"></div>
-                                    <small class="form-text text-muted">
-                                        <i class="las la-info-circle"></i> @lang('You can only upload a maximum of 6 images')</label>
+                                    <small class="form-text text-muted mt-2 d-block">
+                                        <i class="las la-info-circle"></i> @lang('Click empty area to upload more. Images can be edited or deleted.')
                                     </small>
                                 </div>
                             </div>
+                            
                         </div>
-                        <button type="submit" class="btn btn--primary w-100 h-45 mt-2">@lang('Update')</button>
                     </div>
                 </div>
+                <button type="submit" class="btn btn--primary w-100 h-45 mb-3">@lang('Update')</button>
             </form>
         </div>
     </div>
@@ -383,6 +628,11 @@
                 fillSubcategoryDropdown($('#editCategoryId').val());
             }
 
+            function updateGalleryCount() {
+                var count = $('.input-images .uploaded-image').length;
+                $('#galleryImageCount').text(count + ' @lang("Uploaded")');
+            }
+
             function initImageUploader() {
                 if (typeof $.fn.imageUploader !== 'function') return;
                 $('.input-images').imageUploader({
@@ -391,6 +641,14 @@
                     preloadedInputName: 'old',
                     maxFiles: 6
                 });
+
+                updateGalleryCount();
+                var observer = new MutationObserver(function() {
+                    updateGalleryCount();
+                });
+                if ($('.input-images')[0]) {
+                    observer.observe($('.input-images')[0], { childList: true, subtree: true });
+                }
             }
 
             if (typeof requestIdleCallback !== 'undefined') {
