@@ -3,6 +3,7 @@
  */
 @import "./imports/storefront-vendor.css";
 @import "./imports/storefront-home-legacy.css";
+@import "./stayl-product-card.css";
 @import "./storefront-lucide.css";
 /* PDP/listing/cart legacy (~150KB+ minified) loads async via tailwind-storefront-deferred.css */
 

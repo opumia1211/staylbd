@@ -271,7 +271,6 @@
         box-shadow: 0 0 0 2px color-mix(in srgb, var(--stayl-color-primary) 20%, transparent) !important;
     }
 
-    .stayl-card-actions button:hover,
     .stayl-compact-atc:hover {
         background-color: var(--stayl-color-primary) !important;
         border-color: var(--stayl-color-primary) !important;
@@ -602,7 +601,8 @@
     .storefront-main .card,
     .storefront-main .checkout-card,
     .storefront-main .cart-sidebar,
-    .storefront-main .product-card,
+    .storefront-main .product-card:not(.stayl-product-card),
+    .storefront-main .stayl-product-card,
     .storefront-main .footer-glass__card,
     .storefront-main .modal-content,
     .storefront-main .home-category-section__card,
@@ -614,14 +614,12 @@
         box-shadow: var(--stayl-surface-shadow) !important;
         border-radius: 24px !important;
         backdrop-filter: none !important;
-
-            {
-                {
-                -- Cleaner non-glass for stability on Kartify look --
-            }
-        }
-
         -webkit-backdrop-filter: none !important;
+    }
+
+    .storefront-main .stayl-product-card {
+        border-radius: 12px !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
     }
 
     .modal-content {

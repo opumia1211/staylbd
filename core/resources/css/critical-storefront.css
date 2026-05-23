@@ -3458,7 +3458,7 @@ body.floating-auth-page::after {
     border-radius: 0.25em;
 }
 .auth-btn {
-    background: #2dd4bf; 
+    background: #2dd4bf;
     background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
     color: #fff;
     border: none;
