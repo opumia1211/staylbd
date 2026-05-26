@@ -1,0 +1,22 @@
+# Nested duplicate project copy (do not track)
+/staylbd/
+
+# Local / runtime (never commit)
+core/.env
+core/storage/framework/cache/
+core/storage/framework/sessions/
+core/storage/framework/views/
+core/storage/logs/
+core/bootstrap/cache/*.php
+!core/bootstrap/cache/.gitignore
+
+# Dependencies (install via composer/npm)
+core/node_modules/
+core/vendor/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
