@@ -1,12 +1,15 @@
 @php
     $qvPricing = productDisplayPricing($product);
     $detailPrice = $qvPricing['effective'];
-    $hasDiscount = $qvPricing['has_savings'];
     $qvCompareAt = $qvPricing['compare_at'];
+    $showStrike = $qvPricing['show_strike'];
+    $saveAmount = $qvPricing['save_amount'];
     $savePercent = $qvPricing['save_percent'];
-    $reviewsCount = $product->reviews_count ?? 0;
+    $reviewsCount = (int) ($product->reviews_count ?? 0);
+    $avgRate = (float) ($product->avg_rate ?? 0);
     $galleryImages = array_merge([$product->image], $product->gallery ?? []);
     $quickViewUrl = url()->current() . '?quick_view=' . $product->id;
+    $buyNowUrl = storefront_route('cart.list.buy.now', ['id' => $product->id]);
 @endphp
 <div class="qv-modal mx-auto w-full max-w-storefront" data-product-id="{{ $product->id }}">
     <div class="row g-3">
@@ -34,16 +37,19 @@
                     <h2 class="qv-title" id="qvProductName">{{ __($product->name) }}</h2>
                 </div>
 
-                {{-- লাইন ১: দাম ও ডিসকাউন্ট --}}
                 <div class="qv-price-row">
-                    <span class="qv-price staylbd-rt-price">{{ $general->cur_sym }}{{ showAmount($detailPrice) }}</span>
-                    @if($hasDiscount && $qvCompareAt !== null)
-                        <del class="qv-price-old">{{ $general->cur_sym }}{{ showAmount($qvCompareAt) }}</del>
-                        <span class="qv-badge">{{ $savePercent }}% @lang('OFF')</span>
+                    <span class="qv-price staylbd-rt-price notranslate" data-base-price="{{ $detailPrice }}">{{ $general->cur_sym }}{{ showAmount($detailPrice) }}</span>
+                    @if($showStrike && $qvCompareAt !== null)
+                        <del class="qv-price-old staylbd-rt-price-compare notranslate" data-base-price="{{ $qvCompareAt }}">{{ $general->cur_sym }}{{ showAmount($qvCompareAt) }}</del>
+                    @endif
+                    @if($savePercent >= 1)
+                        <span class="qv-badge notranslate">-{{ $savePercent }}%</span>
+                    @endif
+                    @if($saveAmount > 0)
+                        <span class="qv-save-amount notranslate">{{ __('Save') }} {{ $general->cur_sym }}{{ showAmount($saveAmount) }}</span>
                     @endif
                 </div>
 
-                {{-- লাইন ২: প্রোডাক্ট আইডি ও স্টক --}}
                 <div class="qv-meta">
                     @if($product->product_sku)
                         <span class="qv-sku">@lang('Product ID'): {{ $product->product_sku }}</span>
@@ -59,7 +65,8 @@
                 </div>
 
                 <div class="qv-ratings">
-                    {!! showProductRatings($product->avg_rate ?? 0) !!}
+                    {!! showProductRatings($avgRate) !!}
+                    <span class="qv-rating-value notranslate">{{ number_format($avgRate, 1) }}</span>
                     <span class="qv-reviews">({{ $reviewsCount }} @lang('reviews'))</span>
                 </div>
 
@@ -70,7 +77,6 @@
                     </div>
                 @endif
 
-                {{-- এক লাইনে: Quantity + Add To Cart + Buy Now --}}
                 <div class="qv-actions qv-actions--one-line">
                     <div class="qv-qty-inline">
                         <span class="qv-qty-label">@lang('Quantity')</span>
@@ -82,8 +88,8 @@
                         </div>
                     </div>
                     @if($product->quantity)
-                        <a href="#0" class="cmn--btn add-to-cart btn-cart qv-btn-cart staylbd-rt-atc" data-product_id="{{ $product->id }}">@lang('Add To Cart')</a>
-                        <a href="#0" class="cmn--btn buy-now qv-btn-buy" data-product_id="{{ $product->id }}">@include($activeTemplate . 'partials.icon', ['name' => 'bolt', 'class' => 'me-1'])@lang('Buy Now')</a>
+                        <button type="button" class="add-to-cart btn-cart qv-btn-cart staylbd-rt-atc" data-product_id="{{ $product->id }}" data-qty="1">@lang('Add To Cart')</button>
+                        <a href="{{ $buyNowUrl }}" class="buy-now qv-btn-buy" data-no-ajax data-product_id="{{ $product->id }}">@lang('Buy Now')</a>
                     @endif
                 </div>
                 <a href="{{ product_detail_url($product) }}" class="qv-detail-link" target="_blank" rel="noopener">@include($activeTemplate . 'partials.icon', ['name' => 'info-circle']) @lang('Details')</a>
@@ -99,9 +105,3 @@
         </div>
     </div>
 </div>
-
-
-{{-- inline style moved to critical-storefront.css --}}
-
-
-{{-- Thumb, copy link ও quantity +/- লেআউটের ডেলিগেটেড হ্যান্ডলারে (frontend.blade.php) বাইন্ড করা আছে --}}

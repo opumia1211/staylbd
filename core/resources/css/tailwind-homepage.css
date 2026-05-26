@@ -6,6 +6,7 @@
 @import "./imports/storefront-home-legacy.css";
 @import "./home-banner-slider.css";
 @import "./stayl-product-card.css";
+@import "./stayl-quick-view.css";
 @import "./storefront-lucide.css";
 
 @tailwind base;

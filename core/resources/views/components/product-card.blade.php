@@ -3,10 +3,20 @@
 @php
     $pricing = productDisplayPricing($product);
     $price = $pricing['effective'];
-    $basePrice = $pricing['compare_at'] ?? (float) ($product->price ?? 0);
-    $saveAmount = $pricing['save_amount'];
+    $compareAt = $pricing['compare_at'];
     $savePercent = $pricing['save_percent'];
-    $hasDiscount = $pricing['has_savings'];
+
+    $listPrice = ($compareAt !== null && $compareAt > $price + 0.000001) ? $compareAt : null;
+    if ($listPrice === null) {
+        $listCandidates = array_filter([
+            (float) ($product->original_price ?? 0),
+            (float) ($product->price ?? 0),
+        ], static fn ($p) => $p > $price + 0.000001);
+        $listPrice = empty($listCandidates) ? null : max($listCandidates);
+    }
+    if ($listPrice === null && $savePercent >= 1 && $price > 0) {
+        $listPrice = round($price / (1 - ($savePercent / 100)), 2);
+    }
 
     $primaryImg = getImageWebP(getFilePath('product') . '/' . $product->image, getFileSize('product'));
     $qty = $product->has_variants && $product->activeVariants->isNotEmpty()
@@ -18,6 +28,12 @@
 
     $avgRate = (float) ($product->avg_rate ?? 0);
     $reviewCount = (int) ($product->reviews_count ?? 0);
+
+    $showStock = isset($general->display_stock) && (int) $general->display_stock === \App\Constants\Status::ENABLE;
+    $lowStockMax = (int) config('product_upload.low_stock_max', 20);
+    $stockTier = $qty > $lowStockMax ? 'in' : ($qty >= 1 ? 'low' : 'out');
+    $stockLabel = $stockTier === 'in' ? __('In Stock') : ($stockTier === 'low' ? __('Low Stock') : __('Out of Stock'));
+    $hasFreeDelivery = isset($product->delivery_type) && $product->delivery_type === 'free';
 @endphp
 
 <article class="stayl-product-card" data-product-id="{{ $product->id }}">
@@ -28,6 +44,9 @@
     @endif
 
     <div class="stayl-card-media">
+        @if($hasFreeDelivery)
+            <span class="stayl-card-free-delivery">{{ __('Free Delivery') }}</span>
+        @endif
         <a href="{{ product_detail_url($product) }}" title="{{ $displayName }}">
             <img src="{{ $primaryImg }}" alt="{{ $displayName }}" class="stayl-card-img" loading="lazy" decoding="async" width="320" height="320">
         </a>
@@ -60,27 +79,35 @@
     </div>
 
     <div class="stayl-card-bezel">
-        {{-- Line 1: Product name --}}
+        {{-- Line 1: product name (max 2 lines) --}}
         <h3 class="stayl-card-title">
             <a href="{{ product_detail_url($product) }}" title="{{ $displayName }}">{{ $displayName }}</a>
         </h3>
 
-        {{-- Line 2: current price + old price + save % (one row, no badge background) --}}
+        {{-- Line 2: price + old price + save % + stock --}}
         <div class="stayl-card-price-line">
-            <span class="stayl-card-price staylbd-rt-price notranslate" data-base-price="{{ $price }}">{{ currency_symbol() }}{{ showAmount($price) }}</span>
-            @if($hasDiscount)
-                <span class="stayl-card-price-old staylbd-rt-price-compare notranslate" data-base-price="{{ $basePrice }}">{{ currency_symbol() }}{{ showAmount($basePrice) }}</span>
-                <span class="stayl-card-save-percent notranslate">-{{ $savePercent }}%</span>
-            @endif
+            <span class="stayl-card-price-group">
+                <span class="stayl-card-price staylbd-rt-price notranslate" data-base-price="{{ $price }}">{{ currency_symbol() }}{{ showAmount($price) }}</span>
+                @if($listPrice !== null)
+                    <span class="stayl-card-price-old staylbd-rt-price-compare notranslate" data-base-price="{{ $listPrice }}">{{ currency_symbol() }}{{ showAmount($listPrice) }}</span>
+                @endif
+                @if($savePercent >= 1)
+                    <span class="stayl-card-save-percent notranslate">-{{ $savePercent }}%</span>
+                @endif
+                @if($showStock)
+                    <span class="stayl-card-stock staylbd-rt-stock stayl-card-stock--{{ $stockTier }}" data-stock-tier="{{ $stockTier }}">{{ $stockLabel }}</span>
+                @endif
+            </span>
         </div>
 
         {{-- Line 3: review stars beside Add to Cart + Buy Now --}}
         <div class="stayl-card-footer">
             <div class="stayl-card-rating" aria-label="{{ __('Customer rating') }}">
-                {!! showProductRatings($avgRate) !!}
-                @if($reviewCount > 0)
+                <span class="stayl-card-stars-wrap">{!! showProductRatings($avgRate) !!}</span>
+                <span class="stayl-card-rating-meta">
+                    <span class="stayl-card-rating-value notranslate">{{ number_format($avgRate, 1) }}</span>
                     <span class="stayl-card-review-count">({{ $reviewCount }})</span>
-                @endif
+                </span>
             </div>
 
             <div class="stayl-card-actions" role="group" aria-label="{{ __('Purchase actions') }}">
@@ -92,19 +119,17 @@
                         title="{{ __('Add to Cart') }}"
                         aria-label="{{ __('Add to Cart') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                    <span class="stayl-card-cta-label--long">{{ __('Add to Cart') }}</span>
-                    <span class="stayl-card-cta-label--short">{{ __('Cart') }}</span>
+                    <span class="stayl-card-cta-text">{{ __('Cart') }}</span>
                 </button>
 
                 <a href="{{ $buyNowUrl }}"
-                   class="buy-now stayl-card-cta stayl-card-cta--buy {{ $canPurchase ? '' : 'is-disabled' }}"
+                   class="buy-now staylbd-rt-buynow stayl-card-cta stayl-card-cta--buy {{ $canPurchase ? '' : 'is-disabled' }}"
                    data-no-ajax
                    data-product_id="{{ $product->id }}"
                    title="{{ __('Buy Now') }}"
                    aria-label="{{ __('Buy Now') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    <span class="stayl-card-cta-label--long">{{ __('Buy Now') }}</span>
-                    <span class="stayl-card-cta-label--short">{{ __('Buy') }}</span>
+                    <span class="stayl-card-cta-text">{{ __('Buy') }}</span>
                 </a>
             </div>
         </div>

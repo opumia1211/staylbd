@@ -27,7 +27,7 @@ class HomepageDataService
 
     /** Columns needed for product cards and available() scope (smaller payload, faster load) */
     private const PRODUCT_SELECT_BASE = [
-        'id', 'name', 'image', 'gallery', 'price', 'discount', 'discount_type', 'today_deals',
+        'id', 'name', 'image', 'gallery', 'price', 'original_price', 'discount', 'discount_type', 'today_deals',
         'sale_count', 'quantity', 'has_variants', 'created_at', 'avg_rate', 'category_id', 'brand_id', 'subcategory_id', 'status',
     ];
 
@@ -51,6 +51,9 @@ class HomepageDataService
         if (\Illuminate\Support\Facades\Schema::hasColumn((new Product)->getTable(), 'delivery_type')) {
             $cols[] = 'delivery_type';
             $cols[] = 'delivery_charge';
+        }
+        if (!\Illuminate\Support\Facades\Schema::hasColumn((new Product)->getTable(), 'original_price')) {
+            $cols = array_values(array_diff($cols, ['original_price']));
         }
         return $cols;
     }

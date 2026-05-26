@@ -2838,6 +2838,13 @@ function productDisplayPricing($product): array
     if ($originalPrice > $effective + 0.000001) {
         $candidates[] = $originalPrice;
     }
+    // Fallback: list price from product.price when discount reduces effective but float compare failed
+    if (empty($candidates) && $basePrice > 0) {
+        $discountedFromList = (float) showDiscountPrice($basePrice, (float) ($product->discount ?? 0), (int) ($product->discount_type ?? 1));
+        if ($discountedFromList < $basePrice - 0.000001 && abs($discountedFromList - $effective) < 0.02) {
+            $candidates[] = $basePrice;
+        }
+    }
     $compareAt = empty($candidates) ? null : max($candidates);
     $showStrike = $compareAt !== null && $compareAt > $effective + 0.000001;
     $saveAmount = $showStrike ? max(0.0, $compareAt - $effective) : 0.0;
@@ -2875,19 +2882,20 @@ function showProductRatings($avgRate)
     $normalized = round($rate * 2) / 2;
     $label = 'Rating ' . number_format($rate, 1) . ' of 5';
     $html = '<span class="product-card__stars-inline stayl-rating-stars" role="img" aria-label="' . e($label) . '" data-rating="' . e(number_format($rate, 1)) . '">';
+    $starPx = 16;
     for ($i = 1; $i <= 5; $i++) {
         if ($normalized >= $i) {
-            $html .= '<svg class="product-card__star product-card__star--full" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="' . $pathFull . '"/></svg>';
+            $html .= '<svg class="product-card__star product-card__star--full" viewBox="0 0 24 24" width="' . $starPx . '" height="' . $starPx . '" aria-hidden="true" focusable="false"><path d="' . $pathFull . '"/></svg>';
             continue;
         }
 
         if ($normalized >= ($i - 0.5)) {
             $clipId = 'star-half-' . preg_replace('/[^a-zA-Z0-9_-]/', '', uniqid('', true));
-            $html .= '<svg class="product-card__star product-card__star--half" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><defs><clipPath id="' . $clipId . '"><rect x="0" y="0" width="12" height="24"></rect></clipPath></defs><path class="product-card__star-base" d="' . $pathFull . '"></path><path class="product-card__star-fill" d="' . $pathFull . '" clip-path="url(#' . $clipId . ')"></path></svg>';
+            $html .= '<svg class="product-card__star product-card__star--half" viewBox="0 0 24 24" width="' . $starPx . '" height="' . $starPx . '" aria-hidden="true" focusable="false"><defs><clipPath id="' . $clipId . '"><rect x="0" y="0" width="12" height="24"></rect></clipPath></defs><path class="product-card__star-base" d="' . $pathFull . '"></path><path class="product-card__star-fill" d="' . $pathFull . '" clip-path="url(#' . $clipId . ')"></path></svg>';
             continue;
         }
 
-        $html .= '<svg class="product-card__star product-card__star--empty" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="' . $pathFull . '"/></svg>';
+        $html .= '<svg class="product-card__star product-card__star--empty" viewBox="0 0 24 24" width="' . $starPx . '" height="' . $starPx . '" aria-hidden="true" focusable="false"><path d="' . $pathFull . '"/></svg>';
     }
     $html .= '</span>';
 

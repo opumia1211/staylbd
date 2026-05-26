@@ -1,0 +1,311 @@
+/* Quick View modal — professional shell (local assets only) */
+
+#quickView.modal {
+    background: rgba(2, 6, 23, 0.58);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+#quickView .quick-view-modal-content {
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 16px;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
+    background: rgba(255, 255, 255, 0.98);
+    overflow: hidden;
+}
+
+#quickView .modal-close-btn {
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+}
+
+#quickView .modal-body {
+    padding: 1rem 1.1rem 1.15rem;
+}
+
+.qv-modal {
+    padding: 0;
+    max-width: 100%;
+}
+
+.qv-gallery {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.qv-main-img-wrap {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    min-height: 220px;
+}
+
+.qv-main-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.qv-thumbs {
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+    flex-wrap: wrap;
+    background: #fff;
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.qv-thumb {
+    padding: 2px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.qv-thumb.active {
+    border-color: var(--product-buy-now-color, #0d9488);
+}
+
+.qv-thumb img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
+}
+
+.qv-info {
+    padding-left: 0.75rem;
+}
+
+.qv-title-wrap {
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.qv-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.35;
+}
+
+.qv-price-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin-bottom: 0.4rem;
+    overflow: hidden;
+}
+
+.qv-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--product-price-color, #dc2626);
+    white-space: nowrap;
+}
+
+.qv-price-old {
+    font-size: 0.95rem;
+    color: #64748b;
+    text-decoration: line-through;
+    white-space: nowrap;
+}
+
+.qv-badge {
+    background: none;
+    color: #059669;
+    font-size: 0.8rem;
+    padding: 0;
+    border-radius: 0;
+    font-weight: 700;
+}
+
+.qv-save-amount {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #059669;
+    white-space: nowrap;
+}
+
+.qv-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.qv-ratings {
+    margin-bottom: 0.55rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.qv-ratings .product-card__star {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+.qv-rating-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.qv-reviews {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.qv-summary-text {
+    font-size: 0.86rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.qv-actions--one-line .qv-btn-cart,
+.qv-actions--one-line .qv-btn-buy {
+    height: 34px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 999px;
+    border: 2px solid var(--product-buy-now-color, #0d9488);
+    background: #fff;
+    color: var(--product-buy-now-color, #0d9488);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    max-width: none;
+    flex: 0 1 auto;
+}
+
+.qv-actions--one-line .qv-btn-cart:hover,
+.qv-actions--one-line .qv-btn-buy:hover {
+    background: var(--product-buy-now-color, #0d9488);
+    color: #fff;
+}
+
+.qv-actions--one-line .qv-btn-cart.in-cart {
+    background: var(--product-buy-now-color, #0d9488);
+    color: #fff;
+}
+
+.qv-actions--one-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.qv-qty {
+    display: inline-flex !important;
+    align-items: stretch;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.qv-qty .qtybutton {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: #f1f5f9;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qv-qty-display {
+    min-width: 40px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border-left: 1px solid rgba(148, 163, 184, 0.2);
+    border-right: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.qv-detail-link {
+    font-size: 0.85rem;
+    color: var(--product-buy-now-color, #0d9488);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.qv-share {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.qv-share-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.dark-mode #quickView .quick-view-modal-content {
+    background: rgba(15, 23, 42, 0.96);
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+body.dark-mode .qv-title,
+body.dark-mode .qv-rating-value {
+    color: #f1f5f9;
+}
+
+body.dark-mode .qv-gallery {
+    background: rgba(30, 41, 59, 0.65);
+}
+
+@media (max-width: 767px) {
+    #quickView .modal-body {
+        padding: 0.75rem;
+    }
+
+    .qv-info {
+        padding-left: 0;
+        padding-top: 0.5rem;
+    }
+
+    .qv-title {
+        font-size: 1.05rem;
+    }
+}

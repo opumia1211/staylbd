@@ -42,6 +42,12 @@
     }
 
     function applyStockVisual(el, tier) {
+        if (el.classList.contains('stayl-card-stock')) {
+            el.setAttribute('data-stock-tier', tier);
+            el.classList.remove('stayl-card-stock--in', 'stayl-card-stock--low', 'stayl-card-stock--out');
+            el.classList.add('stayl-card-stock--' + tier);
+            return;
+        }
         var isBadge = el.classList.contains('badge');
         el.setAttribute('data-stock-tier', tier);
         if (isBadge) {
@@ -126,12 +132,15 @@
 
             var isBootstrap = btn.classList.contains('btn');
             if (!isBootstrap) {
-                var labelInBtn = btn.querySelector('.product-card-atc-label');
+                var labelInBtn = btn.querySelector('.product-card-atc-label') || btn.querySelector('.stayl-card-cta-text');
                 var labelEl = labelInBtn || cardAtcLabel;
                 if (labelEl) {
                     labelEl.textContent = canCart ? (str.addCart || 'Add to Cart') : (str.outOfStock || 'Out of Stock');
                 }
                 btn.setAttribute('aria-label', canCart ? (str.addCart || 'Add to Cart') : (str.outOfStock || 'Out of Stock'));
+                if (btn.classList.contains('stayl-card-cta')) {
+                    return;
+                }
                 /* Home glass card: slate CTA — only toggle disabled state, keep palette */
                 if (btn.classList.contains('bg-slate-900')) {
                     if (canCart) {
