@@ -1,4 +1,183 @@
 @extends('admin.layouts.app')
+
+@push('style')
+<style>
+    /* Square cards: image fills frame; meta/actions on hover only (CSS-only, lightweight) */
+    .admin-product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+    @media (min-width: 1400px) {
+        .admin-product-grid { grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); }
+    }
+    .admin-product-card {
+        margin: 0;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+    .admin-product-card__frame {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #f4f5f7;
+        border: 1px solid rgba(67, 89, 113, 0.12);
+        border-radius: 8px;
+        overflow: hidden;
+        contain: layout style paint;
+    }
+    .admin-product-card__img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        padding: 8px;
+        box-sizing: border-box;
+        display: block;
+        pointer-events: none;
+    }
+    .admin-product-card__check-wrap {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        z-index: 4;
+    }
+    .admin-product-card__check-wrap .form-check-input {
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+    .admin-product-card__badges {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        z-index: 3;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 3px;
+        max-width: 55%;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+    }
+    .admin-product-card__badges .badge {
+        font-size: 8px;
+        padding: 2px 4px;
+        line-height: 1.1;
+    }
+    .admin-product-card__hover {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 6px;
+        padding: 8px 6px 6px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.72) 55%, rgba(15, 23, 42, 0.88) 100%);
+        color: #fff;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.18s ease, visibility 0.18s ease;
+    }
+    .admin-product-card__title {
+        font-size: 0.7rem;
+        font-weight: 600;
+        line-height: 1.25;
+        margin: 0;
+        color: #fff;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .admin-product-card__meta-line {
+        font-size: 0.62rem;
+        opacity: 0.9;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 6px;
+        align-items: center;
+    }
+    .admin-product-card__meta-line .price {
+        font-weight: 700;
+        color: #a5f3fc;
+    }
+    .admin-product-card__actions {
+        display: flex;
+        gap: 4px;
+        align-items: stretch;
+    }
+    .admin-product-card__actions .btn {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.35rem;
+        min-height: 26px;
+        border: 0;
+    }
+    .admin-product-card__actions .btn-label-primary {
+        flex: 1;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.2);
+    }
+    .admin-product-card__actions .btn-label-primary:hover {
+        background: rgba(255, 255, 255, 0.32);
+        color: #fff;
+    }
+    .admin-product-card__actions .btn-label-secondary {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.12);
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .admin-product-card__frame:hover .admin-product-card__hover,
+        .admin-product-card__frame:focus-within .admin-product-card__hover,
+        .admin-product-card__frame:has(.dropdown.show) .admin-product-card__hover {
+            opacity: 1;
+            visibility: visible;
+        }
+        .admin-product-card__frame:hover .admin-product-card__badges,
+        .admin-product-card__frame:focus-within .admin-product-card__badges,
+        .admin-product-card__frame:has(.dropdown.show) .admin-product-card__badges {
+            opacity: 0;
+        }
+    }
+    @media (hover: none) {
+        .admin-product-card__hover {
+            opacity: 1;
+            visibility: visible;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0) 40%, rgba(15, 23, 42, 0.85) 100%);
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .admin-product-card__hover { transition: none; }
+    }
+    #adminProductListView .admin-product-list-thumb {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f4f5f7;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 6px;
+        overflow: hidden;
+        padding: 2px;
+    }
+    #adminProductListView .admin-product-list-thumb img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+</style>
+@endpush
+
 @section('panel')
     {{-- Section Header: Scoped Title (Featured, Hot Deal, etc.) --}}
     @if(isset($productScope) && $productScope)
@@ -115,44 +294,34 @@
 
         <div class="card-body pt-0">
             {{-- Grid View (following app-academy-course pattern) --}}
-            <div id="adminProductGridView" class="row gy-6 mb-6">
+            <div id="adminProductGridView" class="admin-product-grid mb-4">
                 @forelse($products as $product)
-                    <div class="col-sm-6 col-lg-4 col-xxl-3">
-                        <div class="card p-2 h-100 shadow-none border">
-                            <div class="position-relative rounded-2 text-center mb-0">
-                                <div class="admin-product-card__check-wrap position-absolute top-0 start-0 m-2 z-3">
-                                    <input type="checkbox" class="form-check-input product-select-check" value="{{ $product->id }}">
-                                </div>
-                                <a href="{{ route('admin.product.edit', $product->id) }}" class="d-block">
-                                    <img src="{{ $product->imageShow() }}" alt="{{ __($product->name) }}" class="img-fluid rounded-2 w-100" style="aspect-ratio: 4/3; object-fit: cover;">
-                                </a>
-                                <div class="position-absolute top-0 end-0 m-2 d-flex flex-column gap-1">
-                                    @if($product->status) <span class="badge bg-success small py-1">@lang('Active')</span> @else <span class="badge bg-danger small py-1">@lang('Inactive')</span> @endif
-                                    @if($product->featured_product)<span class="badge bg-info small py-1" title="@lang('Featured')">F</span>@endif
-                                    @if($product->hot_deals)<span class="badge bg-warning text-dark small py-1" title="@lang('Hot Deal')">H</span>@endif
-                                    @if($product->today_deals)<span class="badge bg-danger small py-1" title="@lang('Today Deal')">T</span>@endif
-                                    @if(isset($product->trending_now) && $product->trending_now)<span class="badge bg-success small py-1" title="@lang('Trending Now')">Tr</span>@endif
-                                </div>
+                    <article class="admin-product-card">
+                        <div class="admin-product-card__frame">
+                            <img src="{{ $product->imageShow() }}" alt="{{ __($product->name) }}" class="admin-product-card__img" loading="lazy" decoding="async" width="200" height="200">
+                            <div class="admin-product-card__check-wrap">
+                                <input type="checkbox" class="form-check-input product-select-check" value="{{ $product->id }}" aria-label="@lang('Select product')">
                             </div>
-                            <div class="card-body p-4 pt-4">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-label-primary">{{ $product->category ? \Illuminate\Support\Str::limit(__($product->category->name), 12) : '-' }}</span>
-                                    <p class="d-flex align-items-center fw-medium gap-1 mb-0 small">
-                                        <span class="text-warning"><i class="bx bxs-star me-1 mb-1"></i></span> {{ $product->quantity }} <small class="text-muted fw-normal">(@lang('pcs'))</small>
-                                    </p>
+                            <div class="admin-product-card__badges">
+                                @if($product->status) <span class="badge bg-success">@lang('Active')</span> @else <span class="badge bg-danger">@lang('Inactive')</span> @endif
+                                @if($product->featured_product)<span class="badge bg-info" title="@lang('Featured')">F</span>@endif
+                                @if($product->hot_deals)<span class="badge bg-warning text-dark" title="@lang('Hot Deal')">H</span>@endif
+                                @if($product->today_deals)<span class="badge bg-danger" title="@lang('Today Deal')">T</span>@endif
+                                @if(isset($product->trending_now) && $product->trending_now)<span class="badge bg-success" title="@lang('Trending Now')">Tr</span>@endif
+                            </div>
+                            <div class="admin-product-card__hover">
+                                <p class="admin-product-card__title" title="{{ __($product->name) }}">{{ __($product->name) }}</p>
+                                <div class="admin-product-card__meta-line">
+                                    <span class="price">{{ $general->cur_sym }}{{ showAmount(productPrice($product)) }}</span>
+                                    <span>#{{ $product->product_sku }}</span>
+                                    <span>{{ $product->quantity }} @lang('pcs')</span>
                                 </div>
-                                <a href="{{ route('admin.product.edit', $product->id) }}" class="h6 d-block mb-2 text-truncate" title="{{ __($product->name) }}">{{ __($product->name) }}</a>
-                                <div class="d-flex align-items-center gap-2 mb-4">
-                                    <span class="text-muted small">#{{ $product->product_sku }}</span>
-                                    <span class="fw-bold text-primary ms-auto">{{ $general->cur_sym }}{{ showAmount(productPrice($product)) }}</span>
-                                </div>
-                                
-                                <div class="d-flex align-items-center gap-2 mt-auto">
-                                    <a class="btn btn-label-primary flex-grow-1 d-flex align-items-center justify-content-center" href="{{ route('admin.product.edit', $product->id) }}">
+                                <div class="admin-product-card__actions">
+                                    <a class="btn btn-label-primary btn-sm" href="{{ route('admin.product.edit', $product->id) }}">
                                         <i class="bx bx-edit-alt me-1"></i> @lang('Edit')
                                     </a>
                                     <div class="dropdown">
-                                        <button type="button" class="btn btn-label-secondary dropdown-toggle hide-arrow px-2" data-bs-toggle="dropdown" aria-expanded="false" style="padding-top: 0.4375rem; padding-bottom: 0.4375rem;">
+                                        <button type="button" class="btn btn-label-secondary btn-sm dropdown-toggle hide-arrow" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="@lang('More actions')">
                                             <i class="bx bx-dots-vertical-rounded"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -177,9 +346,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </article>
                 @empty
-                    <div class="col-12 text-center py-12">
+                    <div class="text-center py-12" style="grid-column: 1 / -1;">
                         <i class="bx bx-package fs-1 text-muted mb-2"></i>
                         <h6 class="text-muted">{{ __($emptyMessage) }}</h6>
                     </div>
@@ -208,7 +377,7 @@
                                     <td class="ps-4"><input type="checkbox" class="form-check-input product-select-check" value="{{ $product->id }}"></td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="avatar avatar-sm me-3"><img src="{{ $product->imageShow() }}" alt="Product" class="rounded"></div>
+                                            <div class="admin-product-list-thumb me-2"><img src="{{ $product->imageShow() }}" alt="{{ __($product->name) }}" loading="lazy" decoding="async"></div>
                                             <div class="d-flex flex-column"><span class="text-heading fw-bold text-truncate" style="max-width: 180px;">{{ __($product->name) }}</span><small class="text-muted">ID: #{{ $product->id }}</small></div>
                                         </div>
                                     </td>
@@ -415,4 +584,4 @@
         })();
     });
 </script>
-@endpush
+@endpush

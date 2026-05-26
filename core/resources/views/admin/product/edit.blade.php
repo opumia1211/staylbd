@@ -557,9 +557,9 @@
                             <div class="main-image-wrapper">
                                 <div class="section-title text-center">@lang('Main Image')</div>
                                 <div class="img-box" onclick="document.getElementById('image').click()" style="cursor: pointer;">
-                                    <div class="profilePicPreview" style="background-image: url('{{ $product->imageShow() }}')"></div>
+                                    <div class="profilePicPreview js-main-image-preview" style="background-image: url('{{ $product->imageShow() }}')"></div>
                                     <div class="avatar-edit">
-                                        <input type="file" name="image" class="profilePicUpload" id="image" accept="image/*, video/*">
+                                        <input type="file" name="image" class="profilePicUpload" id="image" accept="image/*">
                                         <label for="image" class="bg--primary" title="@lang('Upload Main Image')"><i class="la la-pencil"></i></label>
                                     </div>
                                 </div>
@@ -657,11 +657,29 @@
                 setTimeout(initImageUploader, 100);
             }
 
-            $(document).on('input', 'input[name="gallery[]"]', function() {
-                var fileUpload = $("input[type='file']");
-                if (fileUpload.get(0) && parseInt(fileUpload.get(0).files.length, 10) > 6) {
+            $(document).on('input change', 'input[name="gallery[]"]', function() {
+                var selectedFiles = this.files ? this.files.length : 0;
+                var currentUploaded = $('.input-images .uploaded-image').length;
+                if ((selectedFiles + currentUploaded) > 6) {
                     $('#errorModal').modal('show');
+                    this.value = '';
                 }
+            });
+
+            // Real-time main image preview for edit form
+            $('#image').on('change', function() {
+                var file = this.files && this.files[0] ? this.files[0] : null;
+                if (!file) return;
+                if (!file.type || file.type.indexOf('image/') !== 0) {
+                    this.value = '';
+                    alert('@lang("Please select a valid image file.")');
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.js-main-image-preview').css('background-image', 'url("' + e.target.result + '")');
+                };
+                reader.readAsDataURL(file);
             });
 
             let linkHtml = `<label class="required">@lang('Link')</label>
