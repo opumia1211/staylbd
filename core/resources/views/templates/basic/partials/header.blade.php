@@ -168,7 +168,12 @@
 
         return $row;
     }, $headerCurrencies);
-    $currentCurrencyCode = strtoupper((string) (session('stayl_display_currency_code') ?: request()->cookie('stayl_display_currency_code') ?: $general->cur_text ?: 'BDT'));
+    $currentCurrencyCode = strtoupper((string) (
+        request()->cookie('stayl_display_currency_code')
+        ?: session('stayl_display_currency_code')
+        ?: $general->cur_text
+        ?: 'BDT'
+    ));
 
     // Keep header hotline in sync with Footer > Company Info fields.
     $headerContactPhone = trim((string) (optional($companyInfo)->data_values->contact_phone ?? ''));
@@ -328,11 +333,11 @@
                                 <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
                             <div id="langMenu" class="hidden group-hover:!block absolute right-0 mt-0 w-48 pt-2 bg-transparent z-[9999]">
-                                <div class="bg-white border border-slate-200 rounded-lg shadow-xl text-slate-800 overflow-hidden ring-1 ring-black/5">
-                                    <div class="bg-slate-50 px-3 py-1.5 border-b border-slate-100">
+                                <div class="stayl-header-flyout bg-white border border-slate-200 rounded-lg shadow-xl text-slate-800 overflow-hidden ring-1 ring-black/5">
+                                    <div class="stayl-header-flyout__head bg-slate-50 px-3 py-1.5 border-b border-slate-100">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">@lang('Language')</span>
                                     </div>
-                                    <div class="max-h-64 overflow-y-auto py-1">
+                                    <div class="stayl-header-flyout__list max-h-64 overflow-y-auto py-1">
                                         @foreach($headerLanguages as $lang)
                                             @php
                                                 $lCode = strtolower($lang->code);
@@ -344,7 +349,7 @@
                                                 $targetUrl = url($lCode . ($cleanPath ? '/' . $cleanPath : ''));
                                                 if (request()->getQueryString()) $targetUrl .= '?' . request()->getQueryString();
                                             @endphp
-                                            <a href="{{ $targetUrl }}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-lang-option="{{ $lCode }}">
+                                            <a href="{{ $targetUrl }}" class="stayl-header-flyout__item flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-lang-option="{{ $lCode }}">
                                                 <x-country-flag :iso="$lFlagCode" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
                                                 <span>{{ $lang->name }}</span>
                                                 @if(strtolower($currentLangCode) === $lCode)
@@ -374,24 +379,33 @@
                                 <svg class="size-3.5 opacity-70 transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
                             <div id="currencyMenu" class="hidden group-hover:!block absolute right-0 mt-0 w-48 pt-2 bg-transparent z-[9999]">
-                                <div class="bg-white border border-slate-200 rounded-lg shadow-xl text-slate-800 overflow-hidden ring-1 ring-black/5">
-                                    <div class="bg-slate-50 px-3 py-1.5 border-b border-slate-100">
+                                <div class="stayl-header-flyout bg-white border border-slate-200 rounded-lg shadow-xl text-slate-800 overflow-hidden ring-1 ring-black/5">
+                                    <div class="stayl-header-flyout__head bg-slate-50 px-3 py-1.5 border-b border-slate-100">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">@lang('Currency')</span>
                                     </div>
-                                    <div class="max-h-64 overflow-y-auto py-1">
+                                    <div class="stayl-header-flyout__list max-h-64 overflow-y-auto py-1">
                                         @foreach($headerCurrencies as $curr)
                                             @php
                                                 $cCode = strtoupper($curr['code']);
                                                 $isActive = strtoupper($currentCurrencyCode) === $cCode;
                                             @endphp
-                                            <a href="javascript:void(0)" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm" data-stayl-currency-option="{{ $cCode }}">
+                                            <a href="javascript:void(0)"
+                                               class="stayl-header-flyout__item flex items-center gap-3 px-3 py-2 hover:bg-slate-50 transition-colors no-underline text-slate-700 font-medium text-sm {{ $isActive ? 'stayl-header-flyout__item--active' : '' }}"
+                                               data-stayl-currency-option="{{ $cCode }}"
+                                               aria-selected="{{ $isActive ? 'true' : 'false' }}">
                                                 @if(!empty($curr['flag_iso']))
                                                     <x-country-flag :iso="$curr['flag_iso']" class="stayl-flag-img w-5 h-4 shrink-0 rounded-sm object-cover" />
                                                 @endif
-                                                <span>{{ $cCode }}</span>
-                                                @if($isActive)
-                                                    <svg class="ms-auto size-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                                @endif
+                                                <span class="min-w-0 truncate">{{ $cCode }}</span>
+                                                <svg data-stayl-currency-check
+                                                     class="stayl-currency-check ms-auto size-4 shrink-0 text-emerald-500 {{ $isActive ? '' : 'hidden' }}"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24"
+                                                     stroke-width="3"
+                                                     aria-hidden="true">
+                                                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
                                             </a>
                                         @endforeach
                                     </div>
@@ -1667,20 +1681,30 @@
             let mutationDebounce = null;
             let isApplyingCurrency = false;
             function markCurrencyOption(code) {
+                const activeCode = (code || '').toUpperCase();
                 currencyOptions.forEach(function (el) {
                     const itemCode = (el.getAttribute('data-stayl-currency-option') || '').toUpperCase();
-                    const on = itemCode === code;
+                    const on = itemCode === activeCode;
                     el.setAttribute('aria-selected', on ? 'true' : 'false');
-                    el.classList.toggle('bg-sky-50', on);
-                    el.classList.toggle('text-sky-700', on);
-                    el.classList.toggle('dark:bg-sky-950/40', on);
-                    el.classList.toggle('dark:text-sky-400', on);
-                    el.classList.toggle('text-slate-800', !on);
-                    el.classList.toggle('dark:text-slate-200', !on);
-                    const check = el.querySelector('[data-stayl-currency-check]');
-                    if (check) {
-                        check.classList.toggle('hidden', !on);
+                    el.classList.toggle('stayl-header-flyout__item--active', on);
+                    let check = el.querySelector('[data-stayl-currency-check]');
+                    if (!check) {
+                        check = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        check.setAttribute('data-stayl-currency-check', '');
+                        check.setAttribute('class', 'stayl-currency-check ms-auto size-4 shrink-0 text-emerald-500');
+                        check.setAttribute('fill', 'none');
+                        check.setAttribute('stroke', 'currentColor');
+                        check.setAttribute('viewBox', '0 0 24 24');
+                        check.setAttribute('stroke-width', '3');
+                        check.setAttribute('aria-hidden', 'true');
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', 'M5 13l4 4L19 7');
+                        path.setAttribute('stroke-linecap', 'round');
+                        path.setAttribute('stroke-linejoin', 'round');
+                        check.appendChild(path);
+                        el.appendChild(check);
                     }
+                    check.classList.toggle('hidden', !on);
                 });
             }
             const headerCurrencyLabel = document.getElementById('staylCurrentCurrencyLabel');
