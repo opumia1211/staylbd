@@ -103,13 +103,39 @@
         });
 
         root.querySelectorAll('.staylbd-rt-price-compare').forEach(function (el) {
+            var compareVal = d.compare_at != null && d.compare_at !== '' ? d.compare_at : d.compare;
             if (d.has_savings && d.compare_formatted) {
-                if (d.compare != null && d.compare !== '') {
-                    el.setAttribute('data-base-price', String(d.compare));
+                if (compareVal != null && compareVal !== '') {
+                    el.setAttribute('data-base-price', String(compareVal));
                 }
                 el.textContent = curSym + d.compare_formatted;
                 el.classList.remove('hidden');
-            } else {
+                return;
+            }
+
+            /* Incomplete batch payloads must not wipe server-rendered compare prices */
+            var baseCompare = parseFloat(el.getAttribute('data-base-price'));
+            var effEl = root.querySelector('.staylbd-rt-price');
+            var effBase = effEl ? parseFloat(effEl.getAttribute('data-base-price')) : NaN;
+            if (
+                !isNaN(baseCompare) &&
+                !isNaN(effBase) &&
+                baseCompare > effBase + 0.000001 &&
+                (el.textContent || '').trim() !== ''
+            ) {
+                el.classList.remove('hidden');
+                return;
+            }
+
+            el.textContent = '';
+            el.classList.add('hidden');
+        });
+
+        root.querySelectorAll('.stayl-card-save-percent').forEach(function (el) {
+            if (d.save_percent != null && parseInt(d.save_percent, 10) >= 1) {
+                el.textContent = '-' + parseInt(d.save_percent, 10) + '%';
+                el.classList.remove('hidden');
+            } else if (!d.has_savings) {
                 el.textContent = '';
                 el.classList.add('hidden');
             }

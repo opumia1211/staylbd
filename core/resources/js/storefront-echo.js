@@ -40,6 +40,16 @@ function batchRowToPayload(row, curSym) {
     const stock = parseInt(row.stock, 10) || 0;
     const priceNum = Number.isFinite(price) ? price : 0;
     const effFmt = formatAmountClient(priceNum);
+    const compareRaw = row.compare_at;
+    const compareNum =
+        compareRaw !== null && compareRaw !== undefined && compareRaw !== ''
+            ? parseFloat(compareRaw)
+            : NaN;
+    const hasSavings =
+        !!row.has_savings &&
+        Number.isFinite(compareNum) &&
+        compareNum > priceNum + 0.000001;
+    const compareFmt = hasSavings ? formatAmountClient(compareNum) : null;
     const delisted = stock <= 0 && priceNum <= 0;
 
     if (delisted) {
@@ -79,10 +89,11 @@ function batchRowToPayload(row, curSym) {
             cur_sym: curSym,
             effective: priceNum,
             effective_formatted: effFmt,
-            compare_at: null,
-            compare_formatted: null,
-            has_savings: false,
-            save_percent: 0,
+            compare_at: hasSavings ? compareNum : null,
+            compare: hasSavings ? compareNum : null,
+            compare_formatted: compareFmt,
+            has_savings: hasSavings,
+            save_percent: hasSavings ? parseInt(row.save_percent, 10) || 0 : 0,
             save_amount_formatted: null,
         },
         variants: [],

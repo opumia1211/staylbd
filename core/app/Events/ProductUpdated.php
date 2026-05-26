@@ -125,6 +125,7 @@ class ProductUpdated implements ShouldBroadcast
                 'effective' => $effective,
                 'effective_formatted' => showAmount($effective),
                 'compare_at' => $compareAt,
+                'compare' => $compareAt,
                 'compare_formatted' => $compareAt !== null ? showAmount((float) $compareAt) : null,
                 'has_savings' => $hasSavings,
                 'save_percent' => $savePct,

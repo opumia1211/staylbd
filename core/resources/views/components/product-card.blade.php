@@ -5,6 +5,8 @@
     $price = $pricing['effective'];
     $compareAt = $pricing['compare_at'];
     $savePercent = $pricing['save_percent'];
+    $showStrike = $pricing['show_strike'];
+    $hasSavings = $pricing['has_savings'];
 
     $listPrice = ($compareAt !== null && $compareAt > $price + 0.000001) ? $compareAt : null;
     if ($listPrice === null) {
@@ -16,6 +18,14 @@
     }
     if ($listPrice === null && $savePercent >= 1 && $price > 0) {
         $listPrice = round($price / (1 - ($savePercent / 100)), 2);
+    }
+
+    $strikePrice = $listPrice;
+    if ($strikePrice === null && $showStrike && $compareAt !== null) {
+        $strikePrice = $compareAt;
+    }
+    if ($strikePrice === null && $hasSavings && $savePercent >= 1 && $price > 0) {
+        $strikePrice = round($price / (1 - ($savePercent / 100)), 2);
     }
 
     $primaryImg = getImageWebP(getFilePath('product') . '/' . $product->image, getFileSize('product'));
@@ -88,11 +98,11 @@
         <div class="stayl-card-price-line">
             <span class="stayl-card-price-group">
                 <span class="stayl-card-price staylbd-rt-price notranslate" data-base-price="{{ $price }}">{{ currency_symbol() }}{{ showAmount($price) }}</span>
-                @if($listPrice !== null)
-                    <span class="stayl-card-price-old staylbd-rt-price-compare notranslate" data-base-price="{{ $listPrice }}">{{ currency_symbol() }}{{ showAmount($listPrice) }}</span>
+                @if($showStrike && $strikePrice !== null && $strikePrice > $price + 0.000001)
+                    <del class="stayl-card-price-old staylbd-rt-price-compare notranslate" data-base-price="{{ $strikePrice }}" data-has-savings="1">{{ currency_symbol() }}{{ showAmount($strikePrice) }}</del>
                 @endif
-                @if($savePercent >= 1)
-                    <span class="stayl-card-save-percent notranslate">-{{ $savePercent }}%</span>
+                @if($showStrike && $savePercent >= 1)
+                    <span class="stayl-card-save-percent staylbd-rt-save-percent notranslate">-{{ $savePercent }}%</span>
                 @endif
                 @if($showStock)
                     <span class="stayl-card-stock staylbd-rt-stock stayl-card-stock--{{ $stockTier }}" data-stock-tier="{{ $stockTier }}">{{ $stockLabel }}</span>

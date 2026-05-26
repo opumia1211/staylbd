@@ -58,9 +58,13 @@ class ProductsRealtimeController extends Controller
                 ? (int) $product->activeVariants->sum('quantity')
                 : (int) $product->quantity;
 
+            $compareAt = $pricing['compare_at'];
             $out[] = [
                 'id' => $id,
                 'price' => round((float) $pricing['effective'], 2),
+                'compare_at' => $compareAt !== null ? round((float) $compareAt, 2) : null,
+                'has_savings' => (bool) $pricing['has_savings'],
+                'save_percent' => (int) $pricing['save_percent'],
                 'stock' => $stock,
             ];
         }

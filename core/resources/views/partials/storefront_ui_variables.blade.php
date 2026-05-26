@@ -491,6 +491,11 @@
         visibility: hidden !important;
     }
 
+    html[data-display-currency] .stayl-product-card .stayl-card-price-line .staylbd-rt-price,
+    html[data-display-currency] .stayl-product-card .stayl-card-price-line .staylbd-rt-price-compare {
+        visibility: visible !important;
+    }
+
     .stayl-rt-ready .staylbd-rt-price,
     .stayl-rt-ready .staylbd-rt-price-compare,
     .stayl-rt-ready .price,
@@ -620,6 +625,13 @@
     .storefront-main .stayl-product-card {
         border-radius: 12px !important;
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+        background-color: var(--product-card-bg, var(--stayl-surface-card, #fff)) !important;
+    }
+
+    body.dark-mode .storefront-main .stayl-product-card {
+        background-color: #0f172a !important;
+        border-color: rgba(148, 163, 184, 0.18) !important;
+        box-shadow: none !important;
     }
 
     .modal-content {
@@ -670,6 +682,7 @@
 
     /* Manual Dark Mode Override (Premium Elite Midnight Look) */
     body.dark-mode {
+        --product-card-bg: #0f172a;
         --stayl-surface-bg: #030712;
         --stayl-surface-card: #0f172a;
         --stayl-surface-card-border: rgba(148, 163, 184, 0.12);
