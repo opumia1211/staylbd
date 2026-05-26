@@ -110,21 +110,7 @@ main.storefront-main{padding-top:calc(var(--stayl-header-height,72px) + var(--st
 .product-card__info-inner .product-card__row--footer,.product-card__info-inner .product-card__row--reviews{margin-top:0!important}
 .product-card__stock,.product-card__shipping-badge{font-size:0.65rem;font-weight:500}
 .product-card__cta,.buy-now-cta{flex:0 0 34px;flex-shrink:0;width:calc(100% - 12px);max-width:320px;margin:6px auto 0}
-.stayl-product-card{display:flex;flex-direction:column;height:100%;overflow:hidden;border-radius:12px;border:1px solid rgba(15,23,42,.1);background:#fff}
-.stayl-product-card .stayl-card-media{position:relative;padding-top:118%;background:#f8fafc}
-.stayl-product-card .stayl-card-media>a{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10px}
-.stayl-product-card .stayl-card-img{max-width:100%;max-height:100%;object-fit:contain}
-.stayl-product-card .stayl-card-bezel{padding:8px;border-top:1px solid rgba(15,23,42,.08);background:#fafbfc}
-.stayl-product-card .stayl-card-title{margin:0;font-size:12px;font-weight:700;line-height:1.3;max-height:2.6em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.stayl-product-card .stayl-card-title a{color:#0f172a;text-decoration:none}
-.stayl-product-card .stayl-card-price-row{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:20px}
-.stayl-product-card .stayl-card-price{font-size:14px;font-weight:800;color:#dc2626}
-.stayl-product-card .stayl-card-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:2px}
-.stayl-product-card .stayl-card-action-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:34px;max-height:34px;border-radius:8px;font-size:8px;font-weight:800;border:1px solid transparent}
-.stayl-product-card .stayl-card-action-btn--wish{background:#fff1f2;border-color:#fecdd3;color:#e11d48}
-.stayl-product-card .stayl-card-action-btn--compare{background:#f5f3ff;border-color:#ddd6fe;color:#6d28d9}
-.stayl-product-card .stayl-card-action-btn--cart{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
-.stayl-product-card .stayl-card-action-btn--buy{background:linear-gradient(180deg,#ef4444,#dc2626);border-color:#b91c1c;color:#fff}
+/* stayl-product-card: full styles in stayl-product-card.css (imported in tailwind-homepage) — do not duplicate legacy 4-btn grid here */
 .show-cart-count.is-pulsing,.show-wishlist-count.is-pulsing{animation:badgePulse .32s ease}
 @keyframes badgePulse{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1)}}
 
