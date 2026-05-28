@@ -9,7 +9,7 @@ $response = $kernel->handle(
 
 use Illuminate\Support\Facades\DB;
 
-$backupFile = 'C:/xampp/htdocs/staylbd1/core/database/wintersm_tt.sql';
+$backupFile = dirname(__DIR__) . '/database/staylbd_wintersm.sql';
 if (!file_exists($backupFile)) {
     die("Backup file not found.\n");
 }

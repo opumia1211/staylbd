@@ -67,7 +67,7 @@
                 </div>
                 <div class="card-body">
                     <ol class="mb-3 ps-3 lh-lg">
-                        <li>@lang('Open phpMyAdmin and select your database') <strong>(e.g. wintersm_tt)</strong>.</li>
+                        <li>@lang('Open phpMyAdmin and select your database') <strong>(e.g. staylbd_wintersm)</strong>.</li>
                         <li>@lang('Click the') <strong>@lang('SQL')</strong> @lang('tab.')</li>
                         <li>@lang('Copy the entire code below, paste into the SQL box, then click') <strong>@lang('Go')</strong>.</li>
                     </ol>

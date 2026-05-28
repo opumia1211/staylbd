@@ -1,6 +1,10 @@
 {{-- ========================================================= --}}
 {{-- Next-Gen Features Integration (Gap List Resolutions) --}}
 {{-- ========================================================= --}}
+@php
+    $libraryOnly = feature_enabled('assets.library_only_mode', true);
+    $allowExternalObs = feature_enabled('assets.allow_external_observability', false);
+@endphp
 
 {{-- 1. PWA & Service Worker --}}
 <link rel="manifest" href="{{ asset('manifest.json') }}">
@@ -17,58 +21,55 @@
 </script>
 
 {{-- 2. Sentry / Centralized Frontend Error Tracking --}}
-<script
-  src="https://browser.sentry-cdn.com/7.99.0/bundle.tracing.min.js"
-  crossorigin="anonymous"
-></script>
-<script>
-    if (typeof Sentry !== 'undefined') {
-        Sentry.init({
-            dsn: "{{ env('SENTRY_LARAVEL_DSN', '') }}", // This should be populated in .env
-            release: "staylbd@{{ config('app.asset_version', '1.0.0') }}",
-            environment: "{{ app()->environment() }}",
-            integrations: [new Sentry.BrowserTracing()],
-            tracesSampleRate: 0.2, // Adjust as per error budget
-        });
-    }
-</script>
+@if(!$libraryOnly && $allowExternalObs)
+    <script
+      src="https://browser.sentry-cdn.com/7.99.0/bundle.tracing.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+        try {
+            if (typeof Sentry !== 'undefined') {
+                Sentry.init({
+                    dsn: "{{ env('SENTRY_LARAVEL_DSN', '') }}",
+                    release: "staylbd@{{ config('app.asset_version', '1.0.0') }}",
+                    environment: "{{ app()->environment() }}",
+                    integrations: [new Sentry.BrowserTracing()],
+                    tracesSampleRate: 0.2,
+                });
+            }
+        } catch (e) {}
+    </script>
+@endif
 
 {{-- 3. Core Web Vitals Continuous Monitoring --}}
-<script type="module">
-    import {onLCP, onFID, onCLS, onINP, onFCP, onTTFB} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.js?module';
-
-    function sendToAnalytics(metric) {
-        // Here we push to our Analytics endpoint or GTM DataLayer
-        const body = JSON.stringify(metric);
-        
-        // Push to datalayer
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-            event: 'web_vitals',
-            web_vital_name: metric.name,
-            web_vital_value: metric.value,
-            web_vital_id: metric.id,
-            web_vital_delta: metric.delta
-        });
-
-        // Uncomment to send to an actual API endpoint:
-        /*
-        (navigator.sendBeacon && navigator.sendBeacon('/api/vitals', body)) ||
-        fetch('/api/vitals', {body, method: 'POST', keepalive: true});
-        */
-        
-        // Console log for debugging
-        if(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-             // console.log(metric);
-        }
-    }
-
-    onCLS(sendToAnalytics);
-    onFID(sendToAnalytics);
-    onLCP(sendToAnalytics);
-    onINP(sendToAnalytics);
-    onFCP(sendToAnalytics);
-    onTTFB(sendToAnalytics);
+<script>
+    (function () {
+        try {
+            window.dataLayer = window.dataLayer || [];
+            var ttfb = Math.round(performance.timeOrigin ? (performance.now()) : 0);
+            window.dataLayer.push({
+                event: 'web_vitals_local',
+                metric: 'TTFB',
+                value: ttfb
+            });
+            if ('PerformanceObserver' in window) {
+                try {
+                    var lcpObserver = new PerformanceObserver(function (entryList) {
+                        var entries = entryList.getEntries();
+                        var last = entries[entries.length - 1];
+                        if (last) {
+                            window.dataLayer.push({
+                                event: 'web_vitals_local',
+                                metric: 'LCP',
+                                value: Math.round(last.startTime)
+                            });
+                        }
+                    });
+                    lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+                } catch (e) {}
+            }
+        } catch (e) {}
+    })();
 </script>
 
 {{-- 4. Checkout Funnel Analytics (Structured Setup) --}}

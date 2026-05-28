@@ -143,7 +143,13 @@ class AdminController extends Controller
     {
         try {
             $stats = $dashboardService->getLiveStats();
-            return response()->json(['ok' => true, 'stats' => $stats]);
+            $feed = $dashboardService->getLiveFeed(10);
+            return response()->json([
+                'ok' => true,
+                'stats' => $stats,
+                'feed' => $feed,
+                'server_time' => now()->toIso8601String(),
+            ]);
         } catch (\Throwable $e) {
             Log::warning('Dashboard stats API failed: ' . $e->getMessage());
             return response()->json(['ok' => false, 'message' => 'Unable to load stats'], 500);

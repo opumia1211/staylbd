@@ -23,9 +23,11 @@
         || str_contains(request()->url(), '127.0.0.1');
     $loadOnLocalhost = filter_var(env('TAWK_ON_LOCALHOST', 'false'), FILTER_VALIDATE_BOOLEAN);
     $skipTawk = $isLocalhost && !$loadOnLocalhost;
+    $libraryOnly = feature_enabled('assets.library_only_mode', true);
+    $allowChat = feature_enabled('assets.allow_live_chat_embed', false);
 @endphp
 {{-- Tawk: only load if TAWK_PROPERTY_ID set. Disabled when APP_ENV=local or on localhost (CORS/404). TAWK_ENABLED=false disables globally; TAWK_ON_LOCALHOST=true loads on localhost. --}}
-@if($tawkValid && env('TAWK_ENABLED', true) && !$skipTawk)
+@if(!$libraryOnly && $allowChat && $tawkValid && env('TAWK_ENABLED', true) && !$skipTawk)
 <script type="text/javascript">
 (function(){
   if (window.__tawkLoaded) return;

@@ -1,5 +1,5 @@
 <?php
-$file = 'C:/xampp/htdocs/staylbd1/core/database/wintersm_tt.sql';
+$file = dirname(__DIR__) . '/database/staylbd_wintersm.sql';
 if (!file_exists($file)) {
     die("File not found: $file\n");
 }

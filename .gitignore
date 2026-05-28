@@ -20,3 +20,7 @@ Thumbs.db
 .idea/
 .vscode/
 *.log
+
+# Build/test artifacts
+core/playwright-report/
+core/public/**/*.map

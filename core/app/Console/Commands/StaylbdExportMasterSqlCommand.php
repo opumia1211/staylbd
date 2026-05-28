@@ -6,9 +6,9 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 
 /**
- * Master SQL export for production: one file (wintersm_tt.sql) only.
- * Run after: php artisan migrate --force && php artisan db:seed --force
- * Then in cPanel import only staylbd_master_final.sql – no patches/migrations needed.
+ * Master SQL export for production: staylbd_wintersm.sql (+ staylbd_wintersm_backup.sql).
+ * Run after: php artisan migrate --force && php artisan staylbd:health-check
+ * Production: import core/database/staylbd_wintersm.sql in cPanel (no migrate:fresh).
  */
 class StaylbdExportMasterSqlCommand extends Command
 {

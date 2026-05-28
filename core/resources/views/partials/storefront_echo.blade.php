@@ -16,8 +16,8 @@
         'pollUrlTemplate' => $pollUrlTemplate,
         'batchPollUrl' => route('api.v1.products.realtime'),
         'batchPollMaxIds' => \App\Http\Controllers\Api\ProductsRealtimeController::MAX_IDS,
-        'pollIntervalMs' => 12000,
-        'wsDeadBeforePollMs' => 15000,
+        'pollIntervalMs' => (int) config('optimization.storefront.realtime_poll_interval_ms', 8000),
+        'wsDeadBeforePollMs' => (int) config('optimization.storefront.realtime_ws_dead_before_poll_ms', 12000),
         'wsResumeProbeMs' => 45000,
         'labels' => [
             'idle' => __('Live updates'),

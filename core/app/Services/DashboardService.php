@@ -71,22 +71,103 @@ class DashboardService
     public function getLiveStats(): array
     {
         $cacheKey = $this->cachePrefix . '.live';
-        return Cache::remember($cacheKey, self::LIVE_CACHE_TTL, function () {
+        $ttl = (int) config('optimization.admin.live_stats_cache_ttl', self::LIVE_CACHE_TTL);
+        if ($ttl < 1) {
+            $ttl = 1;
+        }
+        return Cache::remember($cacheKey, $ttl, function () {
+            $moduleIsolation = (bool) config('features.resilience.module_isolation', true);
+            if (! $moduleIsolation) {
+                return array_merge(
+                    $this->productModule(),
+                    $this->orderModule(),
+                    $this->paymentModule(),
+                    $this->userModule(),
+                    $this->deliveryModule(),
+                    $this->supportModule(),
+                    $this->systemModule(),
+                    $this->securityModule(),
+                    $this->reportModule(),
+                    $this->courierModule(),
+                    $this->subscriberModule(),
+                    $this->criticalAlerts(),
+                    $this->revenueOverview()
+                );
+            }
+
             return array_merge(
-                $this->productModule(),
-                $this->orderModule(),
-                $this->paymentModule(),
-                $this->userModule(),
-                $this->deliveryModule(),
-                $this->supportModule(),
-                $this->systemModule(),
-                $this->securityModule(),
-                $this->reportModule(),
-                $this->courierModule(),
-                $this->subscriberModule(),
-                $this->criticalAlerts(),
-                $this->revenueOverview()
+                $this->safeModule('product', fn () => $this->productModule()),
+                $this->safeModule('order', fn () => $this->orderModule()),
+                $this->safeModule('payment', fn () => $this->paymentModule()),
+                $this->safeModule('user', fn () => $this->userModule()),
+                $this->safeModule('delivery', fn () => $this->deliveryModule()),
+                $this->safeModule('support', fn () => $this->supportModule()),
+                $this->safeModule('system', fn () => $this->systemModule()),
+                $this->safeModule('security', fn () => $this->securityModule()),
+                $this->safeModule('report', fn () => $this->reportModule()),
+                $this->safeModule('courier', fn () => $this->courierModule()),
+                $this->safeModule('subscriber', fn () => $this->subscriberModule()),
+                $this->safeModule('alerts', fn () => $this->criticalAlerts()),
+                $this->safeModule('revenue', fn () => $this->revenueOverview())
             );
+        });
+    }
+
+    /**
+     * Lightweight live feed for admin dashboard activity widget.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getLiveFeed(int $maxItems = 10): array
+    {
+        $maxItems = max(1, min($maxItems, 20));
+        $key = $this->cachePrefix . '.live.feed.' . $maxItems;
+
+        return Cache::remember($key, 5, function () use ($maxItems) {
+            $items = $this->recentActivity($maxItems);
+            $out = [];
+
+            foreach ($items as $item) {
+                $type = (string) ($item['type'] ?? '');
+                $model = $item['model'] ?? null;
+                if (! $model) {
+                    continue;
+                }
+
+                if ($type === 'order') {
+                    $out[] = [
+                        'type' => 'order',
+                        'id' => (int) $model->id,
+                        'title' => 'Order ' . (string) ($model->order_no ?? '#'),
+                        'subtitle' => optional($model->created_at)->diffForHumans() ?? 'just now',
+                        'url' => route('admin.orders.detail', (int) $model->id),
+                    ];
+                    continue;
+                }
+
+                if ($type === 'user') {
+                    $out[] = [
+                        'type' => 'user',
+                        'id' => (int) $model->id,
+                        'title' => (string) ($model->username ?? ('User #' . (int) $model->id)),
+                        'subtitle' => optional($model->created_at)->diffForHumans() ?? 'just now',
+                        'url' => route('admin.users.detail', (int) $model->id),
+                    ];
+                    continue;
+                }
+
+                if ($type === 'deposit') {
+                    $out[] = [
+                        'type' => 'deposit',
+                        'id' => (int) $model->id,
+                        'title' => 'Payment #' . (int) $model->id,
+                        'subtitle' => optional($model->created_at)->diffForHumans() ?? 'just now',
+                        'url' => route('admin.deposit.list'),
+                    ];
+                }
+            }
+
+            return $out;
         });
     }
 
@@ -510,19 +591,19 @@ class DashboardService
     /** Real-time stats for full page (no chart cache). */
     private function getRealtimeStats(): array
     {
-        $product = $this->productModule();
-        $order = $this->orderModule();
-        $payment = $this->paymentModule();
-        $user = $this->userModule();
-        $delivery = $this->deliveryModule();
-        $support = $this->supportModule();
-        $system = $this->systemModule();
-        $security = $this->securityModule();
-        $report = $this->reportModule();
-        $courier = $this->courierModule();
-        $subscriber = $this->subscriberModule();
-        $alerts = $this->criticalAlerts();
-        $revenue = $this->revenueOverview();
+        $product = $this->safeModule('product', fn () => $this->productModule(), []);
+        $order = $this->safeModule('order', fn () => $this->orderModule(), []);
+        $payment = $this->safeModule('payment', fn () => $this->paymentModule(), []);
+        $user = $this->safeModule('user', fn () => $this->userModule(), []);
+        $delivery = $this->safeModule('delivery', fn () => $this->deliveryModule(), []);
+        $support = $this->safeModule('support', fn () => $this->supportModule(), []);
+        $system = $this->safeModule('system', fn () => $this->systemModule(), []);
+        $security = $this->safeModule('security', fn () => $this->securityModule(), []);
+        $report = $this->safeModule('report', fn () => $this->reportModule(), []);
+        $courier = $this->safeModule('courier', fn () => $this->courierModule(), []);
+        $subscriber = $this->safeModule('subscriber', fn () => $this->subscriberModule(), []);
+        $alerts = $this->safeModule('alerts', fn () => $this->criticalAlerts(), []);
+        $revenue = $this->safeModule('revenue', fn () => $this->revenueOverview(), []);
 
         $widget = array_merge(
             $product,
@@ -576,6 +657,27 @@ class DashboardService
             'recentDepositsForActivity' => Deposit::latest()->take(3)->get(['id', 'amount', 'status', 'created_at']),
             'lowStockProducts' => $this->lowStockProducts(),
         ];
+    }
+
+    /**
+     * Execute a dashboard module in isolation so one failure does not break others.
+     *
+     * @param  callable():array<string,mixed>  $resolver
+     * @param  array<string,mixed>  $fallback
+     * @return array<string,mixed>
+     */
+    private function safeModule(string $name, callable $resolver, array $fallback = []): array
+    {
+        try {
+            return $resolver();
+        } catch (\Throwable $e) {
+            report($e);
+            \Log::warning('Dashboard module failed in isolation', [
+                'module' => $name,
+                'message' => $e->getMessage(),
+            ]);
+            return $fallback;
+        }
     }
 
     private function liveOnlineUsersCount(): int
@@ -634,5 +736,6 @@ class DashboardService
         foreach ($tags as $key) {
             Cache::forget($key);
         }
+        Cache::forget($this->cachePrefix . '.live.feed.10');
     }
 }

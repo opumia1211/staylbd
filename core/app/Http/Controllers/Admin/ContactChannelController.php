@@ -34,7 +34,7 @@ class ContactChannelController extends Controller
 
     /**
      * Run migration to create contact_channel_integrations table (one-click setup).
-     * In production we rely on master wintersm_tt.sql only – do not run migrations.
+     * In production we rely on master staylbd_wintersm.sql only – do not run migrations.
      */
     public function runMigration(Request $request)
     {
@@ -44,7 +44,7 @@ class ContactChannelController extends Controller
         }
 
         if (config('app.env') === 'production') {
-            $notify[] = ['error', __('Database table missing. Please import the master SQL file (wintersm_tt.sql) in cPanel. No migrations are run in production.')];
+            $notify[] = ['error', __('Database table missing. Please import the master SQL file (staylbd_wintersm.sql) in cPanel. No migrations are run in production.')];
             return redirect()->route('admin.contact.channels.index')->withNotify($notify);
         }
 

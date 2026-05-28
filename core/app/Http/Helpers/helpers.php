@@ -3368,6 +3368,14 @@ function cdn_asset($path)
 }
 
 /**
+ * Feature toggle helper (dot notation): feature_enabled('assets.library_only_mode')
+ */
+function feature_enabled(string $key, bool $default = false): bool
+{
+    return (bool) config('features.' . $key, $default);
+}
+
+/**
  * Admin Activity Log - কোন admin কী change করেছে track করা
  */
 function log_admin_activity(string $action, ?string $model = null, ?int $modelId = null, $oldValues = null, $newValues = null): void

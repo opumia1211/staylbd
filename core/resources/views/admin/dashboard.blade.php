@@ -421,7 +421,7 @@
                 <h5 class="card-title m-0">@lang('Recent Activity')</h5>
             </div>
             <div class="card-body p-0">
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush" id="recent-activity-live">
                     @php $shown = 0; $maxItems = 10; @endphp
                     @foreach($recentOrdersForActivity ?? [] as $o)
                         @if($shown >= $maxItems) @break @endif
@@ -953,28 +953,95 @@
         if (countryData.length === 0) { countryLabels = ['No data']; countryData = [1]; }
         makeDoughnut('userCountryChart', countryLabels, countryData);
 
-        // ── Real-time stats refresh (every 45s) ──────────────────
+        // ── Real-time stats refresh (near real-time, adaptive) ───
         var statsUrl = "{{ route('admin.dashboard.stats') }}";
+        var refreshIntervalMs = {{ (int) config('optimization.admin.dashboard_poll_interval_ms', 10000) }};
+        if (!Number.isFinite(refreshIntervalMs) || refreshIntervalMs < 5000) refreshIntervalMs = 5000;
+        var inFlight = false;
+        var lastOkAt = 0;
+
+        function iconByType(type) {
+            if (type === 'order') return 'bx-cart';
+            if (type === 'user') return 'bx-user-plus';
+            return 'bx-dollar';
+        }
+        function colorByType(type) {
+            if (type === 'order') return 'warning';
+            if (type === 'user') return 'success';
+            return 'primary';
+        }
+        var emptyActivityText = @json(__('No recent activity'));
+        function renderLiveFeed(feed) {
+            if (!Array.isArray(feed)) return;
+            var host = document.getElementById('recent-activity-live');
+            if (!host) return;
+            if (feed.length === 0) {
+                host.innerHTML = '<li class="list-group-item text-center text-body-secondary py-5">' + emptyActivityText + '</li>';
+                return;
+            }
+            var html = '';
+            feed.forEach(function(item) {
+                var type = (item && item.type) ? item.type : 'deposit';
+                var icon = iconByType(type);
+                var color = colorByType(type);
+                var title = (item && item.title) ? item.title : '';
+                var subtitle = (item && item.subtitle) ? item.subtitle : '';
+                var url = (item && item.url) ? item.url : '#';
+                html += '' +
+                    '<li class="list-group-item list-group-item-action px-4 py-3">' +
+                    '  <div class="d-flex align-items-center">' +
+                    '    <span class="avatar avatar-sm me-3">' +
+                    '      <span class="avatar-initial rounded-circle bg-label-' + color + '">' +
+                    '        <i class="icon-base bx ' + icon + ' icon-xs"></i>' +
+                    '      </span>' +
+                    '    </span>' +
+                    '    <div class="flex-grow-1">' +
+                    '      <a href="' + url + '" class="text-body text-decoration-none small fw-medium">' + title + '</a>' +
+                    '      <small class="text-body-secondary d-block">' + subtitle + '</small>' +
+                    '    </div>' +
+                    '  </div>' +
+                    '</li>';
+            });
+            host.innerHTML = html;
+        }
         function refreshDashboardStats() {
+            if (inFlight || !statsUrl) return;
+            inFlight = true;
             var xhr = new XMLHttpRequest();
             xhr.open('GET', statsUrl);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.onload = function() {
+                inFlight = false;
                 if (xhr.status !== 200) return;
                 try {
                     var res = JSON.parse(xhr.responseText);
                     if (!res.ok || !res.stats) return;
+                    lastOkAt = Date.now();
                     var s = res.stats;
                     document.querySelectorAll('[data-stat]').forEach(function(el) {
                         var key = el.getAttribute('data-stat');
                         if (s[key] !== undefined) el.textContent = s[key];
                     });
+                    renderLiveFeed(res.feed || []);
                 } catch (e) {}
             };
+            xhr.onerror = function() { inFlight = false; };
+            xhr.ontimeout = function() { inFlight = false; };
+            xhr.timeout = 7000;
             xhr.send();
         }
-        if (statsUrl) setInterval(refreshDashboardStats, 45000);
+        if (statsUrl) {
+            // fast initial sync when admin enters dashboard
+            refreshDashboardStats();
+            setInterval(refreshDashboardStats, refreshIntervalMs);
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    var staleMs = Date.now() - lastOkAt;
+                    if (staleMs > refreshIntervalMs) refreshDashboardStats();
+                }
+            });
+        }
     })();
     </script>
 @endpush

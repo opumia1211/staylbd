@@ -90,3 +90,47 @@ The **Cart system** is currently broken due to a route parameter error in the la
 
 ---
 *Audit conducted on: 2026-05-02*
+
+---
+
+## 🔄 Incremental Audit Update (2026-05-28)
+
+### ✅ Completed in this optimization pass
+
+- Runtime + storage optimization:
+  - Removed embedded VCS metadata from `core/vendor` packages.
+  - Cleared runtime cache/session/log artifacts.
+  - Removed nested duplicate project copy and non-runtime build artifacts (`*.map`, `playwright-report`).
+- Realtime/polling optimization:
+  - Storefront realtime fallback now tunable via `core/config/optimization.php`.
+  - Admin dashboard polling converted to adaptive near-realtime (initial instant sync, in-flight guard, timeout handling, visibility-aware refresh).
+  - Added live activity feed API data in dashboard stats response and live UI rendering for recent activities.
+- Production-friendly defaults:
+  - `.env` and `.env.example` adjusted for lower debug overhead and cleaner logging profile.
+  - Rebuilt Laravel caches with `artisan optimize`.
+
+### 📦 Current size snapshot (top-level)
+
+| Path | Size |
+| :--- | :--- |
+| `core` | ~1026.1 MB |
+| `.git` | ~531.1 MB |
+| `assets` | ~200.8 MB |
+
+### ⚠️ Remaining risk / technical debt
+
+- `core/vendor` is tracked in git, so cleanup creates a very large diff footprint.
+- Legacy duplicate-like static directories still exist and should be removed in a staged pass after usage-map validation:
+  - `core/public/assets/vendor/vendor` (~14.56 MB)
+  - `core/public/assets/js/js` (~0.48 MB)
+  - `core/public/assets/css/css` (~0.01 MB)
+- Full end-to-end functional verification (checkout/payment/courier callbacks) still needs an automated smoke suite run.
+
+### 🎯 Next recommended advanced upgrades
+
+1. Admin websocket channel for `orders`, `payments`, and `support` events (beyond polling).
+2. Query-level profiling + N+1 elimination in admin listing pages.
+3. Background queue hardening (Horizon workers + retry policy + dead-letter monitoring).
+4. Asset deduplication release pass with route/view reference lockfile.
+
+*Incremental update generated on: 2026-05-28*

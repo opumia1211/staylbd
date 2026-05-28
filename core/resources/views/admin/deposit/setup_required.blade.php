@@ -24,7 +24,7 @@
                         <p class="mb-2 small fw-bold">@lang('Option 2 – Migration:')</p>
                         <code class="d-block p-2 rounded bg-dark text-light small mb-3">php artisan migrate --path=database/migrations/2026_02_16_160000_create_deposits_table.php</code>
                         <p class="mb-2 small fw-bold">@lang('Option 3 – Manual SQL (phpMyAdmin):')</p>
-                        <p class="small text-muted mb-1">@lang('Select database') <strong>wintersm_tt</strong>, @lang('then Import or run:')</p>
+                        <p class="small text-muted mb-1">@lang('Select database') <strong>staylbd_wintersm</strong>, @lang('then Import or run:')</p>
                         <code class="d-block p-2 rounded bg-dark text-light small">core/database/fix_deposits_table.sql</code>
                     </div>
                     <a href="{{ route('admin.dashboard') }}" class="btn btn--primary">

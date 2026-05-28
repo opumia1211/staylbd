@@ -40,7 +40,7 @@ class EnsureDatabaseReady extends Command
         if (!empty($missing)) {
             $msg = 'Missing tables: ' . implode(', ', $missing);
             if (config('app.env') === 'production') {
-                $msg .= '. In production, import the master SQL file (database/wintersm_tt.sql) in cPanel. Do not run migrations.';
+                $msg .= '. In production, import the master SQL file (database/staylbd_wintersm.sql) in cPanel. Do not run migrations.';
             } else {
                 $msg .= '. Run: php artisan migrate --force';
             }
