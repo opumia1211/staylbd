@@ -126,7 +126,7 @@
                 }
             },
             "url": "text",
-            "modal": true
+            "modal": false
         }
     },
     "footer": {
@@ -159,6 +159,12 @@
             "images": {
                 "image": {
                     "size": "480x430"
+                },
+                "contact_phone_icon": {
+                    "size": "96x96"
+                },
+                "contact_email_icon": {
+                    "size": "96x96"
                 }
             },
             "title": "text",

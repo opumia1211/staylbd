@@ -38,6 +38,9 @@
                             @php echo $order->ordersBadge; @endphp
                             @php echo $order->paymentBadge; @endphp
                             <span class="text--primary fw-semibold">{{ showAmount($order->total) }} {{ __($general->cur_text) }}</span>
+                            @if(\Illuminate\Support\Facades\Schema::hasColumn('orders', 'advance_payment') && (float) ($order->advance_payment ?? 0) > 0)
+                                <span class="badge bg-label-success" title="@lang('Advance payment received')">@lang('Adv') {{ showAmount($order->advance_payment) }}</span>
+                            @endif
                             <div class="d-flex flex-wrap align-items-center gap-1 ms-md-auto order-detail-status-actions">
                                 @if($canAdvance)
                                     <form action="{{ route('admin.orders.status', $order->id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __("Change status? User will be notified.") }}');">

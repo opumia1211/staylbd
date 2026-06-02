@@ -69,6 +69,28 @@
             max-width: 100%;
             overflow-x: hidden;
         }
+        #user-dashboard-root #dashboard-ajax-content {
+            transition: opacity .16s ease, transform .16s ease;
+        }
+        #user-dashboard-root #dashboard-ajax-content.is-loading {
+            opacity: .62;
+            transform: translateY(2px);
+            pointer-events: none;
+            position: relative;
+        }
+        #user-dashboard-root #dashboard-ajax-content.is-loading::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(148,163,184,.10) 20%, rgba(148,163,184,.22) 38%, rgba(148,163,184,.10) 58%);
+            background-size: 350% 100%;
+            animation: staylDashSkeleton 1.05s ease-in-out infinite;
+        }
+        @keyframes staylDashSkeleton {
+            0% { background-position: 100% 0; }
+            100% { background-position: 0 0; }
+        }
         #user-dashboard-root .dashboard-wrapper .table-responsive {
             overflow-x: auto;
         }
@@ -301,7 +323,47 @@
         function setLoading(on) {
             if (contentEl) contentEl.classList.toggle('is-loading', !!on);
         }
+        function warmCountsInBackground() {
+            setTimeout(function() {
+                try {
+                    if (typeof window.getCartCount === 'function') window.getCartCount();
+                    if (typeof window.getWishlistCount === 'function') window.getWishlistCount();
+                    if (typeof window.getCompareCount === 'function') window.getCompareCount();
+                } catch (e) {}
+            }, 0);
+        }
         var pendingRequest = null;
+        var prefetchCache = new Map();
+        var PREFETCH_TTL = 15000;
+        var FAST_NAV_MATCHERS = [
+            /\/user\/[^/]+\/order(?:\/|$)/,
+            /\/user\/[^/]+\/track-order(?:\/|$)/,
+            /\/user\/[^/]+\/cart(?:\/|$)/,
+            /\/user\/[^/]+\/compare(?:\/|$)/,
+            /\/user\/[^/]+\/wishlist(?:\/|$)/
+        ];
+        function isFastNavPath(path) {
+            path = normPath(path || '');
+            return FAST_NAV_MATCHERS.some(function(re) { return re.test(path); });
+        }
+        function primePrefetch(url) {
+            try {
+                var path = normPath(new URL(url, window.location.origin).pathname);
+                if (!isFastNavPath(path)) return;
+                var key = path;
+                var cached = prefetchCache.get(key);
+                if (cached && (Date.now() - cached.at) < PREFETCH_TTL) return;
+                fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
+                    credentials: 'same-origin'
+                }).then(function(r) {
+                    if (!r.ok) throw new Error('prefetch failed');
+                    return r.text();
+                }).then(function(html) {
+                    prefetchCache.set(key, { html: html, at: Date.now() });
+                }).catch(function(){});
+            } catch (e) {}
+        }
         function setSidebarActive(urlOrPath) {
             var path;
             try {
@@ -345,14 +407,22 @@
             var ac = new AbortController();
             pendingRequest = ac;
             setLoading(true);
-            fetch(url, {
-                signal: ac.signal,
-                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
-                credentials: 'same-origin'
-            }).then(function(r) {
-                if (!r.ok) throw new Error('Load failed');
-                return r.text();
-            }).then(function(html) {
+            var pathKey = normPath(new URL(url, window.location.origin).pathname);
+            var cached = prefetchCache.get(pathKey);
+            var fetchPromise;
+            if (cached && (Date.now() - cached.at) < PREFETCH_TTL) {
+                fetchPromise = Promise.resolve(cached.html);
+            } else {
+                fetchPromise = fetch(url, {
+                    signal: ac.signal,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
+                    credentials: 'same-origin'
+                }).then(function(r) {
+                    if (!r.ok) throw new Error('Load failed');
+                    return r.text();
+                });
+            }
+            fetchPromise.then(function(html) {
                 if (pendingRequest !== ac) return;
                 var parser = new DOMParser();
                 var doc = parser.parseFromString(html, 'text/html');
@@ -369,6 +439,7 @@
                         if (ov) ov.classList.remove('active');
                         document.body.classList.remove('dashboard-sidebar-open');
                     }
+                    warmCountsInBackground();
                     try { window.dispatchEvent(new CustomEvent('dashboard-content-updated')); } catch (e) {}
                 } else {
                     window.location.href = url;
@@ -381,6 +452,7 @@
                 setLoading(false);
             });
         }
+        window.__dashboardAjaxLoad = loadPage;
         root.addEventListener('click', function(e) {
             var a = e.target.closest('a');
             if (!a || !isDashboardLink(a)) return;
@@ -394,6 +466,28 @@
             e.preventDefault();
             loadPage(a.href);
         }, true);
+        document.addEventListener('click', function(e) {
+            var a = e.target.closest('a[href]');
+            if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+            try {
+                var u = new URL(a.href, window.location.origin);
+                if (u.origin !== window.location.origin) return;
+                if (!isFastNavPath(u.pathname)) return;
+                if (!window.__dashboardAjaxLoad) return;
+                e.preventDefault();
+                window.__dashboardAjaxLoad(u.href);
+            } catch (err) {}
+        }, true);
+        document.addEventListener('mouseenter', function(e) {
+            var a = e.target.closest('a[href]');
+            if (!a) return;
+            primePrefetch(a.href);
+        }, true);
+        document.addEventListener('touchstart', function(e) {
+            var a = e.target.closest('a[href]');
+            if (!a) return;
+            primePrefetch(a.href);
+        }, { passive: true, capture: true });
         window.addEventListener('popstate', function(e) {
             if (e.state && e.state.dashboard && contentEl) {
                 loadPage(window.location.href, false);

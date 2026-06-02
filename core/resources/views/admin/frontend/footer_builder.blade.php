@@ -670,6 +670,46 @@
                                         </div>
                                     </div>
 
+                                    <div class="col-12">
+                                        <div class="card bg-light border rounded-4">
+                                            <div class="card-body">
+                                                <h6 class="small fw-bold text-dark mb-2">@lang('Footer Voter Section + Compact Mode')</h6>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <div class="form-check form-switch modern-switch">
+                                                            <input type="checkbox" name="footer_compact_mode" value="1" class="form-check-input" id="fb_footer_compact_mode" {{ (int)(optional($footerContent)->data_values->footer_compact_mode ?? 1) === 1 ? 'checked' : '' }}>
+                                                            <label class="form-check-label tiny text-dark fw-bold" for="fb_footer_compact_mode">@lang('Enable compact footer height')</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check form-switch modern-switch">
+                                                            <input type="checkbox" name="vote_enabled" value="1" class="form-check-input" id="fb_vote_enabled" {{ (int)(optional($footerContent)->data_values->vote_enabled ?? 1) === 1 ? 'checked' : '' }}>
+                                                            <label class="form-check-label tiny text-dark fw-bold" for="fb_vote_enabled">@lang('Enable voter section')</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="text" name="vote_title" class="form-control form-control-sm rounded-3" value="{{ optional($footerContent)->data_values->vote_title ?? __('Was this page helpful?') }}" placeholder="@lang('Vote title')">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="text" name="vote_subtitle" class="form-control form-control-sm rounded-3" value="{{ optional($footerContent)->data_values->vote_subtitle ?? __('Vote to help us improve your experience.') }}" placeholder="@lang('Vote subtitle')">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="vote_up_label" class="form-control form-control-sm rounded-3" value="{{ optional($footerContent)->data_values->vote_up_label ?? __('Helpful') }}" placeholder="@lang('Up label')">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="vote_down_label" class="form-control form-control-sm rounded-3" value="{{ optional($footerContent)->data_values->vote_down_label ?? __('Needs work') }}" placeholder="@lang('Down label')">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <select name="vote_scope" class="form-select form-select-sm rounded-3">
+                                                            <option value="page" {{ (optional($footerContent)->data_values->vote_scope ?? 'page') === 'page' ? 'selected' : '' }}>@lang('Per page')</option>
+                                                            <option value="global" {{ (optional($footerContent)->data_values->vote_scope ?? 'page') === 'global' ? 'selected' : '' }}>@lang('Global site')</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="col-12 mt-4">
                                         <button type="submit" class="btn btn-dark px-4 rounded-pill shadow-sm">@lang('Commit Communication Nodes')</button>
                                     </div>

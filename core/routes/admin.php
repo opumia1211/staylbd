@@ -312,6 +312,7 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
         Route::get('cancel', 'cancel')->name('cancel');
         Route::get('export', 'export')->name('export');
         Route::post('status/{id}', 'status')->name('status');
+        Route::post('bulk-status', 'bulkStatus')->name('bulk.status');
         Route::get('details/{id}', 'details')->name('detail');
         Route::get('invoice/{id}', 'invoice')->name('invoice');
         Route::post('address/{id}', 'updateAddress')->name('address.update');
@@ -378,8 +379,31 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
         Route::get('courier/reports/export', 'courier_reports_export')->name('courier.reports.export');
     });
 
-    // Payment Gateways Hub (single entry: /payment-gateways)
+    // Payment center (legacy /finance URL redirects here)
+    Route::get('finance', function () {
+        return redirect()->route('admin.payment.gateways.hub', [], 301);
+    })->name('finance.hub');
     Route::get('payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayHubController::class, 'index'])->name('payment.gateways.hub');
+
+    // Order management hub & channels
+    Route::get('orders/hub', [\App\Http\Controllers\Admin\OrderManagementHubController::class, 'index'])->name('orders.hub');
+    Route::get('orders/fulfillment', [\App\Http\Controllers\Admin\OrderFulfillmentController::class, 'index'])->name('orders.fulfillment');
+    Route::get('orders/import-export', [\App\Http\Controllers\Admin\OrderImportExportController::class, 'index'])->name('orders.import-export');
+    Route::post('orders/import', [\App\Http\Controllers\Admin\OrderImportExportController::class, 'import'])->name('orders.import');
+    Route::controller(\App\Http\Controllers\Admin\OrderAutomationController::class)->prefix('orders/automation')->name('orders.automation.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('settings', 'update')->name('update');
+        Route::post('run', 'runNow')->name('run');
+    });
+    Route::controller(\App\Http\Controllers\Admin\OrderChannelController::class)->prefix('orders/channels')->name('orders.channels.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('edit/{id}', 'edit')->name('edit');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::post('status/{id}', 'status')->name('status');
+        Route::post('regenerate-token/{id}', 'regenerateToken')->name('regenerate-token');
+    });
 
     // Payment Analytics Dashboard
     Route::get('payment/analytics', [\App\Http\Controllers\Admin\PaymentAnalyticsController::class, 'index'])->name('payment.analytics');
@@ -734,6 +758,10 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
                 return app('App\Http\Controllers\Admin\FrontendController')->addNewBanner(); })->name('sections.banner.addNew');
             Route::get('banner', function () {
                 return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('banner'); })->name('sections.banner');
+            Route::get('middle-banner', function () {
+                return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('middle_banner'); })->name('sections.middle_banner');
+            Route::get('bottom-banner', function () {
+                return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('bottom_banner'); })->name('sections.bottom_banner');
             Route::post('banner/update-field', 'updateBannerField')->name('sections.banner.updateField');
             Route::post('banner/duplicate/{id}', function ($id) {
                 return app('App\Http\Controllers\Admin\FrontendController')->bannerDuplicate((int) $id); })->name('sections.banner.duplicate');
@@ -791,7 +819,8 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
                 return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('social_icon'); })->name('sections.social_icon');
             Route::post('social_icon/toggle-public', [FrontendController::class, 'socialIconTogglePublic'])->name('sections.social_icon.toggle_public');
             Route::get('ticker', function () {
-                return app('App\Http\Controllers\Admin\FrontendController')->frontendSections('ticker'); })->name('sections.ticker');
+                return redirect()->route('admin.frontend.sections.scrollbar', [], 301);
+            })->name('sections.ticker');
             Route::get('scrollbar', [FrontendController::class, 'scrollbarView'])->name('sections.scrollbar');
             Route::get('scrollbar/new', [FrontendController::class, 'scrollbarCreate'])->name('sections.scrollbar.new');
             Route::get('scrollbar/new-custom', [FrontendController::class, 'scrollbarCreateCustom'])->name('sections.scrollbar2.new');
@@ -856,7 +885,7 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             Route::get('frontend-sections/social_icon', function () {
                 return redirect()->route('admin.frontend.sections.social_icon', [], 301); });
             Route::get('frontend-sections/ticker', function () {
-                return redirect()->route('admin.frontend.sections.ticker', [], 301); });
+                return redirect()->route('admin.frontend.sections.scrollbar', [], 301); });
             Route::get('frontend-sections/scrollbar', function () {
                 return redirect()->route('admin.frontend.sections.scrollbar', [], 301); });
             Route::get('frontend-sections/header_icons', function () {
@@ -884,7 +913,8 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             Route::post('social_icon/content', function (\Illuminate\Http\Request $request) {
                 return app('App\Http\Controllers\Admin\FrontendController')->frontendContent($request, 'social_icon'); })->name('sections.content.social_icon');
             Route::post('ticker/content', function (\Illuminate\Http\Request $request) {
-                return app('App\Http\Controllers\Admin\FrontendController')->frontendContent($request, 'ticker'); })->name('sections.content.ticker');
+                return redirect()->route('admin.frontend.sections.scrollbar', [], 301);
+            })->name('sections.content.ticker');
 
             // Generic content route (backward compatibility)
             Route::post('frontend-content/{key}', 'frontendContent')->name('sections.content');
@@ -909,7 +939,8 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
             Route::get('social_icon/element/{id?}', function ($id = null) {
                 return app('App\Http\Controllers\Admin\FrontendController')->frontendElement('social_icon', $id); })->name('sections.element.social_icon');
             Route::get('ticker/element/{id?}', function ($id = null) {
-                return app('App\Http\Controllers\Admin\FrontendController')->frontendElement('ticker', $id); })->name('sections.element.ticker');
+                return redirect()->route($id ? 'admin.frontend.sections.scrollbar.edit' : 'admin.frontend.sections.scrollbar', $id ? ['id' => $id] : [], 301);
+            })->name('sections.element.ticker');
 
             // Generic element route (backward compatibility)
             Route::get('frontend-element/{key}/{id?}', 'frontendElement')->name('sections.element');

@@ -1,0 +1,214 @@
+/**
+ * Admin panel — light/day mode contrast fixes.
+ * Fixes faint menu labels, dropdown links, and legacy widget-two stat cards.
+ */
+
+/* —— Horizontal menu: section headers (Payment History, Gateway Methods, etc.) —— */
+.layout-menu-horizontal .menu-sub .menu-item-header,
+.layout-menu-horizontal .menu-sub .menu-section-label {
+    color: #384551 !important;
+    opacity: 1 !important;
+    font-weight: 700 !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.06em !important;
+    padding: 0.75rem 1.25rem 0.35rem !important;
+    margin-top: 0.25rem;
+    border-top: 1px solid rgba(67, 89, 113, 0.12);
+    background: linear-gradient(180deg, #f8f9fb 0%, transparent 100%);
+}
+
+.layout-menu-horizontal .menu-sub .menu-item-header:first-child,
+.layout-menu-horizontal .menu-sub .menu-section-label:first-child {
+    border-top: none;
+    margin-top: 0;
+}
+
+/* —— Dropdown links: readable default; clear active/hover —— */
+.layout-menu-horizontal .menu-sub .menu-item:not(.active) > .menu-link {
+    color: #384551 !important;
+}
+
+.layout-menu-horizontal .menu-sub .menu-item.active > .menu-link {
+    color: #0a6b62 !important;
+    font-weight: 600 !important;
+    background-color: rgba(14, 159, 144, 0.12) !important;
+}
+
+.layout-menu-horizontal .menu-sub .menu-link:hover,
+.layout-menu-horizontal .menu-sub .menu-item:hover > .menu-link {
+    color: #0e9f90 !important;
+    background-color: #f0f2f5 !important;
+}
+
+.layout-menu-horizontal .menu-sub .menu-icon {
+    color: #697a8d !important;
+}
+
+.layout-menu-horizontal .menu-sub .menu-item.active > .menu-link .menu-icon {
+    color: #0e9f90 !important;
+}
+
+.layout-menu-horizontal .menu-inner > .menu-item.active.open > .menu-link.menu-toggle {
+    color: #0e9f90 !important;
+}
+
+/* —— Legacy widget-two stat cards (deposit/payment pages) without app.css —— */
+.widget-two.box--shadow2 {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(67, 89, 113, 0.12);
+}
+
+.widget-two .widget-two__content h2,
+.widget-two .widget-two__content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.widget-two .widget-two__content p,
+.widget-two .widget-two__content .small {
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 1 !important;
+}
+
+.widget-two.bg--success {
+    background-color: #28c76f !important;
+}
+.widget-two.bg--success h2,
+.widget-two.bg--success p,
+.widget-two.bg--success .text-white {
+    color: #fff !important;
+}
+
+.widget-two.bg--6 {
+    background-color: #ff9f43 !important;
+}
+.widget-two.bg--6 h2,
+.widget-two.bg--6 p,
+.widget-two.bg--6 .text-white {
+    color: #fff !important;
+}
+
+.widget-two.bg--pink {
+    background-color: #ea5455 !important;
+}
+.widget-two.bg--pink h2,
+.widget-two.bg--pink p,
+.widget-two.bg--pink .text-white {
+    color: #fff !important;
+}
+
+.widget-two.bg--dark {
+    background-color: #4b4b4b !important;
+}
+.widget-two.bg--dark h2,
+.widget-two.bg--dark p,
+.widget-two.bg--dark .text-white {
+    color: #fff !important;
+}
+
+.widget-two.bg--primary {
+    background-color: #0e9f90 !important;
+}
+.widget-two.bg--primary h2,
+.widget-two.bg--primary p,
+.widget-two.bg--primary .text-white {
+    color: #fff !important;
+}
+
+.widget-two.bg--warning {
+    background-color: #ff9f43 !important;
+}
+.widget-two.bg--warning h2,
+.widget-two.bg--warning p,
+.widget-two.bg--warning .text-white {
+    color: #fff !important;
+}
+
+.widget-two.bg--info {
+    background-color: #00cfe8 !important;
+}
+.widget-two.bg--info h2,
+.widget-two.bg--info p,
+.widget-two.bg--info .text-white {
+    color: #1a1a1a !important;
+}
+
+.card .btn-outline--primary,
+.card .btn-outline--warning,
+.card .btn-outline--success,
+.card .btn-outline--danger,
+.card .btn-outline--info,
+.card .btn-outline--dark {
+    border-width: 1px;
+    font-weight: 600;
+}
+
+.btn-outline--primary { color: #0e9f90 !important; border-color: #0e9f90 !important; }
+.btn-outline--warning { color: #ff9f43 !important; border-color: #ff9f43 !important; }
+.btn-outline--success { color: #28c76f !important; border-color: #28c76f !important; }
+.btn-outline--danger { color: #ea5455 !important; border-color: #ea5455 !important; }
+.btn-outline--info { color: #00cfe8 !important; border-color: #00cfe8 !important; }
+.btn-outline--dark { color: #384551 !important; border-color: #384551 !important; }
+
+.btn--primary { background-color: #0e9f90 !important; color: #fff !important; }
+.btn--warning { background-color: #ff9f43 !important; color: #fff !important; }
+.btn--success { background-color: #28c76f !important; color: #fff !important; }
+.btn--danger { background-color: #ea5455 !important; color: #fff !important; }
+.btn--info { background-color: #00cfe8 !important; color: #1a1a1a !important; }
+.btn--dark { background-color: #4b4b4b !important; color: #fff !important; }
+
+.card-header.bg--light {
+    background-color: #f5f5f9 !important;
+    color: #384551 !important;
+}
+
+[data-bs-theme="light"] .text-muted {
+    color: #697a8d !important;
+}
+
+.btn-label-secondary {
+    background: rgba(105, 122, 141, 0.12) !important;
+    color: #566a7f !important;
+    border: 0 !important;
+}
+.btn-label-secondary:hover {
+    background: rgba(105, 122, 141, 0.2) !important;
+    color: #384551 !important;
+}
+
+/* —— Dark mode: Finance menu, stat cards, deposit pages —— */
+[data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-item-header,
+[data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-section-label {
+    color: #d5d7de !important;
+    border-top-color: rgba(255, 255, 255, 0.08) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%) !important;
+}
+
+[data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-item:not(.active) > .menu-link {
+    color: #e7e9f1 !important;
+}
+
+[data-bs-theme="dark"] .widget-two.box--shadow2 {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+[data-bs-theme="dark"] .card-header.bg--light {
+    background-color: #3a3b51 !important;
+    color: #e7e9f1 !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #b4b7bd !important;
+}
+
+[data-bs-theme="dark"] .btn-label-secondary {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #e7e9f1 !important;
+}
+
+[data-bs-theme="dark"] .layout-navbar {
+    background: rgba(43, 44, 64, 0.95) !important;
+}

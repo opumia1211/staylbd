@@ -145,6 +145,15 @@ class FooterBuilderController extends Controller
             $values['copyright_text'] = $request->input('copyright_text', '');
             $values['seller_account_enabled'] = $request->boolean('seller_account_enabled') ? 1 : 0;
             $values['seller_account_url'] = $request->input('seller_account_url', '');
+            $values['footer_compact_mode'] = $request->boolean('footer_compact_mode') ? 1 : 0;
+            $values['vote_enabled'] = $request->boolean('vote_enabled') ? 1 : 0;
+            $values['vote_title'] = trim((string) $request->input('vote_title', __('Was this page helpful?')));
+            $values['vote_subtitle'] = trim((string) $request->input('vote_subtitle', __('Vote to help us improve your experience.')));
+            $values['vote_up_label'] = trim((string) $request->input('vote_up_label', __('Helpful')));
+            $values['vote_down_label'] = trim((string) $request->input('vote_down_label', __('Needs work')));
+            $values['vote_scope'] = in_array($request->input('vote_scope'), ['global', 'page'], true)
+                ? $request->input('vote_scope')
+                : 'page';
             $content->data_values = (object) $values;
             $content->save();
             $this->clearFooterCache();

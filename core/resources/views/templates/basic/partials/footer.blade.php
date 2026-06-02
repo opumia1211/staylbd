@@ -19,7 +19,7 @@
     $showCookiePrefs = $cookieData && (($cookieData->data_values->status ?? 0) == \App\Constants\Status::ENABLE) && (($cookieData->data_values->show_preferences_link ?? 1) != 0);
     $cookiePrefsText = $cookieData ? ($cookieData->data_values->preferences_link_text ?? __('Cookie Preferences')) : __('Cookie Preferences');
     $subscribeTitle = $footerContent && isset($footerContent->data_values->subscribe_title) ? $footerContent->data_values->subscribe_title : __('Subscribe to our newsletter');
-    $subscribeSubtitle = $footerContent && isset($footerContent->data_values->subscribe_subtitle) ? $footerContent->data_values->subscribe_subtitle : __('Subscribe for new Offers and updates');
+    $subscribeSubtitle = $footerContent && isset($footerContent->data_values->subscribe_subtitle) ? $footerContent->data_values->subscribe_subtitle : __('Stay up to date with news and promotions by signing up for our newsletter');
     $connectTitle   = $footerContent && isset($footerContent->data_values->connect_title) ? $footerContent->data_values->connect_title : __('Find Us');
 
     $showCompanyBlock = $companyInfo && ($companyInfo->data_values->show ?? 1);
@@ -31,20 +31,24 @@
     $returnFormTitle = $returnPolicy && isset($returnPolicy->data_values->form_title) ? $returnPolicy->data_values->form_title : __('Product Return Request');
 
     $fcv = $footerContent && is_object($footerContent->data_values ?? null) ? $footerContent->data_values : (object)[];
+    $footerCompactMode = (int) ($fcv->footer_compact_mode ?? 1) === 1;
+    $voteEnabled = (int) ($fcv->vote_enabled ?? 1) === 1;
+    $voteScope = ($fcv->vote_scope ?? 'page') === 'global' ? 'global' : 'page';
+    $voteTitle = trim((string) ($fcv->vote_title ?? __('Was this page helpful?')));
+    $voteSubtitle = trim((string) ($fcv->vote_subtitle ?? __('Vote to help us improve your experience.')));
+    $voteUpLabel = trim((string) ($fcv->vote_up_label ?? __('Helpful')));
+    $voteDownLabel = trim((string) ($fcv->vote_down_label ?? __('Needs work')));
+    $voteSlug = $voteScope === 'global' ? 'global' : ('page:' . md5(request()->path()));
+    $votePublicKey = $voteScope === 'global' ? 'global' : md5(request()->path());
+    $voteCacheKey = 'footer.vote.counts.' . $voteSlug;
+    $voteCounts = \Illuminate\Support\Facades\Cache::get($voteCacheKey, ['up' => 0, 'down' => 0]);
+    $voteUpCount = max(0, (int) ($voteCounts['up'] ?? 0));
+    $voteDownCount = max(0, (int) ($voteCounts['down'] ?? 0));
+    $voteTotalCount = $voteUpCount + $voteDownCount;
     $sellerAccountFeatureOn = (int)($fcv->seller_account_enabled ?? 0) === 1;
-    $sellerUrlRaw = trim((string)($fcv->seller_account_url ?? ''));
-    if ($sellerAccountFeatureOn) {
-        if ($sellerUrlRaw !== '') {
-            $sellerAccountHref = \Illuminate\Support\Str::startsWith($sellerUrlRaw, ['http://', 'https://'])
-                ? $sellerUrlRaw
-                : url('/' . ltrim($sellerUrlRaw, '/'));
-        } else {
-            $sellerAccountHref = route('seller.apply');
-        }
-    } else {
-        $sellerAccountHref = route('contact.live') . '?open_contact=1';
-    }
-    $sellerLinkNewTab = $sellerAccountFeatureOn && $sellerUrlRaw !== '' && \Illuminate\Support\Str::startsWith($sellerUrlRaw, ['http://', 'https://']);
+    // Keep footer Seller account destination identical to header SELLER button
+    $sellerAccountHref = route('seller.apply');
+    $sellerLinkNewTab = false;
 
     $showPromoFeaturesBar = $services->isNotEmpty();
     $customButtonsAll = \App\Models\Frontend::where('data_keys', 'custom_buttons.element')->orderBy('id', 'asc')->get();
@@ -57,147 +61,250 @@
     })->values();
     $footerTopButtons = $footerCustomButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'top'));
     $footerBottomButtons = $footerCustomButtons->filter(fn($r) => (($r->data_values->position ?? '') === 'bottom'));
+    $aboutPhone = $companyInfo ? trim((string)($companyInfo->data_values->contact_phone ?? '')) : '';
+    $aboutEmail = $companyInfo ? trim((string)($companyInfo->data_values->contact_email ?? '')) : '';
+
+    $validQuickLinks = $quickLinks->filter(function ($link) {
+        $dv = $link->data_values ?? (object)[];
+        $t = trim((string)($dv->title ?? ''));
+        return $t !== '' && strlen($t) >= 3 && preg_match('/[\p{L}\s]/u', $t);
+    });
+    $hasQuickLinksCol = $validQuickLinks->isNotEmpty();
+    $hasSupportCol = $supportEnabled;
+    // Social row can include quick email + Social Icons
+    $hasSocialRow = $socialElement->isNotEmpty() || ($contactContent && !empty($contactContent->data_values->contact_email));
+    $hasAboutCol = $showCompanyBlock || $policyPages->isNotEmpty();
+    $rowExtraCount = ($securityBadges->isNotEmpty() ? 1 : 0) + ($voteEnabled ? 1 : 0) + ($appPromoEnabled ? 1 : 0);
+    $privacyPolicyLink = $policyPages->first();
+    $footerLogo = getLogo('logo') ?: getLogo('logo_dark');
+    $footerEmailIcon = trim((string) (optional($contactContent)->data_values->contact_email_icon ?? ''));
+    $footerEmailIconRel = ($footerEmailIcon !== '' && preg_match('#^[a-zA-Z0-9._-]+$#', $footerEmailIcon))
+        ? 'assets/images/frontend/contact_us/' . $footerEmailIcon
+        : '';
+    $footerEmailIconAbs = $footerEmailIconRel !== '' ? public_path($footerEmailIconRel) : '';
+    $footerHasEmailIconImage = $footerEmailIconAbs !== '' && is_file($footerEmailIconAbs);
 @endphp
 
+<style>
+    /* Structural sizing for the journal bottom row - only for layout, not colors */
+    .footer-journal-bottom-container {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    .footer-journal-bottom-container img {
+        height: auto !important;
+        max-height: 20px !important;
+        width: auto !important;
+        display: block !important;
+    }
+    .footer-journal-bottom-left img {
+        height: 22px !important;
+        max-height: 22px !important;
+        width: 22px !important;
+        border-radius: 50% !important;
+    }
+    .footer-journal-bottom-right .pay-badge {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 4px 8px !important;
+        border-radius: 4px !important;
+    }
+</style>
 
+<footer class="site-footer stayl-footer footer-glass footer-journal-style border-t border-slate-800 bg-slate-950 text-slate-400 {{ $footerCompactMode ? 'stayl-footer--compact' : '' }}" role="contentinfo" aria-label="@lang('Site footer')">
 
-<footer class="site-footer stayl-footer" role="contentinfo">
-
-    {{-- Width/padding: footer-glass.css uses same :root tokens as header (.glass-header__shell) + main (.main-container) --}}
-    <div class="footer-glass__inner">
-        <div class="footer-glass__card w-full">
+    <div class="footer-glass__inner w-full">
         @if($footerTopButtons->isNotEmpty())
-        <div class="d-flex flex-wrap gap-2 px-2 pt-2">
-            @foreach($footerTopButtons as $btn)
-                @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
-                <a href="{{ $href }}" class="btn btn-sm btn-outline-light d-inline-flex align-items-center">
-                    @if(!empty($b['icon_image']))
-                        <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" width="16" height="16" loading="lazy" class="me-1">
-                    @else
-                        @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle'), 'class' => 'me-1'])
-                    @endif
-                    <span>{{ $b['button_text'] ?? __('Button') }}</span>
-                </a>
-            @endforeach
+        <div class="main-container pt-4">
+            <div class="flex flex-wrap gap-2">
+                @foreach($footerTopButtons as $btn)
+                    @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
+                    <a href="{{ $href }}" class="inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white">
+                        @if(!empty($b['icon_image']))
+                            <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" width="16" height="16" loading="lazy">
+                        @else
+                            @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle'), 'sizePx' => 14])
+                        @endif
+                        <span>{{ $b['button_text'] ?? __('Button') }}</span>
+                    </a>
+                @endforeach
+            </div>
         </div>
         @endif
-        <div class="footer-bottom">
-            <div class="footer__wrapper footer-grid flex flex-wrap">
 
-                @if($showCompanyBlock && ($companyInfo->data_values->about_text ?? $companyInfo->data_values->mission_text ?? $companyInfo->data_values->registration_info ?? ''))
-                <div class="footer__bottom__widget footer-about-widget">
-                    <h6 class="title footer-col-title">@lang('About Us')</h6>
-                    @if(!empty($companyInfo->data_values->about_text))
-                        <p class="mb-0 small">{{ __($companyInfo->data_values->about_text) }}</p>
+        <div class="main-container">
+            {{-- Row: Logo | Social --}}
+            <div class="flex flex-col items-start justify-between gap-6 py-8 sm:flex-row sm:items-center footer-journal-top">
+                @if($footerLogo)
+                <a href="{{ route('home') }}" class="inline-block shrink-0" title="@lang('Home')">
+                    <img src="{{ $footerLogo }}" alt="{{ gs('site_name') }}" class="footer-logo site-logo-img stayl-footer-logo {{ getLogoEffectClasses() }}" style="--stayl-footer-logo-h: {{ getFooterLogoHeight() }}px; height: {{ max(32, (int) getFooterLogoHeight()) }}px; width: auto; {{ getLogoStyle() }}" loading="lazy" width="125" height="{{ getFooterLogoHeight() }}">
+                </a>
+                @endif
+                @if($hasSocialRow)
+                <div class="flex flex-wrap items-center gap-2 sm:justify-end footer-social-row" role="list" aria-label="{{ __($connectTitle) }}">
+                    @if($contactContent && !empty($contactContent->data_values->contact_email))
+                        <a href="mailto:{{ $contactContent->data_values->contact_email }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full transition footer-social-link" aria-label="@lang('Email')">
+                            @if($footerHasEmailIconImage)
+                                <img src="{{ getImage($footerEmailIconRel, '96x96') }}" alt="" width="30" height="30" class="object-fit-contain footer-social-image" loading="lazy" decoding="async">
+                            @else
+                                @include($activeTemplate . 'partials.icon', ['name' => 'envelope', 'sizePx' => 30])
+                            @endif
+                        </a>
                     @endif
-                    @if(!empty($companyInfo->data_values->mission_text))
-                        <p class="mb-0 small">{{ __($companyInfo->data_values->mission_text) }}</p>
-                    @endif
-                    @if(!empty($companyInfo->data_values->registration_info))
-                        <p class="mb-0 small opacity-75">{{ __($companyInfo->data_values->registration_info) }}</p>
-                    @endif
-                    @if(!empty($companyInfo->data_values->business_license))
-                        <p class="mb-0 small opacity-75">{{ __($companyInfo->data_values->business_license) }}</p>
-                    @endif
+                    @foreach ($socialElement as $social)
+                        <span role="listitem" class="footer-social-item">@include($activeTemplate . 'partials.footer_social_link', ['social' => $social])</span>
+                    @endforeach
+                </div>
+                @endif
+            </div>
 
+            <hr class="border-0 border-t border-slate-800 m-0">
+
+            {{-- Row: 4 columns (About | Quick Links | Support | Newsletter) --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 py-10 footer-main-row footer-journal-links">
+
+                @if($hasAboutCol)
+                <div class="min-w-0 footer__bottom__widget footer-about-widget">
+                    <h3 class="text-base font-semibold text-white mb-4 footer-col-title">@lang('About Us')</h3>
+                    @if($showCompanyBlock && !empty($companyInfo->data_values->about_text))
+                        <p class="text-sm text-slate-400 mb-4 leading-relaxed">{{ __($companyInfo->data_values->about_text) }}</p>
+                    @endif
+                    <ul class="list-none m-0 p-0 space-y-2.5" role="list">
+                        @foreach ($policyPages as $policy)
+                            <li role="listitem"><a href="{{ route('policy.pages.short', $policy->id) }}" class="text-sm text-slate-400 no-underline hover:text-white">{{ __($policy->data_values->title ?? '') }}</a></li>
+                        @endforeach
+                        @if($showCompanyBlock && !empty($companyInfo->data_values->mission_text))
+                            <li role="listitem"><span class="text-sm text-slate-500">{{ __($companyInfo->data_values->mission_text) }}</span></li>
+                        @endif
+                    </ul>
                     @if($contactContent && !empty($contactContent->data_values->address))
-                        @php
-                            $aboutAddress = trim((string)($contactContent->data_values->address ?? ''));
-                            $aboutAddress = preg_replace('/\s*,\s*/', ', ', $aboutAddress);
-                        @endphp
-                        <div class="footer-app-info footer-address-block mt-2 pt-2 border-top border-white border-opacity-25">
-                            <p class="mb-0 footer-address-line">
-                                <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'map-marker-alt', 'class' => 'me-1'])</span>
-                                <span class="footer-address-line__text">{{ __($aboutAddress) }}</span>
-                            </p>
-                        </div>
-                    @endif
-                    @php
-                        $aboutPhone = trim((string)($companyInfo->data_values->contact_phone ?? ''));
-                        $aboutEmail = trim((string)($companyInfo->data_values->contact_email ?? ''));
-                    @endphp
-                    @if($aboutPhone !== '' || $aboutEmail !== '')
-                        <div class="footer-app-info footer-address-block mt-2 pt-2 border-top border-white border-opacity-25">
-                            @if($aboutPhone !== '')
-                                <p class="mb-1 footer-address-line">
-                                    <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'mobile-alt', 'class' => 'me-1'])</span>
-                                    <span class="footer-address-line__text"><a href="tel:{{ preg_replace('/[^0-9+]/', '', $aboutPhone) }}">{{ __($aboutPhone) }}</a></span>
-                                </p>
-                            @endif
-                            @if($aboutEmail !== '')
-                                <p class="mb-0 footer-address-line">
-                                    <span class="footer-address-line__icon" aria-hidden="true">@include($activeTemplate . 'partials.icon', ['name' => 'envelope', 'class' => 'me-1'])</span>
-                                    <span class="footer-address-line__text"><a href="mailto:{{ $aboutEmail }}">{{ __($aboutEmail) }}</a></span>
-                                </p>
-                            @endif
-                        </div>
+                        @php $aboutAddress = preg_replace('/\s*,\s*/', ', ', trim((string)($contactContent->data_values->address ?? ''))); @endphp
+                        <p class="text-sm text-slate-500 mt-4 mb-0">{{ __($aboutAddress) }}</p>
                     @endif
                 </div>
                 @endif
 
-                {{-- Quick Links, Support, Security: same grid row as other columns (no full-width wrapper — avoids empty gap beside About) --}}
-                @if($quickLinks->isNotEmpty())
-                @php
-                    $validQuickLinks = $quickLinks->filter(function ($link) {
-                        $dv = $link->data_values ?? (object)[];
-                        $t = trim((string)($dv->title ?? ''));
-                        return $t !== '' && strlen($t) >= 3 && preg_match('/[\p{L}\s]/u', $t);
-                    });
-                @endphp
-                @if($validQuickLinks->isNotEmpty())
-                <div class="footer__bottom__widget footer-quick-links-widget">
-                    <h6 class="title footer-col-title">@lang('Quick Links')</h6>
-                    <ul class="list-unstyled mb-0" role="list">
+                @if($hasQuickLinksCol)
+                <div class="min-w-0 footer__bottom__widget footer-quick-links-widget">
+                    <h3 class="text-base font-semibold text-white mb-4 footer-col-title">@lang('Quick Links')</h3>
+                    <ul class="list-none m-0 p-0 space-y-2.5" role="list">
                         @foreach ($validQuickLinks as $link)
                             @php $dv = $link->data_values ?? (object)[]; $u = $dv->url ?? '#'; @endphp
-                            <li role="listitem"><a href="{{ $u }}" @if($u !== '#') target="_blank" rel="noopener noreferrer" @endif>{{ __($dv->title ?? '') }}</a></li>
+                            <li role="listitem"><a href="{{ $u }}" class="text-sm text-slate-400 no-underline hover:text-white" @if($u !== '#') target="_blank" rel="noopener noreferrer" @endif>{{ __($dv->title ?? '') }}</a></li>
                         @endforeach
-
                     </ul>
                 </div>
                 @endif
-                @endif
 
-                @if($supportEnabled)
-                <div class="footer__bottom__widget footer-support-widget">
-                    <h6 class="title footer-col-title">@lang('Support')</h6>
-                    <ul class="list-unstyled mb-0" role="list">
+                @if($hasSupportCol)
+                <div class="min-w-0 footer__bottom__widget footer-support-widget">
+                    <h3 class="text-base font-semibold text-white mb-4 footer-col-title">@lang('Customer Service')</h3>
+                    <ul class="list-none m-0 p-0 space-y-2.5" role="list">
                         @php $sc = $supportCenter ? ($supportCenter->data_values ?? (object)[]) : (object)[]; @endphp
                         @if(!empty($sc->help_center_url))
-                            <li role="listitem"><a href="{{ $sc->help_center_url }}" target="_blank" rel="noopener noreferrer">@lang('Help Center')</a></li>
+                            <li role="listitem"><a href="{{ $sc->help_center_url }}" class="text-sm text-slate-400 no-underline hover:text-white" target="_blank" rel="noopener noreferrer">@lang('Help Center')</a></li>
                         @endif
                         @if(!empty($sc->return_policy_url))
-                            <li role="listitem"><a href="{{ $sc->return_policy_url }}">@lang('Return Policy')</a></li>
+                            <li role="listitem"><a href="{{ $sc->return_policy_url }}" class="text-sm text-slate-400 no-underline hover:text-white">@lang('Return Policy')</a></li>
                         @endif
                         @if(!empty($sc->refund_policy_url))
-                            <li role="listitem"><a href="{{ $sc->refund_policy_url }}">@lang('Refund Policy')</a></li>
+                            <li role="listitem"><a href="{{ $sc->refund_policy_url }}" class="text-sm text-slate-400 no-underline hover:text-white">@lang('Refund Policy')</a></li>
                         @endif
-                        <li role="listitem"><a href="{{ !empty($sc->track_order_url) ? $sc->track_order_url : route('track.order') }}">@lang('Track Order')</a></li>
+                        <li role="listitem"><a href="{{ !empty($sc->track_order_url) ? $sc->track_order_url : route('track.order') }}" class="text-sm text-slate-400 no-underline hover:text-white">@lang('Track Order')</a></li>
                         @if(($sc->support_ticket_enabled ?? 1) && route('message.open', [], false))
-                            <li role="listitem"><a href="{{ route('message.open') }}">@lang('Support Ticket')</a></li>
+                            <li role="listitem"><a href="{{ route('message.open') }}" class="text-sm text-slate-400 no-underline hover:text-white">@lang('Support Ticket')</a></li>
                         @endif
                         @if(!empty($sc->support_email))
-                            <li role="listitem"><a href="mailto:{{ $sc->support_email }}">@lang('Contact Support')</a></li>
+                            <li role="listitem"><a href="mailto:{{ $sc->support_email }}" class="text-sm text-slate-400 no-underline hover:text-white">@lang('Contact Support')</a></li>
                         @endif
-
                     </ul>
                 </div>
                 @endif
 
+                <div class="min-w-0 footer__bottom__widget footer-newsletter-widget">
+                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">@lang('Newsletter')</h3>
+                    @php $subT = $subscribeSubtitle ? __($subscribeSubtitle) : ''; $mainT = __($subscribeTitle); @endphp
+                    <p class="text-sm text-slate-400 mb-4 leading-relaxed">
+                        @if($subT && $subT !== $mainT){{ $subT }}@else{{ $mainT }}@endif
+                    </p>
+                    <form class="newletter-form js-footer-subscribe" action="{{ route('subscribe') }}" method="post" aria-label="@lang('Newsletter subscription')">
+                        @csrf
+                        <div class="flex w-full footer-journal-newsletter-input">
+                            <label class="sr-only" for="footer-subscribe-email">@lang('Email address')</label>
+                            <input id="footer-subscribe-email" type="email" name="email" class="subscribe-email min-w-0 flex-1 border border-slate-600 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:border-slate-500 focus:outline-none" placeholder="@lang('Enter email')" required autocomplete="email">
+                            <button type="submit" class="subscribe-btn inline-flex shrink-0 items-center justify-center border border-slate-700 bg-slate-900 px-4 py-2.5 text-white hover:bg-black focus:outline-none" aria-label="@lang('Subscribe')">
+                                @include($activeTemplate . 'partials.icon', ['name' => 'paper-plane', 'sizePx' => 18, 'class' => 'text-current'])
+                            </button>
+                        </div>
+                        <div class="subscribe-inline-message mt-2 text-sm" aria-live="polite"></div>
+                        @if($privacyPolicyLink)
+                        <div class="mt-3 flex items-start gap-2 text-sm text-slate-400">
+                            <input type="checkbox" id="footer-newsletter-agree" name="newsletter_agree" value="1" class="mt-1 shrink-0">
+                            <label for="footer-newsletter-agree" class="leading-snug">
+                                @lang('I have read and agree to the')
+                                <a href="{{ route('policy.pages.short', $privacyPolicyLink->id) }}" class="font-semibold text-sky-400 no-underline hover:text-sky-300">@lang('Privacy Policy')</a>
+                            </label>
+                        </div>
+                        @endif
+                    </form>
+                    @if($aboutPhone !== '')
+                        <p class="text-sm text-slate-500 mt-4 mb-0">
+                            <span class="text-slate-400">@lang('Questions? Call us'):</span>
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $aboutPhone) }}" class="text-slate-400 no-underline hover:text-white">{{ __($aboutPhone) }}</a>
+                        </p>
+                    @endif
+                    @guest
+                    <div class="mt-4 flex flex-col gap-2" role="navigation" aria-label="@lang('Account')">
+                        <a href="{{ route('user.login') }}?open=login&redirect={{ urlencode(url()->current()) }}" class="js-footer-floating-login text-sm text-slate-400 no-underline hover:text-white">@lang('Login')</a>
+                        <a href="{{ route('user.register') }}?open=register&redirect={{ urlencode(url()->current()) }}" class="js-footer-floating-register text-sm text-slate-400 no-underline hover:text-white">@lang('Registration')</a>
+                        <a href="{{ $sellerAccountHref }}" class="text-sm text-slate-400 no-underline hover:text-white"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
+                    </div>
+                    @else
+                    <div class="mt-4 flex flex-col gap-2" role="navigation" aria-label="@lang('Account')">
+                        <a href="{{ route('user.home') }}" class="text-sm text-slate-400 no-underline hover:text-white">@lang('My account')</a>
+                        <a href="{{ $sellerAccountHref }}" class="text-sm text-slate-400 no-underline hover:text-white"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
+                    </div>
+                    @endguest
+                    @if($showShippingInfo && $shippingPayment)
+                    <div class="mt-4 pt-4 border-t border-slate-800">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">@lang('Payment & Shipping')</p>
+                        @if(($shippingPayment->data_values->cod_enabled ?? 1) == 1)
+                            <p class="text-sm text-slate-500 mb-1">@lang('Cash on Delivery available')</p>
+                        @endif
+                        @if(!empty($shippingPayment->data_values->estimated_delivery_text))
+                            <p class="text-sm text-slate-500 mb-1">@lang('Delivery'): {{ __($shippingPayment->data_values->estimated_delivery_text) }}</p>
+                        @endif
+                        @if(!empty($shippingPayment->data_values->shipping_partners_text))
+                            <p class="text-sm text-slate-500 mb-1">{{ __($shippingPayment->data_values->shipping_partners_text) }}</p>
+                        @endif
+                        @if(!empty($shippingPayment->data_values->delivery_zones_text))
+                            <p class="text-sm text-slate-500 mb-0">{{ __($shippingPayment->data_values->delivery_zones_text) }}</p>
+                        @endif
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            @if($rowExtraCount > 0 || $securityBadges->isNotEmpty())
+            <hr class="border-0 border-t border-slate-800 m-0">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-8 footer-secondary-row footer-journal-extra">
                 @if($securityBadges->isNotEmpty())
-                <div class="footer__bottom__widget footer-security-widget">
-                    <h6 class="title footer-col-title">@lang('Trust & Security')</h6>
-                    <div class="d-flex flex-wrap gap-2 align-items-center" role="list">
+                <div class="min-w-0 footer__bottom__widget footer-security-widget">
+                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">@lang('Trust & Security')</h3>
+                    <div class="flex flex-wrap items-center gap-3" role="list">
                         @foreach ($securityBadges as $badge)
                             @php $dv = $badge->data_values ?? (object)[]; $img = $dv->image ?? null; $u = $dv->url ?? '#'; @endphp
                             @if($img)
                                 <span role="listitem">
                                     @if($u && $u !== '#')
                                         <a href="{{ $u }}" target="_blank" rel="noopener noreferrer" title="{{ __($dv->title ?? '') }}">
-                                            <img src="{{ getImage('assets/images/frontend/footer/' . $img, '80x80') }}" alt="{{ __($dv->title ?? '') }}" loading="lazy" width="50" height="50">
+                                            <img src="{{ getImage('assets/images/frontend/footer/' . $img, '80x80') }}" alt="{{ __($dv->title ?? '') }}" class="h-10 w-auto max-w-full object-contain opacity-90" loading="lazy">
                                         </a>
                                     @else
-                                        <img src="{{ getImage('assets/images/frontend/footer/' . $img, '80x80') }}" alt="{{ __($dv->title ?? '') }}" loading="lazy" width="50" height="50">
+                                        <img src="{{ getImage('assets/images/frontend/footer/' . $img, '80x80') }}" alt="{{ __($dv->title ?? '') }}" class="h-10 w-auto max-w-full object-contain opacity-90" loading="lazy">
                                     @endif
                                 </span>
                             @endif
@@ -205,311 +312,126 @@
                     </div>
                 </div>
                 @endif
-
-                @if($showReturnForm)
-                <div class="footer__bottom__widget footer-widget-return">
-                    <h6 class="title footer-col-title">{{ __($returnFormTitle) }}</h6>
-                    <div class="footer-return-form-wrap">
-                        <form class="js-footer-return-form" action="{{ route('footer.return.submit') }}" method="post">
-                            @csrf
-                            <div class="row g-0">
-                                <div class="col-12"><input type="text" name="name" class="form-control form-control-sm" placeholder="{{ __('Name') }}" autocomplete="name" required></div>
-                                <div class="col-12"><input type="email" name="email" class="form-control form-control-sm" placeholder="{{ __('Email') }}" autocomplete="email" required></div>
-                                <div class="col-12"><input type="text" name="order_number" class="form-control form-control-sm" placeholder="{{ __('Order number (optional)') }}"></div>
-                                <div class="col-12"><input type="text" name="reason" class="form-control form-control-sm" placeholder="{{ __('Reason for return (optional)') }}"></div>
-                                <div class="col-12"><textarea name="message" class="form-control form-control-sm" rows="1" placeholder="{{ __('Message') }}" required></textarea></div>
-                                <div class="col-12"><button type="submit" class="btn btn--primary btn-sm w-100">@lang('Submit Request')</button></div>
-                            </div>
-                        </form>
+                @if($voteEnabled)
+                <div class="min-w-0 footer__bottom__widget footer-vote-widget">
+                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">{{ __($voteTitle !== '' ? $voteTitle : __('Was this page helpful?')) }}</h3>
+                    @if($voteSubtitle !== '')<p class="text-sm text-slate-500 mb-3">{{ __($voteSubtitle) }}</p>@endif
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 hover:text-white" data-vote-kind="up">
+                            @include($activeTemplate . 'partials.icon', ['name' => 'thumbs-up', 'sizePx' => 14])
+                            <span>{{ __($voteUpLabel) }}</span>
+                            <span class="text-xs text-slate-500" data-vote-count="up">{{ $voteUpCount }}</span>
+                        </button>
+                        <button type="button" class="inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 hover:text-white" data-vote-kind="down">
+                            @include($activeTemplate . 'partials.icon', ['name' => 'thumbs-down', 'sizePx' => 14])
+                            <span>{{ __($voteDownLabel) }}</span>
+                            <span class="text-xs text-slate-500" data-vote-count="down">{{ $voteDownCount }}</span>
+                        </button>
                     </div>
+                    <p class="text-xs text-slate-500 mt-2 mb-0"><span data-vote-total>{{ $voteTotalCount }}</span> @lang('votes')</p>
                 </div>
                 @endif
-
-                @if($showPaymentIcons && $footerElement->isNotEmpty())
-                <div class="footer__bottom__widget footer-payment-methods font-sans">
-                    <h6 class="title footer-col-title font-sans">@lang('Payment Methods')</h6>
-                    <div class="footer-payment-grid grid w-full max-w-full grid-cols-3 gap-px leading-none" role="list">
-                        @foreach ($footerElement as $footer)
+                @if($appPromoEnabled)
+                <div class="min-w-0 footer__bottom__widget footer-connect-widget">
+                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">@lang('Get our app')</h3>
+                    <div class="flex flex-col gap-2">
+                        @foreach($appPromotionItems as $appItem)
                             @php
-                                $img = $footer->data_values->image ?? null;
-                                $payUrl = trim($footer->data_values->url ?? '');
-                                $payTitle = $footer->data_values->title ?? '';
+                                $adv = $appItem->data_values ?? (object)[];
+                                if (is_array($adv)) $adv = (object)$adv;
+                                $platform = trim($adv->platform ?? $adv->title ?? '');
+                                $link = $adv->link ?? $adv->android_url ?? $adv->ios_url ?? '';
+                                $appFile = $adv->app_file ?? null;
+                                $label = $platform ?: ($adv->name ?? $adv->title ?? __('Download'));
+                                $downloadUrl = $appFile ? asset('assets/files/frontend/apps/' . $appFile) : null;
+                                $finalLink = $downloadUrl ?: $link ?: '#';
                             @endphp
-                            @if($img)
-                                <div class="footer-payment-item min-h-0 min-w-0 p-0" role="listitem">
-                                    @if($payUrl !== '')
-                                        <a href="{{ $payUrl }}" target="_blank" rel="noopener noreferrer" class="pay-img pay-img-link footer-payment-tile flex w-full items-center justify-center border-0 bg-transparent p-0 shadow-none outline-none ring-0 focus:outline-none focus-visible:ring-0" title="{{ __($payTitle) ?: __('Payment method') }}">
-                                            <img src="{{ getImage('assets/images/frontend/footer/' . $img) }}" alt="{{ __($payTitle) ?: __('Payment method') }}" class="block h-auto w-full max-w-full border-0 object-contain object-center outline-none" width="280" height="100" loading="lazy" decoding="async" fetchpriority="low" sizes="(max-width: 480px) 33vw, 140px">
-                                        </a>
-                                    @else
-                                        <span class="pay-img footer-payment-tile flex w-full items-center justify-center border-0 bg-transparent p-0 shadow-none">
-                                            <img src="{{ getImage('assets/images/frontend/footer/' . $img) }}" alt="{{ __($payTitle) ?: __('Payment method') }}" class="block h-auto w-full max-w-full border-0 object-contain object-center outline-none" width="280" height="100" loading="lazy" decoding="async" fetchpriority="low" sizes="(max-width: 480px) 33vw, 140px">
-                                        </span>
-                                    @endif
-                                </div>
+                            <a href="{{ $finalLink }}" class="text-sm text-slate-400 no-underline hover:text-white" @if(!$downloadUrl && $link) target="_blank" rel="noopener noreferrer" @endif>{{ __($label) }}</a>
+                        @endforeach
+                        @if($appPromotionItems->isEmpty())
+                            @if(!empty($appPromotion->data_values->android_url))
+                                <a href="{{ $appPromotion->data_values->android_url }}" target="_blank" rel="noopener noreferrer" class="text-sm text-slate-400 no-underline hover:text-white">@lang('Android')</a>
                             @endif
-                        @endforeach
+                            @if(!empty($appPromotion->data_values->ios_url))
+                                <a href="{{ $appPromotion->data_values->ios_url }}" target="_blank" rel="noopener noreferrer" class="text-sm text-slate-400 no-underline hover:text-white">@lang('iOS')</a>
+                            @endif
+                        @endif
                     </div>
                 </div>
                 @endif
-
-                <div class="footer__bottom__widget footer-newsletter-widget">
-                    
-{{-- inline style moved to critical-storefront.css --}}
-
-                    <div class="footer-newsletter-card stayl-footer-newsletter-card">
-                        <h6 class="custom-newsletter-heading footer-col-title">@lang('Subscribe Newsletter')</h6>
-                        @php $subT = $subscribeSubtitle ? __($subscribeSubtitle) : ''; $mainT = __($subscribeTitle); @endphp
-                        @if($subT && $subT !== $mainT)
-                            <p class="custom-newsletter-subtitle">{{ $mainT }} — {{ $subT }}</p>
-                        @endif
-                        <form class="newletter-form js-footer-subscribe w-full mt-2" action="{{ route('subscribe') }}" method="post" aria-label="@lang('Newsletter subscription')">
-                            @csrf
-                            <div class="custom-newsletter-input-group">
-                                <div class="custom-newsletter-icon">
-                                    @include($activeTemplate . 'partials.icon', ['name' => 'envelope'])
-                                </div>
-                                <input type="email" name="email" class="custom-newsletter-input" placeholder="@lang('Enter Your Email')" required aria-label="@lang('Email address')" autocomplete="email">
-                                <button type="submit" class="custom-newsletter-btn" aria-label="@lang('Subscribe')">
-                                    @include($activeTemplate . 'partials.icon', ['name' => 'paper-plane'])
-                                </button>
-                            </div>
-                            <div class="subscribe-inline-message mt-2 stayl-footer-msg-success" aria-live="polite"></div>
-                        </form>
-                        @guest
-                        <div class="footer-glass__auth-actions footer-glass__auth-actions--newsletter stayl-footer-auth-row" role="navigation" aria-label="@lang('Account')">
-                            <a href="{{ route('user.login') }}?open=login&redirect={{ urlencode(url()->current()) }}" class="footer-glass__btn footer-glass__btn--outline footer-glass__btn--compact js-footer-floating-login">@lang('Login')</a>
-                            <a href="{{ route('user.register') }}?open=register&redirect={{ urlencode(url()->current()) }}" class="footer-glass__btn footer-glass__btn--primary footer-glass__btn--compact js-footer-floating-register">@lang('Registration')</a>
-                            <a href="{{ $sellerAccountHref }}" class="footer-glass__btn footer-glass__btn--outline footer-glass__btn--compact" title="{{ $sellerAccountFeatureOn ? __('Seller registration') : __('Contact us about seller account') }}"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
-                        </div>
-                        @else
-                        <div class="footer-glass__auth-actions footer-glass__auth-actions--newsletter stayl-footer-auth-row" role="navigation" aria-label="@lang('Account')">
-                            <a href="{{ route('user.home') }}" class="footer-glass__btn footer-glass__btn--primary footer-glass__btn--compact">@lang('My account')</a>
-                            <a href="{{ $sellerAccountHref }}" class="footer-glass__btn footer-glass__btn--outline footer-glass__btn--compact" title="{{ $sellerAccountFeatureOn ? __('Seller account') : __('Contact us about seller account') }}"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
-                        </div>
-                        @endguest
-                    @if($showShippingInfo && $shippingPayment)
-                    <div class="footer-shipping-info mt-3 pt-3">
-                        <h6 class="custom-newsletter-heading footer-col-title mb-1.5 stayl-footer-small-title">@lang('Payment & Shipping')</h6>
-                        @if(($shippingPayment->data_values->cod_enabled ?? 1) == 1)
-                            <p class="mb-1 text-xs text-slate-500 font-medium flex items-center"><span class="stayl-footer-dot"></span>@lang('Cash on Delivery available')</p>
-                        @endif
-                        @if(!empty($shippingPayment->data_values->estimated_delivery_text))
-                            <p class="mb-1 text-xs text-slate-500 font-medium flex items-center">@include($activeTemplate . 'partials.icon', ['name' => 'truck', 'class' => 'stayl-mr-6']) @lang('Delivery'): {{ __($shippingPayment->data_values->estimated_delivery_text) }}</p>
-                        @endif
-                        @if(!empty($shippingPayment->data_values->shipping_partners_text))
-                            <p class="mb-1 text-xs text-slate-500 font-medium">{{ __($shippingPayment->data_values->shipping_partners_text) }}</p>
-                        @endif
-                        @if(!empty($shippingPayment->data_values->delivery_zones_text))
-                            <p class="mb-0 text-xs text-slate-500 font-medium">{{ __($shippingPayment->data_values->delivery_zones_text) }}</p>
-                        @endif
-                    </div>
-                    @endif
-                    </div>
-                </div>
-
-                <div class="footer__bottom__widget footer-connect-widget footer-right-col">
-                    <p class="footer-connect-text mb-1 small text-white">{{ __($connectTitle) }}</p>
-                    <div class="footer-connect-inner footer-social-first">
-                        <ul class="social-icons footer-social-grid stayl-footer-social-grid flex flex-wrap items-center justify-start gap-2.5 list-none m-0 p-0" role="list">
-                        @if($contactContent && !empty($contactContent->data_values->contact_email))
-                            <li class="m-0 shrink-0" role="listitem">
-                                <a class="stayl-footer-social-link" href="mailto:{{ $contactContent->data_values->contact_email }}" aria-label="@lang('Email')">
-                                    @include($activeTemplate . 'partials.icon', ['name' => 'envelope'])
-                                </a>
-                            </li>
-                        @endif
-                        @foreach ($socialElement as $social)
-                            @php
-                                $feDv = $social->data_values ?? null;
-                                $feDv = is_array($feDv) ? (object) $feDv : ($feDv ?? (object) []);
-                                $sUrl = trim((string) ($feDv->url ?? ''));
-                                $sUrl = $sUrl !== '' ? $sUrl : '#';
-                                $customIcon = trim((string) ($feDv->custom_icon ?? ''));
-                                if ($customIcon === '0' || strtolower($customIcon) === 'null') {
-                                    $customIcon = '';
-                                }
-                                $customIconRel = $customIcon !== '' && preg_match('#^[a-zA-Z0-9._-]+$#', $customIcon)
-                                    ? 'assets/images/frontend/social_icon/' . $customIcon
-                                    : '';
-                                $customIconAbs = $customIconRel !== '' && function_exists('public_path')
-                                    ? public_path($customIconRel)
-                                    : '';
-                                $useCustomImg = $customIconAbs !== '' && is_file($customIconAbs);
-                                $inlineCustom = trim((string) ($feDv->custom_icon_svg ?? ''));
-                                $iconStored = trim((string) ($feDv->icon ?? ''));
-                                $iconClassAttr = '';
-                                if ($iconStored !== '') {
-                                    if (preg_match('/<i\b[^>]*\bclass\s*=\s*(["\'])([^"\']*)\1/i', $iconStored, $im)) {
-                                        $iconClassAttr = trim(preg_replace('/\s+/', ' ', html_entity_decode($im[2], ENT_QUOTES | ENT_HTML5, 'UTF-8')));
-                                    } elseif (preg_match('/<i\b[^>]*\bclass\s*=\s*([^\s>]+)/i', $iconStored, $im)) {
-                                        $iconClassAttr = trim(preg_replace('/\s+/', ' ', html_entity_decode($im[1], ENT_QUOTES | ENT_HTML5, 'UTF-8')));
-                                    } else {
-                                        $iconClassAttr = trim(preg_replace('/\s+/', ' ', strip_tags(html_entity_decode($iconStored, ENT_QUOTES | ENT_HTML5, 'UTF-8'))));
-                                    }
-                                }
-                                $iconClassSafe = ($iconClassAttr !== '' && preg_match('#^[a-zA-Z0-9 _\-.]+$#u', $iconClassAttr)) ? $iconClassAttr : '';
-                                $iconRawLower = strtolower($iconClassSafe);
-                                $useLibraryIcon = $iconClassSafe !== '' && (
-                                    preg_match('/\b(fab|far|fas|fa-brands|fa-solid|fa-regular|lab|lar|las|lal)\b/', $iconRawLower)
-                                    || str_contains($iconRawLower, 'fa-')
-                                    || str_contains($iconRawLower, 'la-')
-                                );
-                                $socialLabel = trim((string) ($feDv->title ?? ''));
-                                $socialIconName = match (true) {
-                                    $iconRawLower === '' => 'link',
-                                    str_contains($iconRawLower, 'facebook') => 'facebook',
-                                    str_contains($iconRawLower, 'instagram') => 'instagram',
-                                    str_contains($iconRawLower, 'youtube') => 'youtube',
-                                    str_contains($iconRawLower, 'linkedin') => 'linkedin',
-                                    str_contains($iconRawLower, 'whatsapp') => 'whatsapp',
-                                    str_contains($iconRawLower, 'telegram') => 'telegram',
-                                    str_contains($iconRawLower, 'pinterest') => 'pinterest',
-                                    str_contains($iconRawLower, 'tiktok') => 'tiktok',
-                                    str_contains($iconRawLower, 'github') => 'github',
-                                    str_contains($iconRawLower, 'discord') => 'discord',
-                                    str_contains($iconRawLower, 'reddit') => 'reddit',
-                                    str_contains($iconRawLower, 'spotify') => 'spotify',
-                                    str_contains($iconRawLower, 'snapchat'), str_contains($iconRawLower, 'threads') => 'link',
-                                    str_contains($iconRawLower, 'twitter'), str_contains($iconRawLower, 'x-twitter'), str_contains($iconRawLower, 'x.com') => 'x-twitter',
-                                    str_contains($iconRawLower, 'envelope') => 'envelope',
-                                    default => 'link',
-                                };
-                            @endphp
-                            <li class="m-0 shrink-0" role="listitem">
-                                <a class="stayl-footer-social-link" href="{{ $sUrl }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $socialLabel !== '' ? $socialLabel : __('Social link') }}">
-                                    @if($inlineCustom !== '')
-                                        <span class="stayl-footer-social-inline-wrap inline-flex items-center justify-center shrink-0">{!! $inlineCustom !!}</span>
-                                    @elseif($useCustomImg)
-                                        <img src="{{ getImage($customIconRel, '96x96') }}" alt="" class="stayl-footer-social-img object-contain" width="22" height="22" loading="lazy" decoding="async">
-                                    @elseif($useLibraryIcon)
-                                        {{-- Font icon CSS removed from storefront; map admin-stored FA/LA classes to Lucide SVG --}}
-                                        @include($activeTemplate . 'partials.icon', ['name' => $socialIconName, 'class' => 'w-5 h-5'])
-                                    @elseif(str_contains($iconStored, '<i ') && $socialIconName === 'link')
-                                        <span class="stayl-footer-social-inline-wrap inline-flex items-center justify-center shrink-0">{!! $iconStored !!}</span>
-                                    @else
-                                        @include($activeTemplate . 'partials.icon', ['name' => $socialIconName])
-                                    @endif
-                                </a>
-                            </li>
-                        @endforeach
-                        </ul>
-                    </div>
-                    @if($appPromoEnabled)
-                    <div class="footer-app-qr-inner footer-app-qr-block border-top border-white border-opacity-25">
-                        <h6 class="title footer-col-title mb-2">@lang('Get our app')</h6>
-                        @if($appPromotionItems->isNotEmpty())
-                            <div class="footer-app-grid">
-                            @foreach($appPromotionItems as $appItem)
-                                @php
-                                    $adv = $appItem->data_values ?? (object)[];
-                                    if (is_array($adv)) $adv = (object)$adv;
-                                    $platform = trim($adv->platform ?? $adv->title ?? '');
-                                    $name = $adv->name ?? $adv->title ?? '';
-                                    $link = $adv->link ?? $adv->android_url ?? $adv->ios_url ?? '';
-                                    $appFile = $adv->app_file ?? null;
-                                    $img = $adv->image ?? $adv->qr_image ?? null;
-                                    $label = $platform ?: $name ?: __('Download');
-                                    $platformKey = strtolower($platform);
-                                    $platformIcon = match(true) {
-                                        str_contains($platformKey, 'android') => 'android',
-                                        in_array($platformKey, ['ios', 'apple', 'mac', 'iphone']) => 'apple',
-                                        str_contains($platformKey, 'windows') => 'windows',
-                                        str_contains($platformKey, 'mac') => 'apple',
-                                        str_contains($platformKey, 'desktop') => 'desktop',
-                                        default => 'mobile-alt',
-                                    };
-                                    $platformLogoUrl = getPlatformLogoUrl($platform);
-                                    $downloadUrl = $appFile ? asset('assets/files/frontend/apps/' . $appFile) : null;
-                                    $finalLink = $downloadUrl ?: $link ?: '#';
-                                @endphp
-                                <a href="{{ $finalLink }}" class="footer-app-card" @if(!$downloadUrl && $link) target="_blank" rel="noopener noreferrer" @endif title="{{ __($label) }}">
-                                    <div class="footer-app-card__icon-wrap">
-                                        @if($img)
-                                            <img src="{{ getImage('assets/images/frontend/footer/' . $img) }}" alt="{{ $label }}" loading="lazy" class="footer-app-card__logo">
-                                        @elseif($platformLogoUrl)
-                                            <img src="{{ $platformLogoUrl }}" alt="{{ $label }}" loading="lazy" class="footer-app-card__logo">
-                                        @else
-                                            @include($activeTemplate . 'partials.icon', ['name' => $platformIcon])
-                                        @endif
-                                    </div>
-                                    <div class="footer-app-card__text">
-                                        <span class="platform-label">{{ __('Get it on') }}</span>
-                                        <span class="platform-name">{{ __($label) }}</span>
-                                    </div>
-                                </a>
-                            @endforeach
-                            </div>
-                        @else
-                            <div class="footer-app-grid d-flex flex-wrap gap-2">
-                                @if(!empty($appPromotion->data_values->qr_image))
-                                    <img src="{{ getImage('assets/images/frontend/footer/' . $appPromotion->data_values->qr_image) }}" alt="@lang('QR Code')" width="48" height="48" loading="lazy" class="footer-qr-img rounded">
-                                @endif
-                                @if(!empty($appPromotion->data_values->android_url))
-                                    <a href="{{ $appPromotion->data_values->android_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light footer-app-btn">@include($activeTemplate . 'partials.icon', ['name' => 'android', 'class' => 'me-1']) @lang('Android')</a>
-                                @endif
-                                @if(!empty($appPromotion->data_values->ios_url))
-                                    <a href="{{ $appPromotion->data_values->ios_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light footer-app-btn">@include($activeTemplate . 'partials.icon', ['name' => 'apple', 'class' => 'me-1']) @lang('iOS')</a>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-                    @else
-                    {{-- Address moved under About Us section as requested --}}
-                    @endif
-                </div>
             </div>
-        </div>
-        </div>
-    </div>
-    <div class="footer-glass__copyright">
-        <div class="footer-glass__copyright-inner">
-            <div class="copyright-area footer-glass__copyright-row justify-content-between align-items-center flex flex-wrap">
-                <div class="copyright d-flex flex-wrap align-items-center {{ getLogoEffectClasses() }}">
-                    @php $footerLogo = getLogo('logo') ?: getLogo('logo_dark'); @endphp
+            @endif
+
+            <hr class="border-0 border-t border-slate-800 m-0">
+
+        </div>{{-- .main-container --}}
+
+        {{-- Row: Copyright | Payment icons (Using Theme Classes) --}}
+        <div class="footer-journal-bottom-row w-full mt-4 bg-slate-950 border-t border-slate-900/50">
+            <div class="main-container footer-journal-bottom-container py-6 lg:py-8 gap-6">
+                {{-- Left: Logo + Copyright --}}
+                <div class="flex items-center gap-4">
                     @if($footerLogo)
-                        <a href="{{ route('home') }}" class="me-3" title="@lang('Home')">
-                            <img src="{{ $footerLogo }}" alt="{{ gs('site_name') }}" class="footer-logo site-logo-img stayl-footer-logo" style="--stayl-footer-logo-h: {{ getFooterLogoHeight() }}px; {{ getLogoStyle() }}" loading="lazy" width="120" height="{{ getFooterLogoHeight() }}">
-                        </a>
+                        <img src="{{ $footerLogo }}" alt="{{ gs('site_name') }}" class="footer-journal-bottom-left-img" loading="lazy">
                     @endif
                     @php
                         $copyrightText = $footerContent && trim($footerContent->data_values->copyright_text ?? '') !== ''
                             ? $footerContent->data_values->copyright_text
-                            : __('Copyright') . ' © ' . date('Y') . ' ' . __('All Right Reserved');
+                            : __('Copyright') . ' &copy; ' . date('Y') . ' ' . gs('site_name') . '. ' . __('All Right Reserved.');
                         $copyrightText = str_replace('{year}', date('Y'), $copyrightText);
-                        @endphp
-                    <span class="footer-glass__copy-text">{{ $copyrightText }}</span>
-                </div>
-                <nav class="policy-page footer-glass__policy-nav" aria-label="@lang('Legal and policies')">
-                    @foreach ($policyPages as $policy)
-                        <a href="{{ route('policy.pages.short', $policy->id) }}" class="footer-glass__policy-link">{{ __($policy->data_values->title ?? '') }}</a>
-                    @endforeach
-                    @if($showCookiePrefs)
-                        <a href="{{ route('cookie.revoke') }}" class="footer-glass__policy-link">{{ __($cookiePrefsText) }}</a>
-                    @endif
-                </nav>
-                @if($footerBottomButtons->isNotEmpty())
-                <div class="d-flex flex-wrap gap-2 mt-2">
-                    @foreach($footerBottomButtons as $btn)
-                        @php $b = (array)($btn->data_values ?? []); $href = trim((string)($b['button_url'] ?? '#')) ?: '#'; @endphp
-                        <a href="{{ $href }}" class="btn btn-sm btn-outline-light d-inline-flex align-items-center">
-                            @if(!empty($b['icon_image']))
-                                <img src="{{ asset('assets/images/frontend/custom_buttons/' . $b['icon_image']) }}" alt="{{ $b['button_text'] ?? 'Button' }}" width="16" height="16" loading="lazy" class="me-1">
-                            @else
-                                @include($activeTemplate . 'partials.icon', ['name' => ($b['icon_name'] ?? 'circle'), 'class' => 'me-1'])
+                    @endphp
+                    <span class="text-xs text-slate-500 font-medium">{!! $copyrightText !!}</span>
+
+                    {{-- Dynamic Cookie & Policy Links moved here for a cleaner look --}}
+                    @if($showCookiePrefs || $footerBottomButtons->isNotEmpty())
+                        <div class="hidden sm:flex items-center gap-3 ml-2 border-l border-slate-800 pl-4">
+                            @if($showCookiePrefs)
+                                <button class="text-[10px] uppercase tracking-wider text-slate-500 hover:text-white transition policyCookie">@lang('Cookie Preferences')</button>
                             @endif
-                            <span>{{ $b['button_text'] ?? __('Button') }}</span>
-                        </a>
+
+                            @foreach($footerBottomButtons as $btn)
+                                <a href="{{ $btn->data_values->url }}" class="text-[10px] uppercase tracking-wider text-slate-500 hover:text-white transition">
+                                    {{ __($btn->data_values->button_text) }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Right: Payment icons --}}
+                @if($showPaymentIcons && $footerElement->isNotEmpty())
+                <div class="flex flex-wrap items-center gap-2 lg:justify-end" role="list" aria-label="@lang('Payment Methods')">
+                    @foreach ($footerElement as $footerPay)
+                        @php
+                            $payImg = $footerPay->data_values->image ?? null;
+                            $payUrl = trim($footerPay->data_values->url ?? '');
+                            $payTitle = $footerPay->data_values->title ?? '';
+                        @endphp
+                        @if($payImg)
+                            <div class="pay-badge bg-slate-900/40 border border-slate-800 transition hover:bg-slate-800" role="listitem">
+                                @if($payUrl !== '')
+                                    <a href="{{ $payUrl }}" target="_blank" rel="noopener noreferrer">
+                                        <img src="{{ getImage('assets/images/frontend/footer/' . $payImg) }}" alt="{{ __($payTitle) }}" loading="lazy" class="contrast-125 brightness-90">
+                                    </a>
+                                @else
+                                    <img src="{{ getImage('assets/images/frontend/footer/' . $payImg) }}" alt="{{ __($payTitle) }}" loading="lazy" class="contrast-125 brightness-90">
+                                @endif
+                            </div>
+                        @endif
                     @endforeach
                 </div>
                 @endif
             </div>
+        </div>
+
+
+
+
         </div>
     </div>
 </footer>
 @push('script')
 <script>
-// Footer login/register links: use global capture in auth_iframe_overlay_script only (duplicate handler caused double load).
 (function() {
   var footer = document.querySelector('footer.site-footer.footer-glass');
   if (!footer) return;
@@ -573,4 +495,69 @@
   }
 })();
 </script>
+@if($voteEnabled)
+<script>
+(function() {
+  var host = document.querySelector('.footer-vote-widget');
+  if (!host) return;
+  var endpoint = @json(route('footer.vote.submit'));
+  var csrf = @json(csrf_token());
+  var voteKey = @json($votePublicKey);
+  var buttons = host.querySelectorAll('[data-vote-kind]');
+  var upCountNode = host.querySelector('[data-vote-count="up"]');
+  var downCountNode = host.querySelector('[data-vote-count="down"]');
+  var totalNode = host.querySelector('[data-vote-total]');
+  var inFlight = false;
+  var locked = false;
+
+  function setCounts(payload) {
+    if (upCountNode && Number.isFinite(payload.up)) upCountNode.textContent = payload.up;
+    if (downCountNode && Number.isFinite(payload.down)) downCountNode.textContent = payload.down;
+    if (totalNode && Number.isFinite(payload.total)) totalNode.textContent = payload.total;
+  }
+
+  function setLockedState() {
+    buttons.forEach(function(btn) {
+      btn.disabled = true;
+      btn.classList.add('is-disabled');
+    });
+  }
+
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (inFlight || locked) return;
+      var kind = btn.getAttribute('data-vote-kind');
+      if (!kind) return;
+      inFlight = true;
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': csrf,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ vote: kind, vote_key: voteKey })
+      }).then(function(res) {
+        return res.json();
+      }).then(function(res) {
+        if (!res || !res.success) return;
+        setCounts({
+          up: Number(res.up || 0),
+          down: Number(res.down || 0),
+          total: Number(res.total || 0)
+        });
+        locked = true;
+        setLockedState();
+      }).catch(function() {
+      }).finally(function() {
+        inFlight = false;
+      });
+    });
+  });
+})();
+</script>
+@endif
 @endpush

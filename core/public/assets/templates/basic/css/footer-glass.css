@@ -2185,3 +2185,365 @@ footer.site-footer.footer-glass.footer-glass--premium .footer-app-card__btn,
 footer.site-footer.footer-glass.footer-glass--premium .footer-app-card__label {
   font-size: 8px !important;
 }
+
+/* Footer compact mode (admin-controlled) */
+footer.site-footer.stayl-footer--compact .footer-bottom {
+  padding-top: 0.3rem !important;
+  padding-bottom: 0.3rem !important;
+}
+
+footer.site-footer.stayl-footer--compact .footer__bottom__widget {
+  padding-top: 0.16rem !important;
+  padding-bottom: 0.16rem !important;
+}
+
+footer.site-footer.stayl-footer--compact .footer-glass__copyright-inner {
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.4rem !important;
+}
+
+/* Footer voter section */
+.footer-vote-widget__actions {
+  flex-wrap: wrap;
+}
+
+.footer-vote-btn {
+  appearance: none;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.8);
+  color: #334155;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  line-height: 1.15;
+  padding: 0.28rem 0.48rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.footer-vote-btn:hover {
+  transform: translateY(-1px);
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.footer-vote-btn.is-disabled,
+.footer-vote-btn:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.footer-vote-count {
+  font-weight: 700;
+}
+
+.footer-vote-widget__total {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+/* Day/Night mode support */
+body.dark-mode .footer-vote-btn {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(71, 85, 105, 0.65);
+  color: #cbd5e1;
+}
+
+body.dark-mode .footer-vote-btn:hover {
+  border-color: #60a5fa;
+  color: #93c5fd;
+}
+
+body.dark-mode .footer-vote-widget__total {
+  color: #94a3b8;
+}
+
+/* Storefront footer: Tailwind grid + fallback (Bootstrap grid CSS is not loaded on storefront) */
+footer.site-footer.footer-glass {
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+footer.site-footer.footer-glass > .footer-glass__inner {
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+footer.site-footer.footer-glass .footer__bottom__widget {
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+footer.site-footer.footer-glass .footer-main-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  footer.site-footer.footer-glass .footer-main-row[class*="md:grid-cols-2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  footer.site-footer.footer-glass .footer-main-row[class*="lg:grid-cols-3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+footer.site-footer.footer-glass .footer-secondary-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  footer.site-footer.footer-glass .footer-secondary-row[class*="sm:grid-cols-2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  footer.site-footer.footer-glass .footer-secondary-row[class*="md:grid-cols-3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  footer.site-footer.footer-glass .footer-secondary-row[class*="xl:grid-cols-4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+footer.site-footer.footer-glass .newletter-form .flex {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+}
+
+footer.site-footer.footer-glass .newletter-form .subscribe-email {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+footer.site-footer.footer-glass .newletter-form .subscribe-btn {
+  flex-shrink: 0 !important;
+  width: auto !important;
+  min-width: 2.75rem !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* Journal-style dark footer */
+footer.site-footer.footer-glass.footer-journal-style {
+  background-color: #1a1a1a !important;
+  background-image: none !important;
+  color: #94a3b8 !important;
+}
+
+footer.site-footer.footer-glass.footer-journal-style .footer-main-row,
+footer.site-footer.footer-glass.footer-journal-style .footer-journal-links,
+footer.site-footer.footer-glass.footer-journal-style .footer-secondary-row,
+footer.site-footer.footer-glass.footer-journal-style .footer-journal-extra {
+  display: grid !important;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  footer.site-footer.footer-glass.footer-journal-style .footer-main-row.footer-journal-links,
+  footer.site-footer.footer-glass.footer-journal-style .footer-main-row[class*="lg:grid-cols-4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  footer.site-footer.footer-glass.footer-journal-style .footer-main-row.footer-journal-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+footer.site-footer.footer-glass.footer-journal-style .footer-journal-newsletter-input .subscribe-email {
+  border-radius: 0 !important;
+}
+
+footer.site-footer.footer-glass.footer-journal-style .footer-journal-newsletter-input .subscribe-btn {
+  border-radius: 0 !important;
+}
+
+/* Journal-style Bottom row layout (Copyright row) */
+footer.site-footer.footer-glass.footer-journal-style .footer-journal-bottom {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  padding: 1.5rem 0 !important;
+}
+
+@media (min-width: 992px) {
+  footer.site-footer.footer-glass.footer-journal-style .footer-journal-bottom {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}
+
+footer.site-footer.footer-glass.footer-journal-style .footer-logo-small {
+  height: 22px !important;
+  width: auto !important;
+  object-fit: contain !important;
+  display: inline-block !important;
+  opacity: 0.9 !important;
+}
+
+footer.site-footer.footer-glass.footer-journal-style .footer-journal-bottom [role="list"] img {
+  height: 20px !important;
+  width: auto !important;
+  max-width: 60px !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto;
+}
+
+footer.site-footer.footer-glass.footer-journal-style .footer-journal-bottom [role="list"] span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 4px 6px !important;
+  min-width: 3rem;
+  height: 32px;
+}
+
+/* Footer social icons: keep perfect circles and centered icon/image */
+footer.site-footer.footer-glass .footer-social-row {
+  align-items: center !important;
+  gap: 0.65rem !important;
+  overflow: visible !important;
+}
+
+footer.site-footer.footer-glass .footer-social-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+}
+
+footer.site-footer.footer-glass .footer-social-link {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  border-radius: 9999px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  position: relative;
+  flex-shrink: 0 !important;
+  background: #ffffff !important;
+  border: 1px solid #d5deea !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  color: #1e293b !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+footer.site-footer.footer-glass .footer-social-link:hover {
+  transform: translateY(-1px);
+  border-color: #60a5fa !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.14);
+  color: #1d4ed8 !important;
+  background: #ffffff !important;
+}
+
+footer.site-footer.footer-glass .footer-social-link .footer-social-image {
+  width: 30px !important;
+  height: 30px !important;
+  max-width: 30px !important;
+  max-height: 30px !important;
+  display: block !important;
+  object-fit: contain !important;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+footer.site-footer.footer-glass .footer-social-link .footer-social-font-icon {
+  font-size: 28px !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+}
+
+footer.site-footer.footer-glass .footer-social-link .footer-social-inline,
+footer.site-footer.footer-glass .footer-social-link .footer-social-inline svg {
+  width: 30px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Lucide icons (used by footer mail icon + many built-in icons) */
+footer.site-footer.footer-glass .footer-social-link .stayl-lucide-wrap {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+footer.site-footer.footer-glass .footer-social-link .stayl-lucide-glyph {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  stroke-width: 2px;
+}
+
+/* Extra: keep any svg/i centered inside circle */
+footer.site-footer.footer-glass .footer-social-link svg {
+  width: 30px !important;
+  height: 30px !important;
+  display: block !important;
+}
+
+footer.site-footer.footer-glass .footer-social-link i {
+  width: 30px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 28px !important;
+}
+
+/* Vote (thumbs) lucide icons: ensure no clipping in compact buttons */
+footer.site-footer.footer-glass .footer-vote-btn .stayl-lucide-wrap {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+footer.site-footer.footer-glass .footer-vote-btn .stayl-lucide-glyph {
+  width: 100% !important;
+  height: 100% !important;
+}
+

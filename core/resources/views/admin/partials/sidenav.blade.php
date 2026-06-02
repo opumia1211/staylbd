@@ -4,7 +4,7 @@
     return !$adminUser || $adminUser->canAccessSection($section);
   };
 
-  // Mapping for dynamic sections to specific routes if they exist
+  // Dynamic section routes (items listed in Home Layout are excluded below)
   $routeMapping = [
     'banner' => 'admin.frontend.sections.banner',
     'contact_us' => 'admin.frontend.sections.contact',
@@ -13,8 +13,18 @@
     'policy_pages' => 'admin.frontend.sections.policy',
     'register' => 'admin.frontend.sections.register',
     'service' => 'admin.frontend.sections.service',
-    'ticker' => 'admin.frontend.sections.ticker',
+    'social_icon' => 'admin.frontend.sections.social_icon',
     'scrollbar' => 'admin.frontend.sections.scrollbar',
+    'middle_banner' => 'admin.frontend.sections.middle_banner',
+    'bottom_banner' => 'admin.frontend.sections.bottom_banner',
+  ];
+
+  // Explicit links above the loop — exclude these keys from dynamic list
+  $sectionsMenuExcludeKeys = [
+    'banner',
+    'scrollbar',
+    'header_icons',
+    'social_icon',
   ];
 
   $manageSectionIconMap = [
@@ -30,6 +40,8 @@
     'service' => 'las la-concierge-bell',
     'ticker' => 'las la-bullhorn',
     'scrollbar' => 'las la-ellipsis-h',
+    'middle_banner' => 'las la-image',
+    'bottom_banner' => 'las la-image',
   ];
 
   // Notification counts for badges
@@ -77,20 +89,12 @@
         </ul>
       </li>
 
-      <!-- 2. Home Layout (Spotlights) -->
+      <!-- 2. Home Layout (homepage hub only — shortcuts live in other menus) -->
       @php
         $homeRoutes = [
           'admin.frontend.sections.homepage',
           'admin.frontend.sections.homepageCustomRows*',
           'admin.frontend.sections.homepageAds*',
-          'admin.frontend.sections.banner*',
-          'admin.frontend.sections.scrollbar*',
-          'admin.product.todayDeal',
-          'admin.product.hot',
-          'admin.product.feature.index',
-          'admin.product.trending',
-          'admin.product.bestSelling',
-          'admin.frontend.sections.ticker'
         ];
       @endphp
       <li class="menu-item {{ menuActive($homeRoutes) ? 'active open' : '' }}">
@@ -115,50 +119,6 @@
             <a href="{{ route('admin.frontend.sections.homepageAds') }}" class="menu-link">
               <i class="menu-icon icon-base las la-ad"></i>
               <div data-i18n="Homepage Ads">@lang('Homepage Ads')</div>
-            </a>
-          </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Dynamic Banners')</li>
-          <li class="menu-item {{ menuActive('admin.frontend.sections.banner*') }}">
-            <a href="{{ route('admin.frontend.sections.banner') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-image"></i>
-              <div data-i18n="Banners">@lang('Banner Management')</div>
-            </a>
-          </li>
-          <li class="menu-item {{ menuActive('admin.frontend.sections.scrollbar*') }}">
-            <a href="{{ route('admin.frontend.sections.scrollbar') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-arrows-alt-h"></i>
-              <div data-i18n="Scroll Bar">@lang('Scroll Bar')</div>
-            </a>
-          </li>
-          <li class="menu-item {{ menuActive('admin.frontend.sections.ticker') }}">
-            <a href="{{ route('admin.frontend.sections.ticker') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-ellipsis-h"></i>
-              <div data-i18n="Ticker">@lang('News Ticker')</div>
-            </a>
-          </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Deals & Trending')</li>
-          <li class="menu-item {{ menuActive('admin.product.todayDeal') }}">
-            <a href="{{ route('admin.product.todayDeal') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-bolt"></i>
-              <div data-i18n="Quick Deals">@lang('Quick Deals')</div>
-            </a>
-          </li>
-          <li class="menu-item {{ menuActive('admin.product.hot') }}">
-            <a href="{{ route('admin.product.hot') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-fire"></i>
-              <div data-i18n="Hot Deals">@lang('Hot Deals')</div>
-            </a>
-          </li>
-          <li class="menu-item {{ menuActive('admin.product.trending') }}">
-            <a href="{{ route('admin.product.trending') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-chart-line"></i>
-              <div data-i18n="Trending">@lang('Trending')</div>
-            </a>
-          </li>
-          <li class="menu-item {{ menuActive('admin.product.bestSelling') }}">
-            <a href="{{ route('admin.product.bestSelling') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-star"></i>
-              <div data-i18n="Best Selling">@lang('Best Selling')</div>
             </a>
           </li>
         </ul>
@@ -203,7 +163,7 @@
               <div data-i18n="Reviews">@lang('Product Reviews')</div>
             </a>
           </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Inventory & Alerts')</li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Inventory & Alerts')</li>
           <li
             class="menu-item {{ (request()->routeIs('admin.product.index') && request('low_stock')) ? 'active' : '' }}">
             <a href="{{ route('admin.product.index', ['low_stock' => 1]) }}" class="menu-link">
@@ -217,7 +177,7 @@
               <div data-i18n="Stock Alerts">@lang('Stock Alerts')</div>
             </a>
           </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Marketing Tools')</li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Marketing Tools')</li>
           <li class="menu-item {{ menuActive('admin.product.topbar.index') }}">
             <a href="{{ route('admin.product.topbar.index') }}" class="menu-link">
               <i class="menu-icon icon-base las la-cubes"></i>
@@ -236,7 +196,38 @@
               <div data-i18n="Popup Ads">@lang('Popup Ads')</div>
             </a>
           </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Organization')</li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Deals & Trending')</li>
+          <li class="menu-item {{ menuActive('admin.product.todayDeal') }}">
+            <a href="{{ route('admin.product.todayDeal') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-bolt"></i>
+              <div data-i18n="Quick Deals">@lang('Quick Deals')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.product.hot') }}">
+            <a href="{{ route('admin.product.hot') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-fire"></i>
+              <div data-i18n="Hot Deals">@lang('Hot Deals')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.product.trending') }}">
+            <a href="{{ route('admin.product.trending') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-chart-line"></i>
+              <div data-i18n="Trending">@lang('Trending')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.product.bestSelling') }}">
+            <a href="{{ route('admin.product.bestSelling') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-star"></i>
+              <div data-i18n="Best Selling">@lang('Best Selling')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.product.feature.index') }}">
+            <a href="{{ route('admin.product.feature.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-certificate"></i>
+              <div data-i18n="Featured">@lang('Featured Products')</div>
+            </a>
+          </li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Organization')</li>
           <li class="menu-item {{ menuActive('admin.category.index') }}">
             <a href="{{ route('admin.category.index') }}" class="menu-link">
               <i class="menu-icon icon-base las la-align-left"></i>
@@ -276,80 +267,170 @@
         </ul>
       </li>
 
-      <!-- 4. Operations (Orders & Logistics) -->
+      <!-- 4a. Orders (split from Operations) -->
       @php
-        $opsRoutes = [
+        $orderMenuRoutes = [
           'admin.orders*',
           'admin.abandoned-orders*',
           'admin.notifications*',
-          'admin.setting.stock.order.messages',
-          'admin.shipping*',
-          'admin.api.courier*',
-          'admin.locations.*'
+          'admin.frontend.quickorder',
         ];
+        // hub + channels covered by admin.orders*
       @endphp
-      <li class="menu-item {{ menuActive($opsRoutes) ? 'active open' : '' }}">
+      <li class="menu-item {{ menuActive($orderMenuRoutes) ? 'active open' : '' }}">
         <a href="javascript:void(0)" class="menu-link menu-toggle">
           <i class="menu-icon icon-base las la-list-alt"></i>
-          <div data-i18n="Operations">@lang('Operations')</div>
-          @if($pendingOrderCount > 0 || $failedCourierOrders > 0) <span class="badge badge-dot bg-danger ms-2"></span>
-          @endif
+          <div data-i18n="Orders">@lang('Orders')</div>
+          @if($pendingOrderCount > 0) <span class="badge badge-dot bg-danger ms-2"></span> @endif
         </a>
-        <ul class="menu-sub">
+        <ul class="menu-sub menu-sub--scroll menu-orders-panel">
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Order Hub')</li>
+          <li class="menu-item {{ menuActive('admin.orders.hub') }}">
+            <a href="{{ route('admin.orders.hub') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-th-large"></i>
+              <div data-i18n="Order Center">@lang('Order Center')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.automation.*') }}">
+            <a href="{{ route('admin.orders.automation.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-robot"></i>
+              <div data-i18n="Automation">@lang('Order Automation')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.fulfillment') }}">
+            <a href="{{ route('admin.orders.fulfillment') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-tasks"></i>
+              <div data-i18n="Fulfillment">@lang('Fulfillment Queue')</div>
+            </a>
+          </li>
           <li class="menu-item {{ menuActive('admin.orders.index') }}">
             <a href="{{ route('admin.orders.index') }}" class="menu-link">
               <i class="menu-icon icon-base las la-list"></i>
               <div data-i18n="All Orders">@lang('All Orders')</div>
             </a>
           </li>
-          <li class="menu-item {{ menuActive('admin.orders.*') ? 'active open' : '' }}">
-            <a href="javascript:void(0)" class="menu-link menu-toggle">
-              <i class="menu-icon icon-base las la-clock"></i>
-              <div data-i18n="Order Status">@lang('Order Statuses')</div>
+          <li class="menu-item {{ menuActive('admin.orders.channels.*') }}">
+            <a href="{{ route('admin.orders.channels.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-project-diagram"></i>
+              <div data-i18n="Order Channels">@lang('Order Channels')</div>
             </a>
-            <ul class="menu-sub">
-              <li class="menu-item {{ menuActive('admin.orders.pending') }}"><a
-                  href="{{ route('admin.orders.pending') }}" class="menu-link">@lang('Pending') @if($pendingOrderCount)
-                  <span class="badge bg-danger ms-auto">{{ $pendingOrderCount }}</span> @endif</a></li>
-              <li class="menu-item {{ menuActive('admin.orders.confirmed') }}"><a
-                  href="{{ route('admin.orders.confirmed') }}" class="menu-link">@lang('Confirmed')</a></li>
-              <li class="menu-item {{ menuActive('admin.orders.processing') }}"><a
-                  href="{{ route('admin.orders.processing') }}" class="menu-link">@lang('Processing')</a></li>
-              <li class="menu-item {{ menuActive('admin.orders.packaging') }}"><a
-                  href="{{ route('admin.orders.packaging') }}" class="menu-link">@lang('Packaging')</a></li>
-              <li class="menu-item {{ menuActive('admin.orders.shipped') }}"><a
-                  href="{{ route('admin.orders.shipped') }}" class="menu-link">@lang('Shipped')</a></li>
-              <li class="menu-item {{ menuActive('admin.orders.delivered') }}"><a
-                  href="{{ route('admin.orders.delivered') }}" class="menu-link">@lang('Delivered')</a></li>
-              <li class="menu-item {{ menuActive('admin.orders.cancel') }}"><a href="{{ route('admin.orders.cancel') }}"
-                  class="menu-link">@lang('Canceled')</a></li>
-            </ul>
           </li>
+          <li class="menu-item {{ menuActive(['admin.orders.import-export', 'admin.orders.import']) }}">
+            <a href="{{ route('admin.orders.import-export') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-exchange-alt"></i>
+              <div data-i18n="Import Export">@lang('Import / Export')</div>
+            </a>
+          </li>
+
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Order Status')</li>
+          <li class="menu-item {{ menuActive('admin.orders.pending') }}">
+            <a href="{{ route('admin.orders.pending') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-clock"></i>
+              <div>@lang('Pending')</div>
+              @if($pendingOrderCount > 0)<span class="badge bg-danger ms-auto">{{ $pendingOrderCount }}</span>@endif
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.confirmed') }}">
+            <a href="{{ route('admin.orders.confirmed') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-check"></i>
+              <div>@lang('Confirmed')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.processing') }}">
+            <a href="{{ route('admin.orders.processing') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-cog"></i>
+              <div>@lang('Processing')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.packaging') }}">
+            <a href="{{ route('admin.orders.packaging') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-box"></i>
+              <div>@lang('Packaging')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.shipped') }}">
+            <a href="{{ route('admin.orders.shipped') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-truck"></i>
+              <div>@lang('Shipped')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.delivered') }}">
+            <a href="{{ route('admin.orders.delivered') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-check-double"></i>
+              <div>@lang('Delivered')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.orders.cancel') }}">
+            <a href="{{ route('admin.orders.cancel') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-times-circle"></i>
+              <div>@lang('Canceled')</div>
+            </a>
+          </li>
+
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('More')</li>
           <li class="menu-item {{ menuActive('admin.abandoned-orders.*') }}">
             <a href="{{ route('admin.abandoned-orders.index') }}" class="menu-link">
               <i class="menu-icon icon-base las la-shopping-cart"></i>
               <div data-i18n="Abandoned">@lang('Abandoned Carts')</div>
             </a>
           </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Logistics & API')</li>
-          <li class="menu-item {{ menuActive('admin.shipping.*') ? 'active open' : '' }}">
-            <a href="javascript:void(0)" class="menu-link menu-toggle">
-              <i class="menu-icon icon-base las la-truck-moving"></i>
-              <div data-i18n="Shipping">@lang('Shipping')</div>
+          <li class="menu-item {{ menuActive('admin.frontend.quickorder') }}">
+            <a href="{{ route('admin.frontend.quickorder') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-shipping-fast"></i>
+              <div data-i18n="Quick Order">@lang('Quick Order Page')</div>
             </a>
-            <ul class="menu-sub">
-              <li class="menu-item {{ menuActive('admin.shipping.index') }}"><a
-                  href="{{ route('admin.shipping.index') }}" class="menu-link">@lang('Shipping Hub')</a></li>
-              <li class="menu-item {{ menuActive('admin.shipping.zones*') }}"><a
-                  href="{{ route('admin.shipping.zones.index') }}" class="menu-link">@lang('Zones')</a></li>
-              <li class="menu-item {{ menuActive('admin.shipping.methods*') }}"><a
-                  href="{{ route('admin.shipping.methods.index') }}" class="menu-link">@lang('Methods')</a></li>
-              <li class="menu-item {{ menuActive('admin.shipping.rules*') }}"><a
-                  href="{{ route('admin.shipping.rules.index') }}" class="menu-link">@lang('Rules')</a></li>
-              <li class="menu-item {{ menuActive('admin.shipping.cod.index') }}"><a
-                  href="{{ route('admin.shipping.cod.index') }}" class="menu-link">@lang('COD Settings')</a></li>
-            </ul>
           </li>
+        </ul>
+      </li>
+
+      <!-- 4b. Shipping & Logistics (split from Operations) -->
+      @php
+        $shippingMenuRoutes = [
+          'admin.shipping*',
+          'admin.api.courier*',
+          'admin.locations.*',
+          'admin.setting.stock.order.messages',
+        ];
+      @endphp
+      <li class="menu-item {{ menuActive($shippingMenuRoutes) ? 'active open' : '' }}">
+        <a href="javascript:void(0)" class="menu-link menu-toggle">
+          <i class="menu-icon icon-base las la-truck-moving"></i>
+          <div data-i18n="Shipping">@lang('Shipping')</div>
+          @if($failedCourierOrders > 0) <span class="badge badge-dot bg-danger ms-2"></span> @endif
+        </a>
+        <ul class="menu-sub">
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Shipping Settings')</li>
+          <li class="menu-item {{ menuActive('admin.shipping.index') }}">
+            <a href="{{ route('admin.shipping.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-warehouse"></i>
+              <div data-i18n="Shipping Hub">@lang('Shipping Hub')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.shipping.zones*') }}">
+            <a href="{{ route('admin.shipping.zones.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-map"></i>
+              <div data-i18n="Zones">@lang('Zones')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.shipping.methods*') }}">
+            <a href="{{ route('admin.shipping.methods.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-shipping-fast"></i>
+              <div data-i18n="Methods">@lang('Methods')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.shipping.rules*') }}">
+            <a href="{{ route('admin.shipping.rules.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-ruler-combined"></i>
+              <div data-i18n="Rules">@lang('Rules')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.shipping.cod.index') }}">
+            <a href="{{ route('admin.shipping.cod.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-money-bill-wave"></i>
+              <div data-i18n="COD">@lang('COD Settings')</div>
+            </a>
+          </li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Courier & Delivery')</li>
           <li class="menu-item {{ menuActive('admin.api.courier.*') ? 'active open' : '' }}">
             <a href="javascript:void(0)" class="menu-link menu-toggle">
               <i class="menu-icon icon-base las la-truck"></i>
@@ -400,25 +481,27 @@
         </ul>
       </li>
 
-      <!-- 5. Finance -->
+      <!-- 5. Payment -->
       @php
-        $financeRoutes = [
+        $paymentRoutes = [
+          'admin.finance*',
           'admin.gateway*',
           'admin.deposit*',
-          'admin.payment.*'
+          'admin.payment.*',
+          'admin.shipping.cod*',
         ];
       @endphp
-      <li class="menu-item {{ menuActive($financeRoutes) ? 'active open' : '' }}">
+      <li class="menu-item menu-payment-panel {{ menuActive($paymentRoutes) ? 'active open' : '' }}">
         <a href="javascript:void(0)" class="menu-link menu-toggle">
           <i class="menu-icon icon-base las la-credit-card"></i>
-          <div data-i18n="Finance">@lang('Finance')</div>
+          <div data-i18n="Payment">@lang('Payment')</div>
           @if($pendingDepositsCount > 0) <span class="badge badge-dot bg-danger ms-2"></span> @endif
         </a>
-        <ul class="menu-sub">
-          <li class="menu-item {{ menuActive('admin.payment.gateways.hub') }}">
+        <ul class="menu-sub menu-sub--scroll">
+          <li class="menu-item {{ menuActive(['admin.payment.gateways.hub', 'admin.finance.hub']) }}">
             <a href="{{ route('admin.payment.gateways.hub') }}" class="menu-link">
               <i class="menu-icon icon-base las la-th-large"></i>
-              <div data-i18n="Hub">@lang('Gateways Hub')</div>
+              <div data-i18n="Payment Center">@lang('Payment Center')</div>
             </a>
           </li>
           <li class="menu-item {{ menuActive('admin.payment.analytics') }}">
@@ -427,27 +510,84 @@
               <div data-i18n="Pay Analytics">@lang('Payment Analytics')</div>
             </a>
           </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Gateway Methods')</li>
-          <li class="menu-item {{ menuActive('admin.gateway.automatic.*') }}"><a
-              href="{{ route('admin.gateway.automatic.index') }}" class="menu-link">@lang('Automatic')</a></li>
-          <li class="menu-item {{ menuActive('admin.gateway.manual.*') }}"><a
-              href="{{ route('admin.gateway.manual.index') }}" class="menu-link">@lang('Manual')</a></li>
-          <li class="menu-item {{ menuActive('admin.gateway.autopay.*') }}"><a
-              href="{{ route('admin.gateway.autopay.index') }}" class="menu-link">@lang('Autopay')</a></li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Payment History')</li>
-          <li class="menu-item {{ menuActive('admin.deposit.list') }}"><a href="{{ route('admin.deposit.list') }}"
-              class="menu-link">@lang('All Payments')</a></li>
-          <li class="menu-item {{ menuActive('admin.deposit.pending') }}"><a href="{{ route('admin.deposit.pending') }}"
-              class="menu-link">@lang('Pending') @if($pendingDepositsCount) <span
-              class="badge bg-danger ms-auto">{{ $pendingDepositsCount }}</span> @endif</a></li>
-          <li class="menu-item {{ menuActive('admin.deposit.approved') }}"><a
-              href="{{ route('admin.deposit.approved') }}" class="menu-link">@lang('Approved')</a></li>
-          <li class="menu-item {{ menuActive('admin.deposit.successful') }}"><a
-              href="{{ route('admin.deposit.successful') }}" class="menu-link">@lang('Successful')</a></li>
-          <li class="menu-item {{ menuActive('admin.deposit.rejected') }}"><a
-              href="{{ route('admin.deposit.rejected') }}" class="menu-link">@lang('Rejected')</a></li>
-          <li class="menu-item {{ menuActive('admin.deposit.initiated') }}"><a
-              href="{{ route('admin.deposit.initiated') }}" class="menu-link">@lang('Initiated')</a></li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Gateway Methods')</li>
+          <li class="menu-item {{ menuActive('admin.gateway.automatic.*') }}">
+            <a href="{{ route('admin.gateway.automatic.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-robot"></i>
+              <div>@lang('Automatic (API)')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.gateway.manual.*') }}">
+            <a href="{{ route('admin.gateway.manual.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-university"></i>
+              <div>@lang('Manual / Bank')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.gateway.manual.create') }}">
+            <a href="{{ route('admin.gateway.manual.create') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-plus-circle"></i>
+              <div>@lang('Add Manual Gateway')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.gateway.autopay.*') }}">
+            <a href="{{ route('admin.gateway.autopay.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-external-link-alt"></i>
+              <div>@lang('Autopay / SMS')</div>
+            </a>
+          </li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('More Options')</li>
+          <li class="menu-item {{ menuActive('admin.shipping.cod.*') }}">
+            <a href="{{ route('admin.shipping.cod.index') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-money-bill-wave"></i>
+              <div>@lang('COD Settings')</div>
+            </a>
+          </li>
+          @if(Route::has('admin.report.activity.payments'))
+          <li class="menu-item {{ menuActive('admin.report.activity.payments') }}">
+            <a href="{{ route('admin.report.activity.payments') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-history"></i>
+              <div>@lang('Payment Activity')</div>
+            </a>
+          </li>
+          @endif
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Payment History')</li>
+          <li class="menu-item {{ menuActive('admin.deposit.list') }}">
+            <a href="{{ route('admin.deposit.list') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-list"></i>
+              <div>@lang('All Payments')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.deposit.pending') }}">
+            <a href="{{ route('admin.deposit.pending') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-clock"></i>
+              <div>@lang('Pending')</div>
+              @if($pendingDepositsCount) <span class="badge bg-danger ms-auto">{{ $pendingDepositsCount }}</span> @endif
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.deposit.approved') }}">
+            <a href="{{ route('admin.deposit.approved') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-check"></i>
+              <div>@lang('Approved')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.deposit.successful') }}">
+            <a href="{{ route('admin.deposit.successful') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-check-double"></i>
+              <div>@lang('Successful')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.deposit.rejected') }}">
+            <a href="{{ route('admin.deposit.rejected') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-times-circle"></i>
+              <div>@lang('Rejected')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.deposit.initiated') }}">
+            <a href="{{ route('admin.deposit.initiated') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-hourglass-start"></i>
+              <div>@lang('Initiated')</div>
+            </a>
+          </li>
         </ul>
       </li>
 
@@ -716,31 +856,32 @@
         </ul>
       </li>
 
-      <!-- 9. Frontend & System -->
+      <!-- 9. Sections (Direct Access) -->
       @php
-        $finalRoutes = [
-          'admin.frontend.sections*',
-          'admin.maintenance*',
-          'admin.system*',
-          'admin.setting.custom.css',
-          'admin.request.report',
-          'admin.setting.cookie',
-          'admin.frontend.templates',
-          'admin.frontend.quickorder'
+        $sectionsRoutes = [
+          'admin.frontend.sections.header.index',
+          'admin.frontend.sections.headericons',
+          'admin.frontend.sections.icon',
+          'admin.frontend.sections.general',
+          'admin.frontend.sections.userprofile',
+          'admin.frontend.sections.social_icon',
+          'admin.frontend.sections.banner',
+          'admin.frontend.sections.scrollbar',
+          'admin.frontend.sections.ticker',
+          'admin.frontend.sections.contact',
+          'admin.frontend.sections.footer',
+          'admin.frontend.sections.login',
+          'admin.frontend.sections.policy',
+          'admin.frontend.sections.register',
+          'admin.frontend.sections.service',
         ];
       @endphp
-      <li class="menu-item {{ menuActive($finalRoutes) ? 'active open' : '' }}">
+      <li class="menu-item {{ menuActive($sectionsRoutes) ? 'active open' : '' }}">
         <a href="javascript:void(0)" class="menu-link menu-toggle">
-          <i class="menu-icon icon-base las la-desktop"></i>
-          <div data-i18n="Frontend">@lang('Frontend')</div>
+          <i class="menu-icon icon-base las la-puzzle-piece"></i>
+          <div data-i18n="Sections">@lang('Sections')</div>
         </a>
         <ul class="menu-sub">
-          <li class="menu-item {{ menuActive('admin.frontend.templates') }}">
-            <a href="{{ route('admin.frontend.templates') }}" class="menu-link">
-              <i class="menu-icon icon-base las la-file-code"></i>
-              <div data-i18n="Templates">@lang('Manage Templates')</div>
-            </a>
-          </li>
           <li class="menu-item {{ menuActive('admin.frontend.sections.header.index') }}">
             <a href="{{ route('admin.frontend.sections.header.index') }}" class="menu-link">
               <i class="menu-icon icon-base las la-window-maximize"></i>
@@ -759,37 +900,73 @@
               <div data-i18n="Logo">@lang('Logo & Favicon')</div>
             </a>
           </li>
-          <li class="menu-item {{ menuActive('admin.frontend.sections.*') ? 'active open' : '' }}">
-            <a href="javascript:void(0)" class="menu-link menu-toggle">
-              <i class="menu-icon icon-base las la-puzzle-piece"></i>
-              <div data-i18n="Sections">@lang('Manage Sections')</div>
+          <li class="menu-item {{ menuActive('admin.frontend.sections.general') }}"><a
+              href="{{ route('admin.frontend.sections.general') }}" class="menu-link">@lang('General')</a></li>
+          <li class="menu-item {{ menuActive('admin.frontend.sections.userprofile') }}"><a
+              href="{{ route('admin.frontend.sections.userprofile') }}"
+              class="menu-link">@lang('User Profile Control')</a></li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Homepage Content')</li>
+          <li class="menu-item {{ menuActive('admin.frontend.sections.banner*') }}">
+            <a href="{{ route('admin.frontend.sections.banner') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-image"></i>
+              <div data-i18n="Banners">@lang('Banner Management')</div>
             </a>
-            <ul class="menu-sub">
-              <li class="menu-item {{ menuActive('admin.frontend.sections.general') }}"><a
-                  href="{{ route('admin.frontend.sections.general') }}" class="menu-link">@lang('General')</a></li>
-              <li class="menu-item {{ menuActive('admin.frontend.sections.userprofile') }}"><a
-                  href="{{ route('admin.frontend.sections.userprofile') }}"
-                  class="menu-link">@lang('User Profile Control')</a></li>
-              <li class="menu-item {{ menuActive('admin.frontend.quickorder') }}"><a
-                  href="{{ route('admin.frontend.quickorder') }}" class="menu-link">@lang('Quick Order Page')</a></li>
-              @foreach (getPageSections(true) as $k => $secs)
-                @if ($secs['builder'] && $k !== 'social_icon')
-                  @php
-                    $routeName = $routeMapping[$k] ?? 'admin.frontend.sections';
-                    $routeParams = isset($routeMapping[$k]) ? [] : ['key' => $k];
-                    $secIcon = $manageSectionIconMap[$k] ?? 'las la-puzzle-piece';
-                  @endphp
-                  <li class="menu-item {{ menuActive($routeName) }}">
-                    <a href="{{ route($routeName, $routeParams) }}" class="menu-link">
-                      <i class="menu-icon icon-base {{ $secIcon }}"></i>
-                      <div data-i18n="{{ $secs['name'] }}">{{ __($secs['name']) }}</div>
-                    </a>
-                  </li>
-                @endif
-              @endforeach
-            </ul>
           </li>
-          <li class="menu-item-header small text-muted text-uppercase py-2 px-3">@lang('Compliance & Extra')</li>
+          <li class="menu-item {{ menuActive(['admin.frontend.sections.ticker', 'admin.frontend.sections.scrollbar*']) }}">
+            <a href="{{ route('admin.frontend.sections.scrollbar') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-bullhorn"></i>
+              <div data-i18n="Scroll Bar">@lang('News Ticker & Scroll Bar')</div>
+            </a>
+          </li>
+          <li class="menu-item {{ menuActive('admin.frontend.sections.social_icon') }}">
+            <a href="{{ route('admin.frontend.sections.social_icon') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-share-alt"></i>
+              <div data-i18n="Social Icons">@lang('Social Icons')</div>
+            </a>
+          </li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Page Sections')</li>
+          @foreach (getPageSections(true) as $k => $secs)
+            @if ($secs['builder'] && !in_array($k, $sectionsMenuExcludeKeys, true))
+              @php
+                $routeName = $routeMapping[$k] ?? 'admin.frontend.sections';
+                $routeParams = isset($routeMapping[$k]) ? [] : ['key' => $k];
+                $secIcon = $manageSectionIconMap[$k] ?? 'las la-puzzle-piece';
+              @endphp
+              <li class="menu-item {{ menuActive($routeName) }}">
+                <a href="{{ route($routeName, $routeParams) }}" class="menu-link">
+                  <i class="menu-icon icon-base {{ $secIcon }}"></i>
+                  <div data-i18n="{{ $secs['name'] }}">{{ __($secs['name']) }}</div>
+                </a>
+              </li>
+            @endif
+          @endforeach
+        </ul>
+      </li>
+
+      <!-- 10. Frontend & System -->
+      @php
+        $finalRoutes = [
+          'admin.maintenance*',
+          'admin.system*',
+          'admin.setting.custom.css',
+          'admin.request.report',
+          'admin.setting.cookie',
+          'admin.frontend.templates',
+        ];
+      @endphp
+      <li class="menu-item {{ menuActive($finalRoutes) ? 'active open' : '' }}">
+        <a href="javascript:void(0)" class="menu-link menu-toggle">
+          <i class="menu-icon icon-base las la-desktop"></i>
+          <div data-i18n="Frontend">@lang('Frontend')</div>
+        </a>
+        <ul class="menu-sub">
+          <li class="menu-item {{ menuActive('admin.frontend.templates') }}">
+            <a href="{{ route('admin.frontend.templates') }}" class="menu-link">
+              <i class="menu-icon icon-base las la-file-code"></i>
+              <div data-i18n="Templates">@lang('Manage Templates')</div>
+            </a>
+          </li>
+          <li class="menu-item-header small menu-section-label text-uppercase py-2 px-3">@lang('Compliance & Extra')</li>
           <li class="menu-item {{ menuActive('admin.setting.cookie') }}">
             <a href="{{ route('admin.setting.cookie') }}" class="menu-link">
               <i class="menu-icon icon-base las la-cookie-bite"></i>

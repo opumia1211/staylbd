@@ -35,6 +35,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('abandoned-cart:detect')->everyThirtyMinutes();
         $schedule->command('abandoned-cart:cleanup')->daily()->at('02:30');
 
+        $schedule->command('orders:automation-run')->everyFifteenMinutes();
+
         // Auto optimize (optional): caches config/routes/views for max speed.
         if (env('AUTO_OPTIMIZE', false)) {
             $schedule->command('app:optimize')->weeklyOn(0, '03:30');

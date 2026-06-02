@@ -56,6 +56,8 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="app-url" content="{{ url('/') }}">
+    <meta name="cart-url" content="{{ Route::has('user.cart') ? route('user.cart') : url('/cart-list') }}">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     {{-- Short HTML cache speeds repeat views; assets use ?v= + long Cache-Control on serve-css --}}
     <meta http-equiv="Cache-Control" content="private, max-age=120, must-revalidate">
@@ -103,7 +105,9 @@
 
     @stack('style')
     <link rel="stylesheet" href="{{ asset('assets/templates/basic/css/stayl-elite-core.css') }}?v={{ $assetVersion }}">
-    <link rel="stylesheet" href="{{ asset('assets/templates/basic/css/contact-chat.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/templates/basic/css/stayl-responsive-device.css') }}?v={{ $assetVersion }}">
+    <link rel="stylesheet" href="{{ asset('assets/templates/basic/css/contact-chat.css') }}?v={{ $assetVersion }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ asset('assets/templates/basic/css/contact-chat.css') }}?v={{ $assetVersion }}"></noscript>
 
 
 
@@ -283,6 +287,13 @@
 
     @stack('script-lib')
     @stack('script')
+    @php
+        $__businessJsRel = 'assets/templates/' . activeTemplateName() . '/js/storefront-business.js';
+    @endphp
+    @if(is_file(public_path($__businessJsRel)))
+        <script>window.STAYL_TRACK_URL = @json(url('/api/v1/track/event'));</script>
+        <script src="{{ asset($__businessJsRel) }}?v={{ $assetVersion }}" defer></script>
+    @endif
     @include($activeTemplate . 'partials.experience_enhancement')
 
     {{-- Tawk.to: never load on localhost/127.0.0.1 to avoid CORS (embed.tawk.to blocks localhost) --}}

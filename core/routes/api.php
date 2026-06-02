@@ -55,7 +55,8 @@ Route::prefix('v1')->group(function () {
     });
 
         // Behavioral & Growth Analytics
-        Route::post('track/event', [\App\Http\Controllers\Api\V1\AnalyticsController::class, 'trackEvent']);
+        Route::post('track/event', [\App\Http\Controllers\Api\V1\AnalyticsController::class, 'trackEvent'])
+            ->middleware('throttle:120,1');
 
         // Mobile App: Customer Auth
         Route::prefix('auth')->group(function() {
@@ -78,4 +79,8 @@ Route::prefix('v1')->group(function () {
 Route::get('health', function () {
     return response()->json(['status' => 'ok']);
 });
+
+// Order channel webhook (external stores → import orders)
+Route::post('order-channel/{token}/webhook', [\App\Http\Controllers\Api\OrderChannelWebhookController::class, 'receive'])
+    ->name('api.order-channel.webhook');
 

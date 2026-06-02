@@ -135,6 +135,21 @@ class AdminSearchController extends Controller
         $settings = $this->searchSettings($searchTerm);
         $results = array_merge($results, $settings);
 
+        // Drop duplicate URLs (same page from menu + section + keyword search)
+        $seenUrls = [];
+        $results = array_values(array_filter($results, function ($item) use (&$seenUrls) {
+            $url = $item['url'] ?? '';
+            if ($url === '') {
+                return true;
+            }
+            if (isset($seenUrls[$url])) {
+                return false;
+            }
+            $seenUrls[$url] = true;
+
+            return true;
+        }));
+
         // Fallback: when no or very few results, show suggested/popular links so "wrong" query still shows something
         if (count($results) < 5) {
             $suggested = $this->getSuggestedMenuItems();
@@ -256,7 +271,15 @@ class AdminSearchController extends Controller
             ['title' => 'Courier Logs', 'route' => 'admin.api.courier.logs', 'icon' => 'las la-list-alt', 'category' => 'Reports', 'keywords' => ['courier logs', 'courier history']],
             ['title' => 'Courier Reports', 'route' => 'admin.api.courier.reports', 'icon' => 'las la-chart-bar', 'category' => 'Reports', 'keywords' => ['courier reports', 'courier analytics']],
             ['title' => 'Payment Gateways', 'route' => 'admin.gateway.automatic.index', 'icon' => 'las la-credit-card', 'category' => 'Settings', 'keywords' => ['payment', 'payment gateway', 'gateway', 'payment method', 'payment system']],
-            ['title' => 'Payment Gateways Hub', 'route' => 'admin.payment.gateways.hub', 'icon' => 'las la-th-large', 'category' => 'Settings', 'keywords' => ['payment hub', 'gateways hub']],
+            ['title' => 'Order Center', 'route' => 'admin.orders.hub', 'icon' => 'las la-th-large', 'category' => 'Orders', 'keywords' => ['order center', 'order hub', 'order management']],
+            ['title' => 'Order Automation', 'route' => 'admin.orders.automation.index', 'icon' => 'las la-robot', 'category' => 'Orders', 'keywords' => ['automation', 'auto confirm', 'auto cancel', 'cron orders']],
+            ['title' => 'Abandoned Cart Settings', 'route' => 'admin.abandoned-orders.settings', 'icon' => 'las la-cog', 'category' => 'Orders', 'keywords' => ['abandoned cart settings', 'cart reminder']],
+            ['title' => 'Order Channels', 'route' => 'admin.orders.channels.index', 'icon' => 'las la-project-diagram', 'category' => 'Orders', 'keywords' => ['woocommerce', 'shopify', 'import orders', 'external store', 'marketplace']],
+            ['title' => 'Import Export Orders', 'route' => 'admin.orders.import-export', 'icon' => 'las la-exchange-alt', 'category' => 'Orders', 'keywords' => ['import orders', 'export csv', 'sync orders']],
+            ['title' => 'Payment Center', 'route' => 'admin.payment.gateways.hub', 'icon' => 'las la-th-large', 'category' => 'Payment', 'keywords' => ['payment', 'finance', 'payment hub', 'gateways hub', 'payment center']],
+            ['title' => 'Payment Analytics', 'route' => 'admin.payment.analytics', 'icon' => 'las la-chart-line', 'category' => 'Payment', 'keywords' => ['payment analytics', 'revenue', 'gateway stats']],
+            ['title' => 'Autopay Gateways', 'route' => 'admin.gateway.autopay.index', 'icon' => 'las la-external-link-alt', 'category' => 'Payment', 'keywords' => ['autopay', 'sms payment']],
+            ['title' => 'COD Settings', 'route' => 'admin.shipping.cod.index', 'icon' => 'las la-money-bill-wave', 'category' => 'Payment', 'keywords' => ['cod', 'cash on delivery']],
             ['title' => 'Payment Analytics', 'route' => 'admin.payment.analytics', 'icon' => 'las la-chart-line', 'category' => 'Settings', 'keywords' => ['payment analytics', 'analytics']],
             ['title' => 'Automatic Gateways', 'route' => 'admin.gateway.automatic.index', 'icon' => 'las la-credit-card', 'category' => 'Settings', 'keywords' => ['automatic gateway', 'auto payment', 'online payment']],
             ['title' => 'Manual Gateways', 'route' => 'admin.gateway.manual.index', 'icon' => 'las la-credit-card', 'category' => 'Settings', 'keywords' => ['manual gateway', 'manual payment', 'offline payment']],
@@ -468,14 +491,16 @@ class AdminSearchController extends Controller
                                 'banner' => 'admin.frontend.sections.banner',
                                 'contact_us' => 'admin.frontend.sections.contact',
                                 'footer' => 'admin.frontend.sections.footer',
+                                'header_icons' => 'admin.frontend.sections.headericons',
                                 'login' => 'admin.frontend.sections.login',
                                 'policy_pages' => 'admin.frontend.sections.policy',
                                 'register' => 'admin.frontend.sections.register',
                                 'service' => 'admin.frontend.sections.service',
                                 'social_icon' => 'admin.frontend.sections.social_icon',
-                                'ticker' => 'admin.frontend.sections.ticker',
                                 'scrollbar' => 'admin.frontend.sections.scrollbar',
+                                'ticker' => 'admin.frontend.sections.scrollbar',
                             ];
+                            $homeLayoutKeys = [];
                             try {
                                 if (isset($routeMapping[$key])) {
                                     $url = route($routeMapping[$key]);
@@ -490,7 +515,7 @@ class AdminSearchController extends Controller
                                     'description' => 'Frontend Section - ' . ucfirst($key),
                                     'url' => $url,
                                     'icon' => 'las la-puzzle-piece',
-                                    'category' => 'Frontend'
+                                    'category' => in_array($key, $homeLayoutKeys, true) ? 'Home Layout' : 'Sections',
                                 ];
                             } catch (\Exception $e) {
                                 // Skip section if route fails
@@ -511,7 +536,7 @@ class AdminSearchController extends Controller
         $settings = [];
         
         $settingKeywords = [
-            'banner' => ['title' => 'Banner Upload & Management', 'description' => 'Manage banner images in Frontend Sections', 'url' => route('admin.frontend.sections.banner'), 'icon' => 'las la-image'],
+            'banner' => ['title' => 'Banner Upload & Management', 'description' => 'Manage hero banners (Sections)', 'url' => route('admin.frontend.sections.banner'), 'icon' => 'las la-image'],
             'logo' => ['title' => 'Logo Upload', 'description' => 'Upload and manage site logo', 'url' => route('admin.frontend.sections.icon'), 'icon' => 'las la-images'],
             'favicon' => ['title' => 'Favicon Upload', 'description' => 'Upload and manage favicon', 'url' => route('admin.frontend.sections.icon'), 'icon' => 'las la-images'],
             'login section' => ['title' => 'Login Section', 'description' => 'Manage login page section', 'url' => route('admin.frontend.sections.login'), 'icon' => 'las la-sign-in-alt'],
@@ -520,7 +545,9 @@ class AdminSearchController extends Controller
             'policy pages' => ['title' => 'Policy Pages', 'description' => 'Manage policy pages', 'url' => route('admin.frontend.sections.policy'), 'icon' => 'las la-file-alt'],
             'social icon' => ['title' => 'Social Icons', 'description' => 'Manage social media icons', 'url' => route('admin.frontend.sections.social_icon'), 'icon' => 'las la-share-alt'],
             'footer' => ['title' => 'Footer Section', 'description' => 'Manage footer section', 'url' => route('admin.frontend.sections.footer'), 'icon' => 'las la-window-minimize'],
-            'scrollbar' => ['title' => 'Scroll Bar', 'description' => 'Scroll bars below header, banner or above footer', 'url' => route('admin.frontend.sections.scrollbar'), 'icon' => 'las la-bolt'],
+            'scrollbar' => ['title' => 'Scroll Bar', 'description' => 'Scroll bars below header, banner or above footer (Sections)', 'url' => route('admin.frontend.sections.scrollbar'), 'icon' => 'las la-arrows-alt-h'],
+            'ticker' => ['title' => 'News Ticker', 'description' => 'Homepage news ticker (Sections)', 'url' => route('admin.frontend.sections.scrollbar'), 'icon' => 'las la-bullhorn'],
+            'quick order' => ['title' => 'Quick Order Page', 'description' => 'Quick order landing page (Orders)', 'url' => route('admin.frontend.quickorder'), 'icon' => 'las la-shipping-fast'],
         ];
 
         foreach ($settingKeywords as $keyword => $data) {

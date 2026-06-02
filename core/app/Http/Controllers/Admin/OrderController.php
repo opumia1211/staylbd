@@ -6,6 +6,7 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Courierapi;
 use App\Models\OrderShipmentTracking;
 use App\Services\Courier\CourierManager;
@@ -376,6 +377,7 @@ class OrderController extends Controller
 		}
 
 		$order->save();
+		app(\App\Services\OrderOperationsService::class)->clearCountCache();
 
 		notify($user, 'ORDER_STATUS', [
 			'method_name' => $notifyMessage ?: ('Your order has now ' . $statusLabel),
@@ -386,6 +388,48 @@ class OrderController extends Controller
 		]);
 
 		$notify[] = ['success', 'Order status change successfully.'];
+		return back()->withNotify($notify);
+	}
+
+	public function bulkStatus(Request $request)
+	{
+		$request->validate([
+			'order_ids' => 'required|array|min:1',
+			'order_ids.*' => 'integer|exists:orders,id',
+			'order_status' => 'required|integer|in:0,1,2,3,7,8,9',
+		]);
+
+		$updated = 0;
+		$targetStatus = (int) $request->order_status;
+
+		foreach ($request->order_ids as $orderId) {
+			$order = Order::with('user', 'orderDetail')->find($orderId);
+			if (!$order) {
+				continue;
+			}
+			$order->order_status = $targetStatus;
+			if ($targetStatus == Status::ORDER_DELIVERED && $order->payment_type == Status::PAYMENT_OFFLINE) {
+				$order->payment_status = Status::ORDER_PAYMENT_SUCCESS;
+			}
+			if ($targetStatus == Status::ORDER_CANCEL) {
+				foreach ($order->orderDetail as $detail) {
+					if ($detail->variant_id) {
+						\ProductVariant::where('id', $detail->variant_id)->where('product_id', $detail->product_id)
+							->increment('quantity', $detail->quantity);
+					}
+					Product::where('id', $detail->product_id)->increment('quantity', $detail->quantity);
+				}
+				$order->payment_status = Status::ORDER_PAYMENT_CANCEL;
+			}
+			$order->save();
+			$updated++;
+		}
+
+		if ($updated > 0) {
+			app(\App\Services\OrderOperationsService::class)->clearCountCache();
+		}
+
+		$notify[] = ['success', __(':count orders updated.', ['count' => $updated])];
 		return back()->withNotify($notify);
 	}
 

@@ -3056,8 +3056,10 @@ function getFrontendSectionRoute($key, $type = 'sections')
         'register' => 'admin.frontend.sections.register',
         'service' => 'admin.frontend.sections.service',
         'social_icon' => 'admin.frontend.sections.social_icon',
-        'ticker' => 'admin.frontend.sections.ticker',
+        'ticker' => 'admin.frontend.sections.scrollbar',
         'scrollbar' => 'admin.frontend.sections.scrollbar',
+        'middle_banner' => 'admin.frontend.sections.middle_banner',
+        'bottom_banner' => 'admin.frontend.sections.bottom_banner',
     ];
 
     if ($type == 'content') {
@@ -3071,7 +3073,7 @@ function getFrontendSectionRoute($key, $type = 'sections')
             'register' => 'admin.frontend.sections.content.register',
             'service' => 'admin.frontend.sections.content.service',
             'social_icon' => 'admin.frontend.sections.content.social_icon',
-            'ticker' => 'admin.frontend.sections.content.ticker',
+            'ticker' => 'admin.frontend.sections.scrollbar.save',
             'scrollbar' => 'admin.frontend.sections.scrollbar.save',
         ];
         return $contentMapping[$key] ?? 'admin.frontend.sections.content';
@@ -3085,7 +3087,7 @@ function getFrontendSectionRoute($key, $type = 'sections')
             'register' => 'admin.frontend.sections.element.register',
             'service' => 'admin.frontend.sections.element.service',
             'social_icon' => 'admin.frontend.sections.element.social_icon',
-            'ticker' => 'admin.frontend.sections.element.ticker',
+            'ticker' => 'admin.frontend.sections.scrollbar',
             'scrollbar' => 'admin.frontend.sections.scrollbar',
         ];
         return $elementMapping[$key] ?? 'admin.frontend.sections.element';

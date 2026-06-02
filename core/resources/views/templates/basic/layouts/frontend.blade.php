@@ -1440,15 +1440,11 @@
                 }
             })();
         </script>
-        {{-- Optional template scripts: include only when files exist (prevents 404 noise in console). --}}
+        {{-- storefront-business.js loaded globally from layouts/app.blade.php --}}
         @php
             $templateJsBase = 'assets/templates/' . activeTemplateName() . '/js/';
-            $businessJsRel = $templateJsBase . 'storefront-business.js';
             $legalJsRel = $templateJsBase . 'legal.js';
         @endphp
-        @if(is_file(public_path($businessJsRel)))
-            <script src="{{ asset($businessJsRel) }}" defer></script>
-        @endif
         @if(is_file(public_path($legalJsRel)))
             <script src="{{ asset($legalJsRel) }}" defer></script>
         @endif

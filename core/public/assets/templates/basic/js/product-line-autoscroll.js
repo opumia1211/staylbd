@@ -93,6 +93,8 @@
     }
 
     window.addEventListener('load', scheduleInit);
+    // User dashboard AJAX no-reload navigation: re-bind when content swaps.
+    window.addEventListener('dashboard-content-updated', scheduleInit);
 
     var resizeT;
     window.addEventListener('resize', function () {

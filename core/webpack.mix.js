@@ -104,6 +104,14 @@ mix.postCss('resources/css/tailwind-admin.css', 'public/css/tailwind-admin.css',
     cssNano: mix.inProduction() ? { preset: ['default', { discardComments: { removeAll: true } }] } : false
 });
 
+mix.postCss('resources/css/admin-tailwind-utilities.css', 'public/css/admin-tailwind-utilities.css', [
+    require('tailwindcss')('./tailwind.admin.config.js'),
+    require('autoprefixer'),
+]).options({
+    processCssUrls: false,
+    cssNano: mix.inProduction() ? { preset: ['default', { discardComments: { removeAll: true } }] } : false
+});
+
 /* Blade-extracted rules (no @tailwind) */
 mix.postCss('resources/css/critical-storefront.css', 'public/css/critical-storefront.css', [
     require('autoprefixer'),

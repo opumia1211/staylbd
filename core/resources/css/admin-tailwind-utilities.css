@@ -1,0 +1,66 @@
+/**
+ * Admin Tailwind utilities + shared components (Inter, brand teal).
+ * Built to public/css/admin-tailwind-utilities.css — load after serve-css/tailwind-admin.
+ */
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .st-btn {
+        @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-1;
+    }
+    .st-btn-primary {
+        @apply st-btn bg-[#0e9f90] text-white hover:bg-[#0c8a7d] focus:ring-[#0e9f90]/40;
+    }
+    .st-btn-secondary {
+        @apply st-btn bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-400;
+    }
+    .st-btn-outline {
+        @apply st-btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-300;
+    }
+    .st-btn-outline-primary {
+        @apply st-btn border-2 border-[#0e9f90] bg-white text-[#0a6b62] hover:bg-teal-50 focus:ring-[#0e9f90]/30;
+    }
+    .st-btn-warning {
+        @apply st-btn bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-400;
+    }
+    .st-btn-sm {
+        @apply px-3 py-1.5 text-xs rounded-md;
+    }
+    .admin-card {
+        @apply rounded-xl border border-slate-200/80 bg-white shadow-sm;
+    }
+    .admin-card-body {
+        @apply p-5 sm:p-6;
+    }
+    .admin-kpi-label {
+        @apply text-xs font-medium uppercase tracking-wide text-slate-500;
+    }
+    .admin-kpi-value {
+        @apply text-2xl font-bold text-slate-900 tabular-nums;
+    }
+    .admin-module-card {
+        @apply admin-card block h-full transition hover:-translate-y-0.5 hover:shadow-md;
+    }
+    .admin-badge {
+        @apply inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold;
+    }
+    .admin-badge-teal {
+        @apply admin-badge bg-teal-50 text-[#0a6b62];
+    }
+    .admin-table-wrap {
+        @apply overflow-x-auto rounded-xl border border-slate-200 bg-white;
+    }
+    .admin-table {
+        @apply w-full text-sm text-left text-slate-700;
+    }
+    .admin-table thead {
+        @apply bg-slate-50 text-xs uppercase tracking-wide text-slate-500;
+    }
+    .admin-table th {
+        @apply px-4 py-3 font-semibold;
+    }
+    .admin-table td {
+        @apply px-4 py-3 border-t border-slate-100;
+    }
+}

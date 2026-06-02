@@ -227,6 +227,11 @@
                                 <td>
                                     <div class="fw-bold text-heading">{{ showAmount($order->total) }}</div>
                                     <small class="text-muted">{{ $general->cur_text }}</small>
+                                    @if(\Illuminate\Support\Facades\Schema::hasColumn('orders', 'advance_payment') && (float) ($order->advance_payment ?? 0) > 0)
+                                        <span class="badge bg-label-success d-block mt-1 extra-small" title="@lang('Advance received')">
+                                            @lang('Adv'): {{ showAmount($order->advance_payment) }}
+                                        </span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($order->payment_type == Status::PAYMENT_ONLINE)
@@ -313,6 +318,11 @@
     </div>
 
     @include('admin.order.partials.modals')
+
+    <form id="bulkStatusForm" action="{{ route('admin.orders.bulk.status') }}" method="post" class="d-none">
+        @csrf
+        <input type="hidden" name="order_status" id="bulkStatusValue">
+    </form>
 @endsection
 
 @push('breadcrumb-plugins')
@@ -332,6 +342,14 @@
                 <li><h6 class="dropdown-header small text-muted">@lang('Courier Logistics')</h6></li>
                 <li><button class="dropdown-item d-flex align-items-center" type="button" id="sendToPathaoBtn"><i class="icon-base bx bxs-truck me-2 text-danger"></i> @lang('Send to Pathao')</button></li>
                 <li><button class="dropdown-item d-flex align-items-center" type="button" id="sendToSteadfastBtn"><i class="icon-base bx bxs-ship me-2 text-info"></i> @lang('Send to Steadfast')</button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header small text-muted">@lang('Bulk status')</h6></li>
+                <li><button type="button" class="dropdown-item bulk-status-btn" data-status="1">@lang('Mark Confirmed')</button></li>
+                <li><button type="button" class="dropdown-item bulk-status-btn" data-status="7">@lang('Mark Processing')</button></li>
+                <li><button type="button" class="dropdown-item bulk-status-btn" data-status="8">@lang('Mark Packaging')</button></li>
+                <li><button type="button" class="dropdown-item bulk-status-btn" data-status="2">@lang('Mark Shipped')</button></li>
+                <li><button type="button" class="dropdown-item bulk-status-btn" data-status="3">@lang('Mark Delivered')</button></li>
+                <li><button type="button" class="dropdown-item text-danger bulk-status-btn" data-status="9">@lang('Mark Canceled')</button></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item d-flex align-items-center" href="{{ route('admin.orders.export', array_merge(request()->only(['search','date_from','date_to','payment_type']), ['scope' => $scope])) }}"><i class="icon-base bx bx-export me-2"></i> @lang('Export as CSV')</a></li>
                 <li><a class="dropdown-item d-flex align-items-center" href="{{ route('admin.api.courier.logs') }}"><i class="icon-base bx bx-list-ul me-2"></i> @lang('View Courier Logs')</a></li>
@@ -432,6 +450,20 @@
         });
         $('#selectedOrdersSteadfast').html('<span class="badge bg-label-info">' + ids.length + ' {{ __("Orders Selected") }}</span>');
         showBootstrapModal('steadfastModal');
+    });
+
+    $(document).on('click', '.bulk-status-btn', function() {
+        var ids = getSelectedOrderIds();
+        var status = $(this).data('status');
+        if (!ids.length) { notify('error', '{{ __("Please select at least one order") }}'); return; }
+        if (!confirm('{{ __("Update status for selected orders?") }}')) return;
+        var $form = $('#bulkStatusForm');
+        $form.find('input[name="order_ids[]"]').remove();
+        ids.forEach(function(id) {
+            $form.append($('<input>').attr({ type: 'hidden', name: 'order_ids[]', value: id }));
+        });
+        $('#bulkStatusValue').val(status);
+        $form.submit();
     });
 
     $('#pathaocity').change(function() {

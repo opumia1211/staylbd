@@ -32,6 +32,7 @@
 @import '../../public/assets/admin/css/professional-login.css';
 @import '../../public/assets/admin/css/monokai.min.css';
 @import '../../public/assets/admin/css/verification_code.css';
+@import '../../public/assets/admin/css/admin-light-contrast.css';
 
 /* ====================================================================
    5. AUTH PAGE OVERRIDES (Scoped – only on body.admin-auth-page)

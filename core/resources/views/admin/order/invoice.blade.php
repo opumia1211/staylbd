@@ -10,8 +10,28 @@
     @if($invoiceFavicon)
     <link rel="icon" type="image/x-icon" href="{{ $invoiceFavicon }}">
     @endif
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ asset('css/files/inter-latin-400-normal.woff2') }}') format('woff2');
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url('{{ asset('css/files/inter-latin-600-normal.woff2') }}') format('woff2');
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url('{{ asset('css/files/inter-latin-700-normal.woff2') }}') format('woff2');
+        }
         :root {
             --primary-color: #696cff;
             --secondary-color: #8592a3;
@@ -209,11 +229,10 @@
                         @if(\Illuminate\Support\Facades\Schema::hasColumn('orders', 'delivery_driver_scan_token') && trim((string)($order->delivery_driver_scan_token ?? '')) !== '')
                         @php
                             $driverScanUrl = route('order.delivery.driver.scanned', $order->delivery_driver_scan_token);
-                            $driverQrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&format=png&color=000000&bgcolor=FFFFFF&data=' . rawurlencode($driverScanUrl);
                         @endphp
                         <div class="qr-box">
                             <p class="qr-caption">@lang('Driver: Scan for Maps')</p>
-                            <img src="{{ $driverQrUrl }}" width="100" height="100" alt="QR" class="qr-img">
+                            <div class="qr-img js-invoice-qr" data-qr-text="{{ $driverScanUrl }}" data-qr-size="100"></div>
                             <p class="qr-caption" style="font-size: 10px; font-weight: normal;">@lang('Only for internal logistics')</p>
                         </div>
                         @endif
@@ -222,12 +241,11 @@
                         @if(\Illuminate\Support\Facades\Schema::hasColumn('orders', 'delivery_scan_token') && trim((string)($order->delivery_scan_token ?? '')) !== '')
                         @php
                             $deliveryScanUrl = route('order.delivery.scanned', $order->delivery_scan_token);
-                            $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&format=png&color=696cff&bgcolor=FFFFFF&data=' . rawurlencode($deliveryScanUrl);
                             $customerName = $order->isGuest() ? ($order->guest_name ?? '') : ($order->user->fullname ?? $order->user->username ?? '');
                         @endphp
                         <div class="qr-box" style="border-color: var(--primary-color);">
                             <p class="qr-caption" style="color: var(--primary-color);">@lang('Customer: Scan to Confirm')</p>
-                            <img src="{{ $qrImageUrl }}" width="120" height="120" alt="QR" class="qr-img">
+                            <div class="qr-img js-invoice-qr" data-qr-text="{{ $deliveryScanUrl }}" data-qr-size="120"></div>
                             <p class="qr-caption" style="font-size: 10px; font-weight: normal;">@lang('Scan once you receive the items')</p>
                         </div>
                         @endif
@@ -263,6 +281,19 @@
             <p>&copy; {{ date('Y') }} {{ gs('site_name') }}. @lang('All rights reserved.')</p>
         </footer>
     </div>
+    <script src="{{ asset('assets/admin/js/vendor/qrcode.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof QRCode === 'undefined') return;
+            document.querySelectorAll('.js-invoice-qr[data-qr-text]').forEach(function (el) {
+                var text = el.getAttribute('data-qr-text') || '';
+                if (!text) return;
+                var size = parseInt(el.getAttribute('data-qr-size'), 10) || 120;
+                el.innerHTML = '';
+                new QRCode(el, { text: text, width: size, height: size, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+            });
+        });
+    </script>
 </body>
 
 </html>

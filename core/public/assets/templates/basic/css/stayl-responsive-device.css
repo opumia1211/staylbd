@@ -1,0 +1,137 @@
+/**
+ * Universal device polish: phone, tablet, laptop, small watch screens.
+ */
+:root {
+    --stayl-touch-min: 44px;
+    --stayl-page-pad-x: clamp(10px, 3vw, 28px);
+    --stayl-page-pad-y: clamp(8px, 2vw, 20px);
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+.main-container,
+.storefront-main,
+.dashboard-responsive-shell {
+    padding-left: var(--stayl-page-pad-x);
+    padding-right: var(--stayl-page-pad-x);
+}
+
+img,
+video,
+svg {
+    max-width: 100%;
+    height: auto;
+}
+
+button,
+.btn,
+a.nav-link,
+.mobile-bottom-nav a {
+    min-height: var(--stayl-touch-min);
+}
+
+/* Smartwatch / very narrow */
+@media (max-width: 320px) {
+    :root {
+        --stayl-touch-min: 40px;
+        --stayl-page-pad-x: 8px;
+    }
+    body {
+        font-size: 14px;
+    }
+    .mobile-bottom-nav {
+        font-size: 10px;
+    }
+    h1, .h1 { font-size: 1.25rem; }
+    h2, .h2 { font-size: 1.1rem; }
+}
+
+/* Phone */
+@media (max-width: 575.98px) {
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+    .product-card-glass,
+    .sf-pro-card {
+        min-width: 0;
+    }
+}
+
+/* Tablet */
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .dashboard-aside-col {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Safe areas (notch / home indicator) */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+    }
+    .mobile-bottom-nav {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+}
+
+/* Exit intent modal */
+.staylbd-business-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--stayl-page-pad-x);
+}
+.staylbd-business-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+}
+.staylbd-business-modal__panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 420px);
+    background: #fff;
+    border-radius: 16px;
+    padding: clamp(16px, 4vw, 28px);
+    text-align: center;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+}
+.staylbd-business-modal__panel h2 {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    margin-bottom: 0.5rem;
+}
+.staylbd-business-modal__code {
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #059669;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 12px 0;
+}
+.staylbd-business-modal__claim {
+    width: 100%;
+    min-height: var(--stayl-touch-min);
+    border: 0;
+    border-radius: 12px;
+    background: #0f172a;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.staylbd-business-modal__close {
+    background: transparent;
+    border: 0;
+    color: #64748b;
+    min-height: var(--stayl-touch-min);
+}

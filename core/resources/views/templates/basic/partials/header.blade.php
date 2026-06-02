@@ -175,13 +175,35 @@
         ?: 'BDT'
     ));
 
-    // Keep header hotline in sync with Footer > Company Info fields.
-    $headerContactPhone = trim((string) (optional($companyInfo)->data_values->contact_phone ?? ''));
-    $headerContactEmail = trim((string) (optional($companyInfo)->data_values->contact_email ?? ''));
-    if (trim((string) ($headerTopCfg['support_phone'] ?? '')) !== '') {
+    // Primary control source: Frontend > Contact section.
+    // Fallback source: Footer > Company Info.
+    $headerContactPhone = trim((string) (optional($contactContent)->data_values->contact_number ?? ''));
+    if ($headerContactPhone === '') {
+        $headerContactPhone = trim((string) (optional($companyInfo)->data_values->contact_phone ?? ''));
+    }
+    $headerContactEmail = trim((string) (optional($contactContent)->data_values->contact_email ?? ''));
+    if ($headerContactEmail === '') {
+        $headerContactEmail = trim((string) (optional($companyInfo)->data_values->contact_email ?? ''));
+    }
+    $headerContactPhoneIcon = trim((string) (optional($contactContent)->data_values->contact_phone_icon ?? ''));
+    $headerContactEmailIcon = trim((string) (optional($contactContent)->data_values->contact_email_icon ?? ''));
+    $headerContactPhoneIconRel = ($headerContactPhoneIcon !== '' && preg_match('#^[a-zA-Z0-9._-]+$#', $headerContactPhoneIcon))
+        ? 'assets/images/frontend/contact_us/' . $headerContactPhoneIcon
+        : '';
+    $headerContactEmailIconRel = ($headerContactEmailIcon !== '' && preg_match('#^[a-zA-Z0-9._-]+$#', $headerContactEmailIcon))
+        ? 'assets/images/frontend/contact_us/' . $headerContactEmailIcon
+        : '';
+    $headerContactPhoneIconAbs = $headerContactPhoneIconRel !== '' ? public_path($headerContactPhoneIconRel) : '';
+    $headerContactEmailIconAbs = $headerContactEmailIconRel !== '' ? public_path($headerContactEmailIconRel) : '';
+    $headerHasPhoneIconImage = $headerContactPhoneIconAbs !== '' && is_file($headerContactPhoneIconAbs);
+    $headerHasEmailIconImage = $headerContactEmailIconAbs !== '' && is_file($headerContactEmailIconAbs);
+    $showTopPhone = (int) (optional($contactContent)->data_values->show_top_phone ?? 1) === 1;
+    $showTopEmail = (int) (optional($contactContent)->data_values->show_top_email ?? 1) === 1;
+    // Keep legacy header top-bar override only when contact section is empty.
+    if ($headerContactPhone === '' && trim((string) ($headerTopCfg['support_phone'] ?? '')) !== '') {
         $headerContactPhone = trim((string) $headerTopCfg['support_phone']);
     }
-    if (trim((string) ($headerTopCfg['support_email'] ?? '')) !== '') {
+    if ($headerContactEmail === '' && trim((string) ($headerTopCfg['support_email'] ?? '')) !== '') {
         $headerContactEmail = trim((string) $headerTopCfg['support_email']);
     }
     if ($headerContactPhone === '') {
@@ -247,6 +269,14 @@
     .dark .custom-scrollbar::-webkit-scrollbar-thumb {
         background: rgba(51, 65, 85, 0.5);
     }
+    .stayl-top-contact-icon-img {
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+        min-height: 16px;
+        object-fit: contain;
+        display: inline-block;
+    }
 </style>
 
 <header class="stayl-fixed-master">
@@ -254,24 +284,34 @@
         <div class="stayl-announcement-bar stayl-dynamic-order" style="--stayl-order: {{ $headerBarOrderIndex['header_bar_top_notice'] ?? 1 }};">
             <div class="stayl-wrap">
                 <div class="d-flex align-items-center gap-3">
-                    <a href="{{ $headerContactPhone !== '' ? 'tel:' . preg_replace('/[^0-9+]/', '', $headerContactPhone) : route('contact') }}"
-                        class="stayl-announcement-link stayl-top-contact-link">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                        </svg>
-                        <span class="stayl-top-contact-text">{{ $headerContactPhone }}</span>
-                    </a>
-                    <span class="d-none d-md-inline">|</span>
-                    <a href="{{ $headerContactEmail !== '' ? 'mailto:' . $headerContactEmail : route('contact') }}"
-                        class="stayl-announcement-link stayl-top-contact-link">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                            <path d="m3 7 9 6 9-6"></path>
-                        </svg>
-                        <span class="stayl-top-contact-text">{{ $headerContactEmail }}</span>
-                    </a>
+                    @if($showTopPhone)
+                        <a href="{{ $headerContactPhone !== '' ? 'tel:' . preg_replace('/[^0-9+]/', '', $headerContactPhone) : route('contact') }}"
+                            class="stayl-announcement-link stayl-top-contact-link">
+                            @if($headerHasPhoneIconImage)
+                                <img src="{{ getImage($headerContactPhoneIconRel, '96x96') }}" alt="" class="stayl-top-contact-icon-img" loading="lazy" decoding="async">
+                            @else
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            @endif
+                            <span class="stayl-top-contact-text">{{ $headerContactPhone }}</span>
+                        </a>
+                    @endif
+                    @if($showTopPhone && $showTopEmail)
+                        <span class="d-none d-md-inline">|</span>
+                    @endif
+                    @if($showTopEmail)
+                        <a href="{{ $headerContactEmail !== '' ? 'mailto:' . $headerContactEmail : route('contact') }}"
+                            class="stayl-announcement-link stayl-top-contact-link">
+                            @if($headerHasEmailIconImage)
+                                <img src="{{ getImage($headerContactEmailIconRel, '96x96') }}" alt="" class="stayl-top-contact-icon-img" loading="lazy" decoding="async">
+                            @else
+                                @include($activeTemplate . 'partials.icon', ['name' => 'envelope', 'sizePx' => 16])
+                            @endif
+                            <span class="stayl-top-contact-text">{{ $headerContactEmail }}</span>
+                        </a>
+                    @endif
                     <span class="stayl-cod-badge no-break">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-sky-400">
                            <rect x="1" y="3" width="15" height="13"></rect>

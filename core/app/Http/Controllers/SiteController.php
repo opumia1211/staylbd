@@ -1472,6 +1472,61 @@ class SiteController extends Controller
         return back()->withNotify([['success', $successMessage]]);
     }
 
+    /**
+     * Lightweight footer vote endpoint (admin configurable via footer.content).
+     */
+    public function submitFooterVote(Request $request)
+    {
+        $request->validate([
+            'vote' => 'required|in:up,down',
+            'vote_key' => 'nullable|string|max:80',
+        ]);
+
+        $footerContent = Frontend::where('data_keys', 'footer.content')->orderBy('id', 'desc')->first();
+        $dv = is_object($footerContent->data_values ?? null) ? $footerContent->data_values : (object) [];
+        $voteEnabled = (int) ($dv->vote_enabled ?? 1) === 1;
+
+        if (!$voteEnabled) {
+            return response()->json(['success' => false, 'message' => __('Voting is currently disabled.')], 422);
+        }
+
+        $voteScope = ($dv->vote_scope ?? 'page') === 'global' ? 'global' : 'page';
+        $requestVoteKey = trim((string) $request->input('vote_key', ''));
+        $requestVoteKey = preg_replace('/[^a-f0-9]/i', '', strtolower($requestVoteKey ?? ''));
+        $voteSlug = $voteScope === 'global' ? 'global' : ('page:' . ($requestVoteKey !== '' ? $requestVoteKey : md5(url()->previous())));
+        $cacheKey = 'footer.vote.counts.' . $voteSlug;
+        $sessionKey = 'footer_vote.' . $voteSlug;
+
+        if (session()->has($sessionKey)) {
+            $counts = Cache::get($cacheKey, ['up' => 0, 'down' => 0]);
+            $up = max(0, (int) ($counts['up'] ?? 0));
+            $down = max(0, (int) ($counts['down'] ?? 0));
+            return response()->json([
+                'success' => true,
+                'already_voted' => true,
+                'up' => $up,
+                'down' => $down,
+                'total' => $up + $down,
+            ]);
+        }
+
+        $counts = Cache::get($cacheKey, ['up' => 0, 'down' => 0]);
+        $vote = $request->input('vote');
+        $counts[$vote] = max(0, (int) ($counts[$vote] ?? 0)) + 1;
+        Cache::put($cacheKey, $counts, now()->addDays(30));
+        session()->put($sessionKey, $vote);
+
+        $up = max(0, (int) ($counts['up'] ?? 0));
+        $down = max(0, (int) ($counts['down'] ?? 0));
+
+        return response()->json([
+            'success' => true,
+            'up' => $up,
+            'down' => $down,
+            'total' => $up + $down,
+        ]);
+    }
+
     public function placeholderImage($size = null)
     {
         if (!extension_loaded('gd') || !function_exists('imagecreatetruecolor')) {

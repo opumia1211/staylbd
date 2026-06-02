@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\AutopayIncomingController;
 use App\Http\Controllers\ServeAssetController;
 
 // Serve template JS/CSS with correct MIME (fixes 404/MIME when static assets hit Laravel)
-Route::get('serve-js/{name}', [ServeAssetController::class, 'js'])->name('serve.js')->where('name', 'fly-to-header|product-carousel|glass-header|storefront-lucide|auth');
+Route::get('serve-js/{name}', [ServeAssetController::class, 'js'])->name('serve.js')->where('name', 'fly-to-header|product-carousel|product-line-autoscroll|glass-header|storefront-lucide|auth');
 Route::get('serve-css/global/{name}', [ServeAssetController::class, 'cssGlobal'])->name('serve.css.global');
 Route::get('serve-css/img/{name}', [ServeAssetController::class, 'imageTemplate'])->name('serve.css.img');
 Route::get('serve-css/images/{name}', [ServeAssetController::class, 'cssBundleImages'])->name('serve.css.bundle-images');
@@ -68,6 +68,7 @@ Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'en|bn|hi|ar|ur|r
         Route::get('subscribe', 'subscribePage')->name('subscribe.page');
         Route::post('subscribe', 'subscribe')->name('subscribe')->middleware('throttle:10,1');
         Route::post('footer/return-request', 'submitReturnRequest')->name('footer.return.submit')->middleware('throttle:5,1');
+        Route::post('footer/vote', 'submitFooterVote')->name('footer.vote.submit')->middleware('throttle:20,1');
         Route::get('seller/apply', [\App\Http\Controllers\SellerApplyController::class, 'show'])->name('seller.apply');
         Route::get('/change/{lang?}', 'changeLanguage')->name('lang');
 

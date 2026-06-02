@@ -71,6 +71,12 @@
                             @foreach($section->content as $k => $item)
                                 @if($k == 'images')
                                     @foreach($item as $imgKey => $image)
+                                        @if($key === 'contact_us' && in_array($imgKey, ['contact_phone_icon', 'contact_email_icon'], true))
+                                            @continue
+                                        @endif
+                                        @php
+                                            $isContactIcon = ($key === 'contact_us' && in_array($imgKey, ['contact_phone_icon', 'contact_email_icon'], true));
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="image-node-card p-3 rounded border bg-light-soft h-100">
                                                 <label class="form-label fw-bold text-dark mb-3">{{__(keyToTitle(@$imgKey))}}</label>
@@ -83,16 +89,22 @@
                                                         </div>
                                                     </div>
                                                     <div class="upload-controls">
-                                                        <input type="file" class="form-control d-none image-upload-input" name="image_input[{{ @$imgKey }}]" id="fe_c_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg, .webp">
+                                                        <input type="file" class="form-control d-none image-upload-input" name="image_input[{{ @$imgKey }}]" id="fe_c_img_{{ $key }}_{{ $loop->index }}" accept="{{ $isContactIcon ? '.png,.jpg,.jpeg,.webp,.svg' : '.png,.jpg,.jpeg,.webp' }}">
                                                         <label for="fe_c_img_{{ $key }}_{{ $loop->index }}" class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm">
-                                                            <i class="las la-upload me-1"></i> @lang('Update Identity')
+                                                            <i class="las la-upload me-1"></i> {{ $isContactIcon ? __('Upload Icon') : __('Update Identity') }}
                                                         </label>
+                                                        @if($isContactIcon)
+                                                            <div class="form-check d-inline-flex align-items-center mt-2">
+                                                                <input class="form-check-input me-2" type="checkbox" name="remove_image[{{ $imgKey }}]" value="1" id="remove_{{ $imgKey }}">
+                                                                <label class="form-check-label tiny text-muted" for="remove_{{ $imgKey }}">@lang('Remove current icon')</label>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                     <div class="mt-2 d-flex justify-content-center gap-2">
                                                         @if(@$section->content->images->$imgKey->size) 
                                                             <span class="badge bg-label-secondary tiny rounded-pill">{{@$section->content->images->$imgKey->size}}px</span>
                                                         @endif
-                                                        <span class="badge bg-label-secondary tiny rounded-pill">WebP/PNG/JPG</span>
+                                                        <span class="badge bg-label-secondary tiny rounded-pill">{{ $isContactIcon ? 'SVG/WebP/PNG/JPG' : 'WebP/PNG/JPG' }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -100,6 +112,9 @@
                                     @endforeach
                                 @else
                                     @if($k != 'images')
+                                        @if($key === 'contact_us' && in_array($k, ['contact_number', 'contact_email'], true))
+                                            @continue
+                                        @endif
                                         <div class="{{ $item == 'textarea' || $item == 'textarea-nic' ? 'col-12' : 'col-md-6' }}">
                                             <div class="form-group mb-0">
                                                 <label class="form-label fw-bold text-dark mb-2">{{__(keyToTitle($k))}}</label>
@@ -129,8 +144,98 @@
                                     @endif
                                 @endif
                             @endforeach
+
+                            @if($key === 'contact_us')
+                                @php
+                                    $showTopPhone = (int) (@$content->data_values->show_top_phone ?? 1) === 1;
+                                    $showTopEmail = (int) (@$content->data_values->show_top_email ?? 1) === 1;
+                                    $contactPhone = trim((string) (@$content->data_values->contact_number ?? ''));
+                                    $contactEmail = trim((string) (@$content->data_values->contact_email ?? ''));
+                                    $contactPhoneIcon = trim((string) (@$content->data_values->contact_phone_icon ?? ''));
+                                    $contactEmailIcon = trim((string) (@$content->data_values->contact_email_icon ?? ''));
+                                    $phoneIconRel = ($contactPhoneIcon !== '' && preg_match('#^[a-zA-Z0-9._-]+$#', $contactPhoneIcon)) ? 'assets/images/frontend/contact_us/' . $contactPhoneIcon : '';
+                                    $emailIconRel = ($contactEmailIcon !== '' && preg_match('#^[a-zA-Z0-9._-]+$#', $contactEmailIcon)) ? 'assets/images/frontend/contact_us/' . $contactEmailIcon : '';
+                                    $phoneIconAbs = $phoneIconRel !== '' ? public_path($phoneIconRel) : '';
+                                    $emailIconAbs = $emailIconRel !== '' ? public_path($emailIconRel) : '';
+                                    $hasPhoneIcon = $phoneIconAbs !== '' && is_file($phoneIconAbs);
+                                    $hasEmailIcon = $emailIconAbs !== '' && is_file($emailIconAbs);
+                                    $phoneIconUrl = $hasPhoneIcon ? getImage($phoneIconRel, '96x96') : '';
+                                    $emailIconUrl = $hasEmailIcon ? getImage($emailIconRel, '96x96') : '';
+                                @endphp
+                                <div class="col-12">
+                                    <div class="border rounded-3 p-3 bg-light-soft">
+                                        <h6 class="mb-2 fw-bold">@lang('Top Header Contact Quick Control')</h6>
+                                        <p class="mb-3 tiny text-muted">@lang('One-line edit: icon upload, contact value, remove, and public/private visibility.')</p>
+
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <div class="d-flex flex-wrap align-items-center gap-2 p-1 border rounded-2 bg-white contact-quick-line">
+                                                    <div class="text-center contact-quick-line__label">
+                                                        <div class="mx-auto rounded-circle border bg-light d-flex align-items-center justify-content-center overflow-hidden contact-quick-line__preview">
+                                                            @if($hasPhoneIcon)
+                                                                <img src="{{ $phoneIconUrl }}" alt="" class="w-100 h-100 object-fit-contain">
+                                                            @else
+                                                                <i class="las la-phone fs-5 text-muted"></i>
+                                                            @endif
+                                                        </div>
+                                                        <div class="tiny text-muted mt-1">@lang('Phone')</div>
+                                                    </div>
+                                                    <div>
+                                                        <input type="file" class="form-control form-control-sm contact-quick-line__file" name="image_input[contact_phone_icon]" accept=".png,.jpg,.jpeg,.webp,.svg">
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input" type="checkbox" name="remove_image[contact_phone_icon]" value="1" id="remove_contact_phone_icon">
+                                                        <label class="form-check-label tiny" for="remove_contact_phone_icon">@lang('Remove')</label>
+                                                    </div>
+                                                    <div class="flex-grow-1 contact-quick-line__value">
+                                                        <input type="text" class="form-control form-control-sm" name="contact_number" value="{{ $contactPhone }}" placeholder="@lang('Contact Number')">
+                                                    </div>
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input type="hidden" name="show_top_phone" value="0">
+                                                        <input class="form-check-input" type="checkbox" role="switch" id="show_top_phone" name="show_top_phone" value="1" {{ $showTopPhone ? 'checked' : '' }}>
+                                                        <label class="form-check-label small fw-semibold" for="show_top_phone">@lang('Public')</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex flex-wrap align-items-center gap-2 p-1 border rounded-2 bg-white contact-quick-line">
+                                                    <div class="text-center contact-quick-line__label">
+                                                        <div class="mx-auto rounded-circle border bg-light d-flex align-items-center justify-content-center overflow-hidden contact-quick-line__preview">
+                                                            @if($hasEmailIcon)
+                                                                <img src="{{ $emailIconUrl }}" alt="" class="w-100 h-100 object-fit-contain">
+                                                            @else
+                                                                <i class="las la-envelope fs-5 text-muted"></i>
+                                                            @endif
+                                                        </div>
+                                                        <div class="tiny text-muted mt-1">@lang('Email')</div>
+                                                    </div>
+                                                    <div>
+                                                        <input type="file" class="form-control form-control-sm contact-quick-line__file" name="image_input[contact_email_icon]" accept=".png,.jpg,.jpeg,.webp,.svg">
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input" type="checkbox" name="remove_image[contact_email_icon]" value="1" id="remove_contact_email_icon">
+                                                        <label class="form-check-label tiny" for="remove_contact_email_icon">@lang('Remove')</label>
+                                                    </div>
+                                                    <div class="flex-grow-1 contact-quick-line__value">
+                                                        <input type="email" class="form-control form-control-sm" name="contact_email" value="{{ $contactEmail }}" placeholder="@lang('Contact Email')">
+                                                    </div>
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input type="hidden" name="show_top_email" value="0">
+                                                        <input class="form-check-input" type="checkbox" role="switch" id="show_top_email" name="show_top_email" value="1" {{ $showTopEmail ? 'checked' : '' }}>
+                                                        <label class="form-check-label small fw-semibold" for="show_top_email">@lang('Public')</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <small class="tiny text-muted d-block">@lang('Supported: SVG, WebP, PNG, JPG | Recommended: 96x96 px | Max: 2MB')</small>
+                                                <small class="tiny text-muted d-block">@lang('Email icon is shared: one upload will show in both Header Top Bar and Footer email icon.')</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
-                        <div class="mt-5 text-end border-top pt-4">
+                        <div class="{{ $key === 'contact_us' ? 'mt-3 text-end border-top pt-3 contact-save-bar sticky-bottom bg-white rounded-3 px-2 pb-2' : 'mt-5 text-end border-top pt-4' }}">
                             <button type="submit" class="btn btn-primary px-5 shadow-md rounded-pill">
                                 <i class="las la-save me-1"></i> @lang('Deploy Matrix')
                             </button>
@@ -158,7 +263,11 @@
                             <span class="input-group-text border-0 bg-transparent p-0 me-2"><i class="las la-search text-muted"></i></span>
                             <input type="text" id="elementSearch" class="form-control border-0 bg-transparent p-0 small" style="width: 150px;" placeholder="@lang('Filter nodes...')">
                         </div>
-                        @if($section->element->modal)
+                        @if($key === 'social_icon')
+                            <button type="button" class="btn btn-primary btn-sm shadow-sm px-3 rounded-pill socialQuickAdd">
+                                <i class="las la-plus me-1"></i> @lang('Add New')
+                            </button>
+                        @elseif($section->element->modal)
                             <button type="button" class="btn btn-primary btn-sm addBtn shadow-sm px-3 rounded-pill"><i class="las la-plus me-1"></i> @lang('Add New')</button>
                         @else
                             <a href="{{ route(getFrontendSectionRoute($key, 'element')) }}" class="btn btn-primary btn-sm shadow-sm px-3 rounded-pill"><i class="las la-plus me-1"></i> @lang('Add New')</a>
@@ -193,7 +302,11 @@
                                     @php $firstKey = collect($section->element->images)->keys()[0]; @endphp
                                     <td>
                                         <div class="avatar avatar-sm rounded-3 border overflow-hidden bg-white shadow-sm">
-                                            <img src="{{ getImage('assets/images/frontend/' . $key .'/'. @$data->data_values->$firstKey,@$section->element->images->$firstKey->size) }}" class="w-100 h-100 object-fit-cover">
+                                            @if($key === 'social_icon' && !empty(@$data->data_values->$firstKey))
+                                                <img src="{{ getImage('assets/images/frontend/' . $key .'/'. @$data->data_values->$firstKey,@$section->element->images->$firstKey->size) }}" class="w-100 h-100 object-fit-contain p-1" alt="@lang('Social icon image')">
+                                            @else
+                                                <img src="{{ getImage('assets/images/frontend/' . $key .'/'. @$data->data_values->$firstKey,@$section->element->images->$firstKey->size) }}" class="w-100 h-100 object-fit-cover" alt="@lang('Visual')">
+                                            @endif
                                         </div>
                                     </td>
                                 @endif
@@ -221,7 +334,7 @@
                                             <td>
                                                 @if($key == 'social_icon' && $dataVal === 'show_on_public')
                                                     @php $pub = ($selRaw === null || $selRaw === '' || (int) $selRaw === 1); @endphp
-                                                    <span class="badge {{ $pub ? 'bg-label-success' : 'bg-label-danger' }} rounded-pill px-3 tiny">
+                                                    <span class="badge {{ $pub ? 'bg-label-success' : 'bg-label-danger' }} rounded-pill px-3 tiny js-public-badge" data-public="{{ $pub ? 1 : 0 }}">
                                                         <i class="las la-{{ $pub ? 'eye' : 'eye-slash' }} me-1"></i> {{ $pub ? __('Public') : __('Private') }}
                                                     </span>
                                                 @else
@@ -232,8 +345,45 @@
                                     @endif
                                 @endforeach
                                 <td class="text-end pe-4">
+                                    @if($key === 'social_icon')
+                                        @php
+                                            $dv = (array) ($data->data_values ?? []);
+                                            $pubState = (!isset($dv['show_on_public']) || (int) $dv['show_on_public'] === 1) ? 1 : 0;
+                                        @endphp
+                                        <div class="d-inline-flex align-items-center gap-1 social-action-wrap" style="font-family: Inter, sans-serif;">
+                                            <button type="button"
+                                                class="btn btn-white border socialQuickEditBtn"
+                                                data-id="{{ $data->id }}"
+                                                data-title="{{ e((string) ($dv['title'] ?? '')) }}"
+                                                data-icon="{{ e((string) ($dv['icon'] ?? '')) }}"
+                                                data-url="{{ e((string) ($dv['url'] ?? '')) }}"
+                                                data-custom-icon-svg="{{ e((string) ($dv['custom_icon_svg'] ?? '')) }}"
+                                                data-show-on-public="{{ $pubState }}"
+                                                title="@lang('Edit details')">
+                                                <i class="las la-pen text-primary"></i>
+                                            </button>
+
+                                            <form action="{{ route(getFrontendSectionRoute($key, 'content'), $key) }}" method="POST" enctype="multipart/form-data" class="d-inline-flex mb-0 socialUploadForm">
+                                                @csrf
+                                                <input type="hidden" name="type" value="element">
+                                                <input type="hidden" name="id" value="{{ $data->id }}">
+                                                <input type="file" name="image_input[custom_icon]" class="d-none socialUploadInput" accept=".jpeg,.jpg,.png,.webp,.svg">
+                                                <button type="button" class="btn btn-white border socialUploadTrigger" title="@lang('Upload/Change icon image')">
+                                                    <i class="las la-image text-success"></i>
+                                                </button>
+                                            </form>
+
+                                            <button type="button" class="btn btn-white border socialPublicToggleBtn" data-id="{{ $data->id }}" data-public="{{ $pubState }}" title="@lang('Toggle public/private')">
+                                                <i class="las la-{{ $pubState ? 'toggle-on text-success' : 'toggle-off text-danger' }}"></i>
+                                            </button>
+
+                                            <button class="btn btn-white border confirmationBtn" data-action="{{ route('admin.frontend.remove',$data->id) }}" data-question="@lang('Permanently remove this node from the architecture?')" title="@lang('Remove Node')">
+                                                <i class="las la-trash-alt text-danger"></i>
+                                            </button>
+                                        </div>
+                                    @else
                                     <div class="btn-group btn-group-sm shadow-sm rounded-pill overflow-hidden border">
-                                        @if($section->element->modal)
+                                        @if($section->element->modal && $key !== 'social_icon')
                                             @php
                                                 $images = [];
                                                 if(@$section->element->images){
@@ -250,14 +400,19 @@
                                                 <i class="las la-edit text-primary fs-5"></i>
                                             </button>
                                         @else
-                                            <a href="{{ route(getFrontendSectionRoute($key, 'element'), $data->id) }}" class="btn btn-white border-0" title="@lang('Edit Node')">
-                                                <i class="las la-edit text-primary fs-5"></i>
+                                            <a href="{{ route(getFrontendSectionRoute($key, 'element'), $data->id) }}" class="btn btn-white border-0 {{ $key === 'social_icon' ? 'px-3' : '' }}" title="@lang('Edit Node')">
+                                                @if($key === 'social_icon')
+                                                    <i class="las la-edit text-primary me-1"></i><span class="small fw-semibold text-primary">@lang('Edit & Upload')</span>
+                                                @else
+                                                    <i class="las la-edit text-primary fs-5"></i>
+                                                @endif
                                             </a>
                                         @endif
                                         <button class="btn btn-white confirmationBtn border-0 border-start" data-action="{{ route('admin.frontend.remove',$data->id) }}" data-question="@lang('Permanently remove this node from the architecture?')" title="@lang('Remove Node')">
                                             <i class="las la-trash-alt text-danger fs-5"></i>
                                         </button>
                                     </div>
+                                    @endif
                                 </td>
                             </tr>
                             @empty
@@ -406,6 +561,7 @@
 </div>
 
 {{-- Modernized Modals --}}
+@if($key !== 'social_icon')
 <div id="addModal" class="modal fade animate__animated animate__fadeIn" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-2xl rounded-4">
@@ -530,6 +686,73 @@
         </div>
     </div>
 </div>
+@endif
+
+@if($key === 'social_icon')
+<div id="socialQuickModal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered social-quick-modal-dialog" role="document">
+        <div class="modal-content border-0 shadow-2xl rounded-4">
+            <div class="modal-header border-bottom py-3 px-4">
+                <h5 class="modal-title h6 fw-bold mb-0">@lang('Social Icon Manager')</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route(getFrontendSectionRoute($key, 'content'), $key) }}" method="POST" enctype="multipart/form-data" id="socialQuickForm">
+                @csrf
+                <input type="hidden" name="type" value="element">
+                <input type="hidden" name="id" value="">
+                <div class="modal-body px-3 py-3">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">@lang('Title')</label>
+                            <input type="text" class="form-control rounded-3" name="title" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">@lang('Profile URL')</label>
+                            <input type="text" class="form-control rounded-3" name="url" placeholder="https://">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">@lang('Icon Class')</label>
+                            <div class="input-group input-group-merge shadow-none border rounded-3 overflow-hidden">
+                                <span class="input-group-text border-0 bg-light social-icon-preview"><i class="las la-icons fs-5"></i></span>
+                                <input type="text" class="form-control border-0 social-icon-input ps-1" autocomplete="off" name="icon" placeholder="fab fa-facebook-f / lab la-instagram">
+                            </div>
+                            <small class="text-muted tiny d-block mt-2">@lang('Use any icon class (Font Awesome / Line Awesome), or upload image / SVG below.')</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">@lang('Visibility')</label>
+                            <select class="form-select rounded-3" name="show_on_public">
+                                <option value="1">@lang('Public (show in footer)')</option>
+                                <option value="0">@lang('Private (hidden)')</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">@lang('Upload Social Photo')</label>
+                            <input type="file" class="form-control form-control-sm rounded-3" name="image_input[custom_icon]" accept=".jpeg,.jpg,.png,.webp,.svg">
+                            <small class="text-muted tiny d-block">@lang('Supported formats: JPEG, JPG, PNG, WebP, SVG')</small>
+                            <small class="text-muted tiny d-block">@lang('Recommended size: 96x96 px (square), max file size: 2MB')</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">@lang('Photo Action')</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="remove_image[custom_icon]" value="1" id="socialQuickRemoveImage">
+                                <label class="form-check-label tiny" for="socialQuickRemoveImage">@lang('Remove existing icon photo')</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">@lang('Custom SVG Markup (optional)')</label>
+                            <textarea class="form-control form-control-sm rounded-3" rows="2" name="custom_icon_svg" placeholder="<svg>...</svg>"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 px-3 pb-3 pt-2">
+                    <button type="button" class="btn btn-label-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">@lang('Cancel')</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-5 rounded-pill shadow-md">@lang('Save')</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 <x-confirmation-modal />
 @endsection
@@ -639,8 +862,82 @@
         min-height: 200px !important;
     }
 
+    .social-action-wrap .btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .social-action-wrap .confirmationBtn {
+        border-color: #f0d2d2 !important;
+    }
+
+    .social-quick-modal-dialog {
+        max-width: 540px;
+    }
+
+    #socialQuickModal .modal-content {
+        max-height: min(76vh, 620px);
+        overflow: hidden;
+    }
+
+    #socialQuickModal .modal-body {
+        overflow-y: auto;
+    }
+
+    .contact-quick-line {
+        min-height: 56px;
+        border-color: #e5e7eb !important;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .contact-quick-line__label {
+        width: 60px;
+        flex: 0 0 60px;
+    }
+
+    .contact-quick-line__preview {
+        width: 34px;
+        height: 34px;
+        border-color: #dbe4ff !important;
+        background: #f8faff !important;
+    }
+
+    .contact-quick-line__file {
+        width: 180px;
+    }
+
+    .contact-quick-line__value {
+        min-width: 220px;
+    }
+
+    .contact-save-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        box-shadow: 0 -2px 12px rgba(15, 23, 42, 0.06);
+        border-color: #e5e7eb !important;
+    }
+
+
     @media (max-width: 991px) {
         .sticky-top { position: relative !important; top: 0 !important; margin-top: 2rem; }
+        .contact-quick-line__file,
+        .contact-quick-line__value {
+            width: 100%;
+            min-width: 0;
+        }
+        .contact-quick-line__label {
+            width: 50px;
+            flex-basis: 50px;
+        }
+        .contact-save-bar {
+            border-radius: 0.5rem;
+        }
     }
 </style>
 @endpush
@@ -678,7 +975,13 @@
 
         // 3. Modal Architecture
         function adminFeShowModal($modal) {
-            bootstrap.Modal.getOrCreateInstance($modal[0]).show();
+            if (!$modal.length) return;
+            const modalEl = $modal[0];
+            $('.modal.show').not($modal).each(function () {
+                bootstrap.Modal.getOrCreateInstance(this).hide();
+            });
+            $('.modal-backdrop').not(':last').remove();
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
         }
 
         function feDecodeB64(b64) {
@@ -686,13 +989,17 @@
         }
 
         $('.addBtn').on('click', function () {
-            $('#addModal').find('form')[0].reset();
-            adminFeShowModal($('#addModal'));
+            const addModalEl = $('#addModal');
+            if (addModalEl.length) {
+                addModalEl.find('form')[0].reset();
+                adminFeShowModal(addModalEl);
+            }
         });
 
         $(document).on('click', '.updateBtn', function () {
             const $btn = $(this);
             const modal = $('#updateBtn');
+            if (!modal.length) return;
             const form = modal.find('form');
             form[0].reset();
             form.find('input[name=id]').val($btn.data('id'));
@@ -722,6 +1029,107 @@
 
             adminFeShowModal(modal);
         });
+
+        @if($key === 'social_icon')
+        const socialContentUrl = @json(route(getFrontendSectionRoute($key, 'content'), $key));
+        const socialToggleUrl = @json(route('admin.frontend.sections.social_icon.toggle_public'));
+        const normalizeIconClass = function (rawValue) {
+            const raw = (rawValue || '').toString().trim();
+            if (!raw) return '';
+            if (raw.includes('<i') || raw.includes('&lt;i')) {
+                const decoded = $('<textarea/>').html(raw).text();
+                const classMatch = decoded.match(/class\s*=\s*["']([^"']+)["']/i);
+                if (classMatch && classMatch[1]) {
+                    return classMatch[1].trim();
+                }
+                return decoded.replace(/<[^>]*>/g, '').trim();
+            }
+            return raw.replace(/<[^>]*>/g, '').trim();
+        };
+
+        function updateSocialBadge($row, isPublic) {
+            const $badge = $row.find('.js-public-badge');
+            $badge.attr('data-public', isPublic ? 1 : 0);
+            $badge.removeClass('bg-label-success bg-label-danger');
+            $badge.addClass(isPublic ? 'bg-label-success' : 'bg-label-danger');
+            $badge.html(`<i class="las la-${isPublic ? 'eye' : 'eye-slash'} me-1"></i> ${isPublic ? 'Public' : 'Private'}`);
+        }
+
+        function updateSocialToggleButton($btn, isPublic) {
+            $btn.attr('data-public', isPublic ? 1 : 0);
+            $btn.html(`<i class="las la-${isPublic ? 'toggle-on text-success' : 'toggle-off text-danger'}"></i>`);
+        }
+
+        $(document).on('click', '.socialUploadTrigger', function () {
+            $(this).closest('form').find('.socialUploadInput').trigger('click');
+        });
+
+        $(document).on('change', '.socialUploadInput', function () {
+            if (this.files && this.files.length > 0) {
+                this.form.submit();
+            }
+        });
+
+        $(document).on('click', '.socialPublicToggleBtn', function () {
+            const $btn = $(this);
+            const rowId = $btn.data('id');
+            const current = parseInt($btn.attr('data-public'), 10) === 1 ? 1 : 0;
+            const next = current === 1 ? 0 : 1;
+
+            $.post(socialToggleUrl, {
+                _token: '{{ csrf_token() }}',
+                id: rowId,
+                show_on_public: next
+            }).done(function (res) {
+                if (res && res.success) {
+                    const $row = $btn.closest('tr');
+                    updateSocialBadge($row, next === 1);
+                    updateSocialToggleButton($btn, next === 1);
+                }
+            });
+        });
+
+        $(document).on('click', '.socialQuickAdd', function () {
+            const $modal = $('#socialQuickModal');
+            const $form = $modal.find('form');
+            $form[0].reset();
+            $form.attr('action', socialContentUrl);
+            $form.find('input[name=id]').val('');
+            $form.find('input[name=icon]').val('');
+            $form.find('select[name=show_on_public]').val('1');
+            $form.find('.social-icon-preview i').attr('class', 'las la-icons fs-5');
+            adminFeShowModal($modal);
+        });
+
+        $(document).on('click', '.socialQuickEditBtn', function () {
+            const $btn = $(this);
+            const $modal = $('#socialQuickModal');
+            const $form = $modal.find('form');
+            $form[0].reset();
+            $form.attr('action', socialContentUrl);
+            const normalizedIcon = normalizeIconClass($btn.data('icon') || '');
+            $form.find('input[name=id]').val($btn.data('id'));
+            $form.find('input[name=title]').val($btn.data('title') || '');
+            $form.find('input[name=icon]').val(normalizedIcon);
+            $form.find('.social-icon-preview i').attr('class', (normalizedIcon || 'las la-icons') + ' fs-5');
+            $form.find('input[name=url]').val($btn.data('url') || '');
+            $form.find('textarea[name=custom_icon_svg]').val($btn.data('customIconSvg') || '');
+            $form.find('select[name=show_on_public]').val(($btn.data('showOnPublic') ?? 1).toString());
+            adminFeShowModal($modal);
+        });
+
+        $('#socialQuickModal').on('hidden.bs.modal', function () {
+            $('.modal-backdrop').not(':last').remove();
+            if (!$('.modal.show').length) {
+                $('body').removeClass('modal-open');
+            }
+        });
+
+        $(document).on('input', '#socialQuickModal input[name=icon]', function () {
+            const iconClass = ($(this).val() || '').trim();
+            $('#socialQuickModal .social-icon-preview i').attr('class', (iconClass !== '' ? iconClass : 'las la-icons') + ' fs-5');
+        });
+        @endif
 
         // 4. Icon Picker Integration
         $('.iconPicker').iconpicker({

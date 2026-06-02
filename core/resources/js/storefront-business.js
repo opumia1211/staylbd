@@ -1,129 +1,185 @@
 /**
- * Staylbd Business Engine: User behavior tracking, exit intent, and growth automation.
+ * Staylbd Business Engine: behavioral tracking, exit intent (desktop only), growth hooks.
  */
 class StaylbdBusinessEngine {
     constructor() {
         this.sessionId = this.getOrCreateSessionId();
         this.startTime = Date.now();
         this.maxScroll = 0;
+        this._clickThrottle = 0;
+        this.trackUrl = (typeof window.STAYL_TRACK_URL === 'string' && window.STAYL_TRACK_URL)
+            ? window.STAYL_TRACK_URL
+            : this.resolveTrackUrl();
         this.init();
+    }
+
+    resolveTrackUrl() {
+        var base = (document.querySelector('meta[name="app-url"]') || {}).content || '';
+        base = (base || window.location.origin).replace(/\/$/, '');
+        return base + '/api/v1/track/event';
     }
 
     init() {
         this.trackScroll();
-        this.trackExitIntent();
+        if (!this.isTouchPrimary()) {
+            this.trackExitIntent();
+        }
         this.trackClicks();
         this.trackTimeOnPage();
+        this.trackProductPage();
+    }
+
+    isTouchPrimary() {
+        try {
+            return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        } catch (e) {
+            return 'ontouchstart' in window;
+        }
     }
 
     getOrCreateSessionId() {
-        let sid = localStorage.getItem('staylbd_sid');
-        if (!sid) {
-            sid = 'sid_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-            localStorage.setItem('staylbd_sid', sid);
+        var key = 'staylbd_sid';
+        try {
+            var sid = localStorage.getItem(key);
+            if (!sid) {
+                sid = 'sid_' + Math.random().toString(36).slice(2, 11) + '_' + Date.now();
+                localStorage.setItem(key, sid);
+            }
+            return sid;
+        } catch (e) {
+            return 'sid_guest_' + Date.now();
         }
-        return sid;
     }
 
-    async logEvent(type, data = {}) {
-        try {
-            await fetch('/api/v1/track/event', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({
-                    type: type,
-                    session_id: this.sessionId,
-                    url: window.location.href,
-                    data: data
-                })
-            });
-        } catch (e) {
-            /* silent fail to not interrupt UX */
+    buildHeaders() {
+        var headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        var tokenEl = document.querySelector('meta[name="csrf-token"]');
+        if (tokenEl && tokenEl.getAttribute('content')) {
+            headers['X-CSRF-TOKEN'] = tokenEl.getAttribute('content');
         }
+        return headers;
+    }
+
+    logEvent(type, data) {
+        data = data || {};
+        var payload = JSON.stringify({
+            type: type,
+            session_id: this.sessionId,
+            url: window.location.href,
+            data: data
+        });
+        var url = this.trackUrl;
+
+        try {
+            if (navigator.sendBeacon && (type === 'time_on_page' || type === 'page_scroll_final')) {
+                var blob = new Blob([payload], { type: 'application/json' });
+                if (navigator.sendBeacon(url, blob)) return;
+            }
+        } catch (e) { /* fall through to fetch */ }
+
+        fetch(url, {
+            method: 'POST',
+            headers: this.buildHeaders(),
+            body: payload,
+            credentials: 'same-origin',
+            keepalive: true
+        }).catch(function () { /* silent */ });
     }
 
     trackScroll() {
-        window.addEventListener('scroll', () => {
-            const h = document.documentElement, 
-                  b = document.body,
-                  st = 'scrollTop',
-                  sh = 'scrollHeight';
-            const percent = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight) * 100;
-            if (percent > this.maxScroll) {
-                this.maxScroll = Math.round(percent);
-            }
-        });
+        var self = this;
+        var ticking = false;
+        window.addEventListener('scroll', function () {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () {
+                var h = document.documentElement;
+                var b = document.body;
+                var st = (h.scrollTop || b.scrollTop);
+                var sh = (h.scrollHeight || b.scrollHeight) - h.clientHeight;
+                if (sh > 0) {
+                    var percent = (st / sh) * 100;
+                    if (percent > self.maxScroll) self.maxScroll = Math.round(percent);
+                }
+                ticking = false;
+            });
+        }, { passive: true });
 
-        // Log max scroll when leaving
-        window.addEventListener('beforeunload', () => {
-            this.logEvent('page_scroll_final', { max_percent: this.maxScroll });
+        window.addEventListener('pagehide', function () {
+            self.logEvent('page_scroll_final', { max_percent: self.maxScroll });
         });
     }
 
     trackExitIntent() {
-        document.addEventListener('mouseleave', (e) => {
-            if (e.clientY < 0) {
-                this.showExitIntentPopup();
-            }
+        var self = this;
+        document.addEventListener('mouseleave', function (e) {
+            if (e.clientY < 0) self.showExitIntentPopup();
         });
     }
 
     showExitIntentPopup() {
-        if (sessionStorage.getItem('staylbd_exit_shown')) return;
-        
-        sessionStorage.setItem('staylbd_exit_shown', 'true');
+        try {
+            if (sessionStorage.getItem('staylbd_exit_shown')) return;
+            sessionStorage.setItem('staylbd_exit_shown', '1');
+        } catch (e) { return; }
+
         this.logEvent('exit_intent_trigger');
 
-        // Professional layout for exit intent (Coupon focus)
-        const modal = document.createElement('div');
-        modal.className = 'staylbd-business-modal fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4';
-        modal.innerHTML = `
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-100 p-8 text-center">
-                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2z"></path></svg>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-900 mb-2">Wait! Don't Miss Out</h2>
-                <p class="text-slate-600 mb-6">Finish your order now and get an extra 5% OFF on your entire cart!</p>
-                <div class="bg-slate-50 rounded-lg p-3 border-2 border-dashed border-slate-200 font-mono text-xl font-bold text-emerald-600 mb-6 tracking-wide uppercase">
-                    COMEBACK5
-                </div>
-                <button id="staylbd-exit-claim" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 mb-4">
-                    Claim My Discount
-                </button>
-                <button id="staylbd-exit-close" class="text-sm text-slate-400 font-medium hover:text-slate-600">No thanks, I'll pay full price</button>
-            </div>
-        `;
+        var cartUrl = (document.querySelector('meta[name="cart-url"]') || {}).content || '/cart-list';
+        var modal = document.createElement('div');
+        modal.className = 'staylbd-business-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.innerHTML = '<div class="staylbd-business-modal__backdrop"></div><div class="staylbd-business-modal__panel"><h2>Wait! Don\'t Miss Out</h2><p>Finish your order now and get an extra 5% OFF on your entire cart!</p><div class="staylbd-business-modal__code">COMEBACK5</div><button type="button" class="staylbd-business-modal__claim">Claim My Discount</button><button type="button" class="staylbd-business-modal__close">No thanks</button></div>';
         document.body.appendChild(modal);
 
-        document.getElementById('staylbd-exit-claim').onclick = () => {
-            this.logEvent('exit_intent_claim');
-            location.href = '/cart-list';
+        var self = this;
+        modal.querySelector('.staylbd-business-modal__claim').onclick = function () {
+            self.logEvent('exit_intent_claim');
+            window.location.href = cartUrl;
         };
-        document.getElementById('staylbd-exit-close').onclick = () => {
-            modal.remove();
-        };
+        modal.querySelector('.staylbd-business-modal__close').onclick = function () { modal.remove(); };
+        modal.querySelector('.staylbd-business-modal__backdrop').onclick = function () { modal.remove(); };
     }
 
     trackClicks() {
-        document.addEventListener('click', (e) => {
-            const el = e.target.closest('button, a, .clickable');
-            if (el) {
-                this.logEvent('user_click', {
-                    tag: el.tagName,
-                    text: el.innerText.trim().substring(0, 30),
-                    classes: el.className
-                });
-            }
-        });
+        var self = this;
+        document.addEventListener('click', function (e) {
+            var now = Date.now();
+            if (now - self._clickThrottle < 800) return;
+            var el = e.target.closest('button, a, [data-track-click]');
+            if (!el) return;
+            self._clickThrottle = now;
+            self.logEvent('user_click', {
+                tag: el.tagName,
+                text: (el.innerText || '').trim().substring(0, 40),
+                href: el.getAttribute('href') || null
+            });
+        }, { passive: true });
     }
 
     trackTimeOnPage() {
-        window.addEventListener('beforeunload', () => {
-            const duration = Math.round((Date.now() - this.startTime) / 1000);
-            this.logEvent('time_on_page', { duration_seconds: duration });
+        var self = this;
+        window.addEventListener('pagehide', function () {
+            var duration = Math.round((Date.now() - self.startTime) / 1000);
+            self.logEvent('time_on_page', { duration_seconds: duration });
         });
+    }
+
+    trackProductPage() {
+        var body = document.body;
+        if (!body) return;
+        var pid = body.getAttribute('data-product-id');
+        if (pid) {
+            this.logEvent('product_view', { product_id: parseInt(pid, 10) || pid });
+        }
     }
 }
 
-// Global initialization
-window.StaylbdBusiness = new StaylbdBusinessEngine();
+if (typeof window !== 'undefined' && !window.StaylbdBusiness) {
+    window.StaylbdBusiness = new StaylbdBusinessEngine();
+}

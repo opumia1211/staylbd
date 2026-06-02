@@ -166,92 +166,60 @@
                         chatThread.classList.add('is-loaded');
                     });
             }
-            function renderChatMessages(messages, container, forceScroll, previousCount, unreadCountForBadge) {
-                if (!container) return;
-                previousCount = previousCount || 0;
-                if (typeof unreadCountForBadge !== 'number') unreadCountForBadge = 0;
+            function renderChatMessages(messages, container, forceScroll) {
+                if (!messages) return;
+                var chatContainer = document.getElementById('contactPanelChatMessages');
+                var scrollArea = document.getElementById('contactPanelChatScrollArea');
+                if (!chatContainer || !scrollArea) return;
 
-                // Find scroll container for new unified layout
-                var scrollContainer = document.getElementById('contactPanelChatScrollArea') || container.parentElement;
-                var oldScrollTop = 0;
-                var oldScrollHeight = 0;
-                var wasNearBottom = false;
-                if (scrollContainer && scrollContainer.scrollHeight > 0) {
-                    var threshold = 100;
-                    wasNearBottom = (scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight) <= threshold;
-                    oldScrollTop = scrollContainer.scrollTop;
-                    oldScrollHeight = scrollContainer.scrollHeight;
-                }
-                var hasNewMessages = messages.length > previousCount;
-
-                if (messages.length === 0) {
-                    container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#667781;"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="font-size:3rem;opacity:0.3;"><path d="M21 12a8 8 0 0 1-8 8H7l-4 2 1.5-4.5A8 8 0 1 1 21 12z"></path><path d="M4 4l16 16"></path></svg><br><span style="font-size:0.9rem;">No messages yet.<br>Send a message to start the conversation.</span></div>';
-                    return;
-                }
-
-                var html = '';
+                // Optimization: Only re-render if count or content changed
+                if (messages.length === lastChatMessageCount && !forceScroll) return;
+                
+                chatContainer.innerHTML = '';
                 var lastDate = '';
-                var doubleCheck = `<span class="contact-chat-msg-read" aria-label="@lang("Read")">@include($activeTemplate . 'partials.icon', ['name' => 'check-double'])</span>`;
-                messages.forEach(function (m) {
-                    var datePart = m.date_label || (m.created_at || '').split(',')[0].trim();
+                
+                messages.forEach(function(msg) {
+                    var datePart = msg.date_label || (msg.created_at || '').split(',')[0].trim();
                     if (datePart && datePart !== lastDate) {
                         lastDate = datePart;
-                        html += '<div class="contact-chat-date-divider"><span>' + datePart + '</span></div>';
+                        var dateDiv = document.createElement('div');
+                        dateDiv.className = 'd-flex justify-content-center my-2';
+                        dateDiv.innerHTML = `<span class="badge bg-light text-muted border py-1 px-1.5 font-weight-normal" style="font-size: 9px; border-radius: 4px;">${datePart}</span>`;
+                        chatContainer.appendChild(dateDiv);
                     }
-                    var cls = m.is_admin ? 'contact-chat-msg-admin' : 'contact-chat-msg-user';
-                    var name = (m.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    var msg = (m.message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-                    var channelLabel = (m.channel || '').toString().toUpperCase();
-                    html += '<div class="contact-chat-msg ' + cls + '"><div class="contact-chat-msg-name">' + name;
-                    if (channelLabel) {
-                        html += '<span class="contact-chat-msg-channel" data-channel="' + channelLabel + '">' + channelLabel + '</span>';
-                    }
-                    html += '</div><div class="contact-chat-msg-text">' + msg + '</div>';
-                    if (m.attachments && m.attachments.length) {
-                        var att = m.attachments[0];
-                        var attUrl = typeof att === 'string' ? att : (att && (att.url || att.download_url || att.file_url));
-                        var attLabel = '@lang("Attachment")';
-                        if (typeof att === 'object' && att) {
-                            attLabel = att.name || att.type || attLabel;
-                        }
-                        if (attUrl) {
-                            html += `<div class="contact-chat-msg-att"><a href="${attUrl}" target="_blank">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) ${attLabel}</a></div>`;
-                        } else {
-                            html += `<div class="contact-chat-msg-att">@include($activeTemplate . 'partials.icon', ['name' => 'paperclip']) ${attLabel}</div>`;
-                        }
-                    }
-                    var dateTimeStr = (m.date_label ? m.date_label + ' · ' : '') + (m.created_at || '');
-                    if (m.is_admin) {
-                        html += '<div class="contact-chat-msg-meta"><span class="contact-chat-msg-time">' + dateTimeStr + '</span>' + doubleCheck + '</div>';
-                    } else {
-                        html += '<div class="contact-chat-msg-time">' + dateTimeStr + '</div>';
-                    }
-                    html += '</div>';
-                });
 
-                requestAnimationFrame(function () {
-                    container.innerHTML = html;
-                    var badge = document.getElementById('contactFloatBadge');
-                    if (badge) {
-                        var n = unreadCountForBadge;
-                        badge.textContent = n;
-                        badge.classList.toggle('d-none', !n);
-                    }
-                    if (!scrollContainer) return;
-                    requestAnimationFrame(function () {
-                        var newHeight = scrollContainer.scrollHeight;
-                        var clientH = scrollContainer.clientHeight;
-                        // Only auto-scroll when user explicitly opened/sent (forceScroll) or was at bottom AND new messages arrived
-                        if (forceScroll || (wasNearBottom && hasNewMessages)) {
-                            scrollContainer.scrollTop = newHeight;
-                        } else {
-                            // Preserve scroll position so history does not "run" or jump on poll
-                            var targetTop = oldScrollHeight > 0 ? (oldScrollTop / oldScrollHeight) * newHeight : 0;
-                            scrollContainer.scrollTop = Math.min(Math.max(0, targetTop), Math.max(0, newHeight - clientH));
-                        }
-                    });
+                    var isAdmin = msg.is_admin || msg.admin_id > 0;
+                    var msgDiv = document.createElement('div');
+                    msgDiv.className = `d-flex ${isAdmin ? 'justify-content-start' : 'justify-content-end'} mb-1 px-0.5`;
+                    msgDiv.innerHTML = `
+                        <div class="message-bubble position-relative px-2 py-1 shadow-sm ${isAdmin ? 'bg-white text-dark rounded-tr-3 rounded-br-3 rounded-bl-3 border' : 'bg-success text-white rounded-tl-3 rounded-bl-3 rounded-br-3'}" 
+                             style="max-width: 85%; background-color: ${isAdmin ? '#ffffff' : '#dcf8c6'} !important; color: #1e293b !important; border-color: #e2e8f0 !important;">
+                            <div class="message-text" style="white-space: pre-wrap; font-size: 11px; line-height: 1.4;">${msg.message}</div>
+                            <div class="message-meta mt-0.5 d-flex align-items-center justify-content-end gap-1" style="font-size: 8px; opacity: 0.7;">
+                                <span>${msg.created_at_time || (msg.created_at || '').split(',').pop().trim()}</span>
+                                ${!isAdmin ? '<span style="font-size: 10px; color: #34b7f1;">✓✓</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                    chatContainer.appendChild(msgDiv);
                 });
+                
+                lastChatMessageCount = messages.length;
+                $('#contactPanelDefaultForm').hide();
+                $('#contactPanelChatThread').css('display', 'flex').show();
+                
+                if (forceScroll !== false) {
+                    requestAnimationFrame(function() {
+                        scrollArea.scrollTop = scrollArea.scrollHeight;
+                    });
+                }
             }
+            // Reduced polling from 12s to 5s for real-time feel
+            var chatPollingInterval = setInterval(function() {
+                if (selectedChannel === 'livechat' && document.getElementById('contactPanelChatThread').style.display !== 'none') {
+                    loadChatMessages();
+                }
+            }, 5000);
             if (selectRow) {
                 selectRow.addEventListener('click', function (e) {
                     var btn = e.target.closest('.contact-panel-select-btn');
@@ -303,20 +271,27 @@
                     }
                 });
             }
-            if (contactMsg && contactCharCount) {
+            if (contactMsg) {
+                contactMsg.style.setProperty('height', '32px', 'important'); // Initial height
                 contactMsg.addEventListener('input', function () {
-                    var n = (contactMsg.value || '').length;
-                    contactCharCount.textContent = n;
-                    var counterEl = contactCharCount.closest('.contact-char-counter');
-                    if (counterEl) counterEl.classList.toggle('at-limit', n >= 500);
-                    /* Limit floating textarea height to keep layout steady */
-                    if (this.classList.contains('contact-panel-msg-floating')) {
-                        this.style.height = 'auto';
-                        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-                        return;
+                    var n = (this.value || '').length;
+                    if (contactCharCount) contactCharCount.textContent = n;
+                    
+                    // Auto-resize textarea: 1 to 5 lines
+                    this.style.setProperty('height', '32px', 'important');
+                    var newHeight = this.scrollHeight;
+                    
+                    // Update the parent container background if needed or handle growth
+                    if (newHeight > 120) {
+                        this.style.setProperty('height', '120px', 'important');
+                        this.style.overflowY = 'auto';
+                    } else if (newHeight > 32) {
+                        this.style.setProperty('height', (newHeight + 4) + 'px', 'important');
+                        this.style.overflowY = 'hidden';
+                    } else {
+                        this.style.setProperty('height', '32px', 'important');
+                        this.style.overflowY = 'hidden';
                     }
-                    this.style.height = 'auto';
-                    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
                 });
             }
             function getMsg() { return (contactMsg && contactMsg.value) ? contactMsg.value.trim() : ''; }

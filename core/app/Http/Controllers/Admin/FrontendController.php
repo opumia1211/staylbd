@@ -327,6 +327,9 @@ class FrontendController extends Controller
                     $allowedTypes = BannerService::ALLOWED_EXTENSIONS;
                     $validationRule['image_input.' . $imgValKey] = ['nullable', 'file', 'max:5120', new FileTypeValidate($allowedTypes)];
                     $validation_message['image_input.' . $imgValKey . '.max'] = 'Banner file must not exceed 5MB.';
+                } elseif ($key === 'contact_us' && $type === 'content' && in_array($imgValKey, ['contact_phone_icon', 'contact_email_icon'], true)) {
+                    $validationRule['image_input.' . $imgValKey] = ['nullable', 'file', 'max:2048', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp', 'svg'])];
+                    $validation_message['image_input.' . $imgValKey . '.max'] = 'Contact icon must not exceed 2MB.';
                 } elseif ($key === 'social_icon' && $type === 'element') {
                     $validationRule['image_input.' . $imgValKey] = ['nullable', 'file', 'max:2048', new FileTypeValidate(['jpg', 'jpeg', 'png', 'webp', 'svg'])];
                     $validation_message['image_input.' . $imgValKey . '.max'] = 'Custom logo must not exceed 2MB.';
@@ -462,6 +465,7 @@ class FrontendController extends Controller
         } else {
             if ($imgJson) {
                 foreach ($imgJson as $imgKey => $imgValue) {
+                    $removeRequested = (string) $request->input('remove_image.' . $imgKey, '0') === '1';
                     // Check if file is uploaded for this image key
                     if ($request->hasFile('image_input.' . $imgKey)) {
                         try {
@@ -483,6 +487,18 @@ class FrontendController extends Controller
                             $notify[] = ['error', 'Couldn\'t upload the image: ' . $exp->getMessage()];
                             return back()->withNotify($notify)->withInput();
                         }
+                    } else if ($removeRequested && $key === 'social_icon' && $type === 'element') {
+                        $oldImage = trim((string) (@$content->data_values->$imgKey ?? ''));
+                        if ($oldImage !== '') {
+                            @unlink(public_path('assets/images/frontend/' . $key . '/' . $oldImage));
+                        }
+                        $inputContentValue[$imgKey] = '';
+                    } else if ($removeRequested && $key === 'contact_us' && $type === 'content' && in_array($imgKey, ['contact_phone_icon', 'contact_email_icon'], true)) {
+                        $oldImage = trim((string) (@$content->data_values->$imgKey ?? ''));
+                        if ($oldImage !== '') {
+                            @unlink(public_path('assets/images/frontend/' . $key . '/' . $oldImage));
+                        }
+                        $inputContentValue[$imgKey] = '';
                     } else if (isset($content->data_values->$imgKey)) {
                         // Keep existing image if no new file uploaded
                         $inputContentValue[$imgKey] = $content->data_values->$imgKey;
@@ -683,6 +699,11 @@ class FrontendController extends Controller
             if ($incomingCustom === '' && !empty($existing['custom_icon'])) {
                 $prevC = $existing['custom_icon'];
                 $inputContentValue['custom_icon'] = is_scalar($prevC) ? trim((string) $prevC) : '';
+            }
+            foreach (['title', 'url', 'custom_icon_svg', 'show_on_public'] as $preserveKey) {
+                if (!array_key_exists($preserveKey, $inputContentValue) && array_key_exists($preserveKey, $existing)) {
+                    $inputContentValue[$preserveKey] = $existing[$preserveKey];
+                }
             }
         }
 
@@ -1158,8 +1179,8 @@ class FrontendController extends Controller
         // Map clean route names to internal keys
         $key = $this->mapRouteToKey($key);
 
-        // Scrollbar: custom headline/ticker (does not depend on sections.json)
-        if ($key == 'scrollbar') {
+        // Scrollbar / News Ticker: same headline ticker UI (does not depend on sections.json)
+        if ($key == 'scrollbar' || $key == 'ticker') {
             return $this->scrollbarView();
         }
 

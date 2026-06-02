@@ -143,7 +143,7 @@
                                 <div class="profile-hero-mockup bg-primary p-4 text-center text-white pb-5 position-relative">
                                     <div class="mockup-avatar-wrapper mx-auto mb-3">
                                         <div class="avatar avatar-xl">
-                                            <img src="{{ asset('assets/images/default-user.png') }}" class="rounded-circle border border-3 border-white shadow-lg" onerror="this.src='https://ui-avatars.com/api/?name=John+Doe&background=fff&color=696cff'">
+                                            <img src="{{ asset('assets/images/default-user.png') }}" class="rounded-circle border border-3 border-white shadow-lg" onerror="this.onerror=null;this.src='{{ asset('assets/images/default-user.png') }}'">
                                         </div>
                                     </div>
                                     <h6 class="fw-bold mb-0 text-white">John Doe</h6>

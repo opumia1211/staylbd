@@ -48,6 +48,48 @@
                 <input type="text" name="seller_account_url" class="form-control form-control-sm" value="{{ $dv->seller_account_url ?? '' }}" placeholder="@lang('e.g. https://example.com/sell or seller/apply')">
             </div>
         </div>
+        <div class="col-12 mt-3 pt-2 border-top">
+            <span class="text-muted small fw-semibold d-block mb-2">@lang('Footer Optimization & Voter Section')</span>
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input type="checkbox" name="footer_compact_mode" value="1" class="form-check-input" id="footer_compact_mode" {{ (int)($dv->footer_compact_mode ?? 1) === 1 ? 'checked' : '' }}>
+                        <label class="form-check-label" for="footer_compact_mode">@lang('Enable compact footer height')</label>
+                    </div>
+                    <small class="text-muted d-block">@lang('Keeps footer slimmer and faster to scan on all devices.')</small>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input type="checkbox" name="vote_enabled" value="1" class="form-check-input" id="vote_enabled" {{ (int)($dv->vote_enabled ?? 1) === 1 ? 'checked' : '' }}>
+                        <label class="form-check-label" for="vote_enabled">@lang('Enable footer voter section')</label>
+                    </div>
+                    <small class="text-muted d-block">@lang('Shows a lightweight vote widget with local library icon only.')</small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">@lang('Vote Title')</label>
+                    <input type="text" name="vote_title" class="form-control form-control-sm" value="{{ $dv->vote_title ?? __('Was this page helpful?') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">@lang('Vote Subtitle')</label>
+                    <input type="text" name="vote_subtitle" class="form-control form-control-sm" value="{{ $dv->vote_subtitle ?? __('Vote to help us improve your experience.') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">@lang('Up Vote Label')</label>
+                    <input type="text" name="vote_up_label" class="form-control form-control-sm" value="{{ $dv->vote_up_label ?? __('Helpful') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">@lang('Down Vote Label')</label>
+                    <input type="text" name="vote_down_label" class="form-control form-control-sm" value="{{ $dv->vote_down_label ?? __('Needs work') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">@lang('Vote Scope')</label>
+                    <select name="vote_scope" class="form-control form-control-sm">
+                        <option value="page" {{ ($dv->vote_scope ?? 'page') === 'page' ? 'selected' : '' }}>@lang('Per page')</option>
+                        <option value="global" {{ ($dv->vote_scope ?? 'page') === 'global' ? 'selected' : '' }}>@lang('Global site')</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
     <button type="submit" class="btn btn--primary btn-sm mt-3">@lang('Save Newsletter & Copyright')</button>
 </form>

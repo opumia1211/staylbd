@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" class="layout-navbar-fixed layout-menu-fixed layout-compact " dir="ltr" data-skin="default"
   data-assets-path="{{ url('assets/admin-ui') }}/" data-template="horizontal-menu-template" data-bs-theme="light">
 
@@ -19,26 +19,26 @@
   @endphp
   <link rel="icon" type="image/x-icon" href="{{ $adminFavicon }}" />
 
-  <!-- Fonts: Standardizing on Local System Fonts -->
-
-  <!-- Tailwind CSS Library Integration -->
-  <script src="{{ $assetBase }}/assets/global/js/tailwind.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              teal: '#0e9f90',
-              hover: '#0c8a7d',
-            }
-          },
-          fontFamily: {
-            inter: ['Inter', 'sans-serif'],
-          }
-        }
-      }
+  @php
+    $adminAssetVer = config('app.asset_version', '1');
+    try {
+        $adminTwUtilities = mix('css/admin-tailwind-utilities.css');
+    } catch (\Throwable $e) {
+        $adminTwUtilities = asset('css/admin-tailwind-utilities.css') . '?v=' . $adminAssetVer;
     }
+  @endphp
+  @include('partials.inter-font-preload', ['assetVersion' => $adminAssetVer, 'interPreloadMode' => 'admin-heavy'])
+
+  <script>
+    (function () {
+      try {
+        var key = 'admin-bs-theme';
+        var stored = localStorage.getItem(key) || 'light';
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var resolved = stored === 'system' ? (dark ? 'dark' : 'light') : stored;
+        document.documentElement.setAttribute('data-bs-theme', resolved);
+      } catch (e) { /* ignore */ }
+    })();
   </script>
 
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/fonts/iconify-icons.css" />
@@ -49,6 +49,9 @@
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/pickr/pickr-themes.css" />
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/css/core.css" />
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/css/demo.css" />
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin/css/admin-light-contrast.css?v={{ $adminAssetVer }}" />
+  {{-- Local Tailwind utilities (compiled, preflight off) — after Sneat so layout stays intact --}}
+  <link rel="stylesheet" href="{{ $adminTwUtilities }}">
 
   <!-- Vendors CSS -->
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
@@ -169,8 +172,81 @@
       margin: 0 !important;
     }
 
+    .layout-menu-horizontal .menu-inner > .menu-item > .menu-sub,
+    .layout-menu-horizontal .menu-sub.menu-sub--scroll,
+    .layout-menu-horizontal .menu-item.menu-payment-panel > .menu-sub,
+    .layout-menu-horizontal .menu-item.menu-finance-panel > .menu-sub {
+      max-height: min(72vh, 520px) !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain;
+    }
+
+    /* Orders / Payment long menus: wider + readable sections */
+    .layout-menu-horizontal .menu-sub.menu-orders-panel,
+    .layout-menu-horizontal .menu-item.menu-payment-panel > .menu-sub {
+      min-width: 16.5rem !important;
+    }
+
+    .layout-menu-horizontal .menu-sub.menu-orders-panel {
+      max-height: min(78vh, 600px) !important;
+    }
+
+    /* Inside scroll dropdowns: nested submenus stack vertically (no right flyout) */
+    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item > .menu-sub {
+      display: none !important;
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      margin: 0 0 0.35rem 0 !important;
+      padding: 0.25rem 0 0.25rem 0.75rem !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-left: 2px solid rgba(14, 159, 144, 0.4) !important;
+      border-radius: 0 !important;
+      background: rgba(14, 159, 144, 0.04) !important;
+      min-width: 100% !important;
+    }
+
+    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item.open > .menu-sub,
+    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item.active.open > .menu-sub {
+      display: block !important;
+    }
+
+    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-sub .menu-link {
+      padding: 0.5rem 1rem 0.5rem 1.15rem !important;
+      font-size: 0.875rem !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-item-header:first-child,
+    .layout-menu-horizontal .menu-sub .menu-section-label:first-child {
+      border-top: none !important;
+      margin-top: 0 !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-item:not(.active) > .menu-link {
+      color: #384551 !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-item.active > .menu-link {
+      color: #0a6b62 !important;
+      font-weight: 600 !important;
+      background-color: rgba(14, 159, 144, 0.12) !important;
+    }
+
+    .layout-menu-horizontal .menu-sub .menu-item-header,
+    .layout-menu-horizontal .menu-sub .menu-section-label {
+      color: #384551 !important;
+      opacity: 1 !important;
+      font-weight: 700 !important;
+      font-size: 0.7rem !important;
+      letter-spacing: 0.06em !important;
+      border-top: 1px solid rgba(67, 89, 113, 0.12);
+      background: linear-gradient(180deg, #f8f9fb 0%, transparent 100%);
+    }
+
     .layout-menu-horizontal .menu-sub .menu-link {
-      color: #435971 !important;
+      color: #384551 !important;
       padding: 0.65rem 1.25rem !important;
       font-weight: 500 !important;
       font-size: 0.9375rem !important;
@@ -193,13 +269,8 @@
     }
     
     .layout-menu-horizontal .menu-sub .menu-item-header {
-      color: #a1acb8 !important;
-      font-weight: 700 !important;
-      font-size: 0.75rem !important;
+      padding: 0.75rem 1.25rem 0.35rem !important;
       text-transform: uppercase !important;
-      letter-spacing: 0.8px !important;
-      padding: 0.85rem 1.25rem 0.35rem !important;
-      opacity: 0.8 !important;
     }
 
     .layout-menu-horizontal .menu-sub .menu-toggle::after {
@@ -352,6 +423,34 @@
     .menu-link, .container-xxl {
       transition: all 0.2s ease !important;
     }
+
+    [data-bs-theme="dark"] .layout-navbar {
+      background: rgba(43, 44, 64, 0.95) !important;
+    }
+
+    [data-bs-theme="dark"] .bg-menu-theme {
+      background-color: #2b2c40 !important;
+      color: #e7e9f1 !important;
+    }
+
+    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub {
+      background-color: #32334a !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-item:not(.active) > .menu-link {
+      color: #e7e9f1 !important;
+    }
+
+    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-item-header,
+    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-section-label {
+      color: #d5d7de !important;
+    }
+
+    [data-bs-theme="dark"] .search-results-pane {
+      background: #32334a !important;
+      color: #e7e9f1 !important;
+    }
   </style>
 
   @stack('style-lib')
@@ -393,6 +492,60 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      var themeKey = 'admin-bs-theme';
+      var htmlEl = document.documentElement;
+
+      function resolveTheme(mode) {
+        if (mode === 'system' && window.matchMedia) {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return mode === 'dark' ? 'dark' : 'light';
+      }
+
+      function applyTheme(mode) {
+        var resolved = resolveTheme(mode);
+        htmlEl.setAttribute('data-bs-theme', resolved);
+        document.querySelectorAll('[data-bs-theme-value]').forEach(function (btn) {
+          btn.classList.toggle('active', btn.getAttribute('data-bs-theme-value') === mode);
+        });
+        var icon = document.querySelector('#nav-theme .theme-icon-active');
+        if (icon) {
+          icon.classList.remove('bx-sun', 'bx-moon', 'bx-desktop');
+          if (mode === 'system') {
+            icon.classList.add('bx-desktop');
+          } else if (resolved === 'dark') {
+            icon.classList.add('bx-moon');
+          } else {
+            icon.classList.add('bx-sun');
+          }
+        }
+      }
+
+      document.querySelectorAll('[data-bs-theme-value]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var mode = btn.getAttribute('data-bs-theme-value') || 'light';
+          try { localStorage.setItem(themeKey, mode); } catch (e) { /* ignore */ }
+          applyTheme(mode);
+        });
+      });
+
+      try {
+        var saved = localStorage.getItem(themeKey) || htmlEl.getAttribute('data-bs-theme') || 'light';
+        applyTheme(saved);
+      } catch (e) {
+        applyTheme('light');
+      }
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+          try {
+            if (localStorage.getItem(themeKey) === 'system') {
+              applyTheme('system');
+            }
+          } catch (err) { /* ignore */ }
+        });
+      }
+
       setInterval(function () {
         var meta = document.querySelector('meta[name="csrf-token"]');
         if (!meta) return;

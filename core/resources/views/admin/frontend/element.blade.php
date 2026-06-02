@@ -59,7 +59,13 @@
                                                                         </div>
                                                                     @elseif($key == 'social_icon' || $key == 'service')
                                                                         <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png,.jpg,.jpeg,.webp,.svg">
-                                                                        <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="btn btn--primary w-100 py-2" style="border-radius: 8px;">{{ __($imgKey) }}</label>
+                                                                        <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="btn btn--primary w-100 py-2" style="border-radius: 8px;">
+                                                                            @if($key == 'social_icon')
+                                                                                <i class="fa fa-cloud-upload-alt mr-1"></i> @lang('Upload Social Photo')
+                                                                            @else
+                                                                                {{ __($imgKey) }}
+                                                                            @endif
+                                                                        </label>
                                                                         <small class="mt-2 text-muted">@lang('Supported'): <b>JPEG, PNG, WebP, SVG</b>.
                                                                             @if(@$section->element->images->$imgKey->size)
                                                                                 | @lang('Suggested'): <b>{{@$section->element->images->$imgKey->size}}</b> @lang('px').
@@ -68,6 +74,14 @@
                                                                                 <br><span class="text--info">@lang('Use transparent PNG or SVG for best look.')</span>
                                                                             @endif
                                                                         </small>
+                                                                        @if($key == 'social_icon')
+                                                                            <div class="mt-2">
+                                                                                <label class="d-inline-flex align-items-center mb-0" style="font-family: Inter, sans-serif; font-size: 0.82rem;">
+                                                                                    <input type="checkbox" name="remove_image[{{ $imgKey }}]" value="1" class="mr-2">
+                                                                                    <span>@lang('Remove current photo from footer icon')</span>
+                                                                                </label>
+                                                                            </div>
+                                                                        @endif
                                                                     @else
                                                                         <input type="file" class="profilePicUpload" name="image_input[{{ $imgKey }}]" id="fe_el_img_{{ $key }}_{{ $loop->index }}" accept=".png, .jpg, .jpeg">
                                                                         <label for="fe_el_img_{{ $key }}_{{ $loop->index }}" class="btn btn--primary w-100 py-2">{{ __(keyToTitle($imgKey)) }}</label>
