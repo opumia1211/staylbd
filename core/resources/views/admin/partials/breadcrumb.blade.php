@@ -1,4 +1,4 @@
-<div class="d-flex mb-4 flex-wrap gap-3 justify-content-between align-items-center">
+<div class="d-flex mb-2 flex-wrap gap-2 justify-content-between align-items-center admin-page-header">
     <div class="d-flex flex-column gap-1 min-w-0">
         @if(!empty($breadcrumb) && is_array($breadcrumb))
             <nav aria-label="breadcrumb">

@@ -1,0 +1,53 @@
+{
+  "itemCount": 13,
+  "labels": [
+    "Dashboard",
+    "Home Layout",
+    "Catalog",
+    "Products",
+    "Categories",
+    "Orders"
+  ],
+  "wrapper": {
+    "display": "block",
+    "width": "1280px",
+    "inlineSize": "1280px",
+    "overflow": "auto",
+    "flex": "1 1 auto"
+  },
+  "inner": {
+    "display": "flex",
+    "width": "4720.64px",
+    "marginLeft": "0px",
+    "visibility": "visible",
+    "opacity": "1",
+    "overflow": "visible"
+  },
+  "link": {
+    "display": "flex",
+    "color": "rgb(86, 106, 127)",
+    "width": "107.141px",
+    "visibility": "visible",
+    "fontSize": "15px"
+  },
+  "wrapRect": {
+    "x": 0,
+    "y": 64,
+    "width": 1280,
+    "height": 544.390625,
+    "top": 64,
+    "right": 1280,
+    "bottom": 608.390625,
+    "left": 0
+  },
+  "linkRect": {
+    "x": 0,
+    "y": 270.515625,
+    "width": 126.328125,
+    "height": 131.34375,
+    "top": 270.515625,
+    "right": 126.328125,
+    "bottom": 401.859375,
+    "left": 0
+  }
+}

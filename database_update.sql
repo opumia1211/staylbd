@@ -1,6 +1,12 @@
 -- =============================================================================
 -- StayLBD Database Update Guide (incremental patches)
--- Generated/synced: 2026-05-26 (staylbd_wintersm — full export verified)
+-- Generated/synced: 2026-06-03 (admin menu restructure — no new tables required)
+--
+-- Admin panel (2026-06-03): Catalog / Products / Categories menus split;
+-- Product Center & Category Center hubs added (routes only, no schema change).
+-- Promotional ads moved under Home Layout. Run: cd core && php artisan migrate --force
+--
+-- Previous sync: 2026-05-26 (staylbd_wintersm — full export verified)
 --
 -- MASTER SCHEMA (full fresh install):
 --   core/database/staylbd_wintersm.sql

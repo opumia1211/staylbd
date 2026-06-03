@@ -1,0 +1,225 @@
+/**
+ * Admin header — zero gap below menubar (plan.md)
+ * Menu inside .layout-page (Sneat); fixed navbar+menu; single .layout-page margin offset.
+ */
+:root {
+    --admin-nav-h: 4rem;
+    --admin-menu-h: 3.25rem;
+    --admin-header-offset: calc(var(--admin-nav-h) + var(--admin-menu-h));
+    --admin-shell-max: 1920px;
+    --admin-shell-gutter: clamp(0.5rem, 2vw, 1.25rem);
+}
+
+/* Sneat uses flex column on .layout-container — block avoids flex gap between menu + page */
+.layout-wrapper.layout-horizontal .layout-container {
+    display: block !important;
+    padding-top: 0 !important;
+    padding-block-start: 0 !important;
+    max-width: var(--admin-shell-max) !important;
+    width: 100% !important;
+    margin-inline: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Single vertical offset for all page content (not on container — avoids double gap) */
+.layout-wrapper.layout-horizontal .layout-page {
+    display: block !important;
+    margin-top: var(--admin-header-offset) !important;
+    margin-block-start: var(--admin-header-offset) !important;
+    padding-top: 0 !important;
+    padding-block-start: 0 !important;
+    padding-inline-start: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-height: 0 !important;
+}
+
+/* Navbar + menu: fixed, zero document-flow height */
+.layout-wrapper.layout-horizontal #layout-navbar.layout-navbar,
+.layout-wrapper.layout-horizontal #layout-menu.layout-menu-horizontal {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding-block: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.layout-wrapper.layout-horizontal #layout-navbar.layout-navbar {
+    top: 0 !important;
+    z-index: 1090 !important;
+    height: var(--admin-nav-h) !important;
+    min-height: var(--admin-nav-h) !important;
+    max-height: var(--admin-nav-h) !important;
+    block-size: var(--admin-nav-h) !important;
+}
+
+.layout-wrapper.layout-horizontal #layout-menu.layout-menu-horizontal {
+    top: var(--admin-nav-h) !important;
+    z-index: 1088 !important;
+    height: var(--admin-menu-h) !important;
+    min-height: var(--admin-menu-h) !important;
+    max-height: var(--admin-menu-h) !important;
+    block-size: var(--admin-menu-h) !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+/* Menu inside .layout-page must not reserve in-flow block space */
+.layout-wrapper.layout-horizontal .layout-page > #layout-menu.layout-menu-horizontal {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+#layout-navbar .app-brand.demo {
+    margin-top: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+#layout-navbar .navbar-brand,
+#layout-navbar .container-xxl {
+    min-height: 0 !important;
+    align-items: center !important;
+}
+
+.layout-wrapper.layout-horizontal .layout-page > .content-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: var(--admin-shell-max) !important;
+    margin-inline: auto !important;
+}
+
+.layout-wrapper.layout-horizontal .content-wrapper > .container-xxl {
+    padding-block-start: 0.5rem !important;
+    padding-top: 0.5rem !important;
+    margin-block-start: 0 !important;
+    margin-top: 0 !important;
+    max-width: var(--admin-shell-max) !important;
+    width: 100% !important;
+    margin-inline: auto !important;
+    padding-inline: var(--admin-shell-gutter) !important;
+    box-sizing: border-box !important;
+}
+
+/* Kill Sneat/demo extra top spacing */
+.layout-wrapper.layout-horizontal.layout-without-menu .layout-page,
+.layout-wrapper:not(.layout-without-menu) .layout-page,
+.layout-wrapper.layout-horizontal .layout-page {
+    padding-top: 0 !important;
+    padding-block-start: 0 !important;
+}
+
+.layout-wrapper.layout-horizontal .layout-page .container-p-y,
+.container-p-y:not([class^="pt-"]):not([class*=" pt-"]) {
+    padding-block-start: 0.5rem !important;
+    padding-top: 0.5rem !important;
+}
+
+.layout-horizontal .layout-page .menu-horizontal + .content-wrapper,
+.layout-horizontal .layout-page > .menu-horizontal + .content-wrapper,
+.layout-horizontal .layout-page .menu-horizontal + [class*="container"],
+.layout-horizontal .layout-page .menu-horizontal + [class*="container-"] {
+    padding-block-start: 0 !important;
+    margin-block-start: 0 !important;
+}
+
+.layout-horizontal .layout-page {
+    padding-inline-start: 0 !important;
+}
+
+body.admin-panel-body .admin-page-header {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+@media (min-width: 1921px) {
+    .layout-wrapper.layout-horizontal #layout-navbar,
+    .layout-wrapper.layout-horizontal #layout-menu.layout-menu-horizontal {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%);
+        width: var(--admin-shell-max) !important;
+        max-width: var(--admin-shell-max) !important;
+    }
+
+    body.admin-panel-body {
+        background-color: #eceef2;
+    }
+}
+
+body.admin-panel-body .layout-wrapper.layout-horizontal {
+    width: 100% !important;
+    max-width: var(--admin-shell-max) !important;
+    margin-inline: auto !important;
+    overflow-x: hidden !important;
+}
+
+body.admin-panel-body #layout-navbar .container-xxl,
+body.admin-panel-body #layout-menu .container-xxl {
+    max-width: var(--admin-shell-max) !important;
+    margin-inline: auto !important;
+    padding-inline: var(--admin-shell-gutter) !important;
+}
+
+body.admin-panel-body .card,
+body.admin-panel-body .table-responsive,
+body.admin-panel-body .row {
+    max-width: 100%;
+}
+
+body.admin-panel-body .card .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1199.98px) {
+    :root {
+        --admin-nav-h: 3.5rem;
+        --admin-menu-h: 3rem;
+    }
+
+    #layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-link {
+        padding-left: 0.4rem !important;
+        padding-right: 0.4rem !important;
+        font-size: 0.8125rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    :root {
+        --admin-nav-h: 3.25rem;
+        --admin-menu-h: 2.75rem;
+        --admin-shell-gutter: 0.65rem;
+    }
+
+    body.admin-panel-body .admin-page-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    body.admin-panel-body .breadcrumb-plugins {
+        width: 100%;
+        justify-content: flex-start !important;
+    }
+
+    .admin-header-search-wrapper {
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .layout-wrapper.layout-horizontal .content-wrapper > .container-xxl {
+        padding-inline: 0.5rem !important;
+    }
+}

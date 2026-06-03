@@ -1,0 +1,44 @@
+{
+  "itemCount": 13,
+  "innerMarginLeft": "0px",
+  "wrapHeight": "544.391px",
+  "menuHeight": "544.391px",
+  "subPosition": "static",
+  "subDisplay": "block",
+  "linkRect": {
+    "x": 0,
+    "y": 270.515625,
+    "width": 126.328125,
+    "height": 131.34375,
+    "top": 270.515625,
+    "right": 126.328125,
+    "bottom": 401.859375,
+    "left": 0
+  },
+  "menuRect": {
+    "x": 0,
+    "y": 64,
+    "width": 1280,
+    "height": 545.390625,
+    "top": 64,
+    "right": 1280,
+    "bottom": 609.390625,
+    "left": 0
+  },
+  "wrapRect": {
+    "x": 0,
+    "y": 64,
+    "width": 1280,
+    "height": 544.390625,
+    "top": 64,
+    "right": 1280,
+    "bottom": 608.390625,
+    "left": 0
+  },
+  "labels": [
+    "Dashboard",
+    "Home Layout",
+    "Catalog",
+    "Products"
+  ]
+}

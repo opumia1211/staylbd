@@ -1179,8 +1179,8 @@ class FrontendController extends Controller
         // Map clean route names to internal keys
         $key = $this->mapRouteToKey($key);
 
-        // Scrollbar / News Ticker: same headline ticker UI (does not depend on sections.json)
-        if ($key == 'scrollbar' || $key == 'ticker') {
+        // Scrollbar: custom headline/ticker (does not depend on sections.json)
+        if ($key == 'scrollbar') {
             return $this->scrollbarView();
         }
 

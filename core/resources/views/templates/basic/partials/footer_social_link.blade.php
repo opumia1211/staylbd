@@ -54,16 +54,16 @@
         default => 'link',
     };
 @endphp
-<a href="{{ $sUrl }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $socialLabel !== '' ? $socialLabel : __('Social link') }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full transition footer-social-link">
+<a href="{{ $sUrl }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $socialLabel !== '' ? $socialLabel : __('Social link') }}" class="footer-social-link">
     @if($inlineCustom !== '')
-        <span class="d-inline-flex align-items-center justify-content-center footer-social-inline">{!! $inlineCustom !!}</span>
+        <span class="footer-social-inline">{!! $inlineCustom !!}</span>
     @elseif($useCustomImg)
-        <img src="{{ getImage($customIconRel, '96x96') }}" alt="" width="30" height="30" class="object-fit-contain footer-social-image" loading="lazy" decoding="async">
+        <img src="{{ getImage($customIconRel, '96x96') }}" alt="" width="22" height="22" class="footer-social-image" loading="lazy" decoding="async">
     @elseif($useLibraryIcon)
         <i class="{{ $iconClassSafe }} footer-social-font-icon" aria-hidden="true"></i>
     @elseif($iconStored !== '' && str_contains($iconStored, '<svg'))
-        <span class="d-inline-flex align-items-center justify-content-center footer-social-inline">{!! $iconStored !!}</span>
+        <span class="footer-social-inline">{!! $iconStored !!}</span>
     @else
-        @include($activeTemplate . 'partials.icon', ['name' => $socialIconName, 'sizePx' => 16])
+        @include($activeTemplate . 'partials.icon', ['name' => $socialIconName, 'sizePx' => 22])
     @endif
 </a>

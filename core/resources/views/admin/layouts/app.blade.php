@@ -4,20 +4,15 @@
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
       <div class="layout-container">
-        
+
         @include('admin.partials.topnav')
 
-        <!-- Layout page -->
         <div class="layout-page">
-          
-          {{-- Horizontal Menu --}}
           @include('admin.partials.sidenav')
-
-          <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
-              
+
               @include('admin.partials.breadcrumb')
 
               @yield('panel')

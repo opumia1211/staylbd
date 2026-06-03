@@ -86,35 +86,78 @@
 @endphp
 
 <style>
-    /* Structural sizing for the journal bottom row - only for layout, not colors */
+    /* Compact journal footer layout (plan2.md) */
     .footer-journal-bottom-container {
         display: flex !important;
         flex-wrap: wrap !important;
         justify-content: space-between !important;
         align-items: center !important;
+        gap: 0.65rem !important;
     }
     .footer-journal-bottom-container img {
         height: auto !important;
-        max-height: 20px !important;
+        max-height: 18px !important;
         width: auto !important;
         display: block !important;
     }
     .footer-journal-bottom-left img {
-        height: 22px !important;
-        max-height: 22px !important;
-        width: 22px !important;
+        height: 20px !important;
+        max-height: 20px !important;
+        width: 20px !important;
         border-radius: 50% !important;
     }
     .footer-journal-bottom-right .pay-badge {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 4px 8px !important;
+        padding: 3px 6px !important;
         border-radius: 4px !important;
+    }
+    footer.footer-journal-style .footer-journal-top {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+        gap: 0.75rem !important;
+    }
+    footer.footer-journal-style .footer-main-row.footer-journal-links {
+        padding-top: 1.25rem !important;
+        padding-bottom: 1.25rem !important;
+        gap: 1.25rem 1.5rem !important;
+    }
+    footer.footer-journal-style .footer-secondary-row.footer-journal-extra {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+        gap: 1.25rem 1.5rem !important;
+    }
+    footer.footer-journal-style .footer-col-title {
+        margin-bottom: 0.5rem !important;
+        font-size: 0.9375rem !important;
+        line-height: 1.3 !important;
+    }
+    footer.footer-journal-style .footer__bottom__widget p,
+    footer.footer-journal-style .footer__bottom__widget li {
+        margin-bottom: 0.25rem !important;
+    }
+    footer.footer-journal-style .footer__bottom__widget ul {
+        gap: 0.35rem !important;
+    }
+    footer.footer-journal-style .footer-journal-bottom-row {
+        margin-top: 0.5rem !important;
+    }
+    footer.footer-journal-style .footer-journal-bottom-container {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+    footer.footer-journal-style.stayl-footer--compact .footer-journal-top {
+        padding-top: 0.65rem !important;
+        padding-bottom: 0.65rem !important;
+    }
+    footer.footer-journal-style.stayl-footer--compact .footer-main-row.footer-journal-links {
+        padding-top: 0.85rem !important;
+        padding-bottom: 0.85rem !important;
     }
 </style>
 
-<footer class="site-footer stayl-footer footer-glass footer-journal-style border-t border-slate-800 bg-slate-950 text-slate-400 {{ $footerCompactMode ? 'stayl-footer--compact' : '' }}" role="contentinfo" aria-label="@lang('Site footer')">
+<footer class="site-footer stayl-footer footer-glass footer-journal-style {{ $footerCompactMode ? 'stayl-footer--compact' : '' }}" role="contentinfo" aria-label="@lang('Site footer')">
 
     <div class="footer-glass__inner w-full">
         @if($footerTopButtons->isNotEmpty())
@@ -137,7 +180,7 @@
 
         <div class="main-container">
             {{-- Row: Logo | Social --}}
-            <div class="flex flex-col items-start justify-between gap-6 py-8 sm:flex-row sm:items-center footer-journal-top">
+            <div class="flex flex-col items-start justify-between gap-3 py-4 sm:flex-row sm:items-center footer-journal-top">
                 @if($footerLogo)
                 <a href="{{ route('home') }}" class="inline-block shrink-0" title="@lang('Home')">
                     <img src="{{ $footerLogo }}" alt="{{ gs('site_name') }}" class="footer-logo site-logo-img stayl-footer-logo {{ getLogoEffectClasses() }}" style="--stayl-footer-logo-h: {{ getFooterLogoHeight() }}px; height: {{ max(32, (int) getFooterLogoHeight()) }}px; width: auto; {{ getLogoStyle() }}" loading="lazy" width="125" height="{{ getFooterLogoHeight() }}">
@@ -146,11 +189,11 @@
                 @if($hasSocialRow)
                 <div class="flex flex-wrap items-center gap-2 sm:justify-end footer-social-row" role="list" aria-label="{{ __($connectTitle) }}">
                     @if($contactContent && !empty($contactContent->data_values->contact_email))
-                        <a href="mailto:{{ $contactContent->data_values->contact_email }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full transition footer-social-link" aria-label="@lang('Email')">
+                        <a href="mailto:{{ $contactContent->data_values->contact_email }}" class="footer-social-link" aria-label="@lang('Email')">
                             @if($footerHasEmailIconImage)
-                                <img src="{{ getImage($footerEmailIconRel, '96x96') }}" alt="" width="30" height="30" class="object-fit-contain footer-social-image" loading="lazy" decoding="async">
+                                <img src="{{ getImage($footerEmailIconRel, '96x96') }}" alt="" width="22" height="22" class="object-fit-contain footer-social-image" loading="lazy" decoding="async">
                             @else
-                                @include($activeTemplate . 'partials.icon', ['name' => 'envelope', 'sizePx' => 30])
+                                @include($activeTemplate . 'partials.icon', ['name' => 'envelope', 'sizePx' => 22])
                             @endif
                         </a>
                     @endif
@@ -164,15 +207,15 @@
             <hr class="border-0 border-t border-slate-800 m-0">
 
             {{-- Row: 4 columns (About | Quick Links | Support | Newsletter) --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 py-10 footer-main-row footer-journal-links">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 py-5 footer-main-row footer-journal-links">
 
                 @if($hasAboutCol)
                 <div class="min-w-0 footer__bottom__widget footer-about-widget">
-                    <h3 class="text-base font-semibold text-white mb-4 footer-col-title">@lang('About Us')</h3>
+                    <h3 class="text-base font-semibold text-white mb-2 footer-col-title">@lang('About Us')</h3>
                     @if($showCompanyBlock && !empty($companyInfo->data_values->about_text))
-                        <p class="text-sm text-slate-400 mb-4 leading-relaxed">{{ __($companyInfo->data_values->about_text) }}</p>
+                        <p class="text-sm text-slate-400 mb-2 leading-snug">{{ __($companyInfo->data_values->about_text) }}</p>
                     @endif
-                    <ul class="list-none m-0 p-0 space-y-2.5" role="list">
+                    <ul class="list-none m-0 p-0 space-y-1.5" role="list">
                         @foreach ($policyPages as $policy)
                             <li role="listitem"><a href="{{ route('policy.pages.short', $policy->id) }}" class="text-sm text-slate-400 no-underline hover:text-white">{{ __($policy->data_values->title ?? '') }}</a></li>
                         @endforeach
@@ -182,15 +225,15 @@
                     </ul>
                     @if($contactContent && !empty($contactContent->data_values->address))
                         @php $aboutAddress = preg_replace('/\s*,\s*/', ', ', trim((string)($contactContent->data_values->address ?? ''))); @endphp
-                        <p class="text-sm text-slate-500 mt-4 mb-0">{{ __($aboutAddress) }}</p>
+                        <p class="text-sm text-slate-500 mt-2 mb-0">{{ __($aboutAddress) }}</p>
                     @endif
                 </div>
                 @endif
 
                 @if($hasQuickLinksCol)
                 <div class="min-w-0 footer__bottom__widget footer-quick-links-widget">
-                    <h3 class="text-base font-semibold text-white mb-4 footer-col-title">@lang('Quick Links')</h3>
-                    <ul class="list-none m-0 p-0 space-y-2.5" role="list">
+                    <h3 class="text-base font-semibold text-white mb-2 footer-col-title">@lang('Quick Links')</h3>
+                    <ul class="list-none m-0 p-0 space-y-1.5" role="list">
                         @foreach ($validQuickLinks as $link)
                             @php $dv = $link->data_values ?? (object)[]; $u = $dv->url ?? '#'; @endphp
                             <li role="listitem"><a href="{{ $u }}" class="text-sm text-slate-400 no-underline hover:text-white" @if($u !== '#') target="_blank" rel="noopener noreferrer" @endif>{{ __($dv->title ?? '') }}</a></li>
@@ -201,8 +244,8 @@
 
                 @if($hasSupportCol)
                 <div class="min-w-0 footer__bottom__widget footer-support-widget">
-                    <h3 class="text-base font-semibold text-white mb-4 footer-col-title">@lang('Customer Service')</h3>
-                    <ul class="list-none m-0 p-0 space-y-2.5" role="list">
+                    <h3 class="text-base font-semibold text-white mb-2 footer-col-title">@lang('Customer Service')</h3>
+                    <ul class="list-none m-0 p-0 space-y-1.5" role="list">
                         @php $sc = $supportCenter ? ($supportCenter->data_values ?? (object)[]) : (object)[]; @endphp
                         @if(!empty($sc->help_center_url))
                             <li role="listitem"><a href="{{ $sc->help_center_url }}" class="text-sm text-slate-400 no-underline hover:text-white" target="_blank" rel="noopener noreferrer">@lang('Help Center')</a></li>
@@ -225,23 +268,23 @@
                 @endif
 
                 <div class="min-w-0 footer__bottom__widget footer-newsletter-widget">
-                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">@lang('Newsletter')</h3>
+                    <h3 class="text-base font-semibold text-white mb-2 footer-col-title">@lang('Newsletter')</h3>
                     @php $subT = $subscribeSubtitle ? __($subscribeSubtitle) : ''; $mainT = __($subscribeTitle); @endphp
-                    <p class="text-sm text-slate-400 mb-4 leading-relaxed">
+                    <p class="text-sm text-slate-400 mb-2 leading-snug">
                         @if($subT && $subT !== $mainT){{ $subT }}@else{{ $mainT }}@endif
                     </p>
                     <form class="newletter-form js-footer-subscribe" action="{{ route('subscribe') }}" method="post" aria-label="@lang('Newsletter subscription')">
                         @csrf
                         <div class="flex w-full footer-journal-newsletter-input">
                             <label class="sr-only" for="footer-subscribe-email">@lang('Email address')</label>
-                            <input id="footer-subscribe-email" type="email" name="email" class="subscribe-email min-w-0 flex-1 border border-slate-600 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:border-slate-500 focus:outline-none" placeholder="@lang('Enter email')" required autocomplete="email">
-                            <button type="submit" class="subscribe-btn inline-flex shrink-0 items-center justify-center border border-slate-700 bg-slate-900 px-4 py-2.5 text-white hover:bg-black focus:outline-none" aria-label="@lang('Subscribe')">
+                            <input id="footer-subscribe-email" type="email" name="email" class="subscribe-email min-w-0 flex-1 border border-slate-600 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:border-slate-500 focus:outline-none" placeholder="@lang('Enter email')" required autocomplete="email">
+                            <button type="submit" class="subscribe-btn inline-flex shrink-0 items-center justify-center border border-slate-700 bg-slate-900 px-3 py-2 text-white hover:bg-black focus:outline-none" aria-label="@lang('Subscribe')">
                                 @include($activeTemplate . 'partials.icon', ['name' => 'paper-plane', 'sizePx' => 18, 'class' => 'text-current'])
                             </button>
                         </div>
                         <div class="subscribe-inline-message mt-2 text-sm" aria-live="polite"></div>
                         @if($privacyPolicyLink)
-                        <div class="mt-3 flex items-start gap-2 text-sm text-slate-400">
+                        <div class="mt-2 flex items-start gap-2 text-sm text-slate-400">
                             <input type="checkbox" id="footer-newsletter-agree" name="newsletter_agree" value="1" class="mt-1 shrink-0">
                             <label for="footer-newsletter-agree" class="leading-snug">
                                 @lang('I have read and agree to the')
@@ -251,25 +294,25 @@
                         @endif
                     </form>
                     @if($aboutPhone !== '')
-                        <p class="text-sm text-slate-500 mt-4 mb-0">
+                        <p class="text-sm text-slate-500 mt-2 mb-0">
                             <span class="text-slate-400">@lang('Questions? Call us'):</span>
                             <a href="tel:{{ preg_replace('/[^0-9+]/', '', $aboutPhone) }}" class="text-slate-400 no-underline hover:text-white">{{ __($aboutPhone) }}</a>
                         </p>
                     @endif
                     @guest
-                    <div class="mt-4 flex flex-col gap-2" role="navigation" aria-label="@lang('Account')">
+                    <div class="mt-2 flex flex-col gap-1.5" role="navigation" aria-label="@lang('Account')">
                         <a href="{{ route('user.login') }}?open=login&redirect={{ urlencode(url()->current()) }}" class="js-footer-floating-login text-sm text-slate-400 no-underline hover:text-white">@lang('Login')</a>
                         <a href="{{ route('user.register') }}?open=register&redirect={{ urlencode(url()->current()) }}" class="js-footer-floating-register text-sm text-slate-400 no-underline hover:text-white">@lang('Registration')</a>
                         <a href="{{ $sellerAccountHref }}" class="text-sm text-slate-400 no-underline hover:text-white"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
                     </div>
                     @else
-                    <div class="mt-4 flex flex-col gap-2" role="navigation" aria-label="@lang('Account')">
+                    <div class="mt-2 flex flex-col gap-1.5" role="navigation" aria-label="@lang('Account')">
                         <a href="{{ route('user.home') }}" class="text-sm text-slate-400 no-underline hover:text-white">@lang('My account')</a>
                         <a href="{{ $sellerAccountHref }}" class="text-sm text-slate-400 no-underline hover:text-white"@if($sellerLinkNewTab) target="_blank" rel="noopener noreferrer"@endif>@lang('Seller account')</a>
                     </div>
                     @endguest
                     @if($showShippingInfo && $shippingPayment)
-                    <div class="mt-4 pt-4 border-t border-slate-800">
+                    <div class="mt-2 pt-2 border-t border-slate-800">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">@lang('Payment & Shipping')</p>
                         @if(($shippingPayment->data_values->cod_enabled ?? 1) == 1)
                             <p class="text-sm text-slate-500 mb-1">@lang('Cash on Delivery available')</p>
@@ -290,10 +333,10 @@
 
             @if($rowExtraCount > 0 || $securityBadges->isNotEmpty())
             <hr class="border-0 border-t border-slate-800 m-0">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-8 footer-secondary-row footer-journal-extra">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 py-4 footer-secondary-row footer-journal-extra">
                 @if($securityBadges->isNotEmpty())
                 <div class="min-w-0 footer__bottom__widget footer-security-widget">
-                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">@lang('Trust & Security')</h3>
+                    <h3 class="text-base font-semibold text-white mb-2 footer-col-title">@lang('Trust & Security')</h3>
                     <div class="flex flex-wrap items-center gap-3" role="list">
                         @foreach ($securityBadges as $badge)
                             @php $dv = $badge->data_values ?? (object)[]; $img = $dv->image ?? null; $u = $dv->url ?? '#'; @endphp
@@ -314,15 +357,15 @@
                 @endif
                 @if($voteEnabled)
                 <div class="min-w-0 footer__bottom__widget footer-vote-widget">
-                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">{{ __($voteTitle !== '' ? $voteTitle : __('Was this page helpful?')) }}</h3>
-                    @if($voteSubtitle !== '')<p class="text-sm text-slate-500 mb-3">{{ __($voteSubtitle) }}</p>@endif
+                    <h3 class="text-base font-semibold text-white mb-2 footer-col-title">{{ __($voteTitle !== '' ? $voteTitle : __('Was this page helpful?')) }}</h3>
+                    @if($voteSubtitle !== '')<p class="text-sm text-slate-500 mb-2">{{ __($voteSubtitle) }}</p>@endif
                     <div class="flex flex-wrap gap-2">
-                        <button type="button" class="inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 hover:text-white" data-vote-kind="up">
+                        <button type="button" class="footer-vote-btn inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 hover:text-white" data-vote-kind="up">
                             @include($activeTemplate . 'partials.icon', ['name' => 'thumbs-up', 'sizePx' => 14])
                             <span>{{ __($voteUpLabel) }}</span>
                             <span class="text-xs text-slate-500" data-vote-count="up">{{ $voteUpCount }}</span>
                         </button>
-                        <button type="button" class="inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 hover:text-white" data-vote-kind="down">
+                        <button type="button" class="footer-vote-btn inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 hover:text-white" data-vote-kind="down">
                             @include($activeTemplate . 'partials.icon', ['name' => 'thumbs-down', 'sizePx' => 14])
                             <span>{{ __($voteDownLabel) }}</span>
                             <span class="text-xs text-slate-500" data-vote-count="down">{{ $voteDownCount }}</span>
@@ -333,8 +376,8 @@
                 @endif
                 @if($appPromoEnabled)
                 <div class="min-w-0 footer__bottom__widget footer-connect-widget">
-                    <h3 class="text-base font-semibold text-white mb-3 footer-col-title">@lang('Get our app')</h3>
-                    <div class="flex flex-col gap-2">
+                    <h3 class="text-base font-semibold text-white mb-2 footer-col-title">@lang('Get our app')</h3>
+                    <div class="flex flex-col gap-1.5">
                         @foreach($appPromotionItems as $appItem)
                             @php
                                 $adv = $appItem->data_values ?? (object)[];
@@ -367,8 +410,8 @@
         </div>{{-- .main-container --}}
 
         {{-- Row: Copyright | Payment icons (Using Theme Classes) --}}
-        <div class="footer-journal-bottom-row w-full mt-4 bg-slate-950 border-t border-slate-900/50">
-            <div class="main-container footer-journal-bottom-container py-6 lg:py-8 gap-6">
+        <div class="footer-journal-bottom-row w-full mt-2 border-t border-slate-800">
+            <div class="main-container footer-journal-bottom-container py-3 lg:py-4 gap-4">
                 {{-- Left: Logo + Copyright --}}
                 <div class="flex items-center gap-4">
                     @if($footerLogo)

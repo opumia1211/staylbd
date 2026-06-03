@@ -106,7 +106,7 @@
         <div class="action-buttons cart-row-user__action-btns d-flex flex-nowrap gap-2 justify-content-end">
             <a href="{{ product_detail_url($product) }}" class="btn btn-primary list-page-action-btn cart-action-btn" title="@lang('View')" data-no-ajax>@lang('View')</a>
             @if($inStock)
-            <a href="{{ route('cart.list.buy.now', $productId) }}" class="btn btn-success list-page-action-btn cart-action-btn" title="@lang('Buy Now')" data-no-ajax>@lang('Buy Now')</a>
+            <a href="{{ storefront_route('cart.list.buy.now', ['id' => $productId]) }}" class="btn btn-success list-page-action-btn cart-action-btn" title="@lang('Buy Now')" data-no-ajax>@lang('Buy Now')</a>
             @else
             <span class="btn btn-secondary list-page-action-btn disabled" title="@lang('Stock Out')">@lang('Stock Out')</span>
             @endif

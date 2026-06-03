@@ -53,6 +53,29 @@
         </div>
     </div>
 
+    {{-- E-commerce quick shortcuts (professional store ops) --}}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-3 px-3">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <span class="small fw-semibold text-muted text-uppercase">@lang('Store quick actions')</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ route('admin.product.hub') }}" class="btn btn-sm btn-outline-primary"><i class="las la-th-large me-1"></i>@lang('Products')</a>
+                <a href="{{ route('admin.product.create') }}" class="btn btn-sm btn-primary"><i class="las la-plus-circle me-1"></i>@lang('Add product')</a>
+                <a href="{{ route('admin.category.hub') }}" class="btn btn-sm btn-outline-primary"><i class="las la-sitemap me-1"></i>@lang('Categories')</a>
+                <a href="{{ route('admin.orders.hub') }}" class="btn btn-sm btn-outline-warning"><i class="las la-list-alt me-1"></i>@lang('Orders')</a>
+                <a href="{{ route('admin.coupon.index') }}" class="btn btn-sm btn-outline-danger"><i class="las la-bullhorn me-1"></i>@lang('Coupons')</a>
+                <a href="{{ route('admin.frontend.sections.banner') }}" class="btn btn-sm btn-outline-secondary"><i class="las la-image me-1"></i>@lang('Banners')</a>
+                <a href="{{ route('admin.frontend.sections.middle_banner') }}" class="btn btn-sm btn-outline-secondary"><i class="las la-image me-1"></i>@lang('Middle banner')</a>
+                <a href="{{ route('admin.frontend.sections.bottom_banner') }}" class="btn btn-sm btn-outline-secondary"><i class="las la-image me-1"></i>@lang('Bottom banner')</a>
+                <a href="{{ route('admin.shipping.index') }}" class="btn btn-sm btn-outline-info"><i class="las la-truck me-1"></i>@lang('Shipping')</a>
+                <a href="{{ route('admin.payment.gateways.hub') }}" class="btn btn-sm btn-outline-info"><i class="las la-credit-card me-1"></i>@lang('Payment')</a>
+                <a href="{{ route('admin.seo') }}" class="btn btn-sm btn-outline-dark"><i class="las la-globe me-1"></i>@lang('SEO')</a>
+                <a href="{{ route('admin.report.product') }}" class="btn btn-sm btn-outline-dark"><i class="las la-chart-bar me-1"></i>@lang('Analytics')</a>
+            </div>
+        </div>
+    </div>
+
     @error('layout_json')
         <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center gap-2 mb-3">
             <i class="las la-exclamation-circle la-lg"></i>

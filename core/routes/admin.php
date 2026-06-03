@@ -211,6 +211,9 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
         Route::post('status/{id}', 'status')->name('status');
     });
 
+    Route::get('product-center', [\App\Http\Controllers\Admin\ProductManagementHubController::class, 'index'])->name('product.hub');
+    Route::get('category-center', [\App\Http\Controllers\Admin\CategoryManagementHubController::class, 'index'])->name('category.hub');
+
     //Product Controller
     Route::controller('ProductController')->prefix('product')->name('product.')->group(function () {
         Route::get('/', 'index')->name('index');
@@ -490,10 +493,7 @@ Route::middleware(['admin', 'force.admin.password', 'admin.session.control'])->g
         Route::get('product/export', 'export')->name('product.export');
     });
 
-    // Revenue & Profit Report (module)
-    Route::get('report/revenue-profit', [\App\Modules\RevenueProfitReport\Http\Controllers\RevenueProfitReportController::class, 'index'])->name('report.revenue_profit');
-    // Employee Performance Report (module)
-    Route::get('report/employee-performance', [\App\Modules\EmployeePerformanceReport\Http\Controllers\EmployeePerformanceReportController::class, 'index'])->name('report.employee_performance');
+    // Revenue & Profit / Employee Performance: registered via ModuleServiceProvider (admin.report.*)
 
     // User Activity Reports (full tracking: search, product view, cart, wishlist, compare, orders, payments, login, registration, messages, location, all)
     Route::controller(\App\Http\Controllers\Admin\UserActivityReportController::class)->prefix('report')->name('report.activity.')->group(function () {

@@ -142,7 +142,7 @@
         <a href="{{ $purl }}"
            class="btn btn-primary btn-sm list-page-action-btn product-list-row__btn product-list-row__btn--view"
            data-no-ajax>@lang('View')</a>
-        <a href="{{ route('cart.list.buy.now', $productId) }}"
+        <a href="{{ storefront_route('cart.list.buy.now', ['id' => $productId]) }}"
            class="btn btn-success btn-sm list-page-action-btn product-list-row__btn product-list-row__btn--buy"
            data-no-ajax>
             @if($hasProduct && $inStock)

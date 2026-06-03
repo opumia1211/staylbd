@@ -52,6 +52,43 @@
     color: #0e9f90 !important;
 }
 
+/* Payment dropdown — extra clarity for long lists */
+.layout-menu-horizontal .menu-item.menu-payment-panel > .menu-sub {
+    min-width: 16rem !important;
+}
+
+.layout-menu-horizontal .menu-item.menu-payment-panel .menu-link > div {
+    color: #384551 !important;
+    font-weight: 500 !important;
+}
+
+.layout-menu-horizontal .menu-item.menu-payment-panel .menu-item.active > .menu-link > div {
+    color: #0a6b62 !important;
+    font-weight: 600 !important;
+}
+
+/* Shipping dropdown — same clarity as Payment */
+.layout-menu-horizontal .menu-item.menu-shipping-panel > .menu-sub {
+    min-width: 16.5rem !important;
+}
+
+.layout-menu-horizontal .menu-item.menu-shipping-panel .menu-link > div {
+    color: #384551 !important;
+    font-weight: 500 !important;
+}
+
+.layout-menu-horizontal .menu-item.menu-shipping-panel .menu-item.active > .menu-link > div {
+    color: #0a6b62 !important;
+    font-weight: 600 !important;
+}
+
+.layout-menu-horizontal .menu-item.menu-shipping-panel .menu-item-header.menu-section-label {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.35rem !important;
+}
+
 /* —— Legacy widget-two stat cards (deposit/payment pages) without app.css —— */
 .widget-two.box--shadow2 {
     border-radius: 0.5rem;

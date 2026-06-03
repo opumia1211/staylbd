@@ -38,12 +38,18 @@
     --stayl-search-footer-bg: #f8fafc;
     --stayl-search-footer-border: #f1f5f9;
 
-    /* Footer Palette - Light (Premium Dark Footer by default) */
-    --stayl-footer-bg: #0f172a;
-    --stayl-footer-text: #f1f5f9;
-    --stayl-footer-muted: #94a3b8;
-    --stayl-footer-border: rgba(255, 255, 255, 0.1);
-    --stayl-footer-title: #ffffff;
+    /* Footer Palette — day mode (light) */
+    --stayl-footer-bg: #f1f5f9;
+    --stayl-footer-text: #334155;
+    --stayl-footer-muted: #64748b;
+    --stayl-footer-border: rgba(15, 23, 42, 0.12);
+    --stayl-footer-title: #0f172a;
+    --stayl-footer-input-bg: #ffffff;
+    --stayl-footer-input-text: #0f172a;
+    --stayl-footer-btn-bg: #0f172a;
+    --stayl-footer-btn-text: #ffffff;
+    --stayl-footer-chip-bg: rgba(15, 23, 42, 0.06);
+    --stayl-footer-chip-border: rgba(15, 23, 42, 0.12);
 
 
     /* Animation Constants */
@@ -86,12 +92,20 @@ body.dark-mode {
     --stayl-search-footer-bg: rgba(30, 41, 59, 0.5);
     --stayl-search-footer-border: rgba(255, 255, 255, 0.05);
 
-    /* Footer Palette - Dark (Deep Black Footer) */
-    --stayl-footer-bg: #020617;
-    --stayl-footer-text: #cbd5e1;
-    --stayl-footer-muted: #64748b;
-    --stayl-footer-border: rgba(255, 255, 255, 0.06);
-    --stayl-footer-title: #f8fafc;
+    /* Footer Palette — night mode (high contrast, readable) */
+    --stayl-footer-bg: #0f172a;
+    --stayl-footer-text: #e8eef5;
+    --stayl-footer-muted: #c4d0e0;
+    --stayl-footer-border: rgba(255, 255, 255, 0.16);
+    --stayl-footer-title: #ffffff;
+    --stayl-footer-input-bg: #1e293b;
+    --stayl-footer-input-text: #f8fafc;
+    --stayl-footer-input-border: rgba(255, 255, 255, 0.22);
+    --stayl-footer-btn-bg: #334155;
+    --stayl-footer-btn-text: #ffffff;
+    --stayl-footer-chip-bg: rgba(255, 255, 255, 0.1);
+    --stayl-footer-chip-border: rgba(255, 255, 255, 0.18);
+    --stayl-footer-link-accent: #5eead4;
 
 }
 

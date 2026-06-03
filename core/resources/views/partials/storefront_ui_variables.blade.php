@@ -870,13 +870,66 @@
         color: #f8fafc !important;
     }
 
+    /* Footer — day/night (journal + glass) */
+    footer.site-footer.footer-glass.footer-journal-style,
+    body:not(.dark-mode) footer.site-footer.footer-glass {
+        background-color: var(--stayl-footer-bg) !important;
+        background-image: none !important;
+        color: var(--stayl-footer-text) !important;
+        border-top-color: var(--stayl-footer-border) !important;
+    }
+
+    body.dark-mode footer.site-footer.footer-glass,
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style {
+        background-color: var(--stayl-footer-bg) !important;
+        background-image: none !important;
+        color: var(--stayl-footer-text) !important;
+        border-top-color: var(--stayl-footer-border) !important;
+    }
+
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style .footer-col-title,
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style .text-white {
+        color: var(--stayl-footer-title, #ffffff) !important;
+    }
+
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style .text-slate-400,
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style .text-slate-500,
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style a.text-slate-400 {
+        color: var(--stayl-footer-muted, #c4d0e0) !important;
+    }
+
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style a.text-slate-400:hover,
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style a.hover\:text-white:hover {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style .text-sky-400,
+    body.dark-mode footer.site-footer.footer-glass.footer-journal-style a.text-sky-400 {
+        color: var(--stayl-footer-link-accent, #5eead4) !important;
+    }
+
     body.dark-mode .footer-glass {
-        background: #020617 !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        background: var(--stayl-footer-bg) !important;
+        border-top: 1px solid var(--stayl-footer-border);
     }
 
     body.dark-mode .footer-glass__bottom {
-        border-top-color: rgba(255, 255, 255, 0.05);
+        border-top-color: var(--stayl-footer-border);
+    }
+
+    footer.site-footer.footer-glass .footer-social-link,
+    footer.site-footer.footer-glass .stayl-footer-social-link {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+
+    footer.site-footer.footer-glass .footer-social-link:hover,
+    footer.site-footer.footer-glass .stayl-footer-social-link:hover {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 
     /* Optimized Header Animation Styles Centralized in stayl-elite-core.css */

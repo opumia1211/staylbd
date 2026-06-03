@@ -1,0 +1,22 @@
+{
+  "before": {
+    "subPosition": "absolute",
+    "linkTop": 78,
+    "menuHeight": 52
+  },
+  "after": {
+    "subPosition": "absolute",
+    "subDisplay": "flex",
+    "linkTop": 78,
+    "menuHeight": 52,
+    "wrapHeight": 52,
+    "innerMarginLeft": "0px",
+    "labels": [
+      "Dashboard",
+      "Home Layout",
+      "Catalog",
+      "Products",
+      "Categories"
+    ]
+  }
+}

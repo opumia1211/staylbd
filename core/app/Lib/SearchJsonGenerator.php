@@ -29,7 +29,7 @@ class SearchJsonGenerator
                     [ "name" => "Logo & Favicon", "url" => $baseUrl . "/frontend/icon", "icon" => "las la-image" ],
                     [ "name" => "Banner Management", "url" => $baseUrl . "/frontend/banner", "icon" => "las la-image" ],
                     [ "name" => "Scroll Bar", "url" => $baseUrl . "/frontend/scrollbar", "icon" => "las la-arrows-alt-h" ],
-                    [ "name" => "News Ticker", "url" => $baseUrl . "/frontend/scrollbar", "icon" => "las la-bullhorn" ],
+                    [ "name" => "News Ticker", "url" => $baseUrl . "/frontend/ticker", "icon" => "las la-bullhorn" ],
                     [ "name" => "Social Icons", "url" => $baseUrl . "/frontend/social_icon", "icon" => "las la-share-alt" ],
                     [ "name" => "Contact Us", "url" => $baseUrl . "/frontend/contact", "icon" => "las la-envelope" ],
                     [ "name" => "Footer Builder", "url" => $baseUrl . "/frontend/footer", "icon" => "las la-sitemap" ],
@@ -44,26 +44,36 @@ class SearchJsonGenerator
                 ],
                 "Catalog" => [
                     [ "name" => "All Products", "url" => $baseUrl . "/product", "icon" => "las la-boxes" ],
-                    [ "name" => "Add Product", "url" => $baseUrl . "/product/create", "icon" => "las la-plus-circle" ],
-                    [ "name" => "Product Reviews", "url" => $baseUrl . "/product/reviews", "icon" => "las la-comment-dots" ],
+                    [ "name" => "Low Stock", "url" => $baseUrl . "/product?low_stock=1", "icon" => "las la-exclamation-triangle" ],
+                    [ "name" => "Stock Alerts", "url" => $baseUrl . "/product/stock-alerts", "icon" => "las la-bell" ],
                     [ "name" => "Quick Deals", "url" => $baseUrl . "/product/today-deal", "icon" => "las la-bolt" ],
                     [ "name" => "Hot Deals", "url" => $baseUrl . "/product/hot", "icon" => "las la-fire" ],
                     [ "name" => "Trending", "url" => $baseUrl . "/product/trending", "icon" => "las la-chart-line" ],
                     [ "name" => "Best Selling", "url" => $baseUrl . "/product/best-selling", "icon" => "las la-star" ],
                     [ "name" => "Featured Products", "url" => $baseUrl . "/product/featured", "icon" => "las la-certificate" ],
-                    [ "name" => "Low Stock", "url" => $baseUrl . "/product?low_stock=1", "icon" => "las la-exclamation-triangle" ],
-                    [ "name" => "Stock Alerts", "url" => $baseUrl . "/product/stock-alerts", "icon" => "las la-bell" ],
+                ],
+                "Products" => [
+                    [ "name" => "Product Center", "url" => $baseUrl . "/product-center", "icon" => "las la-th-large" ],
+                    [ "name" => "Add Product", "url" => $baseUrl . "/product/create", "icon" => "las la-plus-circle" ],
+                    [ "name" => "Quick Upload", "url" => $baseUrl . "/product/general-create", "icon" => "las la-magic" ],
+                    [ "name" => "Product Reviews", "url" => $baseUrl . "/product/reviews", "icon" => "las la-comment-dots" ],
+                    [ "name" => "Product Performance", "url" => $baseUrl . "/report/product", "icon" => "las la-chart-bar" ],
+                ],
+                "Categories" => [
+                    [ "name" => "Category Center", "url" => $baseUrl . "/category-center", "icon" => "las la-th-large" ],
                     [ "name" => "Categories", "url" => $baseUrl . "/category", "icon" => "las la-align-left" ],
                     [ "name" => "Subcategories", "url" => $baseUrl . "/sub-category", "icon" => "las la-align-center" ],
                     [ "name" => "Brands", "url" => $baseUrl . "/brand", "icon" => "las la-tags" ],
-                    [ "name" => "Coupons", "url" => $baseUrl . "/coupon", "icon" => "las la-bullhorn" ]
+                    [ "name" => "Coupons", "url" => $baseUrl . "/coupon", "icon" => "las la-bullhorn" ],
+                ],
+                "Home Ads" => [
+                    [ "name" => "Homepage Ads", "url" => $baseUrl . "/frontend/homepage-ads", "icon" => "las la-ad" ],
+                    [ "name" => "Popup Ads", "url" => $baseUrl . "/popup-ads", "icon" => "las la-window-maximize" ],
+                    [ "name" => "Offer Timers", "url" => $baseUrl . "/offer-timers", "icon" => "las la-stopwatch" ],
+                    [ "name" => "Header Icons", "url" => $baseUrl . "/frontend/headericons", "icon" => "las la-icons" ],
+                    [ "name" => "Banners", "url" => $baseUrl . "/frontend/banner", "icon" => "las la-image" ],
                 ],
                 "Orders" => [
-                    [ "name" => "Order Center", "url" => $baseUrl . "/orders/hub", "icon" => "las la-th-large" ],
-                    [ "name" => "Fulfillment Queue", "url" => $baseUrl . "/orders/fulfillment", "icon" => "las la-tasks" ],
-                    [ "name" => "Order Automation", "url" => $baseUrl . "/orders/automation", "icon" => "las la-robot" ],
-                    [ "name" => "Order Channels", "url" => $baseUrl . "/orders/channels", "icon" => "las la-project-diagram" ],
-                    [ "name" => "Import Export Orders", "url" => $baseUrl . "/orders/import-export", "icon" => "las la-exchange-alt" ],
                     [ "name" => "All Orders", "url" => $baseUrl . "/order", "icon" => "las la-list" ],
                     [ "name" => "Pending Orders", "url" => $baseUrl . "/order/pending", "icon" => "las la-clock" ],
                     [ "name" => "Canceled Orders", "url" => $baseUrl . "/order/cancel", "icon" => "las la-times-circle" ],
@@ -75,15 +85,10 @@ class SearchJsonGenerator
                     [ "name" => "Courier Settings", "url" => $baseUrl . "/api-integration/courier", "icon" => "las la-cog" ],
                     [ "name" => "Courier Logs", "url" => $baseUrl . "/api-integration/courier/logs", "icon" => "las la-list-alt" ]
                 ],
-                "Payment" => [
-                    [ "name" => "Payment Center", "url" => $baseUrl . "/payment-gateways", "icon" => "las la-th-large" ],
-                    [ "name" => "Payment Analytics", "url" => $baseUrl . "/payment/analytics", "icon" => "las la-chart-line" ],
-                    [ "name" => "Automatic Gateways", "url" => $baseUrl . "/gateway/automatic", "icon" => "las la-robot" ],
-                    [ "name" => "Manual Gateways", "url" => $baseUrl . "/gateway/manual", "icon" => "las la-university" ],
-                    [ "name" => "Autopay Gateways", "url" => $baseUrl . "/gateway/autopay", "icon" => "las la-external-link-alt" ],
-                    [ "name" => "All Payments", "url" => $baseUrl . "/deposit", "icon" => "las la-list" ],
-                    [ "name" => "Pending Payments", "url" => $baseUrl . "/deposit/pending", "icon" => "las la-clock" ],
-                    [ "name" => "COD Settings", "url" => $baseUrl . "/shipping-method/cod", "icon" => "las la-money-bill-wave" ]
+                "Finance" => [
+                    [ "name" => "Gateways Hub", "url" => $baseUrl . "/payment-gateways", "icon" => "las la-th-large" ],
+                    [ "name" => "Automatic", "url" => $baseUrl . "/gateway/automatic", "icon" => "las la-robot" ],
+                    [ "name" => "Manual", "url" => $baseUrl . "/gateway/manual", "icon" => "las la-hand-holding-usd" ]
                 ],
                 "files" => [],
                 "members" => []
@@ -99,11 +104,7 @@ class SearchJsonGenerator
 
         $json = json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         
-        $assetPath = public_path('assets/json');
-        if (!is_dir($assetPath)) {
-            mkdir($assetPath, 0755, true);
-        }
-        $assetPath .= DIRECTORY_SEPARATOR;
+        $assetPath = base_path('../assets/json/');
         file_put_contents($assetPath . 'search-horizontal.json', $json);
         file_put_contents($assetPath . 'search-vertical.json', $json);
     }

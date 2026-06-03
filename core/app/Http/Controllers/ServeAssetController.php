@@ -36,8 +36,8 @@ class ServeAssetController extends Controller
             abort(404);
         }
 
-        $path = public_path('assets/templates/basic/js/' . $name . '.js');
-        if (!is_file($path) || !is_readable($path)) {
+        $path = $this->getAssetPath('assets/templates/basic/js/' . $name . '.js');
+        if (!$path) {
             abort(404);
         }
 
@@ -56,8 +56,8 @@ class ServeAssetController extends Controller
             abort(404);
         }
 
-        $path = public_path('assets/templates/basic/css/' . $name . '.css');
-        if (!is_file($path) || !is_readable($path)) {
+        $path = $this->getAssetPath('assets/templates/basic/css/' . $name . '.css');
+        if (!$path) {
             abort(404);
         }
 
@@ -76,8 +76,8 @@ class ServeAssetController extends Controller
             abort(404);
         }
 
-        $path = public_path('assets/global/css/' . $name . '.css');
-        if (!is_file($path) || !is_readable($path)) {
+        $path = $this->getAssetPath('assets/global/css/' . $name . '.css');
+        if (!$path) {
             abort(404);
         }
 
@@ -96,8 +96,8 @@ class ServeAssetController extends Controller
         if (str_contains($name, '..') || str_contains($name, '/') || str_contains($name, '\\')) {
             abort(404);
         }
-        $path = public_path('assets/templates/basic/images/' . $name);
-        if (!is_file($path) || !is_readable($path)) {
+        $path = $this->getAssetPath('assets/templates/basic/images/' . $name);
+        if (!$path) {
             abort(404);
         }
         $mime = match (strtolower(pathinfo($name, PATHINFO_EXTENSION))) {
@@ -450,5 +450,30 @@ class ServeAssetController extends Controller
             'svg' => 'image/svg+xml',
             default => 'application/octet-stream',
         };
+    }
+
+    private function getAssetPath(string $relative): ?string
+    {
+        $path = public_path($relative);
+        if (is_file($path) && is_readable($path)) {
+            return $path;
+        }
+        
+        $path = base_path('public/' . $relative);
+        if (is_file($path) && is_readable($path)) {
+            return $path;
+        }
+
+        $path = base_path('../' . $relative);
+        if (is_file($path) && is_readable($path)) {
+            return $path;
+        }
+
+        $path = base_path('../public/' . $relative);
+        if (is_file($path) && is_readable($path)) {
+            return $path;
+        }
+        
+        return null;
     }
 }

@@ -61,7 +61,10 @@ class ModuleServiceProvider extends ServiceProvider
 
             $adminRoutes = "{$base}/Routes/admin.php";
             if (file_exists($adminRoutes)) {
-                Route::middleware(['web', 'admin'])->prefix(config('admin.prefix', 'admin'))->group($adminRoutes);
+                Route::middleware(['web', 'admin'])
+                    ->prefix(config('admin.prefix', 'admin'))
+                    ->name('admin.')
+                    ->group($adminRoutes);
             }
         } catch (\Throwable $e) {
             report($e);

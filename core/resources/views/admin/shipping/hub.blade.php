@@ -88,6 +88,62 @@
 	</div>
 </div>
 
+@php
+	$failedCourier = 0;
+	if (\Illuminate\Support\Facades\Schema::hasTable('courier_logs')) {
+		$failedCourier = (int) \Illuminate\Support\Facades\DB::table('courier_logs')->where('status', 'failed')->count();
+	}
+@endphp
+<div class="row g-4 mt-2">
+	<div class="col-12">
+		<h6 class="text-dark fw-semibold mb-0">@lang('Courier & Delivery')</h6>
+		<p class="text-muted small mb-0">@lang('API keys, bulk ship, logs & reports')</p>
+	</div>
+	<div class="col-md-4">
+		<a href="{{ route('admin.api.courier.manage') }}" class="text-decoration-none d-block h-100">
+			<div class="card border shadow-sm h-100 shipping-hub-card bg-white">
+				<div class="card-body p-4 d-flex flex-column">
+					<div class="d-flex align-items-center justify-content-between mb-3">
+						<div class="rounded-3 p-3 bg-secondary text-white"><i class="las la-cog fs-2"></i></div>
+					</div>
+					<h6 class="card-title mb-2 text-dark fw-semibold">@lang('Courier Settings')</h6>
+					<p class="text-secondary small mb-0 flex-grow-1">@lang('Pathao, Steadfast & custom providers')</p>
+					<span class="mt-3 small fw-semibold text-secondary">@lang('Open') <i class="las la-arrow-right ms-1"></i></span>
+				</div>
+			</div>
+		</a>
+	</div>
+	<div class="col-md-4">
+		<a href="{{ route('admin.api.courier.logs') }}" class="text-decoration-none d-block h-100">
+			<div class="card border shadow-sm h-100 shipping-hub-card bg-white">
+				<div class="card-body p-4 d-flex flex-column">
+					<div class="d-flex align-items-center justify-content-between mb-3">
+						<div class="rounded-3 p-3 bg-danger text-white"><i class="las la-list-alt fs-2"></i></div>
+						@if($failedCourier > 0)<span class="badge bg-danger text-white">{{ $failedCourier }}</span>@endif
+					</div>
+					<h6 class="card-title mb-2 text-dark fw-semibold">@lang('Courier Logs')</h6>
+					<p class="text-secondary small mb-0 flex-grow-1">@lang('Failed & retry delivery attempts')</p>
+					<span class="mt-3 small fw-semibold text-danger">@lang('Open') <i class="las la-arrow-right ms-1"></i></span>
+				</div>
+			</div>
+		</a>
+	</div>
+	<div class="col-md-4">
+		<a href="{{ route('admin.api.courier.reports') }}" class="text-decoration-none d-block h-100">
+			<div class="card border shadow-sm h-100 shipping-hub-card bg-white">
+				<div class="card-body p-4 d-flex flex-column">
+					<div class="d-flex align-items-center justify-content-between mb-3">
+						<div class="rounded-3 p-3 bg-primary text-white"><i class="las la-chart-bar fs-2"></i></div>
+					</div>
+					<h6 class="card-title mb-2 text-dark fw-semibold">@lang('Courier Reports')</h6>
+					<p class="text-secondary small mb-0 flex-grow-1">@lang('Delivery performance & export')</p>
+					<span class="mt-3 small fw-semibold text-primary">@lang('Open') <i class="las la-arrow-right ms-1"></i></span>
+				</div>
+			</div>
+		</a>
+	</div>
+</div>
+
 <div class="row mt-4">
 	<div class="col-12">
 		<div class="card border bg-light">
@@ -96,6 +152,8 @@
 				<a href="{{ route('admin.shipping.methods.index') }}" class="btn btn-sm btn-outline-success"><i class="las la-shipping-fast"></i> Methods</a>
 				<a href="{{ route('admin.shipping.rules.index') }}" class="btn btn-sm btn-outline-info text-dark"><i class="las la-cog"></i> Rules</a>
 				<a href="{{ route('admin.shipping.cod.index') }}" class="btn btn-sm btn-outline-warning text-dark"><i class="las la-money-bill-wave"></i> COD</a>
+				<a href="{{ route('admin.api.courier.manage') }}" class="btn btn-sm btn-outline-secondary"><i class="las la-truck"></i> Courier</a>
+				<a href="{{ route('admin.locations.index') }}" class="btn btn-sm btn-outline-dark"><i class="las la-map-pin"></i> @lang('Locations')</a>
 			</div>
 		</div>
 	</div>

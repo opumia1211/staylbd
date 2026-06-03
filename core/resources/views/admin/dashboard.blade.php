@@ -84,8 +84,17 @@
                             <a href="{{ url()->current() }}?refresh=1" class="btn btn-sm btn-outline-secondary">
                                 <i class="icon-base bx bx-refresh me-1"></i>@lang('Refresh')
                             </a>
+                            <a href="{{ route('admin.product.hub') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="icon-base bx bx-grid-alt me-1"></i>@lang('Product Center')
+                            </a>
+                            <a href="{{ route('admin.category.hub') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="icon-base bx bx-category me-1"></i>@lang('Category Center')
+                            </a>
                             <a href="{{ route('admin.product.create') }}" class="btn btn-sm btn-primary">
                                 <i class="icon-base bx bx-plus me-1"></i>@lang('Add Product')
+                            </a>
+                            <a href="{{ route('admin.product.general.create') }}" class="btn btn-sm btn-info">
+                                <i class="icon-base bx bx-cloud-upload me-1"></i>@lang('Quick Upload')
                             </a>
                             <a href="{{ route('admin.orders.pending') }}" class="btn btn-sm btn-outline-warning">
                                 <i class="icon-base bx bx-time me-1"></i>@lang('Pending Orders')
@@ -230,6 +239,33 @@
     </div>
 </div>
 
+{{-- ── Business snapshot (all modules at a glance) ───────────── --}}
+<div class="row mb-6 g-3">
+    @php
+    $snapshot = [
+        ['label' => 'Customers', 'val' => $userModule['total_users'] ?? $widget['total_users'] ?? 0, 'icon' => 'bx-user', 'color' => 'primary', 'url' => route('admin.users.all')],
+        ['label' => 'Online Now', 'val' => $userModule['live_online_users'] ?? 0, 'icon' => 'bx-broadcast', 'color' => 'success', 'url' => route('admin.report.activity.live')],
+        ['label' => 'Subscribers', 'val' => $subscriberModule['total_subscriber'] ?? $productModule['total_subscriber'] ?? 0, 'icon' => 'bx-envelope', 'color' => 'info', 'url' => route('admin.subscriber.index')],
+        ['label' => 'Open Tickets', 'val' => $supportModule['open_tickets'] ?? $widget['ticket_pending'] ?? 0, 'icon' => 'bx-support', 'color' => 'warning', 'url' => route('admin.ticket.pending')],
+        ['label' => 'Orders Today', 'val' => $orderModule['orders_today'] ?? 0, 'icon' => 'bx-cart', 'color' => 'danger', 'url' => route('admin.orders.index')],
+        ['label' => 'Shipping Methods', 'val' => $productModule['total_shipping_methods'] ?? 0, 'icon' => 'bx-package', 'color' => 'secondary', 'url' => route('admin.shipping.index')],
+    ];
+    @endphp
+    @foreach($snapshot as $snap)
+    <div class="col-6 col-md-4 col-xl-2">
+        <a href="{{ $snap['url'] }}" class="text-decoration-none">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body py-3 text-center">
+                    <i class="icon-base {{ $snap['icon'] }} text-{{ $snap['color'] }} mb-1" style="font-size:1.5rem;"></i>
+                    <div class="fw-bold fs-5 text-dark">{{ $snap['val'] }}</div>
+                    <small class="text-muted">@lang($snap['label'])</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    @endforeach
+</div>
+
 {{-- ── Charts Row: Monthly Sale + Transactions + Orders + Sales ─ --}}
 <div class="row mb-6">
     {{-- Monthly Bar Chart --}}
@@ -342,9 +378,13 @@
                 <div class="row g-3">
                     @php
                     $prodStats = [
+                        ['label'=>'Total',       'val'=>($productModule['total_products'] ?? $widget['total_products'] ?? 0),                   'color'=>'dark'],
                         ['label'=>'Active',      'val'=>($productModule['active_products'] ?? 0),                                           'color'=>'success'],
                         ['label'=>'Draft',       'val'=>($productModule['draft_products'] ?? 0),                                             'color'=>'secondary'],
+                        ['label'=>'Low Stock',   'val'=>($productModule['low_stock_products_count'] ?? $widget['low_stock_count'] ?? 0),     'color'=>'warning'],
+                        ['label'=>'Out of Stock','val'=>($productModule['out_of_stock_products'] ?? 0),                                       'color'=>'danger'],
                         ['label'=>'Featured',    'val'=>($productModule['featured_products'] ?? $widget['product_featured']) ?? 0,            'color'=>'warning'],
+                        ['label'=>'Today Deals', 'val'=>($productModule['product_today_deals'] ?? 0),                                         'color'=>'info'],
                         ['label'=>'Categories',  'val'=>($productModule['total_category'] ?? $widget['total_category']) ?? 0,                 'color'=>'primary'],
                         ['label'=>'Subcategories','val'=>($productModule['total_subcategory'] ?? $widget['total_subcategory']) ?? 0,          'color'=>'info'],
                         ['label'=>'Brands',      'val'=>($productModule['total_brands'] ?? $widget['total_brands']) ?? 0,                    'color'=>'danger'],

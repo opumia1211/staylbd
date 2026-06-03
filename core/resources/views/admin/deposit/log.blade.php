@@ -15,48 +15,60 @@
 @section('panel')
     <div class="row justify-content-center">
         @if(isset($successful) || isset($pending) || isset($rejected) || isset($initiated))
+            @php
+                $paymentStatCards = [
+                    [
+                        'route' => 'admin.deposit.successful',
+                        'amount' => $successful ?? 0,
+                        'label' => __('Successful Payment'),
+                        'icon' => 'las la-check-double',
+                        'bg' => '#28c76f',
+                        'active_route' => 'admin.deposit.successful',
+                    ],
+                    [
+                        'route' => 'admin.deposit.pending',
+                        'amount' => $pending ?? 0,
+                        'label' => __('Pending Payment'),
+                        'icon' => 'las la-clock',
+                        'bg' => '#ff9f43',
+                        'active_route' => 'admin.deposit.pending',
+                    ],
+                    [
+                        'route' => 'admin.deposit.rejected',
+                        'amount' => $rejected ?? 0,
+                        'label' => __('Rejected Payment'),
+                        'icon' => 'las la-times-circle',
+                        'bg' => '#ea5455',
+                        'active_route' => 'admin.deposit.rejected',
+                    ],
+                    [
+                        'route' => 'admin.deposit.initiated',
+                        'amount' => $initiated ?? 0,
+                        'label' => __('Initiated Payment'),
+                        'icon' => 'las la-hourglass-start',
+                        'bg' => '#566a7f',
+                        'active_route' => 'admin.deposit.initiated',
+                    ],
+                ];
+            @endphp
             <div class="col-12 mb-4">
-                <div class="row g-3">
+                <div class="row g-3 payment-stat-row">
+                    @foreach($paymentStatCards as $stat)
                     <div class="col-xxl-3 col-sm-6">
-                        <a href="{{ route('admin.deposit.successful') }}" class="text-decoration-none">
-                            <div class="widget-two box--shadow2 b-radius--5 bg--success h-100">
-                                <div class="widget-two__content p-4">
-                                    <h2 class="text-white mb-0">{{ $general->cur_sym ?? '' }}{{ showAmount($successful ?? 0) }}</h2>
-                                    <p class="text-white opacity-90 mb-0 mt-1 small">@lang('Successful Payment')</p>
+                        <a href="{{ route($stat['route']) }}" class="text-decoration-none d-block h-100">
+                            <div class="payment-stat-card h-100 {{ menuActive($stat['active_route']) ? 'payment-stat-card--active' : '' }}"
+                                 style="--payment-stat-bg: {{ $stat['bg'] }};">
+                                <div class="payment-stat-card__body">
+                                    <span class="payment-stat-card__icon"><i class="{{ $stat['icon'] }}"></i></span>
+                                    <div class="payment-stat-card__text">
+                                        <span class="payment-stat-card__amount">{{ $general->cur_sym ?? '' }}{{ showAmount($stat['amount']) }}</span>
+                                        <span class="payment-stat-card__label">{{ $stat['label'] }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </a>
                     </div>
-                    <div class="col-xxl-3 col-sm-6">
-                        <a href="{{ route('admin.deposit.pending') }}" class="text-decoration-none">
-                            <div class="widget-two box--shadow2 b-radius--5 bg--6 h-100">
-                                <div class="widget-two__content p-4">
-                                    <h2 class="text-white mb-0">{{ $general->cur_sym ?? '' }}{{ showAmount($pending ?? 0) }}</h2>
-                                    <p class="text-white opacity-90 mb-0 mt-1 small">@lang('Pending Payment')</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-xxl-3 col-sm-6">
-                        <a href="{{ route('admin.deposit.rejected') }}" class="text-decoration-none">
-                            <div class="widget-two box--shadow2 b-radius--5 bg--pink h-100">
-                                <div class="widget-two__content p-4">
-                                    <h2 class="text-white mb-0">{{ $general->cur_sym ?? '' }}{{ showAmount($rejected ?? 0) }}</h2>
-                                    <p class="text-white opacity-90 mb-0 mt-1 small">@lang('Rejected Payment')</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-xxl-3 col-sm-6">
-                        <a href="{{ route('admin.deposit.initiated') }}" class="text-decoration-none">
-                            <div class="widget-two box--shadow2 b-radius--5 bg--dark h-100">
-                                <div class="widget-two__content p-4">
-                                    <h2 class="text-white mb-0">{{ $general->cur_sym ?? '' }}{{ showAmount($initiated ?? 0) }}</h2>
-                                    <p class="text-white opacity-90 mb-0 mt-1 small">@lang('Initiated Payment')</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         @endif
@@ -169,6 +181,56 @@
             </div>
         </div>
     </div>
+@push('style')
+<style>
+    .payment-stat-card {
+        border-radius: 0.5rem;
+        background: var(--payment-stat-bg, #0e9f90);
+        box-shadow: 0 4px 14px rgba(67, 89, 113, 0.15);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .payment-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(67, 89, 113, 0.2);
+    }
+    .payment-stat-card--active {
+        outline: 3px solid rgba(14, 159, 144, 0.45);
+        outline-offset: 2px;
+    }
+    .payment-stat-card__body {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.35rem;
+    }
+    .payment-stat-card__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+    .payment-stat-card__amount {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: #ffffff !important;
+    }
+    .payment-stat-card__label {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.95) !important;
+    }
+</style>
+@endpush
 @endsection
 
 @push('breadcrumb-plugins')

@@ -1,5 +1,5 @@
-﻿<!doctype html>
-<html lang="en" class="layout-navbar-fixed layout-menu-fixed layout-compact " dir="ltr" data-skin="default"
+<!doctype html>
+<html lang="en" class="admin-panel-root layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr" data-skin="default"
   data-assets-path="{{ url('assets/admin-ui') }}/" data-template="horizontal-menu-template" data-bs-theme="light">
 
 <head>
@@ -9,8 +9,8 @@
   <title>{{ $general->siteName($pageTitle ?? '') }}</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  @php 
-    $adminFavicon = getLogo('favicon'); 
+  @php
+    $adminFavicon = getLogo('favicon');
     // Fix for subdirectory asset pathing
     $assetBase = str_replace('/core/public', '', url('/'));
     if (str_ends_with($assetBase, '/')) {
@@ -19,26 +19,26 @@
   @endphp
   <link rel="icon" type="image/x-icon" href="{{ $adminFavicon }}" />
 
-  @php
-    $adminAssetVer = config('app.asset_version', '1');
-    try {
-        $adminTwUtilities = mix('css/admin-tailwind-utilities.css');
-    } catch (\Throwable $e) {
-        $adminTwUtilities = asset('css/admin-tailwind-utilities.css') . '?v=' . $adminAssetVer;
-    }
-  @endphp
-  @include('partials.inter-font-preload', ['assetVersion' => $adminAssetVer, 'interPreloadMode' => 'admin-heavy'])
+  @include('partials.inter-font-preload', ['interPreloadMode' => 'admin-heavy'])
 
+  <!-- Tailwind CSS Library Integration -->
+  <script src="{{ $assetBase }}/assets/global/js/tailwind.min.js"></script>
   <script>
-    (function () {
-      try {
-        var key = 'admin-bs-theme';
-        var stored = localStorage.getItem(key) || 'light';
-        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var resolved = stored === 'system' ? (dark ? 'dark' : 'light') : stored;
-        document.documentElement.setAttribute('data-bs-theme', resolved);
-      } catch (e) { /* ignore */ }
-    })();
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              teal: '#0e9f90',
+              hover: '#0c8a7d',
+            }
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
   </script>
 
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/fonts/iconify-icons.css" />
@@ -49,9 +49,10 @@
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/pickr/pickr-themes.css" />
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/css/core.css" />
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/css/demo.css" />
-  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin/css/admin-light-contrast.css?v={{ $adminAssetVer }}" />
-  {{-- Local Tailwind utilities (compiled, preflight off) — after Sneat so layout stays intact --}}
-  <link rel="stylesheet" href="{{ $adminTwUtilities }}">
+  <link rel="stylesheet" href="{{ $assetBase }}/core/public/css/admin-menu-horizontal.css?v=stayl101">
+  <link rel="stylesheet" href="{{ $assetBase }}/core/public/css/admin-layout-fix.css?v=stayl101">
+  <link rel="stylesheet" href="{{ $assetBase }}/assets/admin/css/admin-light-contrast.css?v=4">
+  <link rel="stylesheet" href="{{ route('serve.css.admin.panel') }}?v=stayl101">
 
   <!-- Vendors CSS -->
   <link rel="stylesheet" href="{{ $assetBase }}/assets/admin-ui/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
@@ -166,87 +167,70 @@
       border: 1px solid rgba(67, 89, 113, 0.1) !important;
       border-radius: 8px !important;
       padding: 0.5rem 0 !important;
-      z-index: 1100 !important;
+      z-index: 1115 !important;
       min-width: 230px !important;
       list-style: none !important;
       margin: 0 !important;
+      pointer-events: auto !important;
+      transition: none !important;
+      animation: none !important;
     }
 
-    .layout-menu-horizontal .menu-inner > .menu-item > .menu-sub,
-    .layout-menu-horizontal .menu-sub.menu-sub--scroll,
-    .layout-menu-horizontal .menu-item.menu-payment-panel > .menu-sub,
-    .layout-menu-horizontal .menu-item.menu-finance-panel > .menu-sub {
-      max-height: min(72vh, 520px) !important;
-      overflow-x: hidden !important;
+    /* Instant open on hover (no Sneat delay) */
+    .layout-menu-horizontal.menu-no-animation .menu-inner > .menu-item:hover > .menu-sub,
+    .layout-menu-horizontal.menu-no-animation .menu-inner > .menu-item.open > .menu-sub {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    #layout-menu .menu-horizontal-wrapper {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    #layout-menu .menu-horizontal-wrapper::-webkit-scrollbar {
+      display: none;
+      height: 0;
+    }
+
+    .layout-wrapper.layout-horizontal .content-wrapper,
+    .layout-wrapper.layout-horizontal .container-p-y {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Long dropdowns (Catalog, Sections): scroll so all items visible at 100% zoom */
+    .layout-menu-horizontal .menu-sub.menu-sub-scrollable {
+      max-height: min(70vh, 26rem) !important;
       overflow-y: auto !important;
+      overflow-x: hidden !important;
       overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(14, 159, 144, 0.55) #eef1f4;
     }
 
-    /* Orders / Payment long menus: wider + readable sections */
-    .layout-menu-horizontal .menu-sub.menu-orders-panel,
-    .layout-menu-horizontal .menu-item.menu-payment-panel > .menu-sub {
-      min-width: 16.5rem !important;
+    .layout-menu-horizontal .menu-sub.menu-sub-scrollable::-webkit-scrollbar {
+      width: 8px;
     }
 
-    .layout-menu-horizontal .menu-sub.menu-orders-panel {
-      max-height: min(78vh, 600px) !important;
+    .layout-menu-horizontal .menu-sub.menu-sub-scrollable::-webkit-scrollbar-track {
+      background: #eef1f4;
+      border-radius: 4px;
+      margin: 4px 0;
     }
 
-    /* Inside scroll dropdowns: nested submenus stack vertically (no right flyout) */
-    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item > .menu-sub {
-      display: none !important;
-      position: static !important;
-      left: auto !important;
-      top: auto !important;
-      margin: 0 0 0.35rem 0 !important;
-      padding: 0.25rem 0 0.25rem 0.75rem !important;
-      box-shadow: none !important;
-      border: none !important;
-      border-left: 2px solid rgba(14, 159, 144, 0.4) !important;
-      border-radius: 0 !important;
-      background: rgba(14, 159, 144, 0.04) !important;
-      min-width: 100% !important;
+    .layout-menu-horizontal .menu-sub.menu-sub-scrollable::-webkit-scrollbar-thumb {
+      background: rgba(14, 159, 144, 0.45);
+      border-radius: 4px;
     }
 
-    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item.open > .menu-sub,
-    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item.active.open > .menu-sub {
-      display: block !important;
-    }
-
-    .layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-sub .menu-link {
-      padding: 0.5rem 1rem 0.5rem 1.15rem !important;
-      font-size: 0.875rem !important;
-    }
-
-    .layout-menu-horizontal .menu-sub .menu-item-header:first-child,
-    .layout-menu-horizontal .menu-sub .menu-section-label:first-child {
-      border-top: none !important;
-      margin-top: 0 !important;
-    }
-
-    .layout-menu-horizontal .menu-sub .menu-item:not(.active) > .menu-link {
-      color: #384551 !important;
-    }
-
-    .layout-menu-horizontal .menu-sub .menu-item.active > .menu-link {
-      color: #0a6b62 !important;
-      font-weight: 600 !important;
-      background-color: rgba(14, 159, 144, 0.12) !important;
-    }
-
-    .layout-menu-horizontal .menu-sub .menu-item-header,
-    .layout-menu-horizontal .menu-sub .menu-section-label {
-      color: #384551 !important;
-      opacity: 1 !important;
-      font-weight: 700 !important;
-      font-size: 0.7rem !important;
-      letter-spacing: 0.06em !important;
-      border-top: 1px solid rgba(67, 89, 113, 0.12);
-      background: linear-gradient(180deg, #f8f9fb 0%, transparent 100%);
+    .layout-menu-horizontal .menu-sub.menu-sub-scrollable::-webkit-scrollbar-thumb:hover {
+      background: rgba(14, 159, 144, 0.75);
     }
 
     .layout-menu-horizontal .menu-sub .menu-link {
-      color: #384551 !important;
+      color: #435971 !important;
       padding: 0.65rem 1.25rem !important;
       font-weight: 500 !important;
       font-size: 0.9375rem !important;
@@ -267,10 +251,15 @@
       width: 1.25rem !important;
       text-align: center !important;
     }
-    
+
     .layout-menu-horizontal .menu-sub .menu-item-header {
-      padding: 0.75rem 1.25rem 0.35rem !important;
+      color: #a1acb8 !important;
+      font-weight: 700 !important;
+      font-size: 0.75rem !important;
       text-transform: uppercase !important;
+      letter-spacing: 0.8px !important;
+      padding: 0.85rem 1.25rem 0.35rem !important;
+      opacity: 0.8 !important;
     }
 
     .layout-menu-horizontal .menu-sub .menu-toggle::after {
@@ -316,7 +305,7 @@
     .layout-menu-horizontal .menu-item.active > .menu-link.menu-toggle {
       color: #0e9f90 !important;
     }
-    
+
     .layout-menu-horizontal .menu-item.active > .menu-link.menu-toggle::after {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230e9f90' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
       opacity: 1 !important;
@@ -340,7 +329,7 @@
     .layout-menu-horizontal .menu-inner > .menu-item.active > .menu-link i {
       color: #0e9f90 !important;
     }
-    
+
     /* Hover effect for top-level items on white background */
     .layout-menu-horizontal .menu-inner > .menu-item:hover > .menu-link {
       background: rgba(14, 159, 144, 0.05) !important;
@@ -399,7 +388,7 @@
         justify-content: flex-start !important;
         flex-wrap: nowrap !important;
       }
-      
+
       .layout-menu-horizontal .menu-inner > .menu-item > .menu-link {
         padding-left: 0.9rem !important;
         padding-right: 0.9rem !important;
@@ -424,40 +413,57 @@
       transition: all 0.2s ease !important;
     }
 
-    [data-bs-theme="dark"] .layout-navbar {
-      background: rgba(43, 44, 64, 0.95) !important;
-    }
-
-    [data-bs-theme="dark"] .bg-menu-theme {
-      background-color: #2b2c40 !important;
-      color: #e7e9f1 !important;
-    }
-
-    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub {
-      background-color: #32334a !important;
-      border-color: rgba(255, 255, 255, 0.08) !important;
-    }
-
-    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-item:not(.active) > .menu-link {
-      color: #e7e9f1 !important;
-    }
-
-    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-item-header,
-    [data-bs-theme="dark"] .layout-menu-horizontal .menu-sub .menu-section-label {
-      color: #d5d7de !important;
-    }
-
-    [data-bs-theme="dark"] .search-results-pane {
-      background: #32334a !important;
-      color: #e7e9f1 !important;
-    }
   </style>
 
   @stack('style-lib')
   @stack('style')
+
+  {{-- Must load last: removes gap below fixed menubar (overrides Sneat core + demo) --}}
+  <style id="stayl-admin-header-gap-fix">
+    .layout-wrapper.layout-horizontal .layout-container {
+      display: block !important;
+      padding-top: 0 !important;
+    }
+    .layout-wrapper.layout-horizontal .layout-page {
+      margin-top: calc(4rem + 3.25rem) !important;
+      padding-top: 0 !important;
+    }
+    .layout-wrapper.layout-horizontal #layout-navbar {
+      position: fixed !important;
+      top: 0 !important;
+      height: 4rem !important;
+      max-height: 4rem !important;
+      margin: 0 !important;
+    }
+    .layout-wrapper.layout-horizontal #layout-menu {
+      position: fixed !important;
+      top: 4rem !important;
+      height: 3.25rem !important;
+      max-height: 3.25rem !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .layout-wrapper.layout-horizontal .layout-page > .content-wrapper {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+      justify-content: flex-start !important;
+    }
+    .layout-wrapper.layout-horizontal .content-wrapper > .container-xxl {
+      padding-top: 0.5rem !important;
+      margin-top: 0 !important;
+    }
+    .container-p-y:not([class^="pt-"]):not([class*=" pt-"]) {
+      padding-top: 0.5rem !important;
+    }
+    .layout-horizontal .layout-page .menu-horizontal + .content-wrapper,
+    .layout-horizontal .layout-page > .menu-horizontal + .content-wrapper {
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+  </style>
 </head>
 
-<body>
+<body class="admin-panel-body font-inter antialiased">
 
   @yield('content')
 
@@ -492,60 +498,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var themeKey = 'admin-bs-theme';
-      var htmlEl = document.documentElement;
-
-      function resolveTheme(mode) {
-        if (mode === 'system' && window.matchMedia) {
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        return mode === 'dark' ? 'dark' : 'light';
-      }
-
-      function applyTheme(mode) {
-        var resolved = resolveTheme(mode);
-        htmlEl.setAttribute('data-bs-theme', resolved);
-        document.querySelectorAll('[data-bs-theme-value]').forEach(function (btn) {
-          btn.classList.toggle('active', btn.getAttribute('data-bs-theme-value') === mode);
-        });
-        var icon = document.querySelector('#nav-theme .theme-icon-active');
-        if (icon) {
-          icon.classList.remove('bx-sun', 'bx-moon', 'bx-desktop');
-          if (mode === 'system') {
-            icon.classList.add('bx-desktop');
-          } else if (resolved === 'dark') {
-            icon.classList.add('bx-moon');
-          } else {
-            icon.classList.add('bx-sun');
-          }
-        }
-      }
-
-      document.querySelectorAll('[data-bs-theme-value]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var mode = btn.getAttribute('data-bs-theme-value') || 'light';
-          try { localStorage.setItem(themeKey, mode); } catch (e) { /* ignore */ }
-          applyTheme(mode);
-        });
-      });
-
-      try {
-        var saved = localStorage.getItem(themeKey) || htmlEl.getAttribute('data-bs-theme') || 'light';
-        applyTheme(saved);
-      } catch (e) {
-        applyTheme('light');
-      }
-
-      if (window.matchMedia) {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-          try {
-            if (localStorage.getItem(themeKey) === 'system') {
-              applyTheme('system');
-            }
-          } catch (err) { /* ignore */ }
-        });
-      }
-
       setInterval(function () {
         var meta = document.querySelector('meta[name="csrf-token"]');
         if (!meta) return;
@@ -555,6 +507,246 @@
           .catch(function () { });
       }, 90000);
     });
+  </script>
+  <script>
+    (function staylFixAdminHeaderGap() {
+      function applyGapFix() {
+        var wrap = document.querySelector('.layout-wrapper.layout-horizontal');
+        var page = wrap && wrap.querySelector('.layout-page');
+        var nav = document.getElementById('layout-navbar');
+        var menu = document.getElementById('layout-menu');
+        if (!wrap || !page || !nav || !menu) return;
+        var navH = 64;
+        var menuH = 52;
+        nav.style.setProperty('position', 'fixed', 'important');
+        nav.style.setProperty('top', '0', 'important');
+        nav.style.setProperty('height', navH + 'px', 'important');
+        nav.style.setProperty('max-height', navH + 'px', 'important');
+        nav.style.setProperty('margin', '0', 'important');
+        menu.style.setProperty('position', 'fixed', 'important');
+        menu.style.setProperty('top', navH + 'px', 'important');
+        menu.style.setProperty('height', menuH + 'px', 'important');
+        menu.style.setProperty('max-height', menuH + 'px', 'important');
+        menu.style.setProperty('margin', '0', 'important');
+        menu.style.setProperty('padding', '0', 'important');
+        
+        var targetTop = navH + menuH;
+        page.style.setProperty('margin-top', targetTop + 'px', 'important');
+        page.style.setProperty('padding-top', '0', 'important');
+        
+        // Measure and compensate for any offset/shift (e.g. margin collapsing or theme offset)
+        var currentTop = page.getBoundingClientRect().top;
+        if (currentTop !== targetTop) {
+          var neededMargin = targetTop + (targetTop - currentTop);
+          page.style.setProperty('margin-top', neededMargin + 'px', 'important');
+        }
+        
+        var cw = page.querySelector(':scope > .content-wrapper');
+        if (cw) {
+          cw.style.setProperty('margin-top', '0', 'important');
+          cw.style.setProperty('padding-top', '0', 'important');
+        }
+        var container = page.querySelector('.content-wrapper > .container-xxl');
+        if (container) {
+          container.style.setProperty('margin-top', '0', 'important');
+          container.style.setProperty('padding-top', '8px', 'important');
+        }
+        
+        // Temporary Diagnostics
+        (function showDiagnostics() {
+          var nav = document.getElementById('layout-navbar');
+          var menu = document.getElementById('layout-menu');
+          var pageEl = document.querySelector('.layout-page');
+          var cw = document.querySelector('.content-wrapper');
+          var containerEl = document.querySelector('.content-wrapper > .container-xxl');
+          var header = document.querySelector('.admin-page-header');
+          
+          var getStyle = function(el, prop) {
+            return el ? window.getComputedStyle(el)[prop] : 'N/A';
+          };
+          
+          var getRect = function(el) {
+            if (!el) return 'N/A';
+            var r = el.getBoundingClientRect();
+            return 'h:' + Math.round(r.height) + ' t:' + Math.round(r.top) + ' b:' + Math.round(r.bottom);
+          };
+          
+          var data = {
+            url: window.location.href,
+            html_class: document.documentElement.className,
+            body_class: document.body.className,
+            nav: getRect(nav) + ' (h:' + getStyle(nav, 'height') + ' pos:' + getStyle(nav, 'position') + ')',
+            menu: getRect(menu) + ' (h:' + getStyle(menu, 'height') + ' pos:' + getStyle(menu, 'position') + ')',
+            page: getRect(pageEl) + ' (mt:' + getStyle(pageEl, 'marginTop') + ' pt:' + getStyle(pageEl, 'paddingTop') + ')',
+            cw: getRect(cw) + ' (mt:' + getStyle(cw, 'marginTop') + ' pt:' + getStyle(cw, 'paddingTop') + ')',
+            container: getRect(containerEl) + ' (mt:' + getStyle(containerEl, 'marginTop') + ' pt:' + getStyle(containerEl, 'paddingTop') + ')',
+            header: getRect(header) + ' (mt:' + getStyle(header, 'marginTop') + ' pt:' + getStyle(header, 'paddingTop') + ')'
+          };
+          
+          fetch('/staylbd/core/public/debug_layout.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+          }).catch(function(err) {});
+        })();
+      }
+      applyGapFix();
+      document.addEventListener('DOMContentLoaded', applyGapFix);
+      window.addEventListener('load', applyGapFix);
+      window.addEventListener('resize', applyGapFix);
+    })();
+
+    (function staylHorizontalMenu() {
+      var closeTimer = null;
+
+      function setWrapperOpen(layoutMenu, on) {
+        var wrap = layoutMenu.querySelector('.menu-horizontal-wrapper');
+        if (wrap) wrap.classList.toggle('is-dropdown-open', on);
+      }
+
+      function openItem(item, allItems) {
+        if (!item) return;
+        clearTimeout(closeTimer);
+        for (var i = 0; i < allItems.length; i++) {
+          if (allItems[i] !== item) allItems[i].classList.remove('open');
+        }
+        item.classList.add('open');
+        setWrapperOpen(item.closest('#layout-menu'), true);
+      }
+
+      function closeAllItems(allItems, layoutMenu) {
+        for (var i = 0; i < allItems.length; i++) allItems[i].classList.remove('open');
+        setWrapperOpen(layoutMenu, false);
+      }
+
+      function keepItemOpen(item, topItems, layoutMenu) {
+        clearTimeout(closeTimer);
+        openItem(item, topItems);
+        setWrapperOpen(layoutMenu, true);
+      }
+
+      function scheduleCloseItem(item, topItems, layoutMenu) {
+        closeTimer = setTimeout(function () {
+          if (item.matches(':hover') || item.querySelector(':scope > .menu-sub:hover')) return;
+          item.classList.remove('open');
+          var stillHover = layoutMenu.querySelector('.menu-inner > .menu-item:hover');
+          setWrapperOpen(layoutMenu, !!stillHover || !!layoutMenu.querySelector('.menu-inner > .menu-item.open'));
+        }, 100);
+      }
+
+      function setupInstantHover(layoutMenu, inner) {
+        if (inner._staylInstantHover) return;
+        inner._staylInstantHover = true;
+        var topItems = inner.querySelectorAll(':scope > .menu-item');
+        var alignEndFrom = Math.max(0, topItems.length - 4);
+        topItems.forEach(function (item, idx) {
+          if (idx >= alignEndFrom) item.classList.add('menu-item--align-end');
+          var toggle = item.querySelector(':scope > .menu-link.menu-toggle');
+          if (!toggle) return;
+          var sub = item.querySelector(':scope > .menu-sub');
+          item.addEventListener('mouseenter', function () { keepItemOpen(item, topItems, layoutMenu); });
+          item.addEventListener('mouseleave', function () { scheduleCloseItem(item, topItems, layoutMenu); });
+          if (sub) {
+            sub.addEventListener('mouseenter', function () { keepItemOpen(item, topItems, layoutMenu); });
+            sub.addEventListener('mouseleave', function () { scheduleCloseItem(item, topItems, layoutMenu); });
+          }
+        });
+        layoutMenu.addEventListener('mouseleave', function () {
+          closeTimer = setTimeout(function () { closeAllItems(topItems, layoutMenu); }, 150);
+        });
+      }
+
+      function setupDropdownLinkClicks(layoutMenu) {
+        if (layoutMenu._staylDropdownLinks) return;
+        layoutMenu._staylDropdownLinks = true;
+        layoutMenu.addEventListener('click', function (e) {
+          var link = e.target.closest('.menu-inner > .menu-item > .menu-sub .menu-link[href]');
+          if (!link || link.getAttribute('href') === 'javascript:void(0)') return;
+          var topItem = link.closest('.menu-inner > .menu-item');
+          if (topItem) topItem.classList.remove('open');
+          setWrapperOpen(layoutMenu, false);
+        });
+      }
+
+      function apply() {
+        var layoutMenu = document.getElementById('layout-menu');
+        if (!layoutMenu || !layoutMenu.classList.contains('menu-horizontal')) return;
+
+        layoutMenu.classList.add('menu-no-animation');
+        layoutMenu.querySelectorAll('.menu-horizontal-prev, .menu-horizontal-next').forEach(function (el) {
+          el.style.display = 'none';
+        });
+
+        var wrap = layoutMenu.querySelector('.menu-horizontal-wrapper');
+        var inner = layoutMenu.querySelector('.menu-inner');
+        if (wrap) {
+          wrap.style.scrollbarWidth = 'none';
+          wrap.style.msOverflowStyle = 'none';
+        }
+        if (inner) {
+          inner.style.marginLeft = '0';
+          inner.style.marginRight = '0';
+          inner.style.transform = 'none';
+          if (inner._ps && typeof inner._ps.destroy === 'function') {
+            try { inner._ps.destroy(); } catch (e) { /* ignore */ }
+          }
+          inner.classList.remove('ps', 'ps--active-y', 'ps--active-x');
+          setupInstantHover(layoutMenu, inner);
+          setupDropdownLinkClicks(layoutMenu);
+        }
+
+        var menuApi = layoutMenu.menuInstance || (window.Helpers && window.Helpers.mainMenu);
+        if (menuApi) {
+          menuApi._animate = false;
+          menuApi._showDropdownOnHover = false;
+          if (menuApi._inner) {
+            menuApi._inner.style.marginLeft = '0';
+            menuApi._inner.style.marginRight = '0';
+          }
+          if (!menuApi._staylPatchedUpdate) {
+            menuApi._staylPatchedUpdate = true;
+            var origUpdate = menuApi.update.bind(menuApi);
+            menuApi.update = function () {
+              if (menuApi._horizontal) {
+                layoutMenu.querySelectorAll('.menu-horizontal-prev, .menu-horizontal-next').forEach(function (el) {
+                  el.style.display = 'none';
+                });
+                if (menuApi._inner) {
+                  menuApi._inner.style.marginLeft = '0';
+                  menuApi._inner.style.marginRight = '0';
+                }
+                return;
+              }
+              return origUpdate();
+            };
+          }
+        }
+
+        if (window.Helpers && !window.Helpers._staylHorizontalMenuScrollPatch) {
+          window.Helpers._staylHorizontalMenuScrollPatch = true;
+          var origScroll = window.Helpers.scrollToActive;
+          window.Helpers.scrollToActive = function () {
+            var menu = document.getElementById('layout-menu');
+            if (menu && menu.classList.contains('menu-horizontal')) {
+              var innerEl = menu.querySelector('.menu-inner');
+              if (innerEl) {
+                innerEl.style.marginLeft = '0';
+                innerEl.style.marginRight = '0';
+              }
+              return;
+            }
+            return origScroll.apply(this, arguments);
+          };
+        }
+      }
+
+      apply();
+      document.addEventListener('DOMContentLoaded', function () {
+        apply();
+        setTimeout(apply, 400);
+      });
+      window.addEventListener('load', apply);
+    })();
   </script>
 </body>
 

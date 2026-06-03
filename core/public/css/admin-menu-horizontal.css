@@ -1,0 +1,226 @@
+/**
+ * Admin horizontal menu — no visible scrollbar, instant dropdowns (local, no CDN).
+ */
+
+/* Header offset + 1920 shell: see admin-layout-fix.css (loaded after this file) */
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-sub {
+    position: absolute !important;
+}
+
+#layout-menu.layout-menu-horizontal .container-xxl {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 1920px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    min-height: 3.25rem !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-horizontal-prev,
+#layout-menu.layout-menu-horizontal .menu-horizontal-next {
+    display: none !important;
+}
+
+/* Horizontal scroll without visible scrollbar (wheel/trackpad still works) */
+#layout-menu.layout-menu-horizontal .menu-horizontal-wrapper {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    inline-size: 100% !important;
+    height: 3.25rem !important;
+    max-height: 3.25rem !important;
+    block-size: 3.25rem !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    position: relative !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-horizontal-wrapper::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+#layout-menu.layout-menu-horizontal .container-xxl::-webkit-scrollbar {
+    display: none !important;
+    height: 0 !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-horizontal-wrapper:has(.menu-item.open),
+#layout-menu.layout-menu-horizontal .menu-horizontal-wrapper:has(.menu-item:hover),
+#layout-menu.layout-menu-horizontal .menu-horizontal-wrapper.is-dropdown-open {
+    overflow: visible !important;
+}
+
+.menu-horizontal .menu-inner,
+#layout-menu.layout-menu-horizontal .menu-inner,
+#layout-menu.layout-menu-horizontal .menu-inner.ps {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    flex: 0 0 auto !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+    align-items: center !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0.25rem 0 !important;
+    overflow: visible !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    list-style: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .ps__rail-x,
+#layout-menu.layout-menu-horizontal .menu-inner > .ps__rail-y,
+#layout-menu.layout-menu-horizontal .menu-inner .ps__rail-y {
+    display: none !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    height: auto !important;
+    align-self: center !important;
+}
+
+/* Instant dropdown — no animation delay */
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-sub,
+#layout-menu.layout-menu-horizontal .menu-sub,
+.layout-menu-horizontal .menu-sub {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    display: none !important;
+    z-index: 1115 !important;
+    pointer-events: auto !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14) !important;
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item.open > .menu-sub,
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item:hover > .menu-sub {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-sub.menu-sub--scroll,
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-sub.menu-sub-scrollable,
+#layout-menu.layout-menu-horizontal .menu-item.menu-payment-panel > .menu-sub,
+#layout-menu.layout-menu-horizontal .menu-sub.menu-orders-panel {
+    max-height: min(72vh, 520px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+}
+
+#layout-menu.layout-menu-horizontal .menu-sub.menu-orders-panel {
+    min-width: 16.5rem !important;
+    max-height: min(78vh, 600px) !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-item.menu-payment-panel > .menu-sub,
+#layout-menu.layout-menu-horizontal .menu-item.menu-shipping-panel > .menu-sub {
+    min-width: 16.5rem !important;
+    max-height: min(78vh, 600px) !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item > .menu-sub,
+#layout-menu.layout-menu-horizontal .menu-sub.menu-sub-scrollable .menu-item > .menu-sub {
+    display: none !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 0 0.35rem 0 !important;
+    padding: 0.25rem 0 0.25rem 0.75rem !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-left: 2px solid rgba(14, 159, 144, 0.4) !important;
+    border-radius: 0 !important;
+    background: rgba(14, 159, 144, 0.04) !important;
+    min-width: 100% !important;
+    z-index: auto !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item.open > .menu-sub,
+#layout-menu.layout-menu-horizontal .menu-sub.menu-sub-scrollable .menu-item.open > .menu-sub,
+#layout-menu.layout-menu-horizontal .menu-sub.menu-sub--scroll .menu-item:hover > .menu-sub {
+    display: block !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-sub .menu-sub {
+    z-index: 1120 !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-link {
+    display: flex !important;
+    align-items: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    min-height: 2.5rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    color: #566a7f !important;
+    font-size: 0.875rem !important;
+    line-height: 1.35 !important;
+    max-width: none !important;
+    overflow: visible !important;
+    padding-left: 0.55rem !important;
+    padding-right: 0.55rem !important;
+    transition: color 0.12s ease, background 0.12s ease !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-link > div {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: inherit !important;
+    white-space: nowrap !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-link .menu-icon,
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item > .menu-link i {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #566a7f !important;
+    margin-right: 0.35rem !important;
+    font-size: 1.1rem !important;
+}
+
+#layout-menu.layout-menu-horizontal .menu-inner > .menu-item.menu-item--align-end > .menu-sub {
+    left: auto !important;
+    right: 0 !important;
+}
+
+#layout-menu.layout-menu-horizontal.menu-no-animation .menu-item,
+#layout-menu.layout-menu-horizontal.menu-no-animation .menu-sub {
+    transition: none !important;
+    animation: none !important;
+}

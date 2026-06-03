@@ -1,7 +1,7 @@
 <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
   <div class="container-xxl">
 
-    <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
+    <div class="navbar-brand app-brand d-none d-xl-flex py-0 me-4">
       <a href="{{ route('admin.dashboard') }}" class="app-brand-link gap-2">
         <span class="app-brand-logo demo" style="width: auto !important; height: auto !important;">
           <img src="{{ getLogo('logo') ?: getImage(getFilePath('logoIcon') . '/logo.png') }}" alt="logo" style="object-fit: contain; height: 38px !important; width: auto !important; max-width: 180px; display: inline-block; vertical-align: middle;">
